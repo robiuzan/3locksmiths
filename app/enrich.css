@@ -92,6 +92,17 @@
 /* ---- Spec/comparison tables: light zebra striping ---- */
 .content-blocks .wp-block-table tbody tr:nth-child(even) { background: rgba(0, 0, 0, 0.03); }
 
+/* ---- Grouped link bands on the generated /services/ and /sitemap/ pages ----
+   (s-services-list is a dark band, so the group headings need the light colour) */
+.content-blocks .s-services-list .enrich-linkgroup__title {
+  color: var(--white-font-color, #fff);
+  font-size: 20px;
+  margin: 0 0 18px;
+  text-align: start;
+}
+.content-blocks .s-services-list .enrich-linkgroup + .enrich-linkgroup { margin-top: 16px; }
+.content-blocks .s-services-list .offer-list > a { min-height: 0; padding: 20px 24px; }
+
 /* ============================================================================
    Recolor "למה לבחור בנו" (.enrich-why) and "למה אנחנו" (.enrich-stats).
    Selectors mirror gogo's depth (or add a class) so they win the cascade.

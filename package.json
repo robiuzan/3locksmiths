@@ -7,8 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "snapshot": "node scripts/scrape.mjs && node scripts/transform.mjs && node scripts/build-manifest.mjs && node scripts/enrich.mjs",
-    "enrich": "node scripts/build-manifest.mjs && node scripts/enrich.mjs"
+    "snapshot": "node scripts/scrape.mjs && node scripts/transform.mjs && node scripts/pages.mjs && node scripts/build-manifest.mjs && node scripts/enrich.mjs && node scripts/fix-links.mjs",
+    "enrich": "node scripts/pages.mjs && node scripts/build-manifest.mjs && node scripts/enrich.mjs && node scripts/fix-links.mjs"
   },
   "dependencies": {
     "@ishub/site-kit": "file:vendor/ishub-site-kit-0.0.0.tgz",

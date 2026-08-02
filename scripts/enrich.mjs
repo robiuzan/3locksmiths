@@ -24,6 +24,16 @@ const LB_ID = `${ORIGIN}/#LocalBusiness`;
 const CITIES = ["תל אביב", "חיפה", "ירושלים", "ראשון לציון", "פתח תקווה", "נתניה", "חולון",
   "רמת גן", "גבעתיים", "בת ים", "באר שבע", "כפר סבא", "רעננה", "חדרה", "קריות"];
 
+// Homepage (id 7) SEO. The WordPress source shipped the bare brand name as <title> (14 chars,
+// under the 15-char floor) and no meta description at all, so both are set here — the homepage
+// has no content/enriched/ module because its <main> is kept exactly as scraped.
+const HOME_ID = 7;
+const HOME_SEO = {
+  title: "מנעולן 24/7 לרכב ולבית – שירות מהיר בפריסה ארצית | שלושה מנעולנים",
+  description:
+    "שלושה מנעולנים – מנעולן מוסמך לרכב ולבית עם מעל 25 שנות ניסיון. שכפול וקידוד מפתחות, פתיחת דלת נעולה והחלפת מנעולים בשטח, בפריסה ארצית. חייגו 055-6601006.",
+};
+
 const site = JSON.parse(readFileSync(SITE, "utf8"));
 const byId = new Map(site.pages.map((p) => [p.id, p]));
 
@@ -134,11 +144,14 @@ for (const data of enriched) {
   injected++;
 }
 
-// LocalBusiness on the homepage (id 7), keep its existing schema.
-const home = byId.get(7);
+// Homepage (id 7): set the missing title/description and prepend LocalBusiness to its schema.
+const home = byId.get(HOME_ID);
 if (home) {
+  home.seo = { ...home.seo, ...HOME_SEO };
   const existing = (home.jsonLd || []).filter((s) => !s.includes('"@id":"' + LB_ID + '"'));
   home.jsonLd = [localBusinessSchema(), ...existing];
+} else {
+  problems.push(`homepage id ${HOME_ID} not in site.json`);
 }
 
 writeFileSync(SITE, JSON.stringify(site, null, 2), "utf8");

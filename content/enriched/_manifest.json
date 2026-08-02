@@ -1,15 +1,7 @@
 {
   "referenceId": 95,
-  "count": 51,
+  "count": 53,
   "lookup": {
-    "1": {
-      "path": "/hello-world/",
-      "title": "Hello world!"
-    },
-    "2": {
-      "path": "/sample-page/",
-      "title": "Sample Page"
-    },
     "7": {
       "path": "/",
       "title": "עמוד הבית"
@@ -237,6 +229,34 @@
     "196": {
       "path": "/services/%d7%9e%d7%95%d7%9c%d7%98%d7%99%d7%9c%d7%95%d7%a7/",
       "title": "מולטילוק"
+    },
+    "9001": {
+      "path": "/contact/",
+      "title": "צור קשר"
+    },
+    "9002": {
+      "path": "/privacy-policy/",
+      "title": "מדיניות פרטיות"
+    },
+    "9003": {
+      "path": "/accessibility-statement/",
+      "title": "הצהרת נגישות"
+    },
+    "9004": {
+      "path": "/sitemap/",
+      "title": "מפת אתר"
+    },
+    "9005": {
+      "path": "/services/",
+      "title": "שירותים"
+    },
+    "9101": {
+      "path": "/services/%d7%aa%d7%99%d7%a7%d7%95%d7%9f-%d7%93%d7%9c%d7%aa%d7%95%d7%aa/",
+      "title": "תיקון דלתות"
+    },
+    "9102": {
+      "path": "/services/%d7%94%d7%97%d7%9c%d7%a4%d7%aa-%d7%9e%d7%a0%d7%a2%d7%95%d7%9c%d7%99%d7%9d/",
+      "title": "החלפת מנעולים"
     }
   },
   "pages": [
@@ -1221,6 +1241,40 @@
       "keyword": "מולטילוק",
       "path": "/services/%d7%9e%d7%95%d7%9c%d7%98%d7%99%d7%9c%d7%95%d7%a7/",
       "canonical": "https://3locksmiths.co.il/services/%d7%9e%d7%95%d7%9c%d7%98%d7%99%d7%9c%d7%95%d7%a7/",
+      "relatedServices": [
+        93,
+        94,
+        96,
+        97,
+        115,
+        95
+      ],
+      "relatedLocations": []
+    },
+    {
+      "id": 9101,
+      "kind": "service",
+      "title": "תיקון דלתות",
+      "keyword": "תיקון דלתות",
+      "path": "/services/%d7%aa%d7%99%d7%a7%d7%95%d7%9f-%d7%93%d7%9c%d7%aa%d7%95%d7%aa/",
+      "canonical": "https://3locksmiths.co.il/services/%d7%aa%d7%99%d7%a7%d7%95%d7%9f-%d7%93%d7%9c%d7%aa%d7%95%d7%aa/",
+      "relatedServices": [
+        93,
+        94,
+        96,
+        97,
+        115,
+        95
+      ],
+      "relatedLocations": []
+    },
+    {
+      "id": 9102,
+      "kind": "service",
+      "title": "החלפת מנעולים",
+      "keyword": "החלפת מנעולים",
+      "path": "/services/%d7%94%d7%97%d7%9c%d7%a4%d7%aa-%d7%9e%d7%a0%d7%a2%d7%95%d7%9c%d7%99%d7%9d/",
+      "canonical": "https://3locksmiths.co.il/services/%d7%94%d7%97%d7%9c%d7%a4%d7%aa-%d7%9e%d7%a0%d7%a2%d7%95%d7%9c%d7%99%d7%9d/",
       "relatedServices": [
         93,
         94,

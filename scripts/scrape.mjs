@@ -276,8 +276,15 @@ async function processPage(meta, captureAssets) {
 // All render real themed pages on the live site, so all must be captured for 1:1.
 const CONTENT_TYPES = ["pages", "posts", "services", "locations", "step"];
 
+// WordPress ships these two demo posts with every install and they were never removed from the
+// source. They carry no business content, are not linked from anywhere on the site, and were
+// indexable dead weight — so they are not captured at all. (scripts/pages.mjs prunes them from
+// an older snapshot too, in case site.json predates this.)
+const SKIP_SLUGS = new Set(["hello-world", "sample-page"]);
+
 async function getAllContent() {
   const out = [];
+  let dropped = 0;
   for (const base of CONTENT_TYPES) {
     let p = 1, totalPages = 1, count = 0;
     do {
@@ -286,12 +293,16 @@ async function getAllContent() {
       if (!r.ok) { console.warn(`  ! ${base} page ${p} -> ${r.status} (skipping)`); break; }
       totalPages = parseInt(r.headers.get("x-wp-totalpages") || "1", 10);
       const batch = await r.json();
-      for (const pg of batch) out.push({ id: pg.id, slug: pg.slug, link: pg.link, title: pg.title.rendered, postType: base });
+      for (const pg of batch) {
+        if (SKIP_SLUGS.has(pg.slug)) { dropped++; continue; }
+        out.push({ id: pg.id, slug: pg.slug, link: pg.link, title: pg.title.rendered, postType: base });
+      }
       count += batch.length;
       p++;
     } while (p <= totalPages);
     console.log(`  ${base}: ${count}`);
   }
+  if (dropped) console.log(`  (skipped ${dropped} WordPress demo post(s): ${[...SKIP_SLUGS].join(", ")})`);
   return out;
 }
 

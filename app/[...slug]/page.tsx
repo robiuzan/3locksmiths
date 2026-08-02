@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import SiteFrame from "@/components/SiteFrame";
 import { getContentPages, getPageBySegments, buildMetadata } from "@/lib/content";
 
-// Catch-all route mirroring every WordPress permalink (e.g. /מנעולן-רכב/, /מחירון/, /sample-page/).
+// Catch-all route mirroring every WordPress permalink (e.g. /מנעולן-רכב/, /מחירון/, /services/מולטילוק/).
 // Only the snapshotted pages are generated; any other path 404s (strict 1:1 URL structure).
 export const dynamicParams = false;
 
