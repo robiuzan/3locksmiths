@@ -3,7 +3,7 @@
  * Documentation/type-checking only — the data is plain `.mjs` consumed by scripts/enrich.mjs
  * at build time (the Next app renders the resulting site.json, not these modules).
  */
-export type PageKind = "service" | "brand-key" | "location" | "core";
+export type PageKind = "service" | "brand-key" | "location" | "core" | "guide";
 
 export interface RelatedLink {
   label: string;
@@ -86,6 +86,11 @@ export interface EnrichedPage {
   faq: { subtitle?: string; items: FaqItem[] };
   related: { services: RelatedLink[]; locations: RelatedLink[] };
   cta: { heading: string; body?: string };
+
+  // Guide pages (kind: "guide") — editorial content under /מדריכים/. Drive Article schema.
+  datePublished?: string; // ISO date
+  dateModified?: string; // ISO date
+  authorName?: string; // 🔶 a REAL named person only — never invent a byline
 
   // Optional value-add sections (see render.mjs). Absent → section skipped.
   process?: ProcessStep[];

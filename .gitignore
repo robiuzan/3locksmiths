@@ -16,6 +16,8 @@
 # next.js
 /.next/
 /out/
+# ops/deploy-site.ps1 preserves the previous export here for one-command rollback.
+/out.prev/
 
 # production
 /build

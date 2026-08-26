@@ -11,7 +11,9 @@
  * handled correctly by reading the `X-WP-TotalPages` response header so nothing is missed.
  */
 
-export const WP_URL = (process.env.NEXT_PUBLIC_WP_URL ?? "https://3locksmiths.co.il").replace(/\/+$/, "");
+export const WP_URL = (
+  process.env.NEXT_PUBLIC_WP_URL ?? "https://3locksmiths.co.il"
+).replace(/\/+$/, "");
 export const WP_API = `${WP_URL}/wp-json/wp/v2`;
 
 export interface WP_Rendered {
@@ -86,7 +88,8 @@ export async function fetchAllPaginated<T>(path: string, perPage = 100): Promise
     const res = await fetch(`${WP_API}/${path}${sep}per_page=${perPage}&page=${page}`, {
       headers: { Accept: "application/json" },
     });
-    if (!res.ok) throw new Error(`WP REST "${path}" failed: ${res.status} ${res.statusText}`);
+    if (!res.ok)
+      throw new Error(`WP REST "${path}" failed: ${res.status} ${res.statusText}`);
     totalPages = parseInt(res.headers.get("x-wp-totalpages") ?? "1", 10) || 1;
     out.push(...((await res.json()) as T[]));
     page += 1;
@@ -107,7 +110,9 @@ export function getMedia(): Promise<WP_Media[]> {
 }
 
 export async function getPage(id: number): Promise<WP_Page> {
-  const res = await fetch(`${WP_API}/pages/${id}`, { headers: { Accept: "application/json" } });
+  const res = await fetch(`${WP_API}/pages/${id}`, {
+    headers: { Accept: "application/json" },
+  });
   if (!res.ok) throw new Error(`WP page ${id} failed: ${res.status}`);
   return (await res.json()) as WP_Page;
 }
@@ -124,7 +129,13 @@ export async function getMenu(slug: string): Promise<WP_MenuItem[]> {
     });
     if (!res.ok) return [];
     const data = (await res.json()) as {
-      items?: { ID: number; title: string; url: string; menu_item_parent: string; menu_order: number }[];
+      items?: {
+        ID: number;
+        title: string;
+        url: string;
+        menu_item_parent: string;
+        menu_order: number;
+      }[];
     };
     return (data.items ?? []).map((i) => ({
       id: i.ID,

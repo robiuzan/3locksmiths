@@ -14,7 +14,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return pages
     .filter((p) => p.seo?.canonical && !excluded(p.path))
     .map((p) => {
-      const isContent = p.path.startsWith("/services/") || p.path.startsWith("/locations/");
+      const isContent =
+        p.path.startsWith("/services/") || p.path.startsWith("/locations/");
       return {
         url: p.seo.canonical as string,
         changeFrequency: (p.isFront ? "weekly" : "monthly") as "weekly" | "monthly",

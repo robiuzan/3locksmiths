@@ -1,0 +1,160 @@
+name: CI
+
+# Build-only. This workflow does NOT deploy.
+#
+# Production is Cloudflare Pages (project `3locksmiths`) via wrangler direct upload
+# (`ops/deploy-site.ps1` in the Israeli services sites hub) - see CLAUDE.md §10.
+# The sibling `deploy.yml` publishes to GitHub Pages, which is a SECOND, STALE live
+# origin (backlog §12.1). A green check here has never meant "shipped".
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+
+      - name: Lint
+        run: npm run lint
+      - name: Type-check
+        run: npm run typecheck
+      - name: Format check
+        run: npm run format:check
+
+      # content/site.json must be newer than every module and script that feeds it. A stale
+      # artifact builds and deploys SILENTLY with the previous copy — that happened on
+      # 2026-08-25. See scripts/check-freshness.mjs.
+      - name: Assert content is not stale
+        run: node scripts/check-freshness.mjs
+
+      # NOTE: `build` only. `npm run snapshot` re-scrapes the live WordPress origin and
+      # must never run in CI - it would rewrite content/site.json from whatever the old
+      # site serves today.
+      - name: Build static export
+        run: npm run build
+
+      # ---------------------------------------------------------------------------
+      # BLOCKING: invariants that pass today. These exist to stop a regression.
+      # ---------------------------------------------------------------------------
+      - name: Assert the export
+        run: |
+          set -euo pipefail
+
+          routes=$(find out -name index.html | wc -l)
+          urls=$(grep -c '<url>' out/sitemap.xml)
+          echo "routes=$routes sitemap_urls=$urls"
+          test "$routes" -ge 66 || { echo "::error::expected >=66 emitted routes, got $routes"; exit 1; }
+          test "$urls" -ge 60 || { echo "::error::expected >=60 sitemap URLs, got $urls"; exit 1; }
+
+          # Exactly one <h1> per page. scripts/enrich.mjs enforces this for the 53 authored
+          # pages; this covers the other 13 too.
+          bad_h1=0
+          while IFS= read -r f; do
+            n=$(grep -o '<h1' "$f" | wc -l)
+            if [ "$n" -ne 1 ]; then echo "::error::$f has $n <h1>"; bad_h1=1; fi
+          done < <(find out -name index.html -not -path 'out/404/*' -not -path 'out/_not-found/*')
+          test "$bad_h1" -eq 0
+
+          # Every real page carries a self-referencing canonical. /thank-you/ is excluded:
+          # it is the noindex form-success redirect target, deliberately uncanonicalized.
+          missing=$(find out -name index.html -not -path 'out/404/*' -not -path 'out/_not-found/*' \
+            -not -path 'out/thank-you/*' -exec grep -L 'rel="canonical"' {} + || true)
+          if [ -n "$missing" ]; then echo "::error::missing canonical:"; echo "$missing"; exit 1; fi
+
+          # Ratings must never ship without a verifiable public source (docs/schema-graph.md §4.4).
+          if grep -rl 'aggregateRating\|"@type": *"Review"' out --include=index.html | grep -q .; then
+            echo "::error::Review/aggregateRating present - must be sourced, see docs/business-facts.md §B"; exit 1
+          fi
+
+          # Nothing unreferenced and huge in the JS payload.
+          if find out -name '*.js' -size +1M | grep -q .; then
+            find out -name '*.js' -size +1M -exec ls -lh {} \;
+            echo "::error::JS bundle over 1 MB in the export"; exit 1
+          fi
+
+      # §9.2 - every emitted route must have an inbound internal link. The footer was
+      # rebuilt 2026-08-25 to reach both silos; this stops it silently regressing.
+      - name: Assert no orphaned routes
+        run: node scripts/check-orphans.mjs
+
+      - name: Assert titles and descriptions are unique
+        run: |
+          set -euo pipefail
+          dupes=$(grep -rho '<title>[^<]*</title>' out --include=index.html \
+            | grep -v 'could not be found' | sort | uniq -d || true)
+          if [ -n "$dupes" ]; then echo "::error::duplicate <title>:"; echo "$dupes"; exit 1; fi
+
+      # ---------------------------------------------------------------------------
+      # BLOCKING: defects fixed on 2026-08-17 (backlog §4.1, §4.2, §8.1, §2.1, §13.3).
+      # These checks were promoted from a non-blocking "known defects" step the day the
+      # fixes shipped, so none of them can come back silently.
+      # ---------------------------------------------------------------------------
+      - name: Assert the conversion path and structured data
+        run: |
+          set -euo pipefail
+
+          # §4.1 - every ld+json block must parse. scripts/enrich.mjs repairs/drops scraped
+          # blocks with raw control chars; this asserts nothing slipped through.
+          node -e '
+            const fs=require("fs"),path=require("path");const files=[];
+            (function w(d){for(const e of fs.readdirSync(d,{withFileTypes:true})){
+              const p=path.join(d,e.name); e.isDirectory()?w(p):e.name==="index.html"&&files.push(p);}})("out");
+            let bad=0;
+            for(const f of files){const h=fs.readFileSync(f,"utf8");
+              for(const m of h.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)){
+                try{JSON.parse(m[1]);}catch{bad++;console.log("::error::unparseable JSON-LD in "+f);}}}
+            console.log("unparseable JSON-LD blocks: "+bad);
+            process.exit(bad?1:0);'
+
+          # §8.1 - dead click-to-call from an unresolved WordPress [phone] shortcode.
+          n=$(grep -rho 'tel:%5Bphone%5D\|tel:\[phone\]' out --include=index.html | wc -l)
+          if [ "$n" -gt 0 ]; then echo "::error::$n dead tel:[phone] links (backlog §8.1)"; exit 1; fi
+
+          # §4.2 - the personal address must never reappear, in schema OR visible chrome.
+          if grep -rl 'robiuzan@gmail.com' out --include=index.html | grep -q .; then
+            echo "::error::personal email in the export (backlog §4.2)"; exit 1
+          fi
+
+          # §2.1 - the brand must appear exactly once per <title>.
+          node -e '
+            const fs=require("fs"),path=require("path");const files=[];
+            (function w(d){for(const e of fs.readdirSync(d,{withFileTypes:true})){
+              const p=path.join(d,e.name); e.isDirectory()?w(p):e.name==="index.html"&&files.push(p);}})("out");
+            const brand="שלושה מנעולנים";let bad=0;
+            for(const f of files){const h=fs.readFileSync(f,"utf8");
+              const t=(h.match(/<title>([^<]*)<\/title>/)||[])[1]||"";
+              if(t.split(brand).length-1>1){bad++;console.log("::error::doubled brand in title: "+t);}}
+            process.exit(bad?1:0);'
+
+          # §13.3 - per-surface CTA tracking: several distinct data-cta values, and the
+          # homepage must carry at least one tracked CTA.
+          vals=$(grep -rho 'data-cta="[^"]*"' out --include=index.html | sort -u | wc -l)
+          echo "distinct data-cta values: $vals"
+          if [ "$vals" -lt 5 ]; then echo "::error::only $vals distinct data-cta values - per-surface tracking regressed (backlog §13.3)"; exit 1; fi
+          if ! grep -q 'data-cta=' out/index.html; then
+            echo "::error::homepage has no tracked CTA (backlog §13.3)"; exit 1
+          fi
+
+          # §8.6 - every Web3Forms form redirects to the thank-you conversion page.
+          if grep -rl 'api.web3forms.com' out --include=index.html \
+            | xargs grep -L 'name="redirect"' | grep -q .; then
+            echo "::error::Web3Forms form(s) missing the /thank-you/ redirect (backlog §8.6)"; exit 1
+          fi
+          test -f out/thank-you/index.html || { echo "::error::/thank-you/ route missing"; exit 1; }

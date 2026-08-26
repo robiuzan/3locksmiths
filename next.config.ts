@@ -2,7 +2,8 @@ import type { NextConfig } from "next";
 
 const wpHost = (() => {
   try {
-    return new URL(process.env.NEXT_PUBLIC_WP_URL ?? "https://3locksmiths.co.il").hostname;
+    return new URL(process.env.NEXT_PUBLIC_WP_URL ?? "https://3locksmiths.co.il")
+      .hostname;
   } catch {
     return "3locksmiths.co.il";
   }

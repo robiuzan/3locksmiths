@@ -31,10 +31,49 @@ const REMAP = new Map([
 /** Link prefixes with no migrated destination — the anchor becomes plain text. */
 const UNLINK = [/^\/author\//, /^\/category\//, /^\/tag\//];
 
-const ASSET = /\.(png|jpe?g|gif|svg|webp|avif|ico|css|js|mjs|woff2?|ttf|eot|pdf|xml|txt|zip)$/i;
+const ASSET =
+  /\.(png|jpe?g|gif|svg|webp|avif|ico|css|js|mjs|woff2?|ttf|eot|pdf|xml|txt|zip)$/i;
 const NON_ROUTE = /^(tel:|mailto:|whatsapp:|sms:|javascript:|data:|#)/i;
 
 const site = JSON.parse(readFileSync(FILE, "utf8"));
+
+// --- conversion-path repair config (backlog §8.1, §8.6, §13.3) ---
+// NAP comes from the manifest; the WordPress scrape shipped four spellings of the one
+// business number, three of them non-E.164 and one a dead unresolved [phone] shortcode.
+const manifest = JSON.parse(readFileSync(join(ROOT, "site.config.json"), "utf8"));
+const PHONE_TEL = manifest.contact?.phoneE164 ?? "+972556601006";
+const PHONE_DIGITS = PHONE_TEL.replace(/\D/g, ""); // 972556601006
+const PHONE_LOCAL = "0" + PHONE_DIGITS.slice(3); // 0556601006
+// Web3Forms full-page redirect on success — the site's only URL-based conversion signal.
+// English path matching /contact/ etc.; a Hebrew route directory breaks the Next 16 exporter
+// (see app/thank-you/page.tsx).
+const THANK_YOU_URL = "https://3locksmiths.co.il/thank-you/";
+// The scraped WordPress chrome displayed a PERSONAL Gmail as the business contact — visible
+// caption text and mailto: on every page (backlog §4.2 was the schema instance of the same
+// defect). Replaced sitewide with the manifest email. 🔶 confirm info@ deliverability —
+// the manifest lists "email" under _needsConfirmation.
+const EMAIL = manifest.contact?.email ?? "";
+const LEGACY_EMAILS = ["robiuzan@gmail.com"];
+
+/** Is this tel: href the business number in any of its scraped spellings, or the dead placeholder? */
+function isBusinessTel(rawTel) {
+  const v = decode(rawTel).trim();
+  if (/^\[phone\]$/i.test(v)) return true;
+  const digits = v.replace(/\D/g, "");
+  return digits === PHONE_DIGITS || digits === PHONE_LOCAL;
+}
+
+/** GTM click-trigger surface for a CTA link: which chrome region contains it. */
+function ctaSection(el) {
+  for (let n = el; n; n = n.parentNode) {
+    const tag = (n.rawTagName || "").toLowerCase();
+    const cls = typeof n.getAttribute === "function" ? n.getAttribute("class") || "" : "";
+    if (cls.includes("floated-elements")) return "float";
+    if (tag === "footer") return "footer";
+    if (tag === "header") return "header";
+  }
+  return "content";
+}
 
 /** Every route the site generates, decoded and without its trailing slash ("" for the front page). */
 const routes = new Set(site.pages.map((p) => p.segments.join("/")));
@@ -53,7 +92,9 @@ function routeOf(href) {
   const [path, query = ""] = beforeHash.split("?");
   return {
     // Trimmed: some source hrefs carry a stray space before the closing slash.
-    key: decode(path).replace(/^\/+|\/+$/g, "").trim(),
+    key: decode(path)
+      .replace(/^\/+|\/+$/g, "")
+      .trim(),
     suffix: (query ? `?${query}` : "") + (hash ? `#${hash}` : ""),
   };
 }
@@ -61,9 +102,24 @@ function routeOf(href) {
 let remapped = 0;
 let slashed = 0;
 let unlinked = 0;
+let telFixed = 0;
+let emailFixed = 0;
+let ctaTagged = 0;
+let redirectsSet = 0;
 const unresolved = [];
 
 for (const page of site.pages) {
+  // Legacy personal email → manifest email, sitewide. Plain string replace on purpose:
+  // it appears both as a mailto: href and as visible caption text in the scraped chrome.
+  if (EMAIL) {
+    for (const legacy of LEGACY_EMAILS) {
+      if (page.bodyHtml.includes(legacy)) {
+        emailFixed += page.bodyHtml.split(legacy).length - 1;
+        page.bodyHtml = page.bodyHtml.split(legacy).join(EMAIL);
+      }
+    }
+  }
+
   const root = parse(page.bodyHtml, {
     blockTextElements: { script: true, style: true, noscript: true, pre: true },
   });
@@ -107,12 +163,67 @@ for (const page of site.pages) {
     }
   }
 
+  // --- tel: normalization + data-cta tagging (backlog §8.1, §13.3) ---
+  // Every spelling of the business number — including the dead tel:[phone] shortcode the
+  // scrape carried — becomes the manifest's E.164 form. Visible text is untouched.
+  // Then every call/WhatsApp link gets a data-cta="{section}-{action}" the shared GTM
+  // container's click triggers can tell apart; links that already carry one keep it.
+  for (const a of root.querySelectorAll("a[href]")) {
+    const href = a.getAttribute("href") || "";
+    const isTel = /^tel:/i.test(href);
+    const isWa = /(?:wa\.me|api\.whatsapp\.com)/i.test(href);
+    const isMail = /^mailto:/i.test(href);
+    if (!isTel && !isWa && !isMail) continue;
+
+    if (isTel && isBusinessTel(href.slice(4)) && href !== `tel:${PHONE_TEL}`) {
+      a.setAttribute("href", `tel:${PHONE_TEL}`);
+      telFixed++;
+      changed = true;
+    }
+    if (!a.getAttribute("data-cta")) {
+      const action = isTel ? "call" : isWa ? "whatsapp" : "email";
+      a.setAttribute("data-cta", `${ctaSection(a)}-${action}`);
+      ctaTagged++;
+      changed = true;
+    }
+  }
+
+  // --- Web3Forms success redirect → /תודה/ (backlog §8.6) ---
+  // A URL-based conversion target; without it a successful submit lands off-domain on
+  // Web3Forms' generic page. Idempotent: refreshes the value if the input already exists.
+  // The submit button gets data-cta="form-submit" for the same GTM click triggers.
+  for (const form of root.querySelectorAll("form")) {
+    if (!/api\.web3forms\.com/.test(form.getAttribute("action") || "")) continue;
+    const existing = form.querySelector('input[name="redirect"]');
+    if (existing) {
+      if (existing.getAttribute("value") !== THANK_YOU_URL) {
+        existing.setAttribute("value", THANK_YOU_URL);
+        redirectsSet++;
+        changed = true;
+      }
+    } else {
+      const key = form.querySelector('input[name="access_key"]');
+      const input = `<input type="hidden" name="redirect" value="${THANK_YOU_URL}">`;
+      if (key) key.insertAdjacentHTML("afterend", input);
+      else form.set_content(input + form.innerHTML);
+      redirectsSet++;
+      changed = true;
+    }
+    const submit = form.querySelector('button[type="submit"], input[type="submit"]');
+    if (submit && !submit.getAttribute("data-cta")) {
+      submit.setAttribute("data-cta", "form-submit");
+      ctaTagged++;
+      changed = true;
+    }
+  }
+
   if (changed) page.bodyHtml = root.toString();
 }
 
 writeFileSync(FILE, JSON.stringify(site, null, 2), "utf8");
 console.log(
-  `fix-links: remapped ${remapped}, normalized ${slashed} trailing slash(es), unlinked ${unlinked} dead archive link(s).`,
+  `fix-links: remapped ${remapped}, normalized ${slashed} trailing slash(es), unlinked ${unlinked} dead archive link(s), ` +
+    `normalized ${telFixed} tel: href(s) + ${emailFixed} legacy email(s), tagged ${ctaTagged} data-cta, set ${redirectsSet} form redirect(s).`,
 );
 
 if (unresolved.length) {

@@ -21,17 +21,37 @@ const ENRICHED = join(ROOT, "content", "enriched");
 const ORIGIN = "https://3locksmiths.co.il";
 const LB_ID = `${ORIGIN}/#LocalBusiness`;
 
-const CITIES = ["תל אביב", "חיפה", "ירושלים", "ראשון לציון", "פתח תקווה", "נתניה", "חולון",
-  "רמת גן", "גבעתיים", "בת ים", "באר שבע", "כפר סבא", "רעננה", "חדרה", "קריות"];
+// NAP for the LocalBusiness node comes from the manifest — never hardcoded (backlog §4.3).
+// Values themselves change in the roster (Israeli services sites/roster/sites/3locksmiths.json).
+const manifest = JSON.parse(readFileSync(join(ROOT, "site.config.json"), "utf8"));
+
+// `areaServed` for the LocalBusiness node. Derived from the location pages in the build manifest
+// rather than hardcoded: this list used to be a literal of 15 cities and silently went stale the
+// moment a location page was added, so the schema claimed a smaller service area than the site.
+const PAGE_MANIFEST = JSON.parse(readFileSync(join(ENRICHED, "_manifest.json"), "utf8"));
+const CITIES = [
+  ...new Set(
+    PAGE_MANIFEST.pages.filter((p) => p.kind === "location" && p.city).map((p) => p.city),
+  ),
+];
 
 // Homepage (id 7) SEO. The WordPress source shipped the bare brand name as <title> (14 chars,
 // under the 15-char floor) and no meta description at all, so both are set here — the homepage
 // has no content/enriched/ module because its <main> is kept exactly as scraped.
 const HOME_ID = 7;
+// 🔶 confirm: the description used to claim "מנעולן מוסמך" and "מעל 25 שנות ניסיון" — both
+// unverified (docs/business-facts.md §A.1, §A "credentials"). Restore only once sourced.
+// The title's "24/7" claim is also 🔶 (§D.3) but is left pending the owner's answer — changing
+// a ranking page's <title> is not a casual edit.
 const HOME_SEO = {
-  title: "מנעולן 24/7 לרכב ולבית – שירות מהיר בפריסה ארצית | שלושה מנעולנים",
+  // No "24/7": every page publishes openingHoursSpecification 08:00–18:00 (Sat 08:00–17:00),
+  // so a 24/7 title contradicts our own structured data on the site's most important page.
+  // 56 chars. The previous wording ran to 63 and Google truncated it mid-phrase; "פתיחה" was
+  // dropped rather than one of the two duplication terms because the homepage's own H1 and the
+  // /services/פתיחת-רכב-נעול/ + /services/פתיחת-דלת-נעולה/ pages already carry that intent.
+  title: "מנעולן לרכב ולבית – שכפול וקידוד מפתחות | שלושה מנעולנים",
   description:
-    "שלושה מנעולנים – מנעולן מוסמך לרכב ולבית עם מעל 25 שנות ניסיון. שכפול וקידוד מפתחות, פתיחת דלת נעולה והחלפת מנעולים בשטח, בפריסה ארצית. חייגו 055-6601006.",
+    "שלושה מנעולנים – מנעולן לרכב ולבית: שכפול וקידוד מפתחות, פתיחת דלת נעולה והחלפת מנעולים אצלכם בשטח, במחיר שקוף מראש. חייגו 055-6601006 למענה מהיר.",
 };
 
 const site = JSON.parse(readFileSync(SITE, "utf8"));
@@ -49,31 +69,101 @@ for (const f of files) {
   else console.warn(`  ! ${f}: missing default export with numeric id`);
 }
 
+/**
+ * Fill `related` / `areas` from the build manifest when a module does not author them.
+ *
+ * WHY — until 2026-08-26 every module hand-wrote its related links as percent-encoded href
+ * literals (a 40-character `%d7%…` string per link). That is both unreadable and the easiest way
+ * in this repo to ship a link to a route that does not exist; `fix-links.mjs` fails the build on
+ * exactly that, after the fact. scripts/build-manifest.mjs already computes `relatedServices` and
+ * `relatedLocations` as ID lists, so the encoding can simply be looked up instead of retyped.
+ *
+ * Authored `related` still wins — the existing modules keep the link sets they were written with.
+ * This is a fallback for modules that omit it, which is now the preferred way to author one.
+ */
+const MANIFEST_BY_ID = new Map(PAGE_MANIFEST.pages.map((p) => [p.id, p]));
+const linkTo = (id) => {
+  const row = MANIFEST_BY_ID.get(id);
+  return row ? { label: row.title, href: row.path } : null;
+};
+function withDerivedLinks(data) {
+  const row = MANIFEST_BY_ID.get(data.id);
+  if (!row) return data;
+  const out = { ...data };
+  if (!out.related) {
+    out.related = {
+      services: (row.relatedServices || []).map(linkTo).filter(Boolean),
+      locations: (row.relatedLocations || []).map(linkTo).filter(Boolean),
+    };
+  }
+  // `areas` is the location-page "other cities we serve" band. Default it to the sibling
+  // locations the manifest already picked, so a new city page links into the mesh for free.
+  if (!out.areas && out.kind === "location") {
+    out.areas = (row.relatedLocations || []).map(linkTo).filter(Boolean);
+  }
+  return out;
+}
+
 // --- schema builders ---
 const J = (o) => JSON.stringify(o);
 const abs = (page) => page.seo?.canonical || `${ORIGIN}${page.path}`;
 
 function breadcrumbSchema(data, page) {
   const list = [{ name: "בית", item: `${ORIGIN}/` }];
-  if (data.kind === "location") list.push({ name: "אזורי שירות", item: `${ORIGIN}/אזורי-שירות/` });
-  else if (data.kind === "service" || data.kind === "brand-key") list.push({ name: "שירותים", item: `${ORIGIN}/services` });
+  if (data.kind === "location")
+    list.push({ name: "אזורי שירות", item: `${ORIGIN}/אזורי-שירות/` });
+  else if (data.kind === "guide")
+    list.push({ name: "מדריכים", item: `${ORIGIN}/מדריכים/` });
+  else if (data.kind === "service" || data.kind === "brand-key")
+    list.push({ name: "שירותים", item: `${ORIGIN}/services` });
   list.push({ name: data.keyword, item: abs(page) });
   return J({
-    "@context": "https://schema.org", "@type": "BreadcrumbList",
-    itemListElement: list.map((c, i) => ({ "@type": "ListItem", position: i + 1, name: c.name, item: c.item })),
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: list.map((c, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: c.name,
+      item: c.item,
+    })),
   });
+}
+
+/**
+ * Article for guide pages (/מדריכים/…). `author` is emitted ONLY when the module supplies a
+ * real named person — docs/business-facts.md §A records that nobody is currently named on this
+ * site, and a fabricated byline is a worse trust signal than an absent one. Publishing without
+ * `author` is the deliberate choice until the owner supplies one.
+ */
+function articleSchema(data, page) {
+  const o = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: data.seo?.title || data.keyword,
+    description: data.seo?.description || "",
+    mainEntityOfPage: { "@type": "WebPage", "@id": abs(page) },
+    publisher: { "@id": LB_ID },
+    inLanguage: "he-IL",
+  };
+  if (data.datePublished) o.datePublished = data.datePublished;
+  if (data.dateModified) o.dateModified = data.dateModified;
+  if (data.authorName) o.author = { "@type": "Person", name: data.authorName };
+  return J(o);
 }
 
 function serviceSchema(data, page) {
   if (data.kind === "core") return null;
   return J({
-    "@context": "https://schema.org", "@type": "Service",
-    serviceType: data.keyword, name: data.keyword,
+    "@context": "https://schema.org",
+    "@type": "Service",
+    serviceType: data.keyword,
+    name: data.keyword,
     description: data.seo?.description || "",
     provider: { "@id": LB_ID },
-    areaServed: data.kind === "location" && data.city
-      ? { "@type": "City", name: data.city }
-      : { "@type": "Country", name: "IL" },
+    areaServed:
+      data.kind === "location" && data.city
+        ? { "@type": "City", name: data.city }
+        : { "@type": "Country", name: "IL" },
     url: abs(page),
   });
 }
@@ -81,10 +171,14 @@ function serviceSchema(data, page) {
 function howToSchema(data) {
   if (!data.process?.length) return null;
   return J({
-    "@context": "https://schema.org", "@type": "HowTo",
+    "@context": "https://schema.org",
+    "@type": "HowTo",
     name: data.keyword,
     step: data.process.map((s, i) => ({
-      "@type": "HowToStep", position: i + 1, name: s.title, text: s.text,
+      "@type": "HowToStep",
+      position: i + 1,
+      name: s.title,
+      text: s.text,
     })),
   });
 }
@@ -92,23 +186,59 @@ function howToSchema(data) {
 function faqSchema(data) {
   if (!data.faq?.items?.length) return null;
   return J({
-    "@context": "https://schema.org", "@type": "FAQPage",
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
     mainEntity: data.faq.items.map((it) => ({
-      "@type": "Question", name: it.q,
+      "@type": "Question",
+      name: it.q,
       acceptedAnswer: { "@type": "Answer", text: `<p>${it.a}</p>` },
     })),
   });
 }
 
+/**
+ * The business entity, emitted on EVERY enriched page — not just the homepage.
+ *
+ * WHY EVERY PAGE — `serviceSchema` sets `provider: {"@id": LB_ID}` and `articleSchema` sets
+ * `publisher: {"@id": LB_ID}`, but until 2026-08-26 the node those pointed at existed only on
+ * `/`. On all 60 other pages the reference dangled: a `Service` with a provider that resolves to
+ * nothing on the page declaring it. Crawlers evaluate a page's structured data per page, so the
+ * fix is to repeat the node, keyed by a stable `@id` so consumers de-duplicate it into one
+ * entity. It costs well under a kilobyte per page.
+ *
+ * `address` carries `addressCountry` only. docs/business-facts.md §C.1 records that no confirmed
+ * street address exists and that inventing one is forbidden — but the country is a fact we can
+ * source, and an address node with a country is better understood than no address node at all.
+ * `sameAs` stays absent while the manifest's array is empty: an empty array is noise, not a
+ * signal, and there is nothing to point it at until the owner has external profiles.
+ */
 function localBusinessSchema() {
+  const sameAs = manifest.schema?.sameAs ?? [];
   return J({
-    "@context": "https://schema.org", "@type": ["LocalBusiness", "Locksmith"], "@id": LB_ID,
-    name: "שלושה מנעולנים", url: `${ORIGIN}/`, telephone: "+972-55-6601006",
-    email: "robiuzan@gmail.com", image: `${ORIGIN}/wp-content/uploads/2025/04/157336036_m.jpg`,
-    priceRange: "₪₪",
+    "@context": "https://schema.org",
+    "@type": ["LocalBusiness", "Locksmith"],
+    "@id": LB_ID,
+    name: manifest.brandName,
+    url: `${ORIGIN}/`,
+    telephone: manifest.contact.phoneE164,
+    email: manifest.contact.email,
+    image: `${ORIGIN}/wp-content/uploads/2025/04/157336036_m.jpg`,
+    address: { "@type": "PostalAddress", addressCountry: "IL" },
+    ...(sameAs.length ? { sameAs } : {}),
+    priceRange: manifest.schema?.priceRange ?? "₪₪",
     openingHoursSpecification: [
-      { "@type": "OpeningHoursSpecification", dayOfWeek: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday"], opens: "08:00", closes: "18:00" },
-      { "@type": "OpeningHoursSpecification", dayOfWeek: "Saturday", opens: "08:00", closes: "17:00" },
+      {
+        "@type": "OpeningHoursSpecification",
+        dayOfWeek: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+        opens: "08:00",
+        closes: "18:00",
+      },
+      {
+        "@type": "OpeningHoursSpecification",
+        dayOfWeek: "Saturday",
+        opens: "08:00",
+        closes: "17:00",
+      },
     ],
     areaServed: CITIES.map((c) => ({ "@type": "City", name: c })),
   });
@@ -117,14 +247,24 @@ function localBusinessSchema() {
 // --- inject ---
 let injected = 0;
 const problems = [];
-for (const data of enriched) {
+for (const raw of enriched) {
+  const data = withDerivedLinks(raw);
   const page = byId.get(data.id);
-  if (!page) { problems.push(`id ${data.id}: not in site.json`); continue; }
+  if (!page) {
+    problems.push(`id ${data.id}: not in site.json`);
+    continue;
+  }
 
   const inner = renderContentBlocks(data);
-  const root = parse(page.bodyHtml, { blockTextElements: { script: true, style: true, noscript: true, pre: true } });
-  const main = root.querySelector("main.page-template-builder") || root.querySelector("main");
-  if (!main) { problems.push(`id ${data.id}: no <main>`); continue; }
+  const root = parse(page.bodyHtml, {
+    blockTextElements: { script: true, style: true, noscript: true, pre: true },
+  });
+  const main =
+    root.querySelector("main.page-template-builder") || root.querySelector("main");
+  if (!main) {
+    problems.push(`id ${data.id}: no <main>`);
+    continue;
+  }
   main.setAttribute("data-enriched", "1");
   main.set_content(`<div class="content-blocks">${inner}</div>`);
   page.bodyHtml = root.toString();
@@ -134,13 +274,26 @@ for (const data of enriched) {
   if (data.seo?.title) page.seo.title = data.seo.title;
   if (data.seo?.description) page.seo.description = data.seo.description;
 
-  // schema
-  page.jsonLd = [breadcrumbSchema(data, page), serviceSchema(data, page), howToSchema(data), faqSchema(data)].filter(Boolean);
+  // schema. A guide is editorial, so it emits Article instead of Service.
+  // localBusinessSchema() leads so the entity every other node references is declared first.
+  page.jsonLd = [
+    localBusinessSchema(),
+    breadcrumbSchema(data, page),
+    data.kind === "guide" ? articleSchema(data, page) : serviceSchema(data, page),
+    howToSchema(data),
+    faqSchema(data),
+  ].filter(Boolean);
 
   // assertions
   const h1count = (page.bodyHtml.match(/<h1[\s>]/g) || []).length;
   if (h1count !== 1) problems.push(`id ${data.id}: expected 1 <h1>, found ${h1count}`);
-  for (const s of page.jsonLd) { try { JSON.parse(s); } catch { problems.push(`id ${data.id}: invalid JSON-LD`); } }
+  for (const s of page.jsonLd) {
+    try {
+      JSON.parse(s);
+    } catch {
+      problems.push(`id ${data.id}: invalid JSON-LD`);
+    }
+  }
   injected++;
 }
 
@@ -148,14 +301,48 @@ for (const data of enriched) {
 const home = byId.get(HOME_ID);
 if (home) {
   home.seo = { ...home.seo, ...HOME_SEO };
-  const existing = (home.jsonLd || []).filter((s) => !s.includes('"@id":"' + LB_ID + '"'));
+  const existing = (home.jsonLd || []).filter(
+    (s) => !s.includes('"@id":"' + LB_ID + '"'),
+  );
   home.jsonLd = [localBusinessSchema(), ...existing];
 } else {
   problems.push(`homepage id ${HOME_ID} not in site.json`);
 }
 
+// --- validate EVERY JSON-LD block sitewide, including scraped pass-through blocks ---
+// The WordPress scrape shipped blocks with raw control characters inside JSON strings
+// (literal newlines), which fail JSON.parse — Google can't read them either (backlog §4.1).
+// Repair by collapsing control chars to spaces (legal outside strings, the fix inside them),
+// re-serialize minified; a block that still doesn't parse is dropped — a malformed block is
+// worth strictly less than no block.
+let repairedLd = 0;
+let droppedLd = 0;
+for (const p of site.pages) {
+  p.jsonLd = (p.jsonLd || []).flatMap((s) => {
+    try {
+      JSON.parse(s);
+      return [s];
+    } catch {}
+    const fixed = s.replace(/[\u0000-\u001f]+/g, " ");
+    try {
+      const clean = JSON.stringify(JSON.parse(fixed));
+      repairedLd++;
+      return [clean];
+    } catch {
+      droppedLd++;
+      console.warn(
+        `  ! id ${p.id} (${decodeURIComponent(p.path)}): dropped unparseable JSON-LD block`,
+      );
+      return [];
+    }
+  });
+}
+
 writeFileSync(SITE, JSON.stringify(site, null, 2), "utf8");
-console.log(`enrich: injected ${injected}/${enriched.length} pages, schema set, titles decoded.`);
+console.log(
+  `enrich: injected ${injected}/${enriched.length} pages, schema set, titles decoded, ` +
+    `JSON-LD repaired ${repairedLd} / dropped ${droppedLd}.`,
+);
 if (problems.length) {
   console.error(`\nENRICH PROBLEMS (${problems.length}):`);
   for (const p of problems) console.error("  ! " + p);

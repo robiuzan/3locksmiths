@@ -78,7 +78,9 @@ function decodeSeg(s: string): string {
 /** Match a route's decoded slug segments against a snapshot page. */
 export function getPageBySegments(segments: string[]): SitePage | undefined {
   const key = segments.map(decodeSeg).join("/");
-  return site.pages.find((p) => !p.isFront && p.segments.map(decodeSeg).join("/") === key);
+  return site.pages.find(
+    (p) => !p.isFront && p.segments.map(decodeSeg).join("/") === key,
+  );
 }
 
 /** Map captured WordPress/RankMath SEO fields to a Next.js Metadata object (1:1). */
