@@ -41,6 +41,10 @@ const site = JSON.parse(readFileSync(FILE, "utf8"));
 // NAP comes from the manifest; the WordPress scrape shipped four spellings of the one
 // business number, three of them non-E.164 and one a dead unresolved [phone] shortcode.
 const manifest = JSON.parse(readFileSync(join(ROOT, "site.config.json"), "utf8"));
+// The build manifest — the source of truth for which brand pages exist and where they live.
+const pageManifest = JSON.parse(
+  readFileSync(join(ROOT, "content", "enriched", "_manifest.json"), "utf8"),
+);
 const PHONE_TEL = manifest.contact?.phoneE164 ?? "+972556601006";
 const PHONE_DIGITS = PHONE_TEL.replace(/\D/g, ""); // 972556601006
 const PHONE_LOCAL = "0" + PHONE_DIGITS.slice(3); // 0556601006
@@ -220,10 +224,99 @@ for (const page of site.pages) {
   if (changed) page.bodyHtml = root.toString();
 }
 
+// --- the brand grid: resolve href="#" placeholders and complete the set --------------------
+//
+// The homepage band "כל שירותי מנעולן הרכב במקום אחד" is a grid of brand cards the WordPress
+// build shipped with EVERY href set to "#". All 17 were dead, on the site's most valuable page,
+// pointing at brand pages that existed the whole time.
+//
+// They survived this script's own 404 check because `NON_ROUTE` treats "#" as a deliberate
+// non-route — which is right in general (a real in-page anchor is not a broken link) and is
+// exactly why a placeholder href is the one broken link a link checker will not report.
+//
+// Resolution is driven by the build manifest's `brand` field rather than a hardcoded table, so
+// a brand page added later is wired automatically. Cards for brand pages missing from the grid
+// are appended by cloning an existing card, which keeps the vendored theme's markup and icon.
+const brandRows = pageManifest.pages.filter((p) => p.kind === "brand-key" && p.brand);
+/** "שכפול מפתח לפיג׳ו" / "פיג'ו" → "פיגו" — strips the lead-in, the ל prefix and every geresh. */
+const brandKey = (s) =>
+  String(s ?? "")
+    .replace(/^\s*שכפול\s+מפתח\s+/, "")
+    .replace(/^ל(?=[֐-׿])/, "")
+    .replace(/['׳’"״]/g, "")
+    .replace(/[\s-]/g, "")
+    .trim();
+const brandByKey = new Map(brandRows.map((p) => [brandKey(p.brand), p]));
+
+let brandLinked = 0;
+let brandAdded = 0;
+let brandRemoved = 0;
+for (const page of site.pages) {
+  const root = parse(page.bodyHtml, {
+    blockTextElements: { script: true, style: true, noscript: true, pre: true },
+  });
+  let changed = false;
+
+  // 1. resolve every placeholder brand card, wherever it appears
+  const cards = root.querySelectorAll("a.service-item");
+  for (const a of cards) {
+    if (a.getAttribute("href") !== "#") continue;
+    const caption = a.querySelector(".caption");
+    if (!caption) continue;
+    const row = brandByKey.get(brandKey(caption.text));
+    if (!row) continue;
+    a.setAttribute("href", row.path);
+    if (!a.getAttribute("data-cta")) a.setAttribute("data-cta", "brand-grid");
+    brandLinked++;
+    changed = true;
+  }
+
+  // 2. complete the grid — a brand page absent from it gets no equity from the homepage
+  //
+  // Presence is keyed on the resolved HREF, never on the caption. Keying on caption text looked
+  // equivalent and was not: "שכפול מפתח לרכבי BYD" normalises to "רכביBYD", which never matches
+  // the manifest brand "BYD", so that card was judged absent and re-appended on EVERY build —
+  // a duplicate that compounds one card at a time and that nothing else would have flagged.
+  // An href is unambiguous, and step 1 has already populated it.
+  const grid = cards.length ? cards[0].parentNode : null;
+  if (grid && page.isFront) {
+    const present = new Set();
+    for (const a of root.querySelectorAll("a.service-item")) {
+      const href = a.getAttribute("href");
+      if (!href || href === "#") continue;
+      // Idempotence backstop: drop a card whose destination is already in the grid, so a
+      // duplicate introduced by an earlier run is cleaned up rather than preserved forever.
+      if (present.has(href)) {
+        a.remove();
+        brandRemoved++;
+        changed = true;
+        continue;
+      }
+      present.add(href);
+    }
+    const template = cards[0];
+    for (const row of brandRows) {
+      if (present.has(row.path)) continue;
+      const clone = parse(template.toString()).querySelector("a");
+      clone.setAttribute("href", row.path);
+      clone.setAttribute("data-cta", "brand-grid");
+      const cap = clone.querySelector(".caption");
+      if (cap) cap.set_content(row.title);
+      grid.appendChild(clone);
+      present.add(row.path);
+      brandAdded++;
+      changed = true;
+    }
+  }
+
+  if (changed) page.bodyHtml = root.toString();
+}
+
 writeFileSync(FILE, JSON.stringify(site, null, 2), "utf8");
 console.log(
   `fix-links: remapped ${remapped}, normalized ${slashed} trailing slash(es), unlinked ${unlinked} dead archive link(s), ` +
-    `normalized ${telFixed} tel: href(s) + ${emailFixed} legacy email(s), tagged ${ctaTagged} data-cta, set ${redirectsSet} form redirect(s).`,
+    `normalized ${telFixed} tel: href(s) + ${emailFixed} legacy email(s), tagged ${ctaTagged} data-cta, set ${redirectsSet} form redirect(s), ` +
+    `wired ${brandLinked} brand card(s), added ${brandAdded}, removed ${brandRemoved} duplicate(s).`,
 );
 
 if (unresolved.length) {
