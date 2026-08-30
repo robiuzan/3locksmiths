@@ -227,6 +227,26 @@
   background: rgba(0, 159, 60, 0.2);
 }
 
+/* ---- homepage hero grid: keep 4 tiles in normal flow ----------------------
+ * The theme styles the LAST .gallery-item as an absolutely-centred overlay badge
+ * (main.css:1788-1793) because the scrape shipped five children: four photos plus a
+ * fabricated "Google 5.0" badge, which scripts/claims.mjs now removes.
+ *
+ * With the badge gone the 4th photo becomes :last-child and inherits that rule, so it
+ * would jump into the middle of the grid and cover the others. This pins it back into
+ * flow. It is scoped to the exact selector rather than reverting the theme rule, so if a
+ * genuine 5th overlay is ever added back the theme behaviour is still there to restore.
+ *
+ * Not an edit to the vendored theme (CLAUDE.md §3 rule 4) — this is our own override file.
+ * ==========================================================================*/
+.home-hero-right-galley .gallery-item:last-child {
+  position: static;
+  top: auto;
+  left: auto;
+  max-width: none;
+  transform: none;
+}
+
 /* ============================================================================
  * UI the project owns OUTSIDE the ported WordPress body (not under .content-blocks):
  * the mobile sticky CTA bar (components/StickyCta.tsx) and the /תודה/ page.

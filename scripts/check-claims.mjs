@@ -85,6 +85,29 @@ const BLOCKING_RAW = [
     why: "asserts a star rating we cannot source — docs/business-facts.md §B has zero reviews.",
   },
   {
+    // 2026-08-30: this guard matched on the token `GoogleRating`, so it caught the theme's badge
+    // and missed TWO more copies of the same fabricated rating that were live the whole time:
+    //
+    //   · logo-11.png        — a "Google 5.0 ★★★★★" badge, 5th tile in the homepage hero
+    //   · admin-ajax-2-1     — the same badge composited INTO a 4-photo collage raster
+    //
+    // Neither filename says "rating", so no text-level rule could ever have seen them. The lesson
+    // is that a rating badge is identified by what it depicts, not by what it is called — so this
+    // pins the specific files by name. Any NEW badge image still needs a human to notice it, which
+    // is why docs/optimization-backlog.md §7.7 (imagery provenance) exists.
+    id: "fabricated-rating-image-by-filename",
+    re: /logo-11\.png|admin-ajax-2-1/,
+    why: "a fabricated Google 5.0 rating badge, baked into an image so no text guard can see it.",
+  },
+  {
+    // A US phone number (Houston area code) shipped in the homepage CTA text for months, while the
+    // href beside it dialled the correct Israeli number — so every link test passed and a human
+    // reading the page still saw the wrong number. NAP integrity is checked on what is DISPLAYED.
+    id: "foreign-phone-number",
+    re: /\(\d{3}\)\s*\d{3}-\d{4}/,
+    why: "a US-format phone number on an Israeli site — NAP must match site.config.json (CLAUDE.md §6).",
+  },
+  {
     // The theme's review carousel, pruned in scripts/pages.mjs. It published three invented
     // testimonials with invented customer names on the live homepage until 2026-08-26.
     id: "review-widget-markup",

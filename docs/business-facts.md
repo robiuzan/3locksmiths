@@ -14,15 +14,15 @@ Status key: ✅ confirmed · 🔶 unconfirmed, do not state · ⛔ contradicted 
 
 ## A. Identity & people
 
-| Fact              | Value                             | Status | Source                      |
-| ----------------- | --------------------------------- | ------ | --------------------------- |
-| Brand name (he)   | שלושה מנעולנים                    | ✅     | manifest `brandName`        |
-| Brand name (en)   | 3 Locksmiths                      | ✅     | manifest `brandNameEn`      |
-| Legal name / ח.פ. | —                                 | 🔶     | manifest `legalName: null`  |
-| Owner / founder   | —                                 | 🔶     | named nowhere in the repo   |
-| Named technician  | —                                 | 🔶     | no person named on any page |
-| Years in business | "מעל 25 שנות ניסיון"              | ⛔     | see §A.1                    |
-| Team size         | "שלושה" implied by the brand name | 🔶     | never stated as a fact      |
+| Fact              | Value                | Status | Source                      |
+| ----------------- | -------------------- | ------ | --------------------------- |
+| Brand name (he)   | שלושה מנעולנים       | ✅     | manifest `brandName`        |
+| Brand name (en)   | 3 Locksmiths         | ✅     | manifest `brandNameEn`      |
+| Legal name / ח.פ. | —                    | 🔶     | manifest `legalName: null`  |
+| Owner / founder   | —                    | 🔶     | named nowhere in the repo   |
+| Named technician  | —                    | 🔶     | no person named on any page |
+| Years in business | "מעל 25 שנות ניסיון" | ⛔     | see §A.1                    |
+| Team size         | **three locksmiths** | ✅     | owner, 2026-08-30 — §A.2    |
 
 ### A.1 The 25-years claim — the flagship trust defect
 
@@ -59,6 +59,23 @@ Resolve one of three ways — do not leave it as is:
 Until then: **no new page may repeat the 25-years claim.**
 
 ---
+
+### A.2 Team size — ✅ CONFIRMED 2026-08-30
+
+**"שלושה מנעולנים" is literal: three people do the work.** Confirmed by the owner on 2026-08-30.
+
+⚠️ **This is a fact about the business, not about the imagery.** The people pictured on the site are
+AI-generated brand characters, not photographs of the three real locksmiths — see §G.1. An earlier
+version of this row also recorded "all three technicians consented to AI images of themselves"; that
+was wrong and has been removed. No real person's likeness appears in any site image, so there is no
+consent to record.
+
+This matters beyond the brand name. It is the fact that makes depicting a _team_ honest, and it sets
+the ceiling: imagery and copy must never imply more than three people. It does **not** substantiate
+§A.1 — years in business is still unsourced, and the two are unrelated.
+
+Still open: no individual is **named** anywhere on the site, so `authorName` stays absent on all 12
+guides (`scripts/enrich.mjs:132-137`). A fabricated byline is worse than an absent one.
 
 ## B. Reputation & social proof
 
@@ -118,6 +135,28 @@ Until then the site has no social proof — which the 2026-08-26 competitor tear
 the single largest gap against the category leader, and the one that cannot be closed with code.
 
 ---
+
+### B.3 Two more fabricated Google 5.0 badges — REMOVED 2026-08-30
+
+§B.1 removed the theme's `GoogleRating.png` and added a guard for the token `GoogleRating`. **Two
+more copies of the same fabricated rating were live the whole time**, and neither could ever have
+matched that guard:
+
+| File             | Where                                                                                | Why nothing caught it                  |
+| ---------------- | ------------------------------------------------------------------------------------ | -------------------------------------- |
+| `logo-11.png`    | 5th `.gallery-item` in the **homepage hero**, absolutely centred over the photo grid | the filename says "logo", not "rating" |
+| `admin-ajax-2-1` | a 4-photo collage with the badge **composited into the raster**                      | no text-level guard can read pixels    |
+
+Both removed in `scripts/claims.mjs` (`fabricated-google-rating-badge-hero`, `…-collage`).
+`scripts/check-claims.mjs` now also pins them by filename (`fabricated-rating-image-by-filename`).
+
+**A rating badge is identified by what it depicts, not by what it is called.** A new badge image
+would still need a human to notice it — which is what §G exists for.
+
+⚠️ Removing the hero badge required a CSS override in `app/enrich.css`: the theme styles
+`.home-hero-right-galley .gallery-item:last-child` as an absolutely-centred overlay
+(`main.css:1788`), so dropping the 5th tile would otherwise make the 4th photo jump into the middle
+of the grid.
 
 ## C. Contact & NAP
 
@@ -193,6 +232,22 @@ payload; count `href="tel:` to get the real number). Confirmed
 > Note the destination is still a personal Gmail. That is fine for delivery, but if the business ever
 > wants mail to survive a change of hands, the routing destination is the thing to revisit — not the
 > address on the site.
+
+### C.4 A US phone number was printed on the homepage — FIXED 2026-08-30
+
+The homepage CTA button displayed **`(281) 843-8447`** — a Houston, Texas number inherited from the
+gogo theme's US origin. It was live and visible.
+
+It survived every check because **the `href` was correct**: `fix-links.mjs` had already normalised
+it to `tel:+972556601006`, so the button dialled Israel while the text a human reads said Texas.
+Link tests passed; the page still lied. Desktop visitors, who read a number rather than tap it, got
+a US one.
+
+Fixed by `scripts/claims.mjs` (`us-phone-number-in-cta`), substituting
+`manifest.contact.phoneDisplay`. `scripts/check-claims.mjs` now blocks any US-format
+`(NNN) NNN-NNNN` string sitewide (`foreign-phone-number`).
+
+**NAP integrity has to be checked on what is displayed, not only on what is linked.**
 
 ## D. Services & pricing
 
@@ -327,15 +382,67 @@ Fix direction: put the real token in the **roster manifest**, sync, and read it 
 
 ## G. Imagery
 
-| Fact                | Value                                                                 | Status                                                  |
-| ------------------- | --------------------------------------------------------------------- | ------------------------------------------------------- |
-| Content images      | vendored from the WordPress source under `public/wp-content/uploads/` | ✅ provenance: the original site                        |
-| OG card             | `3locksmiths/og.jpg` on `imgquarry.com`, sha256 pinned                | ✅ manifest `images.og`                                 |
-| Photos of real jobs | —                                                                     | 🔶 no evidence any image shows this business's own work |
+| Fact                | Value                                                                 | Status                                                    |
+| ------------------- | --------------------------------------------------------------------- | --------------------------------------------------------- |
+| Content images      | vendored from the WordPress source under `public/wp-content/uploads/` | ✅ provenance: the original site                          |
+| OG card             | `3locksmiths/og.jpg` on `imgquarry.com`, sha256 pinned                | ✅ manifest `images.og`                                   |
+| Photos of real jobs | —                                                                     | 🔶 no evidence any image shows this business's own work   |
+| People in images    | **AI-generated brand characters**, not real staff                     | ✅ owner, 2026-08-30 — see §G.1                           |
+| Generated imagery   | **8 published** — 3 heroes, avatar, 4 homepage tiles                  | ✅ live 2026-08-31; `node scripts/check-placeholders.mjs` |
 
 The uploads are whatever the original WordPress site shipped. **Nobody has confirmed they are photos
 of this business's own work** rather than stock. Do not caption an image as a real job, a real
 customer or a real result without confirming it.
+
+### G.1 AI-generated imagery — policy, 2026-08-30
+
+Every photograph inherited from the WordPress source is stock imagery **of a different trade**: an
+electrician at a breaker panel, a man drilling a fence, two people at a desktop PC, and — as the hero
+on 111 pages — a hand unscrewing a **computer power supply**. No lock, key, cylinder or vehicle
+appears anywhere.
+
+The replacement is **AI-generated brand characters**, commissioned by the owner. Three recurring
+figures, filed under the names אבי יחזקל, אביעד בן שושן and שרון אליקים.
+
+**They are not photographs, and they are not the three real locksmiths.** This is a deliberate brand
+choice (owner, 2026-08-30), and the rules follow from it:
+
+- **Never name them on the site** — not in copy, alt text, a caption or a byline. A name attached to
+  a synthetic face asserts a person who does not exist. This is also why `authorName` stays absent
+  on all 12 guides (§A.2).
+- **Never present one as a specific real job**, a real customer, or a real result.
+- **Never imply a headcount from imagery.** The team fact (§A.2) is the owner's statement; the
+  pictures are not evidence for it.
+- Never a certificate, licence, rating, badge or review — §B.3 is what happens when that slips.
+
+**No image containing legible text may ever ship.** That is not a style preference — it is a defect
+found in the supplied set. Of the 16 commissioned images:
+
+| Image             | Text defect                                                                                                                                      |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `אביעד בן שושן 5` | the van reads **`3locksmith.co.il`**. The real domain is `3locksmiths.co.il`, and the singular form **does not resolve** — it is a dead address. |
+| `שרון אליקים 6`   | the van shows a phone number that is pure gibberish (`(3&0) 12 9899-980`), plus a mangled domain                                                 |
+| `אבי יחזקל 3`     | the polo logo renders as scrambled Hebrew rather than the brand name                                                                             |
+
+A diffusion model cannot reliably render Hebrew, and it invents plausible-looking contact details. A
+wrong phone number or a dead domain baked into a raster is the same class of defect as the US phone
+number in §C.4 and the rating badges in §B.3 — invisible to every text-level guard, and directly
+costly.
+
+**Disclosure is repo-only**, by the owner's decision: the prompt files in
+`Media Studio/prompts/3locksmiths/` record which images are synthetic and the exact wording behind
+each one. No visible label on the site. Google embeds an invisible **SynthID** watermark in its own
+output; EXIF stripping does not remove it, and should not.
+
+**Published 2026-08-31.** All 8 slots are live: `3locksmiths/hero.jpg` plus `gallery/hero-car`,
+`hero-home`, `avatar` and `home-tile-1..4`. Every badge was audited at full resolution before
+upload — four separate generations were rejected for growing a Hebrew wordmark the prompt forbade.
+
+Still inherited stock, and NOT yet replaced: the three CTA-band photographs on the homepage
+(`Rectangle-4133738-1-1`, `-2`, `Rectangle-4133739-1` — welding, a video intercom, a fence
+installer). They are wrong-trade stock like everything else was, but no slot was specified for them.
+
+Run `node scripts/check-placeholders.mjs` for the current state of all 8 slots.
 
 ---
 

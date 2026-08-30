@@ -13,6 +13,7 @@ import { join, dirname } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import he from "he";
 import { renderContentBlocks } from "../lib/enrich/render.mjs";
+import { heroRefFor, imageRef, originalUrl } from "../lib/enrich/catalog-image.mjs";
 import { parse } from "node-html-parser";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -148,7 +149,16 @@ function articleSchema(data, page) {
   if (data.datePublished) o.datePublished = data.datePublished;
   if (data.dateModified) o.dateModified = data.dateModified;
   if (data.authorName) o.author = { "@type": "Person", name: data.authorName };
+  // `image` is a recommended property for Article rich results and was absent entirely. Emitted
+  // only when a catalog image exists, so it never points at borrowed stock we cannot vouch for.
+  const img = catalogSchemaImage(data);
+  if (img) o.image = img;
   return J(o);
+}
+
+/** The page's own catalog image, or null. Used only where schema.org treats `image` as optional. */
+function catalogSchemaImage(data) {
+  return originalUrl(heroRefFor(data) ?? imageRef("hero"));
 }
 
 function serviceSchema(data, page) {
@@ -170,10 +180,14 @@ function serviceSchema(data, page) {
 
 function howToSchema(data) {
   if (!data.process?.length) return null;
+  // One image for the HowTo as a whole rather than a fake per-step image: we have one photograph
+  // per bucket, and claiming a distinct picture of each step would be inventing evidence.
+  const img = catalogSchemaImage(data);
   return J({
     "@context": "https://schema.org",
     "@type": "HowTo",
     name: data.keyword,
+    ...(img ? { image: img } : {}),
     step: data.process.map((s, i) => ({
       "@type": "HowToStep",
       position: i + 1,
@@ -212,6 +226,21 @@ function faqSchema(data) {
  * `sameAs` stays absent while the manifest's array is empty: an empty array is noise, not a
  * signal, and there is nothing to point it at until the owner has external profiles.
  */
+/**
+ * The business image for JSON-LD.
+ *
+ * Deliberately the PLAIN R2 URL, not a /cdn-cgi/image/ transform: a crawler wants one stable
+ * canonical asset, and a transform URL bakes a width and a crop into what should be the original.
+ * The markup gets the responsive variants; the graph gets the source.
+ *
+ * Order: hero slot -> OG card -> the legacy upload. The last of those is where it points today,
+ * and it stops pointing there the moment anything is published to the catalog.
+ */
+function schemaImage(page) {
+  const ref = (page ? heroRefFor(page) : null) ?? imageRef("hero") ?? imageRef("og");
+  return originalUrl(ref) ?? `${ORIGIN}/wp-content/uploads/2025/04/157336036_m.jpg`;
+}
+
 function localBusinessSchema() {
   const sameAs = manifest.schema?.sameAs ?? [];
   return J({
@@ -222,7 +251,12 @@ function localBusinessSchema() {
     url: `${ORIGIN}/`,
     telephone: manifest.contact.phoneE164,
     email: manifest.contact.email,
-    image: `${ORIGIN}/wp-content/uploads/2025/04/157336036_m.jpg`,
+    // Read from the manifest, never hardcoded. This was a literal pointing at
+    // /wp-content/uploads/2025/04/157336036_m.jpg — a 0.96 MB stock photograph of a hand
+    // unscrewing a COMPUTER POWER SUPPLY, published as this locksmith's business image on all
+    // 106 routes. `schemaImage()` prefers the hero slot, then the OG card, and only falls back
+    // to that upload while neither is published.
+    image: schemaImage(),
     address: { "@type": "PostalAddress", addressCountry: "IL" },
     ...(sameAs.length ? { sameAs } : {}),
     priceRange: manifest.schema?.priceRange ?? "₪₪",
@@ -346,10 +380,43 @@ for (const p of site.pages) {
   });
 }
 
+// --- Open Graph / Twitter card, on EVERY route ---
+// The WordPress source emitted no OG tags at all, so extractSeo() found nothing and every one of
+// the 106 routes shipped without og:image. Meanwhile site.config.json has carried a finished
+// 1200x630 card at 3locksmiths/og.jpg that no code read. Every WhatsApp share of this site
+// unfurled blank — on a business whose second conversion goal is WhatsApp.
+//
+// lib/content.ts:112 already maps seo.ogImage -> metadata.openGraph.images, so this is wiring
+// existing data to an existing code path. Set on scraped pages too, not just authored ones.
+const ogRef = imageRef("og");
+const ogUrl = originalUrl(ogRef);
+let ogSet = 0;
+if (ogUrl) {
+  for (const p of site.pages) {
+    p.seo = p.seo || {};
+    // Never clobber a page that already declares its own card.
+    if (!p.seo.ogImage) {
+      p.seo.ogImage = ogUrl;
+      ogSet++;
+    }
+    p.seo.ogType = p.seo.ogType || (p.id === HOME_ID ? "website" : "article");
+    p.seo.ogLocale = p.seo.ogLocale || "he_IL";
+    p.seo.ogUrl = p.seo.ogUrl || `${ORIGIN}${p.path}`;
+    // summary_large_image needs an image to be worth anything, so it is set alongside one.
+    p.seo.twitterCard = p.seo.twitterCard || "summary_large_image";
+    p.seo.twitterImage = p.seo.twitterImage || ogUrl;
+  }
+}
+
 writeFileSync(SITE, JSON.stringify(site, null, 2), "utf8");
 console.log(
   `enrich: injected ${injected}/${enriched.length} pages, schema set, titles decoded, ` +
     `JSON-LD repaired ${repairedLd} / dropped ${droppedLd}.`,
+);
+console.log(
+  ogUrl
+    ? `enrich: og:image set on ${ogSet} page(s) -> ${ogUrl}`
+    : `enrich: no og image in site.config.json images.og — og:image NOT set (run ops/sync-media.ps1)`,
 );
 if (problems.length) {
   console.error(`\nENRICH PROBLEMS (${problems.length}):`);

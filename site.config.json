@@ -39,6 +39,21 @@
   "images": {
     "mediaHost": "imgquarry.com",
     "defaultQuality": 80,
+    "hero": {
+      "key": "3locksmiths/hero.jpg",
+      "sha256": "c6d25fb6570ec84a24e1d0187a28be0286587b3e6a53295b64b8d60ae5c46c03",
+      "alt": "A man in a navy polo shirt holds a key and a brass lock cylinder beside an open van with a case of locksmith tools",
+      "altHe": "גבר בחולצת פולו כחולה מחזיק מפתח וצילינדר פליז ליד רכב שירות פתוח עם מזוודת כלי מנעולנות",
+      "width": 2400,
+      "height": 1792,
+      "bytes": 2602543,
+      "kind": "raster",
+      "focal": {
+        "x": 0.48,
+        "y": 0.35
+      },
+      "legacySrc": null
+    },
     "og": {
       "key": "3locksmiths/og.jpg",
       "sha256": "20ca76d7f88fe8895b70c9c78c94c9a007b5047e245d1dc16afe2818451ca4e8",
@@ -52,6 +67,140 @@
       "legacySrc": null
     },
     "badges": [],
-    "gallery": null
+    "gallery": {
+      "mode": "fetched",
+      "catalogUrl": "https://imgquarry.com/catalog/3locksmiths.co.il/gallery.json",
+      "categories": ["שכפול מפתחות", "team", "hero", "homepage"],
+      "items": [
+        {
+          "key": "3locksmiths/gallery/157336036-m.jpg",
+          "sha256": "55931214d30fd2ce53fb5ffe4a4571f21b8569c8abb09f12997b775d1a4129f3",
+          "alt": "A hand uses a red screwdriver to remove a screw through a torn \"warranty void if removed\" sticker on a computer power supply with a fan grille",
+          "altHe": "יד מפרקת בורג במברג אדום דרך מדבקת אחריות קרועה על ספק כוח של מחשב עם סבכת מאוורר",
+          "width": 2508,
+          "height": 1672,
+          "bytes": 974167,
+          "kind": "raster",
+          "focal": {
+            "x": 0.52,
+            "y": 0.45
+          },
+          "legacySrc": null,
+          "category": "שכפול מפתחות"
+        },
+        {
+          "key": "3locksmiths/gallery/avatar.jpg",
+          "sha256": "27416e36c8cba981f0f0ce358bc00d9f290bfffbd47fa750c51bb0b6a89b580e",
+          "alt": "Smiling man in a navy polo shirt with a small three-figure logo, standing outdoors by a pale stone wall",
+          "altHe": "גבר מחייך בחולצת פולו כחולה כהה עם לוגו קטן של שלוש דמויות, עומד בחוץ ליד קיר אבן בהיר",
+          "width": 1024,
+          "height": 1024,
+          "bytes": 634688,
+          "kind": "raster",
+          "focal": {
+            "x": 0.47,
+            "y": 0.32
+          },
+          "legacySrc": null,
+          "category": "team"
+        },
+        {
+          "key": "3locksmiths/gallery/hero-car.jpg",
+          "sha256": "ad9bb25f0e30100344850e7e831a6eb72e45299218d86779f86085d58243aead",
+          "alt": "Locksmith in a navy polo shirt holds up a freshly cut key beside an open car boot with a key-cutting machine",
+          "altHe": "מנעולן בחולצת פולו כחולה מחזיק מפתח שזה עתה שוכפל ליד תא מטען פתוח עם מכונת שכפול מפתחות",
+          "width": 2400,
+          "height": 1792,
+          "bytes": 2413954,
+          "kind": "raster",
+          "focal": {
+            "x": 0.58,
+            "y": 0.32
+          },
+          "legacySrc": null,
+          "category": "hero"
+        },
+        {
+          "key": "3locksmiths/gallery/hero-home.jpg",
+          "sha256": "f6b4ec64d4f1c1e3c35d7074357a0496944d530dd9fef729f35383bf3a5ae9fd",
+          "alt": "Smiling grey-haired man in a navy polo shirt with a three-figure logo, holding a brass lock cylinder and keys beside a door",
+          "altHe": "גבר מחייך עם שיער אפור בחולצת פולו כחולה עם לוגו של שלוש דמויות, מחזיק צילינדר מנעול פליז ומפתחות ליד דלת",
+          "width": 2400,
+          "height": 1792,
+          "bytes": 2193138,
+          "kind": "raster",
+          "focal": {
+            "x": 0.57,
+            "y": 0.32
+          },
+          "legacySrc": null,
+          "category": "hero"
+        },
+        {
+          "key": "3locksmiths/gallery/home-tile-1.jpg",
+          "sha256": "379a780078042126c60411aad641f2cbb49f3ed304302db3c5addc47953ebd23",
+          "alt": "Hands holding a fan of freshly cut brass keys at a workbench with a key-cutting machine, lock cylinder and scattered keys",
+          "altHe": "ידיים אוחזות מפתחות פליז שזה עתה שוכפלו על שולחן עבודה עם מכונת שיכפול מפתחות, צילינדר מנעול ומפתחות מפוזרים",
+          "width": 2528,
+          "height": 1696,
+          "bytes": 2619403,
+          "kind": "raster",
+          "focal": {
+            "x": 0.4,
+            "y": 0.42
+          },
+          "legacySrc": null,
+          "category": "homepage"
+        },
+        {
+          "key": "3locksmiths/gallery/home-tile-2.jpg",
+          "sha256": "9333d9ed90cb2f8989539e00e75d7655568dc7a538b92676302df9a918ef819e",
+          "alt": "Bald man in a navy polo shirt holding a car key beside an open door of a dark grey car on a residential street",
+          "altHe": "גבר קירח בחולצת פולו כחולה מחזיק מפתח רכב ליד דלת פתוחה של מכונית אפורה כהה ברחוב מגורים",
+          "width": 2528,
+          "height": 1696,
+          "bytes": 2577397,
+          "kind": "raster",
+          "focal": {
+            "x": 0.41,
+            "y": 0.28
+          },
+          "legacySrc": null,
+          "category": "homepage"
+        },
+        {
+          "key": "3locksmiths/gallery/home-tile-3.jpg",
+          "sha256": "84e9e5e1d5dbc2886bcc55c07c7dbd879111c48167c42dbd2bc60f6c83e390cf",
+          "alt": "A grey-haired man in a navy polo shirt holds a brass lock cylinder and a screwdriver beside an open door",
+          "altHe": "גבר בעל שיער אפור בחולצת פולו כחולה מחזיק צילינדר מנעול פליז ומברג לצד דלת פתוחה",
+          "width": 2528,
+          "height": 1696,
+          "bytes": 2538303,
+          "kind": "raster",
+          "focal": {
+            "x": 0.4,
+            "y": 0.42
+          },
+          "legacySrc": null,
+          "category": "homepage"
+        },
+        {
+          "key": "3locksmiths/gallery/home-tile-4.jpg",
+          "sha256": "c671b979532f8eb14b69553910352f8d062e2a5e9e26b6e2d95bed9abb8fd97b",
+          "alt": "Smiling man in a navy polo shirt with a three-figure logo holds up a set of keys in an open doorway",
+          "altHe": "גבר מחייך בחולצת פולו כחולה עם לוגו של שלוש דמויות מחזיק צרור מפתחות בפתח דלת פתוחה",
+          "width": 2528,
+          "height": 1696,
+          "bytes": 2376922,
+          "kind": "raster",
+          "focal": {
+            "x": 0.56,
+            "y": 0.36
+          },
+          "legacySrc": null,
+          "category": "homepage"
+        }
+      ]
+    }
   }
 }

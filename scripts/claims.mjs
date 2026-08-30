@@ -39,6 +39,11 @@ import { readFileSync, writeFileSync } from "node:fs";
 
 const PATH = "content/site.json";
 
+// The display phone comes from the manifest. CLAUDE.md §6: a phone number typed anywhere but the
+// roster is a bug — which is exactly the defect the `us-phone-number-in-cta` rule below cleans up.
+const manifest = JSON.parse(readFileSync("site.config.json", "utf8"));
+const PHONE = manifest.contact?.phoneDisplay ?? "055-6601006";
+
 /** Enumerated rewrites. `from` must be the exact scraped text. */
 const REWRITES = [
   {
@@ -125,6 +130,48 @@ const HTML_REWRITES = [
     id: "footer-hours-block-encoded",
     from: `<p>א&#8217;-ו&#8217;: 8:00–18:00 | שבת: 8:00–17:00</p>`,
     to: `<p>זמינים 24/7, כל ימות השבוע</p>`,
+  },
+  {
+    // §rating — the SECOND fabricated "Google 5.0 ★★★★★" badge, and the one the guards could not
+    // see. It is `logo-11.png`, the 5th .gallery-item in the homepage hero, absolutely positioned
+    // as a centred overlay on the photo grid.
+    //
+    // Neither the rule above nor check-claims.mjs caught it: both match on the token
+    // `GoogleRating`, and a badge named `logo-11.png` matches nothing. The guard has been widened
+    // (check-claims.mjs §fabricated-rating-badge) so a rating hiding behind an innocuous filename
+    // cannot pass again.
+    //
+    // ⚠️ Removing this ALSO needs the CSS override in app/enrich.css: the theme styles
+    // `.home-hero-right-galley .gallery-item:last-child` as an absolutely-centred overlay
+    // (main.css:1788). Drop the 5th tile and the 4th inherits that rule and jumps into the middle
+    // of the grid. The override pins the tiles back into normal flow.
+    id: "fabricated-google-rating-badge-hero",
+    from: '<div class="gallery-item"><img loading="lazy" decoding="async" width="480" height="258" src="/wp-content/uploads/2025/05/logo-11.png" alt></div>',
+    to: "",
+  },
+  {
+    // §rating — the THIRD copy, baked into a raster so no text-level guard could ever see it:
+    // `admin-ajax-2-1` is a 4-photo collage with a "Google 5.0 ★★★★★" card composited into the
+    // middle of the image. The photos underneath are stock electricians and builders, so nothing
+    // is lost by removing it.
+    //
+    // The whole `.img-serv` wrapper goes, not just the <img>: main.css:2981 gives that div a fixed
+    // 652×485 box, so removing only the image would leave a large empty hole in the section.
+    id: "fabricated-google-rating-badge-collage",
+    from: '<div class="img-serv">\r\n\t\t\t\t<img loading="lazy" decoding="async" width="600" height="446" src="/assets/img/admin-ajax-2-1.webp" alt>\r\n\t\t\t</div>',
+    to: "",
+  },
+  {
+    // §nap — a HOUSTON, TEXAS phone number printed on the homepage of an Israeli locksmith.
+    // `(281) 843-8447` is leftover from the gogo theme's US origin and it is live right now.
+    //
+    // fix-links.mjs already normalised the href to tel:+972556601006, so the button DIALS
+    // correctly — which is precisely why this survived: the link works, only the text a human
+    // reads is wrong. Anyone on a desktop reads a US number off the page, and a US area code on
+    // an Israeli service site is an instant trust failure.
+    id: "us-phone-number-in-cta",
+    from: "</svg>(281) 843-8447\t\t\t\t\t\t</a>",
+    to: `</svg>${PHONE}\t\t\t\t\t\t</a>`,
   },
   {
     // The brand logo shipped with an empty alt on every page, so the one image that names the
