@@ -46,10 +46,29 @@ for (const f of readdirSync(join(ROOT, "scripts"))) {
 sources.push(join(ROOT, "lib", "enrich", "render.mjs"));
 sources.push(join(ROOT, "site.config.json"));
 
+/**
+ * Modification times are only meaningful in a working tree someone has actually been editing.
+ *
+ * A fresh `git checkout` writes every file at once, milliseconds apart and in no guaranteed
+ * order — so on a clean clone `site.json` lands either side of the scripts by pure chance, and a
+ * strict `mtime >` comparison becomes a coin flip. That is exactly what happened in CI on
+ * 2026-08-30: the job failed with 13 sources reported as "0s newer" than the artifact, all of
+ * them from the same checkout, none of them actually edited.
+ *
+ * The skew below discards that jitter. The defect this guard exists to catch — a module edited
+ * *after* `npm run enrich` — is always seconds to hours newer, never milliseconds.
+ *
+ * CI does not rely on this check alone. `.github/workflows/ci.yml` re-runs the pipeline and
+ * asserts `content/site.json` does not change, which tests the same property by content instead
+ * of by timestamp and cannot be fooled by a checkout. The pipeline is byte-deterministic
+ * (verified 2026-08-30 over three consecutive runs), so that assertion is stable.
+ */
+const SKEW_MS = 5_000;
+
 const stale = sources
   .filter((f) => existsSync(f))
   .map((f) => ({ f, m: statSync(f).mtimeMs }))
-  .filter((x) => x.m > siteMtime)
+  .filter((x) => x.m > siteMtime + SKEW_MS)
   .sort((a, b) => b.m - a.m);
 
 if (stale.length === 0) {

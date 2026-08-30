@@ -38,11 +38,35 @@ jobs:
       - name: Format check
         run: npm run format:check
 
-      # content/site.json must be newer than every module and script that feeds it. A stale
-      # artifact builds and deploys SILENTLY with the previous copy — that happened on
-      # 2026-08-25. See scripts/check-freshness.mjs.
-      - name: Assert content is not stale
-        run: node scripts/check-freshness.mjs
+      # content/site.json is a build artifact that `npm run build` does NOT regenerate, so a
+      # stale one builds and deploys SILENTLY with the previous copy — that happened on
+      # 2026-08-25.
+      #
+      # Asserted by CONTENT, not by timestamp. scripts/check-freshness.mjs compares mtimes,
+      # which is the right test in a working tree but meaningless after actions/checkout writes
+      # every file at once: on 2026-08-30 this job failed with 13 sources reported "0s newer"
+      # than the artifact, purely from checkout write order. Re-running the pipeline and
+      # diffing tests the same property — does the committed artifact match what the sources
+      # produce — and cannot be fooled by a checkout.
+      #
+      # Safe because the pipeline is byte-deterministic (verified over three consecutive runs)
+      # and `enrich` never touches the network. `snapshot` does, and must never run here.
+      - name: Assert content/site.json matches its sources
+        run: |
+          set -euo pipefail
+          npm run enrich
+          if ! git diff --quiet -- content/site.json content/enriched/_manifest.json; then
+            echo "::error::content/site.json is stale — run \`npm run enrich\` and commit the result"
+            git diff --stat -- content/site.json content/enriched/_manifest.json
+            exit 1
+          fi
+          echo "content/site.json reproduces exactly from its sources"
+
+      - name: Assert Hebrew punctuation
+        run: node scripts/check-typography.mjs
+
+      - name: Assert no claim our own data refutes
+        run: node scripts/check-claims.mjs
 
       # NOTE: `build` only. `npm run snapshot` re-scrapes the live WordPress origin and
       # must never run in CI - it would rewrite content/site.json from whatever the old
@@ -57,14 +81,18 @@ jobs:
         run: |
           set -euo pipefail
 
+          # Floors, not exact counts — the site grows. Raised 2026-08-30 from 66/60, which the
+          # 2026-08-26 content work left so far behind that losing a third of the site would
+          # still have passed. Keep a little headroom below the real numbers (111 routes /
+          # 104 sitemap URLs) and raise these when the site grows again.
           routes=$(find out -name index.html | wc -l)
           urls=$(grep -c '<url>' out/sitemap.xml)
           echo "routes=$routes sitemap_urls=$urls"
-          test "$routes" -ge 66 || { echo "::error::expected >=66 emitted routes, got $routes"; exit 1; }
-          test "$urls" -ge 60 || { echo "::error::expected >=60 sitemap URLs, got $urls"; exit 1; }
+          test "$routes" -ge 105 || { echo "::error::expected >=105 emitted routes, got $routes"; exit 1; }
+          test "$urls" -ge 100 || { echo "::error::expected >=100 sitemap URLs, got $urls"; exit 1; }
 
-          # Exactly one <h1> per page. scripts/enrich.mjs enforces this for the 53 authored
-          # pages; this covers the other 13 too.
+          # Exactly one <h1> per page. scripts/enrich.mjs enforces this for the 97 authored
+          # pages; this covers the rest of the 108 routes too.
           bad_h1=0
           while IFS= read -r f; do
             n=$(grep -o '<h1' "$f" | wc -l)
