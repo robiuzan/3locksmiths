@@ -1,11 +1,14 @@
 name: CI
 
-# Build-only. This workflow does NOT deploy.
+# Build-only. This workflow does NOT deploy, and nothing in this repo does.
 #
 # Production is Cloudflare Pages (project `3locksmiths`) via wrangler direct upload
 # (`ops/deploy-site.ps1` in the Israeli services sites hub) - see CLAUDE.md §10.
-# The sibling `deploy.yml` publishes to GitHub Pages, which is a SECOND, STALE live
-# origin (backlog §12.1). A green check here has never meant "shipped".
+# A green check here does not mean "shipped".
+#
+# The sibling `deploy.yml` used to publish to GitHub Pages, giving the site a second,
+# stale live origin (backlog §12.1). That origin was retired 2026-08-25 and the workflow
+# was deleted 2026-08-26. If a deploy workflow reappears here, treat it as a regression.
 
 on:
   push:
@@ -86,7 +89,7 @@ jobs:
           # still have passed. Keep a little headroom below the real numbers (111 routes /
           # 104 sitemap URLs) and raise these when the site grows again.
           routes=$(find out -name index.html | wc -l)
-          urls=$(grep -c '<url>' out/sitemap.xml)
+          urls=$(grep -c '<url>' out/sitemap.xml || true)
           echo "routes=$routes sitemap_urls=$urls"
           test "$routes" -ge 105 || { echo "::error::expected >=105 emitted routes, got $routes"; exit 1; }
           test "$urls" -ge 100 || { echo "::error::expected >=100 sitemap URLs, got $urls"; exit 1; }
@@ -95,7 +98,7 @@ jobs:
           # pages; this covers the rest of the 108 routes too.
           bad_h1=0
           while IFS= read -r f; do
-            n=$(grep -o '<h1' "$f" | wc -l)
+            n=$(grep -o '<h1' "$f" | wc -l || true)
             if [ "$n" -ne 1 ]; then echo "::error::$f has $n <h1>"; bad_h1=1; fi
           done < <(find out -name index.html -not -path 'out/404/*' -not -path 'out/_not-found/*')
           test "$bad_h1" -eq 0
@@ -152,7 +155,13 @@ jobs:
             process.exit(bad?1:0);'
 
           # §8.1 - dead click-to-call from an unresolved WordPress [phone] shortcode.
-          n=$(grep -rho 'tel:%5Bphone%5D\|tel:\[phone\]' out --include=index.html | wc -l)
+          #
+          # The `|| true` is load-bearing. Under `set -euo pipefail` a grep that matches NOTHING
+          # exits 1, pipefail propagates that through `| wc -l`, and the assignment kills the
+          # step — so this check failed precisely when it should pass, and could only have gone
+          # green while the defect still existed. It was never caught because the workflow had
+          # never run: it was committed untracked and the freshness step above it failed first.
+          n=$(grep -rho 'tel:%5Bphone%5D\|tel:\[phone\]' out --include=index.html | wc -l || true)
           if [ "$n" -gt 0 ]; then echo "::error::$n dead tel:[phone] links (backlog §8.1)"; exit 1; fi
 
           # §4.2 - the personal address must never reappear, in schema OR visible chrome.
@@ -173,7 +182,8 @@ jobs:
 
           # §13.3 - per-surface CTA tracking: several distinct data-cta values, and the
           # homepage must carry at least one tracked CTA.
-          vals=$(grep -rho 'data-cta="[^"]*"' out --include=index.html | sort -u | wc -l)
+          # `|| true` for the same reason as §8.1 above: no match must mean "zero", not "abort".
+          vals=$(grep -rho 'data-cta="[^"]*"' out --include=index.html | sort -u | wc -l || true)
           echo "distinct data-cta values: $vals"
           if [ "$vals" -lt 5 ]; then echo "::error::only $vals distinct data-cta values - per-surface tracking regressed (backlog §13.3)"; exit 1; fi
           if ! grep -q 'data-cta=' out/index.html; then
