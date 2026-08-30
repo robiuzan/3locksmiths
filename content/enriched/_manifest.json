@@ -1,6 +1,6 @@
 {
   "referenceId": 95,
-  "count": 98,
+  "count": 106,
   "lookup": {
     "7": {
       "path": "/",
@@ -318,6 +318,10 @@
       "path": "/services/%d7%9e%d7%a4%d7%aa%d7%97-%d7%a0%d7%a9%d7%91%d7%a8-%d7%91%d7%9e%d7%a0%d7%a2%d7%95%d7%9c/",
       "title": "מפתח נשבר במנעול"
     },
+    "9304": {
+      "path": "/services/%d7%9e%d7%a0%d7%a2%d7%95%d7%9c%d7%9f-24-%d7%a9%d7%a2%d7%95%d7%aa/",
+      "title": "מנעולן 24 שעות"
+    },
     "9401": {
       "path": "/services/%d7%a0%d7%99%d7%aa%d7%95%d7%a7-%d7%a7%d7%95%d7%93%d7%9f-%d7%9c%d7%a8%d7%9b%d7%91/",
       "title": "ניתוק קודן לרכב"
@@ -373,6 +377,34 @@
     "9507": {
       "path": "/services/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%91%d7%99-%d7%95%d7%95%d7%90%d7%99-%d7%93%d7%99/",
       "title": "שכפול מפתח לרכבי BYD"
+    },
+    "9508": {
+      "path": "/services/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%9e%d7%99%d7%a0%d7%99-%d7%a7%d7%95%d7%a4%d7%a8/",
+      "title": "שכפול מפתח מיני קופר"
+    },
+    "9509": {
+      "path": "/services/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%a7%d7%a8%d7%99%d7%99%d7%96%d7%9c%d7%a8/",
+      "title": "שכפול מפתח קרייזלר"
+    },
+    "9510": {
+      "path": "/services/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%a7%d7%90%d7%93%d7%99%d7%9c%d7%a7/",
+      "title": "שכפול מפתח קאדילק"
+    },
+    "9511": {
+      "path": "/services/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%90%d7%99%d7%a1%d7%95%d7%96%d7%95/",
+      "title": "שכפול מפתח איסוזו"
+    },
+    "9512": {
+      "path": "/services/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%93%d7%99%d7%99%d7%94%d7%98%d7%a1%d7%95/",
+      "title": "שכפול מפתח דייהטסו"
+    },
+    "9513": {
+      "path": "/services/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%91%d7%99%d7%95%d7%90%d7%99%d7%a7/",
+      "title": "שכפול מפתח ביואיק"
+    },
+    "9514": {
+      "path": "/services/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%90%d7%99%d7%a0%d7%a4%d7%99%d7%a0%d7%99%d7%98%d7%99/",
+      "title": "שכפול מפתח אינפיניטי"
     },
     "9601": {
       "path": "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%90%d7%a9%d7%93%d7%95%d7%93/",
@@ -1417,6 +1449,22 @@
       "relatedLocations": []
     },
     {
+      "id": 9304,
+      "kind": "service",
+      "title": "מנעולן 24 שעות",
+      "keyword": "מנעולן 24 שעות",
+      "path": "/services/%d7%9e%d7%a0%d7%a2%d7%95%d7%9c%d7%9f-24-%d7%a9%d7%a2%d7%95%d7%aa/",
+      "canonical": "https://3locksmiths.co.il/services/%d7%9e%d7%a0%d7%a2%d7%95%d7%9c%d7%9f-24-%d7%a9%d7%a2%d7%95%d7%aa/",
+      "relatedServices": [
+        93,
+        94,
+        95,
+        96,
+        97
+      ],
+      "relatedLocations": []
+    },
+    {
       "id": 9301,
       "kind": "service",
       "title": "פתיחת רכב נעול",
@@ -1724,6 +1772,132 @@
       "path": "/services/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%91%d7%99-%d7%95%d7%95%d7%90%d7%99-%d7%93%d7%99/",
       "canonical": "https://3locksmiths.co.il/services/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%91%d7%99-%d7%95%d7%95%d7%90%d7%99-%d7%93%d7%99/",
       "brand": "BYD",
+      "relatedServices": [
+        98,
+        99,
+        100,
+        101,
+        109,
+        95
+      ],
+      "relatedLocations": []
+    },
+    {
+      "id": 9508,
+      "kind": "brand-key",
+      "title": "שכפול מפתח מיני קופר",
+      "keyword": "שכפול מפתח מיני קופר",
+      "path": "/services/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%9e%d7%99%d7%a0%d7%99-%d7%a7%d7%95%d7%a4%d7%a8/",
+      "canonical": "https://3locksmiths.co.il/services/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%9e%d7%99%d7%a0%d7%99-%d7%a7%d7%95%d7%a4%d7%a8/",
+      "brand": "מיני קופר",
+      "relatedServices": [
+        98,
+        99,
+        100,
+        101,
+        109,
+        95
+      ],
+      "relatedLocations": []
+    },
+    {
+      "id": 9509,
+      "kind": "brand-key",
+      "title": "שכפול מפתח קרייזלר",
+      "keyword": "שכפול מפתח קרייזלר",
+      "path": "/services/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%a7%d7%a8%d7%99%d7%99%d7%96%d7%9c%d7%a8/",
+      "canonical": "https://3locksmiths.co.il/services/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%a7%d7%a8%d7%99%d7%99%d7%96%d7%9c%d7%a8/",
+      "brand": "קרייזלר",
+      "relatedServices": [
+        98,
+        99,
+        100,
+        101,
+        109,
+        95
+      ],
+      "relatedLocations": []
+    },
+    {
+      "id": 9510,
+      "kind": "brand-key",
+      "title": "שכפול מפתח קאדילק",
+      "keyword": "שכפול מפתח קאדילק",
+      "path": "/services/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%a7%d7%90%d7%93%d7%99%d7%9c%d7%a7/",
+      "canonical": "https://3locksmiths.co.il/services/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%a7%d7%90%d7%93%d7%99%d7%9c%d7%a7/",
+      "brand": "קאדילק",
+      "relatedServices": [
+        98,
+        99,
+        100,
+        101,
+        109,
+        95
+      ],
+      "relatedLocations": []
+    },
+    {
+      "id": 9511,
+      "kind": "brand-key",
+      "title": "שכפול מפתח איסוזו",
+      "keyword": "שכפול מפתח איסוזו",
+      "path": "/services/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%90%d7%99%d7%a1%d7%95%d7%96%d7%95/",
+      "canonical": "https://3locksmiths.co.il/services/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%90%d7%99%d7%a1%d7%95%d7%96%d7%95/",
+      "brand": "איסוזו",
+      "relatedServices": [
+        98,
+        99,
+        100,
+        101,
+        109,
+        95
+      ],
+      "relatedLocations": []
+    },
+    {
+      "id": 9512,
+      "kind": "brand-key",
+      "title": "שכפול מפתח דייהטסו",
+      "keyword": "שכפול מפתח דייהטסו",
+      "path": "/services/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%93%d7%99%d7%99%d7%94%d7%98%d7%a1%d7%95/",
+      "canonical": "https://3locksmiths.co.il/services/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%93%d7%99%d7%99%d7%94%d7%98%d7%a1%d7%95/",
+      "brand": "דייהטסו",
+      "relatedServices": [
+        98,
+        99,
+        100,
+        101,
+        109,
+        95
+      ],
+      "relatedLocations": []
+    },
+    {
+      "id": 9513,
+      "kind": "brand-key",
+      "title": "שכפול מפתח ביואיק",
+      "keyword": "שכפול מפתח ביואיק",
+      "path": "/services/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%91%d7%99%d7%95%d7%90%d7%99%d7%a7/",
+      "canonical": "https://3locksmiths.co.il/services/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%91%d7%99%d7%95%d7%90%d7%99%d7%a7/",
+      "brand": "ביואיק",
+      "relatedServices": [
+        98,
+        99,
+        100,
+        101,
+        109,
+        95
+      ],
+      "relatedLocations": []
+    },
+    {
+      "id": 9514,
+      "kind": "brand-key",
+      "title": "שכפול מפתח אינפיניטי",
+      "keyword": "שכפול מפתח אינפיניטי",
+      "path": "/services/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%90%d7%99%d7%a0%d7%a4%d7%99%d7%a0%d7%99%d7%98%d7%99/",
+      "canonical": "https://3locksmiths.co.il/services/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%90%d7%99%d7%a0%d7%a4%d7%99%d7%a0%d7%99%d7%98%d7%99/",
+      "brand": "אינפיניטי",
       "relatedServices": [
         98,
         99,

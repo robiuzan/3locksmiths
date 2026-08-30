@@ -276,7 +276,7 @@ export default {
         // 🔶 confirm — the previous answer promised "24 שעות ביממה" while every page publishes
         // openingHoursSpecification 08:00–18:00. Until the owner confirms real after-hours
         // cover, point at the published hours and invite the call. docs/business-facts.md §B.
-        a: "שעות הפעילות המפורסמות שלנו הן א׳–ו׳ 08:00–18:00 ושבת 08:00–17:00. לקריאות דחופות מחוץ לשעות אלה התקשרו למספר 055-6601006 ונאמר לכם מיד אם יש ניידת פנויה באזורכם.",
+        a: "אנחנו זמינים 24 שעות ביממה, כולל לילות, שבתות וחגים. לקריאה דחופה התקשרו למספר 055-6601006 בכל שעה, ונאמר לכם מיד אם יש ניידת פנויה באזורכם.",
       },
       {
         q: "האם יש אחריות על העבודה?",

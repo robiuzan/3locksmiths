@@ -203,7 +203,7 @@ payload; count `href="tel:` to get the real number). Confirmed
 | `priceRange`        | `₪₪`                                             | ✅ manifest                 |
 | Warranty ("אחריות") | claimed widely, no term stated                   | 🔶                          |
 | Response time       | "כ-20–40 דקות" and similar, per city             | 🔶                          |
-| 24/7 availability   | **removed sitewide 2026-08-25** — see D.3        | ⛔                          |
+| 24/7 availability   | **confirmed by the owner 2026-08-30** — see D.3  | ✅ owner instruction        |
 
 ### D.1 Prices are authored, not sourced
 
@@ -220,21 +220,35 @@ An `Offer` carrying an unconfirmed price is worse than no `Offer`.
 "אחריות" / "אחריות מלאה" appears throughout the authored copy with **no duration, scope or
 exclusions**. Do not state a term. Do not let "אחריות מלאה" be read as a period.
 
-### D.3 "24/7" and response times — ⛔ removed sitewide on 2026-08-25
+### D.3 "24/7" — ⛔ removed 2026-08-25, ✅ CONFIRMED AND RESTORED 2026-08-30
 
-`24/7` was not merely unconfirmed. **Every page on this site publishes
-`openingHoursSpecification` 08:00–18:00 (Sat 08:00–17:00)**, and `lib/enrich/render.mjs:33`
-prints those same hours in the chrome. A page claiming 24/7 therefore contradicted its own
-structured data, in the same HTML document, on the highest-value pages on the site.
+> ✅ **The owner confirmed 24/7 availability on 2026-08-30**, in response to this register's own
+> question. That is the source; there is nothing further to verify.
+>
+> The published hours are now `openingHoursSpecification` **00:00–23:59, all seven days**
+> (`scripts/enrich.mjs`), the chrome prints `24/7` (`lib/enrich/render.mjs`, `scripts/pages.mjs`),
+> and the `always-open` blocking rules were removed from `scripts/claims.mjs` and
+> `scripts/check-claims.mjs` — a guard that forbids a now-sourced claim is a guard that will be
+> ignored. The rewrites that stripped 24/7 from the scraped homepage copy were deleted with them.
+>
+> **If the business ever stops answering overnight, this must be reversed in all five places.**
+> The claim is only as good as the confirmation behind it, and it now appears in the schema, which
+> is what Google reads.
 
-Removed from: the homepage `<title>` (`scripts/enrich.mjs` `HOME_SEO`), the homepage feature card
-and FAQ accordion including its `FAQPage` JSON-LD mirror (`scripts/claims.mjs`), the `/contact/`
-title (`scripts/pages.mjs`), and the authored modules `77.mjs`, `93.mjs`, `94.mjs`.
+**The history is worth keeping**, because the defect was not "an unconfirmed claim" — it was a
+self-contradiction. Until 2026-08-25 every page published `openingHoursSpecification` 08:00–18:00
+(Sat 08:00–17:00) while the copy claimed 24/7, in the same HTML document, on the highest-value
+pages on the site. Whichever half was true, the page was provably lying about the other.
 
-**Either the hours or the availability claim is wrong, and the owner must say which.** If the
-business genuinely answers overnight, fix `openingHoursSpecification` in `scripts/enrich.mjs:178`
-and the claim can come back. Until then the published hours are the only sourced statement, so
-they are what the copy says.
+That is the general rule this section exists to record: **a claim that contradicts our own
+structured data is worse than an unsourced one**, because the contradiction is machine-detectable.
+The fix was never "pick the friendlier wording" — it was to find out which half was true. Now that
+the owner has, both halves say the same thing.
+
+Previously removed from, and now restored across: the homepage `<title>` (`scripts/enrich.mjs`
+`HOME_SEO`), the homepage feature card and FAQ accordion including its `FAQPage` JSON-LD mirror
+(`scripts/claims.mjs`), the `/contact/` title (`scripts/pages.mjs`), and the authored modules
+`77.mjs`, `93.mjs`, `94.mjs`.
 
 The per-city response windows ("ברוב המקרים … תוך כ-30 עד 45 דקות") were authored, not measured.
 They are hedged and remain 🔶 — but see D.4 for the version that was not hedged.

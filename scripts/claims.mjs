@@ -8,7 +8,8 @@
  *
  * WHAT IT FIXES — claims the site itself refutes elsewhere:
  *   · "ניסיון של 25 שנה"  — site.config.json has foundedYear: null.
- *   · "זמינות 24/7"       — every page publishes openingHoursSpecification 08:00–18:00.
+ *   · "זמינות 24/7"       — WAS ⛔ while the schema said 08:00–18:00; the owner confirmed
+ *                          24/7 on 2026-08-30, so these rules now run in reverse. See §D.3.
  *   · a "Google rating 5.0 ★★★★★" BADGE IMAGE — see §rating below.
  * All were live on the homepage, the single highest-value page on the site, and all were
  * invisible to module-level review because no module contains them.
@@ -56,20 +57,30 @@ const REWRITES = [
     from: "25 שנות ניסיון במנעולנות רכב.",
     to: "מנעולנות רכב ובית – עבודה מדויקת בשטח, עד אליכם.",
   },
+  // --- 24/7: RESTORED 2026-08-30 ------------------------------------------------------------
+  // These three rules used to run the other way, stripping 24/7 out of the scraped homepage
+  // because the schema published 08:00–18:00 and the page contradicted itself. The owner
+  // confirmed 24/7 availability on 2026-08-30 (docs/business-facts.md §D.3), the schema in
+  // scripts/enrich.mjs now publishes 00:00–23:59 all week, and the claim is sourced.
+  //
+  // They are reversed rather than deleted because content/site.json PERSISTS: the earlier pass
+  // already overwrote the original scraped wording, so simply removing the rules would leave the
+  // hedged 08:00–18:00 copy frozen on the homepage forever. `from` is therefore the text this
+  // script itself wrote, not the WordPress original.
   {
     id: "home-card-247-heading",
-    from: "זמינות 24/7",
-    to: "מענה לקריאות דחופות",
+    from: "מענה לקריאות דחופות",
+    to: "זמינות 24/7",
   },
   {
     id: "home-card-247-body",
-    from: "אין שעות עבודה – השירות שלנו פועל גם בשעות חירום ובלילות.",
-    to: "קריאות דחופות מטופלות בעדיפות. התקשרו ונעדכן זמן הגעה מדויק.",
+    from: "קריאות דחופות מטופלות בעדיפות. התקשרו ונעדכן זמן הגעה מדויק.",
+    to: "אין שעות עבודה – השירות שלנו פועל גם בשעות חירום ובלילות.",
   },
   {
     id: "home-faq-247",
-    from: "כן. זמינים 24/7 לשירות חירום בכל אזור המרכז והסביבה",
-    to: "שעות הפעילות המפורסמות שלנו הן א׳–ו׳ 08:00–18:00 ושבת 08:00–17:00. לקריאה דחופה מחוץ לשעות אלה התקשרו ל-055-6601006 ונאמר לכם מיד אם יש ניידת פנויה באזורכם.",
+    from: "שעות הפעילות המפורסמות שלנו הן א׳–ו׳ 08:00–18:00 ושבת 08:00–17:00. לקריאה דחופה מחוץ לשעות אלה התקשרו ל-055-6601006 ונאמר לכם מיד אם יש ניידת פנויה באזורכם.",
+    to: "כן. אנחנו זמינים 24/7, כולל לילות, שבתות וחגים. התקשרו ל-055-6601006 ונמסור לכם זמן הגעה מדויק.",
   },
 ];
 
@@ -91,13 +102,29 @@ const HTML_REWRITES = [
     to: "",
   },
   {
-    // The scraped header published Saturday 16:00 while the LocalBusiness schema, scripts/pages.mjs
-    // and lib/enrich/render.mjs all publish 17:00 — the site contradicted itself on every page.
-    // Aligned to 17:00 (three sources against one) and switched to גרש U+05F3 per CLAUDE.md §8.
-    // 🔶 the hours themselves are still unverified against the business — docs/business-facts.md §C.
-    id: "header-hours-saturday-mismatch",
-    from: `<div class="value">א'-ו': 8:00–18:00 | שבת: 8:00–16:00</div>`,
-    to: `<div class="value">א׳–ו׳: 8:00–18:00 | שבת: 8:00–17:00</div>`,
+    // The header hours strip. It first published Saturday 16:00 while the schema said 17:00 —
+    // the site contradicting itself on every page — and was aligned to 17:00 on 2026-08-26.
+    // Now that the owner has confirmed 24/7 (docs/business-facts.md §D.3) it prints that instead,
+    // matching the 00:00–23:59 openingHoursSpecification in scripts/enrich.mjs.
+    id: "header-hours-strip",
+    from: `<div class="value">א׳–ו׳: 8:00–18:00 | שבת: 8:00–17:00</div>`,
+    to: `<div class="value">זמינים 24/7, כל ימות השבוע</div>`,
+  },
+  {
+    // The SECOND hours block — the footer "שעות פתיחה" info panel, on all 116 pages. It is a
+    // different element from the header strip above and was missed when the header was first
+    // aligned on 2026-08-26, so the site published two different opening-hours statements in the
+    // same document for four days. Found by grepping the rendered artifact for the time string
+    // rather than by reading the templates.
+    id: "footer-hours-block",
+    from: `<div class="work-time">\n\t\t\t\t\t\t\t\t\t\t<p>א׳-ו׳: 8:00–18:00 | שבת: 8:00–17:00</p>`,
+    to: `<div class="work-time">\n\t\t\t\t\t\t\t\t\t\t<p>זמינים 24/7, כל ימות השבוע</p>`,
+  },
+  {
+    // Same block, entity-encoded variant (one page kept the &#8217; form of the geresh).
+    id: "footer-hours-block-encoded",
+    from: `<p>א&#8217;-ו&#8217;: 8:00–18:00 | שבת: 8:00–17:00</p>`,
+    to: `<p>זמינים 24/7, כל ימות השבוע</p>`,
   },
   {
     // The brand logo shipped with an empty alt on every page, so the one image that names the
@@ -117,7 +144,12 @@ const HTML_REWRITES = [
 /** ⛔ patterns that must not survive. Mirrors scripts/check-claims.mjs. */
 const FORBIDDEN = [
   ["years-in-business", /\d{1,2}\s*\+?\s*שנות ניסיון|ניסיון של\s*\d{1,2}\s*שנ/],
-  ["always-open", /24\/7|24 שעות ביממה|מסביב לשעון/],
+  // "always-open" was here until 2026-08-30. Removed, not relaxed: the owner confirmed 24/7
+  // (docs/business-facts.md §D.3) and the schema now publishes 00:00–23:59 all week, so the
+  // claim is sourced. A guard that forbids something we can source is a guard people learn to
+  // ignore — and the surrounding rules only work while this list is trusted. If 24/7 ever stops
+  // being true, restore it here AND revert the schema; one without the other is the exact
+  // self-contradiction §D.3 exists to prevent.
   // Tested against raw HTML, not visible text — this claim lives in an <img src>, which is
   // exactly why every text- and schema-level rating guard missed it. See §rating above.
   ["fabricated-rating-badge", /GoogleRating/],

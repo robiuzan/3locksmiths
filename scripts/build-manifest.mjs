@@ -58,6 +58,14 @@ const BRANDS = [
   "דאצ׳יה",
   "ג׳ילי",
   "BYD",
+  // Added 2026-08-30 with the final brand batch.
+  "מיני קופר",
+  "קרייזלר",
+  "קאדילק",
+  "איסוזו",
+  "דייהטסו",
+  "ביואיק",
+  "אינפיניטי",
 ];
 
 // Explicit city list — avoids stripping a leading ב that is part of the city name (בת ים, באר שבע).

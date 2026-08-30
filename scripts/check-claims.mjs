@@ -44,11 +44,14 @@ const BLOCKING = [
     re: /\b\d{1,2}\s*\+?\s*שנות ניסיון|ניסיון של\s*\d{1,2}\s*שנ|מעל\s*\d{1,2}\s*שנות/,
     why: "site.config.json has foundedYear: null — we cannot source any number of years.",
   },
-  {
-    id: "always-open",
-    re: /24\/7|24 שעות ביממה|מסביב לשעון/,
-    why: "every page publishes openingHoursSpecification 08:00–18:00 (Sat 08:00–17:00).",
-  },
+  // "always-open" lived here until 2026-08-30, when the owner confirmed 24/7 availability
+  // (docs/business-facts.md §D.3). The schema now publishes 00:00–23:59 across all seven days,
+  // so the claim and the structured data agree and there is nothing left to block.
+  //
+  // The rule was never about the wording — it was about the CONTRADICTION. Every page asserted
+  // 24/7 in copy while publishing 08:00–18:00 in its own markup, which is machine-detectable and
+  // therefore worse than an unsourced claim. If the hours ever change back, this rule and the
+  // openingHoursSpecification must move together.
   {
     id: "average-response-time",
     re: /זמן מענה ממוצע|זמן הגעה ממוצע/,

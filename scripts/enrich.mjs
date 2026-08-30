@@ -41,17 +41,17 @@ const CITIES = [
 const HOME_ID = 7;
 // 🔶 confirm: the description used to claim "מנעולן מוסמך" and "מעל 25 שנות ניסיון" — both
 // unverified (docs/business-facts.md §A.1, §A "credentials"). Restore only once sourced.
-// The title's "24/7" claim is also 🔶 (§D.3) but is left pending the owner's answer — changing
-// a ranking page's <title> is not a casual edit.
 const HOME_SEO = {
-  // No "24/7": every page publishes openingHoursSpecification 08:00–18:00 (Sat 08:00–17:00),
-  // so a 24/7 title contradicts our own structured data on the site's most important page.
-  // 56 chars. The previous wording ran to 63 and Google truncated it mid-phrase; "פתיחה" was
-  // dropped rather than one of the two duplication terms because the homepage's own H1 and the
-  // /services/פתיחת-רכב-נעול/ + /services/פתיחת-דלת-נעולה/ pages already carry that intent.
-  title: "מנעולן לרכב ולבית – שכפול וקידוד מפתחות | שלושה מנעולנים",
+  // 24/7 restored to the title 2026-08-30, now that the owner has confirmed it and the schema
+  // publishes 00:00–23:59 all week (§D.3). It leads the title because after-hours availability
+  // is the strongest differentiator this business has in the SERP — a lockout at 02:00 is the
+  // highest-intent query in the trade, and the category leader has been claiming it unopposed.
+  //
+  // 58 chars, inside the ~60 limit. "פתיחה" stays dropped: the H1 and the two פתיחה service
+  // pages already carry that intent, and the length has to pay for "24/7".
+  title: "מנעולן 24/7 לרכב ולבית – שכפול וקידוד | שלושה מנעולנים",
   description:
-    "שלושה מנעולנים – מנעולן לרכב ולבית: שכפול וקידוד מפתחות, פתיחת דלת נעולה והחלפת מנעולים אצלכם בשטח, במחיר שקוף מראש. חייגו 055-6601006 למענה מהיר.",
+    "שלושה מנעולנים – מנעולן 24/7 לרכב ולבית: שכפול וקידוד מפתחות, פתיחת דלת נעולה והחלפת מנעולים אצלכם בשטח, במחיר שקוף מראש. חייגו 055-6601006 בכל שעה.",
 };
 
 const site = JSON.parse(readFileSync(SITE, "utf8"));
@@ -226,18 +226,26 @@ function localBusinessSchema() {
     address: { "@type": "PostalAddress", addressCountry: "IL" },
     ...(sameAs.length ? { sameAs } : {}),
     priceRange: manifest.schema?.priceRange ?? "₪₪",
+    // 24/7 — confirmed by the owner 2026-08-30 (docs/business-facts.md §D.3). Until then this
+    // published 08:00–18:00 while parts of the copy claimed 24/7, so every page contradicted
+    // itself in its own markup. Both halves now say the same thing.
+    //
+    // `00:00`–`23:59` is the schema.org convention for always-open; a single spec covering all
+    // seven days is what Google reads as continuous availability.
     openingHoursSpecification: [
       {
         "@type": "OpeningHoursSpecification",
-        dayOfWeek: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-        opens: "08:00",
-        closes: "18:00",
-      },
-      {
-        "@type": "OpeningHoursSpecification",
-        dayOfWeek: "Saturday",
-        opens: "08:00",
-        closes: "17:00",
+        dayOfWeek: [
+          "Sunday",
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+        ],
+        opens: "00:00",
+        closes: "23:59",
       },
     ],
     areaServed: CITIES.map((c) => ({ "@type": "City", name: c })),

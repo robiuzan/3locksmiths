@@ -38,7 +38,7 @@ const PHONE = manifest.contact.phoneDisplay;
 const PHONE_TEL = manifest.contact.phoneE164;
 const EMAIL = manifest.contact.email;
 const BRAND = manifest.brandName;
-const HOURS = "א׳–ו׳: 8:00–18:00 | שבת: 8:00–17:00";
+const HOURS = "זמינים 24/7, כל ימות השבוע";
 // Last review date of the legal/accessibility copy. Bump when the text is revised.
 const LEGAL_UPDATED = "2 באוגוסט 2026";
 
@@ -129,7 +129,11 @@ function contactBody() {
         {
           icon: "clock",
           title: "שעות פעילות",
-          html: `${esc(HOURS)}. לקריאות חירום אנו זמינים גם מחוץ לשעות אלה.`,
+          // The trailing "and for emergencies we are available outside those hours too" made
+          // sense while HOURS read 08:00–18:00. With 24/7 confirmed it contradicted itself —
+          // there are no hours to be outside of. Replaced rather than deleted so the card keeps
+          // saying something useful.
+          html: `${esc(HOURS)} – כולל לילות, שבתות וחגים. תמיד יענה אדם, גם בשעות הקטנות.`,
         },
       ],
     ),
@@ -531,10 +535,21 @@ const NEW_SERVICES = [
 // doorway cluster (docs/content-standards.md §2). Those phrasings are handled INSIDE the
 // relevant page instead.
 //
-// "מנעולן חירום / מנעולן 24 שעות" is deliberately NOT built: it is purely an availability
-// claim, and availability is 🔶 unconfirmed while the LocalBusiness schema says 08:00–18:00
-// (docs/business-facts.md §D.3). Build it when the owner confirms real hours.
+// "מנעולן 24 שעות" was deliberately NOT built until 2026-08-30, because it is purely an
+// availability claim and availability was 🔶 unconfirmed while the schema said 08:00–18:00.
+// The owner confirmed 24/7 on 2026-08-30 (docs/business-facts.md §D.3) and the schema now
+// publishes 00:00–23:59 all week, so the page has a source and is built below.
 const EMERGENCY = [
+  {
+    id: 9304,
+    slug: "מנעולן-24-שעות",
+    title: "מנעולן 24 שעות",
+    h1: "מנעולן 24 שעות – מי עונה באמת בשתיים לפנות בוקר?",
+    tagline:
+      "נעילה לא בוחרת שעה. אנחנו זמינים בלילות, בשבתות ובחגים – מגיעים אליכם עם ניידת מצוידת.",
+    description:
+      "מנעולן 24 שעות ביממה לרכב ולבית – מענה בלילות, בשבתות ובחגים, פתיחה בשטח בלי נזק ומחיר שנמסר לפני היציאה. חייגו 055-6601006 בכל שעה.",
+  },
   {
     id: 9301,
     slug: "פתיחת-רכב-נעול",
@@ -664,6 +679,29 @@ const NEW_BRANDS = [
     slug: "שכפול-מפתח-בי-וואי-די",
     title: "שכפול מפתח לרכבי BYD",
     brand: "BYD",
+  },
+  // Added 2026-08-30 — the last brands the category leader covered and we did not. With these,
+  // brand coverage is complete against keyforme.co.il at 32 pages to their 31.
+  //
+  // These are longer-tail than the 2026-08-26 batch: smaller Israeli parc, so lower volume but
+  // also far less competition, and an owner searching for a Daihatsu key has nowhere good to go.
+  // Slugs stay ASCII-Hebrew with no גרש, matching the 25 existing brand slugs.
+  {
+    id: 9508,
+    slug: "שכפול-מפתח-מיני-קופר",
+    title: "שכפול מפתח מיני קופר",
+    brand: "מיני קופר",
+  },
+  { id: 9509, slug: "שכפול-מפתח-קרייזלר", title: "שכפול מפתח קרייזלר", brand: "קרייזלר" },
+  { id: 9510, slug: "שכפול-מפתח-קאדילק", title: "שכפול מפתח קאדילק", brand: "קאדילק" },
+  { id: 9511, slug: "שכפול-מפתח-איסוזו", title: "שכפול מפתח איסוזו", brand: "איסוזו" },
+  { id: 9512, slug: "שכפול-מפתח-דייהטסו", title: "שכפול מפתח דייהטסו", brand: "דייהטסו" },
+  { id: 9513, slug: "שכפול-מפתח-ביואיק", title: "שכפול מפתח ביואיק", brand: "ביואיק" },
+  {
+    id: 9514,
+    slug: "שכפול-מפתח-אינפיניטי",
+    title: "שכפול מפתח אינפיניטי",
+    brand: "אינפיניטי",
   },
 ];
 
@@ -850,9 +888,12 @@ site.pages.push(
     segments: ["contact"],
     jsonLd: hubJsonLd({ name: "צור קשר", segments: ["contact"], type: "ContactPage" }),
     seo: {
-      // No "24/7": every page publishes openingHoursSpecification 08:00–18:00.
-      title: `צור קשר – מנעולן לרכב ולבית, מענה מהיר | ${BRAND}`,
-      description: `צריכים מנעולן עכשיו? התקשרו ל-${PHONE}, שלחו וואטסאפ או מלאו את הטופס. ${BRAND} – שירות מהיר לרכב ולבית בפריסה ארצית, עם מחיר ברור מראש.`,
+      // 24/7 restored 2026-08-30 — owner-confirmed, and the schema now publishes 00:00–23:59
+      // all week (docs/business-facts.md §D.3). On the contact page it is the single most
+      // useful thing the snippet can say: the question a visitor has here is "will anyone
+      // actually answer".
+      title: `צור קשר – מנעולן 24/7 לרכב ולבית | ${BRAND}`,
+      description: `צריכים מנעולן עכשיו? התקשרו ל-${PHONE}, שלחו וואטסאפ או מלאו את הטופס. ${BRAND} – מענה 24 שעות ביממה לרכב ולבית, עם מחיר ברור מראש.`,
     },
     body: contactBody(),
   }),
