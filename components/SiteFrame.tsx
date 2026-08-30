@@ -20,7 +20,10 @@ export default function SiteFrame({ page }: { page: SitePage }) {
           dangerouslySetInnerHTML={{ __html: json }}
         />
       ))}
-      <div className={page.bodyClass} dangerouslySetInnerHTML={{ __html: page.bodyHtml }} />
+      <div
+        className={page.bodyClass}
+        dangerouslySetInnerHTML={{ __html: page.bodyHtml }}
+      />
       <ThemeScripts scripts={page.scripts} />
     </>
   );

@@ -31,5 +31,27 @@
     "areaServed": null,
     "sameAs": []
   },
-  "analytics": { "gtmId": "GTM-KWGGH438", "googleSiteVerification": null }
+  "analytics": {
+    "gtmId": "GTM-KWGGH438",
+    "ga4MeasurementId": null,
+    "googleSiteVerification": "ifGKeC-eWQKeDqM1qDUOgGmDODCTE1vSalAmg7bGmEI"
+  },
+  "images": {
+    "mediaHost": "imgquarry.com",
+    "defaultQuality": 80,
+    "og": {
+      "key": "3locksmiths/og.jpg",
+      "sha256": "20ca76d7f88fe8895b70c9c78c94c9a007b5047e245d1dc16afe2818451ca4e8",
+      "alt": "3 Locksmiths - share card",
+      "altHe": "שלושה מנעולנים",
+      "width": 1200,
+      "height": 630,
+      "bytes": 37205,
+      "kind": "raster",
+      "focal": null,
+      "legacySrc": null
+    },
+    "badges": [],
+    "gallery": null
+  }
 }

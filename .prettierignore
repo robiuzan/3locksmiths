@@ -1,0 +1,24 @@
+node_modules
+.next
+out
+out.prev
+build
+next-env.d.ts
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# Generated artifacts, all rewritten by `npm run enrich`. Formatting them creates a loop:
+# prettier rewrites them, the next enrich regenerates them unformatted, format:check fails.
+content/site.json
+content/enriched/_manifest.json
+public/assets/fa-subset.css
+
+# Vendored WordPress theme + plugin output — never edited, never formatted.
+public/wp-content
+public/wp-includes
+
+# Scratch dirs from the migration.
+.scratch
+.scratch2
+.scratch3

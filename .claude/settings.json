@@ -1,0 +1,71 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run build)",
+      "Bash(npm run lint)",
+      "Bash(npm run typecheck)",
+      "Bash(npm run dev)",
+      "Bash(npm run format)",
+      "Bash(npm run format:check)",
+      "Bash(npm run enrich)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Edit(.claude/**)",
+      "Write(.claude/**)",
+      "Edit(docs/**)",
+      "Write(docs/**)",
+      "Edit(content/enriched/**)",
+      "Write(content/enriched/**)",
+      "WebFetch(domain:3locksmiths.co.il)",
+      "Skill(3locksmiths-architecture)",
+      "Skill(seo-metadata)",
+      "Skill(schema-structured-data)",
+      "Skill(local-seo-il)",
+      "Skill(aeo-answer-content)",
+      "Skill(hebrew-rtl)",
+      "Skill(internal-linking)",
+      "Skill(conversion-cro)",
+      "Skill(tracking-analytics)",
+      "Skill(performance-web-vitals)",
+      "Skill(responsive-accessibility)",
+      "Skill(web-security-headers)",
+      "Skill(new-city)",
+      "Skill(new-service)",
+      "Skill(new-article)",
+      "Skill(qa-build-gate)",
+      "Skill(deploy-3locksmiths)",
+      "Skill(keyword-research)",
+      "Skill(content-brief)",
+      "Skill(competitor-gap)",
+      "Skill(site-navigation)",
+      "Skill(guides-hub)",
+      "Skill(engagement-ux)",
+      "Skill(reporting-cadence)"
+    ],
+    "deny": [
+      "Edit(content/site.json)",
+      "Write(content/site.json)",
+      "Edit(public/wp-content/**)",
+      "Write(public/wp-content/**)",
+      "Edit(public/wp-includes/**)",
+      "Write(public/wp-includes/**)",
+      "Edit(site.config.json)",
+      "Write(site.config.json)"
+    ]
+  },
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"$CLAUDE_PROJECT_DIR/.claude/hooks/format-changed.ps1\"",
+            "statusMessage": "Formatting changed files with Prettier",
+            "async": true
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -10,12 +10,20 @@ import { getSite } from "@/lib/content";
 
 export default function SiteAssets() {
   const { assets } = getSite();
-  const stylesheets = assets.headLinks.filter((l) => (l.rel ?? "").includes("stylesheet"));
+  const stylesheets = assets.headLinks.filter((l) =>
+    (l.rel ?? "").includes("stylesheet"),
+  );
 
   return (
     <>
       {stylesheets.map((l, i) => (
-        <link key={`css-${i}`} rel="stylesheet" href={l.href} media={l.media} precedence="gogo" />
+        <link
+          key={`css-${i}`}
+          rel="stylesheet"
+          href={l.href}
+          media={l.media}
+          precedence="gogo"
+        />
       ))}
       {assets.headStyles.map((css, i) => (
         <style

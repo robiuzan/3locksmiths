@@ -1,0 +1,51 @@
+# Cloudflare Pages response headers (backlog §12.3).
+#
+# `output: "export"` makes Next's headers() unavailable, so this file is the only place
+# response headers can be set. Cloudflare Pages MERGES these with its own defaults
+# (x-content-type-options and referrer-policy already arrive from Pages) rather than
+# replacing them.
+#
+# VERIFY AFTER EVERY DEPLOY — never assume a header shipped:
+#   curl -sSI https://3locksmiths.co.il/ | grep -iE 'strict-transport|x-frame|permissions|content-security'
+
+/*
+  # 1 year. NOTE: `preload` is deliberately ABSENT. Submitting to the preload list is
+  # effectively irreversible and commits every subdomain to HTTPS indefinitely — that is the
+  # owner's decision, not a default. Add it only on an explicit instruction.
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+
+  # SAMEORIGIN rather than DENY, so a future Business Profile or map embed of the site itself
+  # still works.
+  X-Frame-Options: SAMEORIGIN
+
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+
+  # No feature on this site needs any of these.
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
+
+  # ---------------------------------------------------------------------------------------
+  # CSP — REPORT-ONLY ON PURPOSE. Do not switch to enforcing without a week of real traffic.
+  #
+  # Host list enumerated from the actual export on 2026-08-25, not guessed:
+  #   cdnjs.cloudflare.com     the theme's jQuery/plugin bundles (329 refs) — kills the nav,
+  #                            carousels and calculator if blocked
+  #   www.googletagmanager.com GTM container + the <noscript> iframe
+  #   fonts.googleapis.com     the theme's Google Fonts stylesheet (Alexandria/Rubik/Poppins)
+  #   fonts.gstatic.com        the font files that stylesheet then requests
+  #   imgquarry.com            manifest media host (OG card, preconnected in <head>)
+  #   api.web3forms.com        the lead form POST — needs connect-src AND form-action
+  #   wa.me                    WhatsApp deep links (navigation, so form-action/frame not needed)
+  #
+  # 'unsafe-inline' in script-src is UNAVOIDABLE here, and that is worth stating plainly rather
+  # than pretending this policy is strong. There are three separate inline-script paths:
+  #   1. the GTM snippet injected via dangerouslySetInnerHTML in app/layout.tsx
+  #   2. components/ThemeScripts.tsx, which CREATES <script> elements at runtime to replay the
+  #      original theme scripts in document order
+  #   3. the scraped WordPress HTML, which carries its own inline scripts, varying per page
+  # A static export cannot emit a per-request nonce, and hashing (3) is impractical because the
+  # blocks differ on every page. So this CSP buys defence-in-depth against injected EXTERNAL
+  # resources, not against inline script. Enforcing it may never be fully reachable without
+  # changing the port itself — see docs/optimization-backlog.md §12.5.
+  # ---------------------------------------------------------------------------------------
+  Content-Security-Policy-Report-Only: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https://www.googletagmanager.com https://imgquarry.com; connect-src 'self' https://api.web3forms.com https://www.googletagmanager.com; frame-src https://www.googletagmanager.com; form-action 'self' https://api.web3forms.com

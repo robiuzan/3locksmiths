@@ -1,71 +1,332 @@
 @AGENTS.md
 
-# 3locksmiths.co.il — WordPress → Next.js 1:1 Migration
+# CLAUDE.md — שלושה מנעולנים (3locksmiths.co.il) project rulebook
 
-This project is a **pixel-perfect 1:1 migration** of an existing WordPress site to a modern
-React stack. It is **NOT** a redesign. Every decision is judged against one question:
-*"Does this match the live WordPress source exactly?"*
+> The operating manual for any AI agent (and human) working in this repo. Project rules here
+> **override** global defaults. When this file and the code disagree, fix the code. When this file and
+> `Israeli services sites/roster/sites/3locksmiths.json` disagree about a business fact, **the roster
+> wins**.
 
-## Stack
-- **Next.js 16.2.9** (App Router) — ⚠️ breaking changes vs. older Next; read `node_modules/next/dist/docs/` before touching routing/metadata/image APIs.
-- **React 19**
-- **TypeScript** (strict)
-- **Tailwind CSS v4** — CSS-first config via `@theme` in `app/globals.css` (there is **no** `tailwind.config.ts` by default). Brand colors/fonts go in the `@theme` block.
-- Data source: WordPress REST API at `${NEXT_PUBLIC_WP_URL}/wp-json/wp/v2/`.
-- Rendering strategy: **SSG** (`generateStaticParams` + static `fetch`).
+---
 
-## Primary Directive — Strict 1:1 Replication
-- Replicate the source WordPress site exactly: **design, content, layout, URL/permalink structure, metadata, and internal links.**
-- Content is fetched from `/wp-json/wp/v2/` (pages, posts, media, menus). **No invented content, no creative liberties.**
-- Preserve the exact **H1 → H2 → H3** heading hierarchy from the source HTML.
-- Preserve **internal links** exactly (same slugs/paths as WordPress permalinks).
+## 1. What this repo is — read this before anything else
 
-## RTL & Localization (mandatory)
-- Document root: `<html lang="he" dir="rtl">`.
-- Locale: Hebrew / Israel (`he-IL`). Phone numbers, dates, currency follow Israeli conventions.
-- Use **logical/RTL-aware Tailwind utilities**: `ps-*`/`pe-*` (not `pl-*`/`pr-*`), `ms-*`/`me-*`, `start-*`/`end-*`, `text-start`/`text-end`, and `space-x-reverse` where needed.
-- Layout and text flow must mirror the Hebrew source perfectly (right-to-left).
+This is a **completed 1:1 migration of a WordPress site into Next.js**, plus an authored enrichment
+layer on top. It is **not** a component-based React site, and the instincts that work on the other
+Next.js sites in this fleet will produce wrong code here.
 
-## Code Style
-- **Strict TypeScript.** No `any` in committed code. Model all WordPress structures with explicit interfaces (`WP_Page`, `WP_Post`, `WP_Media`, `WP_MenuItem`, etc.) — see `lib/wp.ts`.
-- Keep UI modular: extract repeatable elements (header, footer, nav, contact form, floating WhatsApp button, service cards) into `/components`.
-- Match the source's existing visual conventions; do not introduce new design patterns.
+**Page bodies are scraped HTML injected with `dangerouslySetInnerHTML`.** They are styled by the
+original WordPress theme's CSS and enhanced by the original theme's jQuery. React treats the body as
+opaque on purpose.
 
-## ⚠️ Actual source architecture (discovered) & migration approach
-The source is **NOT** a Gutenberg/block site. It is a **custom theme `gogo`** (`/wp-content/themes/gogo/`)
-with a server-side page builder + heavy custom jQuery. Consequences:
-- The REST API returns **empty `content.rendered`** for all inner pages, and `acf` is empty. The design +
-  content is rendered by theme PHP from post-meta the REST API does **not** expose.
-- **Therefore the page bodies are sourced from the LIVE rendered HTML**, not REST content. REST is still used for
-  the page list (slugs/permalinks/titles), media, and structure.
-- **Content is spread across multiple public post types**, not just `pages`. `scripts/scrape.mjs` captures them all
-  (`CONTENT_TYPES`): `pages` (9), `posts` (1), `services` (`/services/<slug>/`), `locations` (`/locations/<slug>/`),
-  `step` (`/step/<slug>/`, price-calculator steps). ~59 pages total. One `services` item returns HTTP 500 on the
-  live site (broken at the source) and is skipped; the scraper retries transient errors and skips source-broken pages.
-- Structure per page: `<header class="template-header">`, `<nav class="nav-bottom">`/`<nav class="nav-side">`,
-  `<main class="page-template-builder">`, `<section class="section-header-banner">`, `<footer class="footer">`.
-- Interactive features rely on jQuery: `nav.js` (mobile menu), `owl.carousel`, `magnific-popup` (CF7 contact
-  **popup** — `/contact` itself 404s), `calculator.js` (price calc), `quiz.js`, `marquee`, `fancybox`, `matchHeight`.
+```
+live WordPress HTML  ──scrape──►  content/site.json  ──►  SiteFrame  ──►  dangerouslySetInnerHTML
+                                        ▲
+                          content/enriched/<id>.mjs  ──enrich──┘   (replaces <main> + all JSON-LD)
+```
 
-**Chosen approach — Faithful HTML+CSS port (user-approved):**
-- Scrape each live page; extract `header` / `main` / `footer`; render via `dangerouslySetInnerHTML` (React treats it
-  as opaque so the original jQuery can safely enhance it).
-- **Vendor the original assets locally** under `public/` mirrored at their original paths (`/wp-content/...`) so the
-  same absolute URLs resolve: theme + plugin CSS, theme JS, icon fonts, and referenced upload images. Rewrite the
-  `https://3locksmiths.co.il` origin → relative in scraped HTML/head.
-- Load **jQuery + the theme JS** via `next/script` (afterInteractive) to reproduce interactions exactly.
-- Google Fonts (**Alexandria, Rubik, Poppins**) via the original `<link>` to Google's CDN, matching the source.
-- **Tailwind preflight is DISABLED** (import utilities only) — the global reset would clobber the theme CSS and break
-  fidelity. The ported content is styled by the original theme CSS, not Tailwind.
-- Decode HTML entities (`he`) for titles coming back from the API where needed.
-- `html-react-parser` remains available if specific nodes later need to become React components.
+Consequences you must internalise:
 
-## SEO / Metadata
-- Use `generateMetadata` to emit `<title>`, `<meta name="description">`, and canonical URLs **identical** to the WordPress source (prefer Yoast/RankMath fields if exposed in the REST payload, else fall back to `title`/`excerpt`).
-- Never change URLs — the canonical and route paths must equal the WP permalink.
+- **There is no `lib/site-config.ts` and no `lib/content.ts` copy module.** Copy lives in
+  `content/enriched/<id>.mjs`.
+- **Tailwind's preflight and theme layers are deliberately NOT imported** (`app/globals.css`). Only
+  the utilities layer is. Importing preflight or theme clobbers the gogo theme's cascade — this was
+  verified by computed-style comparison against the live site.
+- **jQuery is load-bearing.** `components/ThemeScripts.tsx` replays the original script sequence in
+  document order. Removing it breaks the nav, the carousels, the contact popup and the calculator.
+- Editing a page means editing its **authored module** and re-running the pipeline, never editing
+  `content/site.json` by hand.
 
-## Images
-- `next.config.ts` → `images.remotePatterns` must allow the WordPress domain so `<Image>` can load media directly from WP.
+## 2. Business context
 
-## Build gate
-- `npm run build` must pass with **zero** TypeScript/compile errors and `generateStaticParams` must successfully generate all routes before any phase is considered done.
+- **Business:** שלושה מנעולנים (3 Locksmiths) — locksmith for car and home. Key cutting and coding,
+  lock opening, cylinder and lock replacement, door repair.
+- **Phone (click-to-call):** `055-6601006` · WhatsApp same number · `info@3locksmiths.co.il`.
+- **Coverage:** 17 location pages across Israel; the homepage claims פריסה ארצית.
+- **Conversion goals, in order:** (1) phone call, (2) WhatsApp, (3) the Web3Forms lead form.
+- **Scale:** 71+ pages — 30 services, 17 locations, 7 top-level Hebrew landers, a /מדריכים/ guides
+  hub + guides, an emergency cluster, 4 calculator steps, 4 legal/utility, 1 service hub, 1 homepage.
+  Counts move as content ships — read `content/enriched/_manifest.json`, never assume.
+
+> ⚠️ Several claims on this site are **not substantiated**: "מעל 25 שנות ניסיון" (the manifest has
+> `foundedYear: null`), "24/7" (the schema says 08:00–18:00), every price, the warranty term, and
+> coverage. See [docs/business-facts.md](docs/business-facts.md). **Never present an unconfirmed value
+> as fact.**
+
+---
+
+## 3. Golden rules
+
+1. **Never fabricate a business fact.** Years in business, prices, warranty terms, licences,
+   insurance, ratings, reviews, certifications, customer names, response times. If it is not in the
+   roster manifest, `site.config.json`, or [docs/business-facts.md](docs/business-facts.md), mark it
+   `// 🔶 confirm` and add a row. A fabricated review or rating is a Google policy violation, not a
+   style problem.
+2. **Never hand-edit `content/site.json`.** It is a 7 MB build artifact regenerated by
+   `npm run snapshot`. Edit the authored module in `content/enriched/`, or the pipeline script, then
+   re-run. A hand edit is silently destroyed on the next build.
+3. **Never edit `site.config.json` directly.** It syncs down from
+   `Israeli services sites/roster/sites/3locksmiths.json`. Edit the roster, then sync.
+4. **Never edit anything under `public/wp-content/` or `public/wp-includes/`.** That is vendored
+   third-party theme and plugin output. Changes there are unmaintainable and get overwritten. Style
+   overrides go in `app/enrich.css`; behaviour changes go in an enhancement layer.
+5. **Never rename or merge a live slug** without a `public/_redirects` 301 plan. Every path in
+   `content/site.json` is a live WordPress permalink holding real ranking signal — **including** the
+   ones that look like typos: `/שכפול-שלט-לרכב-2/`, the `שכפול-מפתח-בנתניה` / `שכפול-מפתחות-בנתניה`
+   pair, the same pair for חולון, and the `/מנעולן-רכב/` ↔ `/services/מנעולן-רכב/` duplicates.
+   `docs/keyword-map.md` §8.
+6. **Do not import Tailwind's preflight or theme layer.** See §1. `app/globals.css` explains why in
+   full; read the comment before touching it.
+7. **Pushing to `main` does not deploy production.** Production is Cloudflare Pages via
+   `ops/deploy-site.ps1` — confirmed by the drift check, which reports the project serves the apex,
+   www and `.pages.dev`. (The old GitHub Pages origin was retired 2026-08-25 and now redirects.)
+8. **No page ships under the bar in [docs/content-standards.md](docs/content-standards.md).** The
+   existing pages are genuinely deep — median ~1,500 words, and the location pages pass the doorway
+   test. Do not regress that.
+9. **A GTM snippet in the HTML proves nothing.** Whenever a container id changes, assert
+   `https://www.googletagmanager.com/gtm.js?id=<ID>` returns **200**. Two fabricated ids once cost the
+   IL fleet 18 days of zero analytics across every site.
+10. **Never edit generated or vendored output** — `node_modules/`, `vendor/`, `.next/`, `out/`,
+    `content/site.json`, `public/wp-*`.
+
+---
+
+## 4. Stack
+
+Next.js **16.2.9** App Router · React **19.2.4** · TypeScript strict · Tailwind **v4, utilities layer
+only** · `@ishub/site-kit` (vendored tarball) · `he` · `html-react-parser` · `node-html-parser` (build
+scripts). Flat layout, path alias `@/* -> ./*`.
+
+> ⚠️ **This is not the Next.js you know.** 16.2.9 has breaking changes against older majors — `params`
+> is a `Promise` in route handlers, and metadata/image APIs moved. Read
+> `node_modules/next/dist/docs/` before touching routing, metadata or image APIs. See `AGENTS.md`.
+
+**`next.config.ts` — the constraints that shape everything:**
+
+```ts
+output: "export",              // static HTML into out/
+trailingSlash: true,           // mirrors the WordPress permalinks exactly
+images: { unoptimized: true },
+transpilePackages: ["@ishub/site-kit"],
+```
+
+**Static export forbids** `headers()`, `redirects()`, `rewrites()`, middleware, API routes, server
+actions and ISR. Response headers come from `public/_headers` at the Cloudflare edge; redirects from
+`public/_redirects`. If a task seems to need a forbidden API, the answer is at the edge, not in Next.
+
+---
+
+## 5. Layout
+
+```
+app/
+  layout.tsx           <html lang="he" dir="rtl">, GTM, icons, metadataBase
+  page.tsx             the WordPress front page (id 7)
+  [...slug]/page.tsx   catch-all for all 63 other permalinks, dynamicParams = false
+  sitemap.ts robots.ts
+  globals.css          Tailwind UTILITIES ONLY — read the comment before editing
+  enrich.css           styling for the authored blocks, scoped under .content-blocks
+components/
+  SiteFrame.tsx        JSON-LD + ported body + script replay
+  SiteAssets.tsx       theme stylesheets + head <style> blocks, order-preserved
+  ThemeScripts.tsx     "use client" — replays the original scripts in document order
+lib/
+  content.ts           ⭐ typed accessors over content/site.json + buildMetadata()
+  wp.ts                WordPress REST types (page list / media only)
+  enrich/types.ts      ⭐ EnrichedPage — the authored-page contract
+  enrich/render.mjs    ⭐ renders authored blocks into gogo-classed HTML
+scripts/               scrape → transform → pages → build-manifest → enrich → footer → form → fix-links
+                       + check-freshness.mjs / check-orphans.mjs (release guards)
+content/
+  site.json            ⭐ 7 MB build artifact — NEVER hand-edit
+  enriched/<id>.mjs    ⭐ 57 authored pages + _manifest.json (92xx guides, 93xx emergency)
+public/wp-content/     vendored theme + plugin assets — NEVER edit
+site.config.json       SiteManifest — synced from the roster, never edit here
+docs/                  the acceptance bars every agent cites
+```
+
+---
+
+## 6. Data flow & source of truth
+
+```
+Israeli services sites/roster/sites/3locksmiths.json   ← EDIT HERE for NAP/brand/schema/analytics
+        │  (ops sync)
+        ▼
+site.config.json  (SiteManifest)                       ← never edit directly
+        │
+        ├──► app/layout.tsx        GTM, icons, verification
+        └──► lib/enrich/render.mjs Web3Forms access key
+
+content/enriched/<id>.mjs   ← EDIT HERE for page copy, pricing, FAQ, process, schema inputs
+        │  (npm run enrich)
+        ▼
+content/site.json  ← build artifact
+        │
+        ▼
+lib/content.ts  →  app/**  →  components/SiteFrame  →  out/
+```
+
+**Identity and NAP go up to the roster. Page copy goes in `content/enriched/`. Presentation goes in
+`lib/enrich/render.mjs` + `app/enrich.css`.** A phone number or a price typed anywhere else is a bug.
+
+---
+
+## 7. The build pipeline
+
+```bash
+npm run snapshot   # scrape → transform → pages → build-manifest → enrich → footer → form → fix-links
+                   #                                                    ↑ re-scrapes live WP — rare
+npm run enrich     # pages → build-manifest → enrich → footer → form → fix-links      (no network)
+npm run build      # next build → out/
+```
+
+| Step                 | Does                                                                          |
+| -------------------- | ----------------------------------------------------------------------------- |
+| `scrape.mjs`         | fetches the live WordPress HTML (**snapshot only**)                           |
+| `transform.mjs`      | CF7 → Web3Forms rewrite (**snapshot only** — see the warning below)           |
+| `pages.mjs`          | **creates routes that never existed** — utility pages, service shells, guides |
+| `build-manifest.mjs` | classifies every page and computes related-link candidates                    |
+| `enrich.mjs`         | fills `<main>` from `content/enriched/<id>.mjs`, emits all JSON-LD            |
+| `footer.mjs`         | rebuilds the global footer from the manifest                                  |
+| `form.mjs`           | normalises the lead form (validation, phone field, RTL, consent)              |
+| `fix-links.mjs`      | repairs/validates every internal link, `tel:`, `data-cta`, form redirect      |
+
+> ⚠️ **`transform.mjs` runs ONLY in `npm run snapshot`.** A chrome change made there will not appear
+> from `npm run enrich`. Anything that must apply on every ordinary rebuild belongs in the enrich
+> chain — that is why the footer and form fixes are their own scripts.
+
+Use **`npm run enrich`** after editing an authored module. Use `npm run snapshot` only when the
+upstream WordPress site has genuinely changed — it rewrites everything from whatever that origin
+serves today.
+
+**Route creation is not blocked.** `pages.mjs` invents routes with synthetic ids (9101/9102 services,
+92xx guides, 93xx emergency); `enrich.mjs` then fills them from an authored module like any scraped
+page. Hebrew paths are fine because the renderer is the ASCII catch-all `app/[...slug]/` — but a
+literal Hebrew route **directory** (`app/מדריכים/`) breaks the Next 16 exporter.
+
+**The gates in the pipeline:**
+
+- `enrich.mjs` asserts one `<h1>` per enriched page, that every generated JSON-LD block parses, and
+  now repairs or drops unparseable **scraped** blocks too. Exits non-zero on any problem.
+- `pages.mjs` asserts no duplicate paths and that every generated page has one `<h1>` and metadata.
+- `fix-links.mjs` **fails the build** on any internal link that points at a non-existent route.
+- `scripts/check-freshness.mjs` — run before shipping. `npm run build` does **not** regenerate
+  `content/site.json`, so editing a module and building without `npm run enrich` silently ships the
+  previous copy. That reached production once; don't repeat it.
+- `scripts/check-orphans.mjs` — decode-aware orphan check (the shell one-liner version gives false
+  positives on this site's percent-encoded Hebrew paths).
+- `scripts/claims.mjs` — **in the enrich chain.** Rewrites ⛔ claims that live in _scraped_ HTML
+  (the homepage body is WordPress markup, not a module, and `content/site.json` may not be
+  hand-edited — so the only durable place to correct it is inside the pipeline). Self-verifies and
+  exits non-zero if a ⛔ claim survives.
+- `scripts/check-claims.mjs` — run before shipping. Scans the **rendered** `content/site.json` for
+  claims our own data refutes. It exists because module-level review cannot see renderer defaults:
+  `DEFAULT_STATS` shipped `25+ שנות ניסיון`, `30–60 ד׳ זמן מענה ממוצע` and `אלפי לקוחות מרוצים` to
+  ~60 pages while every authored module was clean. See `docs/business-facts.md` §D.4.
+
+---
+
+## 8. RTL & localization — NON-NEGOTIABLE
+
+- `<html lang="he" dir="rtl">` is set in `app/layout.tsx`. Do not remove it.
+- Israeli formats: phone `055-6601006`, currency `₪` **after** the number, dates `dd/mm/yyyy`, en
+  dashes in ranges.
+- Hebrew abbreviations use גרש `׳` (U+05F3) and גרשיים `״` (U+05F4) — not ASCII `'` / `"`, and not the
+  typographic `’` (U+2019). `lib/enrich/render.mjs:29` currently gets this wrong.
+- Keep user-facing strings Hebrew. No mid-sentence language mixing — a Latin brand or model name gets
+  its own clause.
+- **Logical Tailwind utilities only** where Tailwind is used at all: `ps-*`/`pe-*`, `ms-*`/`me-*`,
+  `start-*`/`end-*`, `text-start`/`text-end`. **Banned:** `pl-* pr-* ml-* mr-* left-* right-*
+text-left text-right`.
+  **Scope note:** almost all layout here comes from the vendored gogo CSS, which has its own
+  `rtl.css`. The Tailwind rule applies to new utility classes you write, not to the vendored theme —
+  and you do not edit the vendored theme.
+
+Full rules: `/hebrew-rtl`.
+
+---
+
+## 9. Code style
+
+- **TypeScript strict. No `any` in committed code.** Use `unknown` + narrowing. Model WordPress and
+  snapshot structures with explicit interfaces (`SitePage`, `SiteData`, `SeoData`, `EnrichedPage`).
+- **RSC by default.** `"use client"` only for state, effects or browser APIs. Currently exactly one
+  client component: `ThemeScripts`. Keep it that way unless there is a real reason.
+- The build scripts are `.mjs` and deliberately outside the TS project. `lib/enrich/types.ts`
+  documents the authored-page shape for humans and editors; it is not enforced at runtime — so
+  **read it and match it**.
+- Imports use the `@/*` alias. No `../../..` chains.
+- Match the surrounding code. This repo has strong, unusual, deliberate patterns; an idiomatic
+  suggestion that ignores them is noise.
+
+---
+
+## 10. Deploy — read this before shipping
+
+**Production is Cloudflare Pages (project `3locksmiths`). Pushing to `main` does not deploy it.**
+
+Live evidence (2026-08-16): the apex returns `Server: cloudflare`, `cf-cache-status: DYNAMIC`, a
+Cloudflare-managed `robots.txt`, and the Cloudflare Pages default header set — with **no
+`Last-Modified`, `ETag` or `x-github-request-id`**, all of which GitHub Pages always sends.
+
+But the roster's free-text notes still describe a GitHub Pages deploy, and `logs/deploys.csv` has no
+row for this domain. **So verify, don't assume** — the dry run's drift check asks the Cloudflare API
+directly and is the arbiter:
+
+```powershell
+powershell -File "c:/Users/robiu/antigravity/Projects/Israeli services sites/ops/deploy-site.ps1" -Domain 3locksmiths.co.il -DryRun
+powershell -File "c:/Users/robiu/antigravity/Projects/Israeli services sites/ops/deploy-site.ps1" -Domain 3locksmiths.co.il -Confirm
+```
+
+**Deploying is a production mutation — always ask first.** See `/deploy-3locksmiths`.
+
+> ✅ **The second origin was retired 2026-08-25.** `robiuzan.github.io` now serves a redirect to
+> production (GitHub does not allow disabling Pages on a user-site repo), and the repo is archived.
+>
+> ⚠️ **Never deploy while anything is still writing to `content/enriched/`.** `npm run build` does
+> not regenerate `content/site.json`, so a build started mid-edit ships the previous copy **silently**.
+> That reached production once. Run `node scripts/check-freshness.mjs` first — it is also a CI gate.
+
+---
+
+## 11. Build gate
+
+```bash
+npm run format                     # FIRST — prettier rewrites modules, which restales site.json
+npm run enrich                     # if you touched content/enriched, lib/enrich or scripts
+node scripts/check-freshness.mjs   # content/site.json must be newer than its sources
+node scripts/check-claims.mjs      # no claim our own data refutes may reach the browser
+npm run lint && npm run typecheck && npm run format:check && npm run build
+node scripts/check-orphans.mjs     # decode-aware; the shell version lies here
+```
+
+All four must pass before any deploy. `/qa-build-gate` adds the assertions on `out/` — route count,
+sitemap parity, unique titles, one H1, **JSON-LD parseability**, no `aggregateRating`, and no
+`tel:[phone]` placeholder.
+
+---
+
+## 12. Commands
+
+| Task                         | Command                                   |
+| ---------------------------- | ----------------------------------------- |
+| Dev server                   | `npm run dev`                             |
+| Production build             | `npm run build`                           |
+| Lint                         | `npm run lint`                            |
+| Type-check                   | `npm run typecheck`                       |
+| Format / check               | `npm run format` · `npm run format:check` |
+| Rebuild content (no network) | `npm run enrich`                          |
+| Full re-scrape + rebuild     | `npm run snapshot`                        |
+
+---
+
+## 13. Scope guardrails
+
+- Implement real UI, sections or content only when asked. Don't opportunistically redesign — this is a
+  fidelity port, and "improvement" is often regression.
+- Don't add a 31st service or an 18th location before `content/enriched/95.mjs` exists (backlog §3.2).
+- Don't add dependencies without a reason that survives "can the platform already do this?"
+- Don't put PII in `dataLayer`.
+- Cloudflare zone settings (AI crawler policy, Scrape Shield, cache rules) are **the owner's to
+  change**. Document the exact toggle; never assume it was done.

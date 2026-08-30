@@ -14,7 +14,8 @@ import { parse } from "node-html-parser";
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const FILE = join(ROOT, "content", "site.json");
 const WEB3FORMS_KEY =
-  JSON.parse(readFileSync(join(ROOT, "site.config.json"), "utf8")).contact?.formAccessKey ?? "";
+  JSON.parse(readFileSync(join(ROOT, "site.config.json"), "utf8")).contact
+    ?.formAccessKey ?? "";
 const FORM_ENDPOINT = "https://api.web3forms.com/submit";
 
 // Web3Forms config (hidden inputs) + a honeypot checkbox for spam. `email` field becomes reply-to.
@@ -25,7 +26,9 @@ const HIDDEN =
   `<input type="checkbox" name="botcheck" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden">`;
 
 const isCf7Script = (s) =>
-  s.kind === "src" ? /contact-form-7|\/cf7\.js/.test(s.url) : /\bwpcf7\b/.test(s.code || "");
+  s.kind === "src"
+    ? /contact-form-7|\/cf7\.js/.test(s.url)
+    : /\bwpcf7\b/.test(s.code || "");
 
 const site = JSON.parse(readFileSync(FILE, "utf8"));
 let formsFixed = 0;
@@ -67,4 +70,6 @@ for (const page of site.pages) {
 }
 
 writeFileSync(FILE, JSON.stringify(site, null, 2), "utf8");
-console.log(`transform: re-pointed ${formsFixed} CF7 form(s) → Web3Forms; removed ${scriptsRemoved} CF7 script(s).`);
+console.log(
+  `transform: re-pointed ${formsFixed} CF7 form(s) → Web3Forms; removed ${scriptsRemoved} CF7 script(s).`,
+);
