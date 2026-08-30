@@ -14,13 +14,13 @@ does not deploy it — and it _does_ publish a stale second origin.**
 
 This site has contradictory deploy documentation, so **verify rather than assume**:
 
-| Source                                            | Says                                                    |
-| ------------------------------------------------- | ------------------------------------------------------- |
-| `roster/roster.json` → `hosting.target`           | `cloudflare-pages`, `pagesProject: "3locksmiths"`       |
-| `roster/roster.json` → `notes` (dated 2026-07-13) | deploy by pushing to `robiuzan/robiuzan.github.io`      |
-| `logs/deploys.csv`                                | **no row for this domain**                              |
-| `.github/workflows/deploy.yml`                    | publishes `out/` to GitHub Pages                        |
-| local `git remote origin`                         | `robiuzan/3locksmiths` (private mirror, Pages disabled) |
+| Source                                            | Says                                                |
+| ------------------------------------------------- | --------------------------------------------------- |
+| `roster/roster.json` → `hosting.target`           | `cloudflare-pages`, `pagesProject: "3locksmiths"`   |
+| `roster/roster.json` → `notes` (dated 2026-07-13) | deploy by pushing to `robiuzan/robiuzan.github.io`  |
+| `logs/deploys.csv`                                | **no row for this domain**                          |
+| `.github/workflows/deploy.yml`                    | _deleted 2026-08-26_ — used to publish to GH Pages  |
+| local `git remote origin`                         | `robiuzan/3locksmiths` — **public**, Pages disabled |
 
 **Live evidence favours Cloudflare Pages.** Verified 2026-08-16 against `https://3locksmiths.co.il/`:
 
@@ -42,15 +42,19 @@ Cloudflare-managed `robots.txt`, which is a proxy-only feature.
 `3locksmiths` actually serves this domain, and refuses if it doesn't. Run it and read the drift-check
 output before believing anything above.
 
-## ⚠️ The stale second origin
+## ✅ The stale second origin — retired
 
-`https://robiuzan.github.io/` returns **200** with `Server: GitHub.com` and serves an **older build**
-of this site — its homepage `<title>` is the pre-fix bare `שלושה מנעולנים` while production serves the
-enriched title. `.github/workflows/deploy.yml` keeps it alive, and `public/CNAME` claims the apex for
-it (backlog §12.1).
+`https://robiuzan.github.io/` used to return **200** with `Server: GitHub.com`, serving an older
+build of this site alongside production: two live origins for one site, a duplicate-content and
+brand risk (backlog §12.1).
 
-Two live origins for one site is a duplicate-content and brand risk. **Retiring it is a deploy-
-behaviour change — confirm with the user before doing it.** See `/web-security-headers`.
+It was retired operationally on **2026-08-25** (the user-site repo cannot have Pages disabled, so it
+now serves a redirect to production, and the repo is archived). The two files that kept it alive here
+— `.github/workflows/deploy.yml` and `public/CNAME` — were **deleted from this repo on 2026-08-26**
+in `ebb913e`, which is why the table above no longer lists the workflow as a live claim.
+
+Nothing in this repo now publishes to GitHub Pages. `.github/workflows/ci.yml` is **build-only** and
+deliberately does not deploy. If a second origin ever reappears, treat it as a regression.
 
 ## The command
 
@@ -131,16 +135,23 @@ unparseable JSON-LD block, a `tel:[phone]` placeholder, a personal email in the 
 curl -sSI https://3locksmiths.co.il/ | head -20
 curl -sS https://3locksmiths.co.il/ | grep -o '<title>[^<]*</title>'
 curl -sS "https://3locksmiths.co.il/%d7%9e%d7%97%d7%99%d7%a8%d7%95%d7%9f/" | grep -o '<title>[^<]*</title>'
-curl -sS https://3locksmiths.co.il/sitemap.xml | grep -c '<url>'          # expect 60
+curl -sS https://3locksmiths.co.il/sitemap.xml | grep -c '<loc>'          # expect 104
 curl -sS https://3locksmiths.co.il/robots.txt | head -40
 curl -o /dev/null -s -w '%{http_code}\n' "https://www.googletagmanager.com/gtm.js?id=GTM-KWGGH438"
 curl -sS https://3locksmiths.co.il/ | grep -c 'tel:%5Bphone%5D'           # target 0
+curl -sS https://3locksmiths.co.il/ | grep -c 'href="#"'                  # target 0 — see below
 ```
 
-Check: the page is the new build; titles carry the brand exactly once; the sitemap lists 60 URLs;
-`robots.txt` matches the intended AI-crawler stance (**Cloudflare prepends a managed block** — see
-`/aeo-answer-content`); GTM returns 200; and any new `public/_headers` entries actually appear in the
-response (`/web-security-headers`).
+Check: the page is the new build; titles carry the brand exactly once; the sitemap lists **104**
+URLs; `robots.txt` matches the intended AI-crawler stance (**Cloudflare prepends a managed block** —
+see `/aeo-answer-content`); GTM returns 200; and any new `public/_headers` entries actually appear in
+the response (`/web-security-headers`).
+
+> The `href="#"` check is there because of a 2026-08-26 finding: the homepage brand grid shipped all
+> 17 of its cards pointing at `#`, dead, while the brand pages they should have reached existed the
+> whole time. Neither guard caught it — `fix-links.mjs` treats `#` as a deliberate non-route, and the
+> orphan check passed because the footer already reached those pages. `fix-links.mjs` now resolves
+> the grid from the build manifest, so this line is a regression check, not a routine step.
 
 ## Rollback
 

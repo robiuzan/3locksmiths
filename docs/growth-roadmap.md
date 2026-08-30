@@ -336,14 +336,14 @@ triage.
 
 ## KPIs
 
-| Dimension   | Metric                                                             | Today             |
-| ----------- | ------------------------------------------------------------------ | ----------------- |
-| Conversion  | calls, WhatsApp, form leads — by page and surface                  | partly unmeasured |
-| Local       | GBP views, calls, direction requests, review count and rating      | no GBP            |
-| Rankings    | head terms, brand-key cluster, emergency cluster, location cluster | untracked         |
-| Indexation  | indexed pages, impressions, CTR (Search Console)                   | 60 URLs submitted |
-| AEO         | citations in AI answers; crawler reachability                      | blocked at edge   |
-| Performance | LCP / CLS / INP field data, mobile                                 | unmeasured        |
-| Trust       | reviews published, credentials shown, claims sourced               | zero              |
+| Dimension   | Metric                                                             | Today              |
+| ----------- | ------------------------------------------------------------------ | ------------------ |
+| Conversion  | calls, WhatsApp, form leads — by page and surface                  | partly unmeasured  |
+| Local       | GBP views, calls, direction requests, review count and rating      | no GBP             |
+| Rankings    | head terms, brand-key cluster, emergency cluster, location cluster | untracked          |
+| Indexation  | indexed pages, impressions, CTR (Search Console)                   | 104 URLs submitted |
+| AEO         | citations in AI answers; crawler reachability                      | blocked at edge    |
+| Performance | LCP / CLS / INP field data, mobile                                 | unmeasured         |
+| Trust       | reviews published, credentials shown, claims sourced               | zero               |
 
 Set the baseline **after Phase 1** — before then, most of these cannot be read honestly.

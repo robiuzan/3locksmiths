@@ -5,7 +5,7 @@ description: Start-here orientation for 3locksmiths.co.il — the scrape → enr
 
 # 3locksmiths.co.il architecture
 
-שלושה מנעולנים — locksmith for car and home. Hebrew RTL, **64 pages**, Next.js 16 App Router compiled
+שלושה מנעולנים — locksmith for car and home. Hebrew RTL, **111 pages**, Next.js 16 App Router compiled
 to static HTML. **Read this before changing anything** — this repo will trip every instinct you have
 from a normal React site.
 
@@ -106,7 +106,7 @@ Find a page's `id` in `content/enriched/_manifest.json` → `lookup` (id → pat
 
 The catch-all sets `dynamicParams = false` and generates from `getContentPages()`, so the emitted
 route set cannot drift from `content/site.json`. Breakdown: 30 services + 1 service hub, 17 locations,
-7 top-level Hebrew landers, 4 `/step/` calculator fragments, 4 legal/utility, 1 homepage. **60 appear
+7 top-level Hebrew landers, 4 `/step/` calculator fragments, 4 legal/utility, 1 homepage. **104 appear
 in `sitemap.xml`** — the `/step/` pages are excluded deliberately.
 
 ## The percent-encoded Hebrew route trap

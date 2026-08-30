@@ -71,7 +71,7 @@ and "24/7" are both gated.
 150–160 chars, unique per route, following `docs/keyword-map.md` §5: service + place, one true
 differentiator, then an action with the phone in display format.
 
-Currently **unique across all 64 pages with zero duplicates** — hold that line. Missing on five real
+Currently **unique across all 108 pages with zero duplicates** — hold that line. Missing on five real
 pages (backlog §2.3): `/services/שכפול-מפתח-לרכב/` and the four `/step/` routes. The `/step/` pages
 are funnel fragments and may legitimately stay bare; the service page may not.
 
@@ -111,8 +111,8 @@ edge blocking every major AI crawler. See `/aeo-answer-content`.
 ## Sitemap
 
 `app/sitemap.ts` derives entirely from `getSite().pages` — filtering on `seo.canonical` and excluding
-`/step/`. **No hand-maintained array anywhere**, which is better than most of the fleet. 60 URLs
-against 64 pages is exactly right.
+`/step/`. **No hand-maintained array anywhere**, which is better than most of the fleet. 104 URLs
+against 108 pages is exactly right.
 
 It emits `changeFrequency` and `priority` (1 front, 0.8 services/locations, 0.6 other) but **no
 `lastModified`**. Leave it that way unless a real per-page date source appears — **never stamp build
@@ -131,7 +131,7 @@ time**; a date that changes on every deploy is worth less than no date (backlog 
 
 Exactly one `<h1>`, matching the title's intent — currently true on **all 66 emitted pages**.
 `scripts/enrich.mjs` asserts `h1count === 1` per enriched page and **fails the build** otherwise. That
-guard covers 53 of 64 pages; the rest are correct but unguarded, so check them by hand after any
+guard covers 97 of 108 pages; the rest are correct but unguarded, so check them by hand after any
 change to the scrape or transform steps.
 
 The H1 is `hero.h1` in the authored module and should restate the keyword naturally rather than

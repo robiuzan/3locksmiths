@@ -43,3 +43,6 @@ yarn-error.log*
 next-env.d.ts
 .verify
 .scratch/
+
+# Stray editor/sync backups (e.g. site.config.json.bak from a roster sync).
+*.bak

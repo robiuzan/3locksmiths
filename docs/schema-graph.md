@@ -17,7 +17,7 @@ content/site.json  page.jsonLd[]  ──►  components/SiteFrame.tsx  ──►
         │                    │
   scraped verbatim      REPLACED WHOLESALE by scripts/enrich.mjs
   from the live WP        for every page with a content/enriched/<id>.mjs module
-  (53 of 64 pages)
+  (103 of 108 pages)
 ```
 
 - For the **53 enriched pages**, `scripts/enrich.mjs` **overwrites** `page.jsonLd` entirely with

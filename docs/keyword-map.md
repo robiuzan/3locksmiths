@@ -21,7 +21,7 @@ signal this site has. It is not tidy, and it does not get tidied.
 | Calculator steps         | `/step/<he-slug>/`                                                                                              | 4     | funnel fragments, not landing pages |
 | Legal / utility          | `/contact/`, `/privacy-policy/`, `/accessibility-statement/`, `/sitemap/`                                       | 4     | trust + utility                     |
 
-**64 pages total. 60 in `sitemap.xml`** (the four `/step/` routes are excluded by `app/sitemap.ts`).
+**108 pages total. 104 in `sitemap.xml`** (the four `/step/` routes are excluded by `app/sitemap.ts`).
 
 Three quirks that are deliberate:
 
@@ -144,7 +144,7 @@ Everything below is `<h2>`/`<h3>` with no skipped levels. `lib/enrich/render.mjs
 
 ## 5. Description formula
 
-150–160 characters, unique per route. Present on 59 of 64 pages today.
+150–160 characters, unique per route. Present on 104 of 108 pages today.
 
 ```
 <שירות> ב<מקום/מותג> <בידול אמיתי>. <מה קורה בפועל>. חייגו 055-6601006.

@@ -34,11 +34,11 @@ Two consequences:
 - `docs/keyword-map.md` §3–§5 holds the title, H1 and description formulas, and §1 the silo model.
 - `docs/content-standards.md` §1 (word floors) and §2 (the doorway test).
 - The export: `out/**/index.html`, `out/sitemap.xml`, `out/robots.txt`.
-- `content/site.json` → the set of routes that must exist (64 pages).
+- `content/site.json` → the set of routes that must exist (111 pages).
 
 ## What to audit
 
-1. **Route and sitemap parity.** 64 pages → 66 `index.html` (plus `/404` and `/_not-found`) → 60
+1. **Route and sitemap parity.** 111 pages → 111 `index.html` (plus `/404` and `/_not-found`) → 60
    `<url>` in `sitemap.xml`. The gap is exactly the four `/step/` calculator fragments, which
    `app/sitemap.ts` excludes deliberately. Any other gap is a finding (§1.3).
 2. **Titles.** Unique (currently zero duplicates — hold it), brand exactly once, under ~60 chars.
@@ -47,7 +47,7 @@ Two consequences:
 3. **Descriptions.** Present, unique, 150–160 chars. Five real pages have none:
    `/services/שכפול-מפתח-לרכב/` and the four `/step/` routes (§2.3).
 4. **One H1 per page.** Currently true on all 66 — and `scripts/enrich.mjs` fails the build if an
-   enriched page has any other count. That guard covers 53 of 64 pages; the rest are unguarded, so
+   enriched page has any other count. That guard covers 97 of 111 pages; the rest are unguarded, so
    check them explicitly (§2.5).
 5. **Canonicals.** Self-referencing, trailing slash, percent-escaped, byte-identical to the sitemap
    `<loc>`. Sourced from the scraped `seo.canonical`, so they match the WordPress originals (§1.2).

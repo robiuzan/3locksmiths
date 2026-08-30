@@ -64,14 +64,14 @@ The migration got this right. Protect it.
 
 **1.1 Route generation — sound.** `app/[...slug]/page.tsx` derives every route from
 `getContentPages()` with `dynamicParams = false`, so the emitted route set cannot drift from
-`content/site.json`. 64 pages + `/404` + `/_not-found` = 66 `index.html` files.
+`content/site.json`. 108 pages + `/404` + `/_not-found` + `/thank-you` = 111 `index.html` files.
 
 **1.2 Canonicals — sound.** Present on all 64 real pages, self-referencing, trailing slash,
 percent-escaped. Sourced from the scraped `seo.canonical`, so they are byte-identical to the
 WordPress originals. Only `/404/` and `/_not-found/` lack one, which is correct.
 
 **1.3 Sitemap parity — sound.** `app/sitemap.ts` derives from `getSite().pages`, filters on
-`seo.canonical`, and excludes `/step/`. 60 `<url>` entries against 64 pages = exactly the four
+`seo.canonical`, and excludes `/step/`. 104 `<url>` entries against 108 pages = exactly the four
 calculator fragments excluded. **No hand-maintained array anywhere** — better than most of the fleet.
 
 **1.4 `lastModified` — absent.** The sitemap emits `changeFrequency` and `priority` but no
@@ -353,7 +353,7 @@ most expensive defect on the list.
 > export embeds a second copy of the markup in its payload. Count `href="tel:` for rendered anchors.
 > The same doubling affects any raw attribute grep over `out/` — see §13.3.
 
-Full `tel:` inventory across all 64 pages in `content/site.json`:
+Full `tel:` inventory across all 108 pages in `content/site.json`:
 
 | href                | Count | Verdict          |
 | ------------------- | ----- | ---------------- |
@@ -365,7 +365,7 @@ Full `tel:` inventory across all 64 pages in `content/site.json`:
 Fix the placeholder in the scrape/transform pipeline so it cannot come back, and normalise all four
 forms to the manifest's `contact.phoneE164`.
 
-**8.2 🔴 WhatsApp is effectively absent.** Exactly **1 of 64 pages** carries a WhatsApp link, despite
+**8.2 🔴 WhatsApp is effectively absent.** Exactly **1 of 108 pages** carries a WhatsApp link, despite
 `contact.whatsappE164` being set and WhatsApp being the fleet's second conversion channel. There is no
 floating WhatsApp button and no sticky mobile CTA bar.
 
@@ -427,7 +427,7 @@ Two lessons worth keeping:
   column entry. See §9.7.
 
 > ✅ **FIXED 2026-08-25.** `scripts/footer.mjs` (new, in the enrich chain) rebuilds the footer
-> on all 64 pages: a **שירותים** column (13 links incl. the Tier-1 page), an **אזורי שירות**
+> on all 108 pages: a **שירותים** column (13 links incl. the Tier-1 page), an **אזורי שירות**
 > column (all 17 — no truncation), the original contact column preserved, and a bottom-bar strip
 > carrying every top-level lander. **6 links → 40.** The empty `sidebar-1` column is gone.
 > Orphans are now a blocking CI check (`scripts/check-orphans.mjs`). Original finding below.

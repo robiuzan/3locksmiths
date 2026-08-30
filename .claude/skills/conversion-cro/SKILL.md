@@ -10,7 +10,7 @@ _is_ the conversion — which makes the current state unusually bad.
 
 ## The headline: the phone links are partly broken
 
-Verified across all 64 pages in `content/site.json`, and live on the homepage:
+Verified across all 111 pages in `content/site.json`, and live on the homepage:
 
 | `tel:` href         | Count | Verdict                                             |
 | ------------------- | ----- | --------------------------------------------------- |
@@ -34,7 +34,7 @@ grep -rho 'tel:%5Bphone%5D\|tel:\[phone\]' out --include=index.html
 
 ## Gap 1 — WhatsApp is effectively absent
 
-**Exactly 1 of 64 pages carries a WhatsApp link**, despite `contact.whatsappE164` being set in the
+**Exactly 1 of 108 pages carries a WhatsApp link**, despite `contact.whatsappE164` being set in the
 manifest and WhatsApp being the fleet's second conversion channel. There is no floating WhatsApp
 button and no sticky mobile CTA bar (backlog §8.2).
 

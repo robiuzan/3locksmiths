@@ -113,7 +113,7 @@ Add them in the **pipeline**, then `npm run enrich`. Never patch the built HTML.
   manifest carries `analytics.googleSiteVerification: null`. The token works, but the manifest is no
   longer the source of truth. Move it to the **roster manifest** and read it from
   `manifest.analytics.googleSiteVerification` (backlog §13.5). Never edit `site.config.json` directly.
-- Submit `https://3locksmiths.co.il/sitemap.xml` (60 URLs).
+- Submit `https://3locksmiths.co.il/sitemap.xml` (104 URLs).
 
 ## Verifying a deploy
 

@@ -163,7 +163,7 @@ Profile side, not an invented address.
 > CI checks. The `info@` address was **confirmed live** on 2026-08-24 — see §C.3.
 > The historical record below is kept as written.
 
-Verified against `content/site.json` across all 64 pages:
+Verified against `content/site.json` across all 108 pages:
 
 | `tel:` href         | Count | Verdict                                             |
 | ------------------- | ----- | --------------------------------------------------- |

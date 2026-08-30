@@ -5,7 +5,7 @@ description: Build the link mesh on 3locksmiths — the inherited WordPress navi
 
 # Internal linking
 
-64 pages. Unlike most sites in this fleet, the mesh is **inherited from WordPress rather than
+108 pages. Unlike most sites in this fleet, the mesh is **inherited from WordPress rather than
 designed** — which means it is complete but not shaped.
 
 ## Current state (backlog §9)
@@ -17,7 +17,7 @@ designed** — which means it is complete but not shaped.
 | Service → location contextual | **zero** beyond `related`                                                   |
 | Location → location           | only via `related.locations[]`                                              |
 | Contextual in-copy anchors    | **near zero** — links are nav items, cards and chips                        |
-| Breadcrumbs                   | visible from the theme; `BreadcrumbList` on 53 of 64 pages                  |
+| Breadcrumbs                   | visible from the theme; `BreadcrumbList` on 103 of 108 pages                |
 
 **Verify the no-orphans claim rather than trusting it** — it is a property of the current scrape, not
 a guarantee.

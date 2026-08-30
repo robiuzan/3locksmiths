@@ -73,7 +73,7 @@ Whatever validation approach is chosen (`/conversion-cro` gap 3), the a11y requi
 ## Semantics
 
 - **One `<h1>` per page** — currently correct on all 66 emitted pages, and `scripts/enrich.mjs`
-  **fails the build** if an enriched page has any other count. That guard covers 53 of 64 pages; the
+  **fails the build** if an enriched page has any other count. That guard covers 97 of 108 pages; the
   other 11 are correct but unguarded.
 - Heading order: `lib/enrich/render.mjs` owns the `<h2>`/`<h3>` structure for authored content. Give
   any new block the level its position implies — don't pick one for its default size.
