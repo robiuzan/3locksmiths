@@ -137,6 +137,45 @@
           "category": "hero"
         },
         {
+          "key": "3locksmiths/gallery/home-cta-1.jpg",
+          "sha256": "9c5c0ace4ab8a76b57b5d373c0ad021d01608bebc0e5306141fb6fd52e41e4e0",
+          "alt": "A locksmith sitting sideways in the open driver's door of a silver car in a parking bay, looking at a key fob in his hand",
+          "altHe": "מנעולן יושב בפתח דלת הנהג הפתוחה של רכב כסוף בחניון ומביט בשלט מפתח שבידו",
+          "width": 2752,
+          "height": 1536,
+          "bytes": 2758927,
+          "kind": "raster",
+          "focal": null,
+          "legacySrc": null,
+          "category": "homepage"
+        },
+        {
+          "key": "3locksmiths/gallery/home-cta-2.jpg",
+          "sha256": "c616e329205a524d26c73a0b19c999fff68c0e04c73ba3261d93505c64810012",
+          "alt": "A locksmith at the entrance of an apartment building, one hand on the door handle and a brass key in the other, with an open tool roll of cylinders and picks laid out beside him",
+          "altHe": "מנעולן בכניסה לבניין מגורים, יד אחת על ידית הדלת ומפתח פליז בשנייה, לצידו מארז כלים פרוס ובו צילינדרים ומברגים",
+          "width": 2752,
+          "height": 1536,
+          "bytes": 2377007,
+          "kind": "raster",
+          "focal": null,
+          "legacySrc": null,
+          "category": "homepage"
+        },
+        {
+          "key": "3locksmiths/gallery/home-cta-3.jpg",
+          "sha256": "3c5c3fc0b4db0fe14e27b2ddf96ec43c8db1db1724b890f79fdbde8cc39d35af",
+          "alt": "The open side door of a plain white van fitted out as a mobile locksmith workshop, with a key-cutting machine, drawers of blanks and lock cylinders",
+          "altHe": "דלת הצד הפתוחה של רכב שירות לבן ללא סימון המצויד כניידת מנעולנות, ובו מכונת שכפול מפתחות, מגירות של מפתחות גולמיים וצילינדרים",
+          "width": 2752,
+          "height": 1536,
+          "bytes": 2751720,
+          "kind": "raster",
+          "focal": null,
+          "legacySrc": null,
+          "category": "homepage"
+        },
+        {
           "key": "3locksmiths/gallery/home-tile-1.jpg",
           "sha256": "379a780078042126c60411aad641f2cbb49f3ed304302db3c5addc47953ebd23",
           "alt": "Hands holding a fan of freshly cut brass keys at a workbench with a key-cutting machine, lock cylinder and scattered keys",

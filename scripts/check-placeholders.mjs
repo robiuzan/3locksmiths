@@ -89,6 +89,29 @@ const SLOTS = [
     pages: 1,
     fallback: "stock: electrician",
   },
+  // The "ננעלתם בחוץ" call-to-action band, further down the homepage. A different grid from the
+  // hero tiles: rendered 476x276 css px (~1.73:1) with object-fit:cover over a 16:9 source.
+  {
+    name: "home-cta-1",
+    label: "homepage CTA photo 1",
+    ratio: "16:9",
+    pages: 1,
+    fallback: "stock: a gate intercom (not locksmithing)",
+  },
+  {
+    name: "home-cta-2",
+    label: "homepage CTA photo 2",
+    ratio: "16:9",
+    pages: 1,
+    fallback: "stock: welding a steel frame (not locksmithing)",
+  },
+  {
+    name: "home-cta-3",
+    label: "homepage CTA photo 3",
+    ratio: "16:9",
+    pages: 1,
+    fallback: "stock: drilling a garden fence (not locksmithing)",
+  },
 ];
 
 /** Parse just the front matter of a prompt file — enough for `key` and `approved`. */

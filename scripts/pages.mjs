@@ -376,7 +376,22 @@ const PRUNE_PATHS = new Set(["/hello-world/", "/sample-page/"]);
 // Google policy violation and a consumer-protection exposure, not a content placeholder, so the
 // whole band is removed rather than emptied. There is nothing here to keep: the section carried
 // no links and no CTA. Restore a reviews section only when real, attributable reviews exist.
-const PRUNE_SELECTORS = [".s-latest-posts", ".s-feedback"];
+//
+// `.s-home-hero .home-goole-box-wrap` — the gogo demo's floating sticker over the homepage hero
+// grid, added to this list 2026-08-31. It is a 250×250 PNG of a yellow starburst badge reading
+// "Explore our offers!" — English, on a Hebrew RTL site, and it advertises an offers page this
+// business does not have. The asset is theme demo art, not photography we commissioned, so it is
+// not a slot the image catalog should ever fill; it just goes.
+//
+// The selector is SCOPED to the hero deliberately. `.home-goole-box-wrap` also names the
+// technician-avatar box in the inner-page banner on 111 other pages, where it is real content the
+// catalog fills — pruning it unscoped would strip the avatar site-wide. `.s-home-hero` exists on
+// the homepage alone, so this matches exactly one node.
+const PRUNE_SELECTORS = [
+  ".s-latest-posts",
+  ".s-feedback",
+  ".s-home-hero .home-goole-box-wrap",
+];
 
 // ---- page assembly --------------------------------------------------------
 const site = JSON.parse(readFileSync(FILE, "utf8"));
