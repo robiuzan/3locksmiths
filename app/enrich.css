@@ -237,9 +237,21 @@
  * flow. It is scoped to the exact selector rather than reverting the theme rule, so if a
  * genuine 5th overlay is ever added back the theme behaviour is still there to restore.
  *
+ * ⚠️ THE `.s-home-hero` PREFIX IS LOAD-BEARING. The first version of this rule used the same
+ * selector as the theme — `.home-hero-right-galley .gallery-item:last-child` — which is identical
+ * specificity (0,3,0). app/enrich.css is emitted in the Next CSS chunk, which loads FIRST in
+ * <head>; the vendored main.css loads NINTH. On a specificity tie the later sheet wins, so the
+ * override lost and did nothing at all: the 4th tile stayed absolutely centred in the middle of
+ * the grid while the bottom-left slot sat empty. It shipped to production that way.
+ *
+ * Adding the ancestor makes it (0,4,0), which beats the theme regardless of load order. Any rule
+ * in this file that targets a vendored theme selector needs to win on SPECIFICITY, never on order.
+ *
+ * In RTL the stagger lands on items 2 and 3 (rtl.css:135-146), so item 4 flows to the BOTTOM-LEFT.
+ *
  * Not an edit to the vendored theme (CLAUDE.md §3 rule 4) — this is our own override file.
  * ==========================================================================*/
-.home-hero-right-galley .gallery-item:last-child {
+.s-home-hero .home-hero-right-galley .gallery-item:last-child {
   position: static;
   top: auto;
   left: auto;
@@ -312,8 +324,13 @@
     height: calc(56px + env(safe-area-inset-bottom));
   }
   /* Lift the theme's floating phone button (fixed bottom:30px in vendored main.css)
-     clear of the bar. Override lives HERE — the vendored CSS is never edited. */
-  .floated-right {
+     clear of the bar. Override lives HERE — the vendored CSS is never edited.
+
+     `body` prefix required: bare `.floated-right` is the SAME selector the theme uses, so it
+     ties on specificity and the theme wins on load order (this sheet is emitted first, main.css
+     ninth). The button stayed at bottom:30px and overlapped the bar. See the note at the hero
+     grid rule below. */
+  body .floated-right {
     bottom: calc(86px + env(safe-area-inset-bottom));
   }
 }

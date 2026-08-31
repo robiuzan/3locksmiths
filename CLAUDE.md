@@ -330,6 +330,7 @@ node scripts/check-freshness.mjs   # content/site.json must be newer than its so
 node scripts/check-claims.mjs      # no claim our own data refutes may reach the browser
 npm run lint && npm run typecheck && npm run format:check && npm run build
 node scripts/check-orphans.mjs     # decode-aware; the shell version lies here
+node scripts/check-css-cascade.mjs     # no enrich.css override may tie with the vendored theme
 node scripts/check-catalog-images.mjs  # the cdn-cgi URL builder still matches site-kit
 node scripts/check-placeholders.mjs    # which image slots are still falling back to stock
 ```
