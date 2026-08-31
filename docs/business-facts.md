@@ -259,6 +259,7 @@ Fixed by `scripts/claims.mjs` (`us-phone-number-in-cta`), substituting
 | Warranty ("אחריות") | claimed widely, no term stated                   | 🔶                          |
 | Response time       | "כ-20–40 דקות" and similar, per city             | 🔶                          |
 | 24/7 availability   | **confirmed by the owner 2026-08-30** — see D.3  | ✅ owner instruction        |
+| Key-type per model  | `keyModels[]` on brand pages — see D.5           | 🔶                          |
 
 ### D.1 Prices are authored, not sourced
 
@@ -335,6 +336,27 @@ scan could ever have reached.
 **Rule going forward:** anything added to `DEFAULT_STATS`, `DEFAULT_FEATURES` or any renderer
 default is asserted on ~55 pages at once. It must be a description of what the business does, or a
 ✅ row in this file. Never a number, a duration, a guarantee or a count.
+
+### D.5 Per-model key types on the brand pages — 🔶 open
+
+`content/enriched/99.mjs` (פורד) now renders a `keyModels[]` grid: eight Ford models, each with
+the key type we say is fitted to it, a button count, a model-year span and a price range.
+
+**The prices are safe.** Every range restates a number already published in that page's
+`pricing` and `specsTable`; the grid introduces none of its own.
+
+**The key types are not sourced.** The model → key-type mapping (blade-with-chip on Fiesta,
+flip-with-remote on Focus/Transit/EcoSport, smart key on Puma and late Kuga) is general Ford
+market knowledge, and trims vary _within_ a generation — a Kuga ST-Line and a base Kuga of the
+same year do not carry the same key. The copy hedges accordingly ("בגימורים גבוהים", "בדור
+החדש"), but a hedge is not a source.
+
+**What would confirm it:** the owner cuts these keys and is the only person who can sign the
+mapping off. One pass down the eight cards, correcting the key type and the year span, closes
+this. Until then the grid is accurate-as-hedged, not verified.
+
+**Before this pattern is copied to the other 31 brand pages**, get that pass — otherwise one
+unverified mapping becomes thirty-two.
 
 ---
 

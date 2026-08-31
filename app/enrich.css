@@ -146,6 +146,105 @@
   font-size: 19px;
 }
 
+/* ---- Per-model key grid (brand pages) ----
+ * Product tiles, so the media box is a square with object-fit:contain on a light ground: a key
+ * fob cropped to fill its box cannot be identified, and identification is the whole point.
+ * Every selector here is `enrich-*` and therefore new — nothing ties with the vendored theme.
+ */
+.content-blocks .enrich-keygrid {
+  list-style: none;
+  margin: 26px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 22px;
+}
+@media (max-width: 1199px) {
+  .content-blocks .enrich-keygrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media (max-width: 767px) {
+  .content-blocks .enrich-keygrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+}
+.content-blocks .enrich-keycard {
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border: 1px solid #e6e8ee;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 4px 18px rgba(1, 21, 50, 0.05);
+  transition: transform 0.25s ease;
+}
+.content-blocks .enrich-keycard:hover {
+  transform: translateY(-4px);
+}
+.content-blocks .enrich-keycard__media {
+  aspect-ratio: 1 / 1;
+  background: #f6f7f9;
+  border-block-end: 1px solid #eef0f4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.content-blocks .enrich-keycard__img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+/* Placeholder while the slot is unpublished — a glyph, never a borrowed photo. */
+.content-blocks .enrich-keycard__ph i {
+  font-size: 72px;
+  color: rgba(1, 21, 50, 0.13);
+}
+.content-blocks .enrich-keycard__body {
+  flex: 1;
+  padding: 16px 18px 20px;
+}
+.content-blocks .enrich-keycard__title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--dark-font-color, #011532);
+}
+.content-blocks .enrich-keycard__years {
+  margin: 4px 0 0;
+  font-size: 14px;
+  color: #64748b;
+}
+.content-blocks .enrich-keycard__meta {
+  margin: 8px 0 0;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--acsent-color, #009f3c);
+}
+.content-blocks .enrich-keycard__note {
+  margin: 8px 0 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: #3f4a5a;
+}
+.content-blocks .enrich-keygrid__foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 18px;
+  margin-top: 26px;
+}
+.content-blocks .enrich-keygrid__foot p {
+  margin: 0;
+  flex: 1 1 320px;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--dark-font-color, #011532);
+}
+
 /* ---- FAQ: stick the right-column text/heading/CTA to the right edge ---- */
 .content-blocks .section-faq .row-faq .text-left {
   text-align: right;
@@ -257,6 +356,24 @@
   left: auto;
   max-width: none;
   transform: none;
+}
+
+/* ---- reclaim the space the demo sticker used to occupy ---------------------
+ * media.css:481 gives .home-hero-right a 100px padding-bottom below 768px. That padding is not
+ * layout: it is clearance for .home-goole-box-wrap, the theme's absolutely-positioned sticker
+ * (bottom:39px), which scripts/pages.mjs now prunes from the hero. With the sticker gone the
+ * padding is 100px of empty column between the tile grid and the block beneath it on mobile —
+ * on the fold that matters most for an emergency visitor.
+ *
+ * The 36px margin in the same theme rule IS real spacing and is deliberately left alone.
+ *
+ * .s-home-hero prefix for the same reason as the rule above: (0,2,0) beats the theme's (0,1,0),
+ * so this wins on specificity rather than on load order.
+ * ==========================================================================*/
+@media (max-width: 767.98px) {
+  .s-home-hero .home-hero-right {
+    padding-bottom: 0;
+  }
 }
 
 /* ============================================================================
@@ -521,4 +638,36 @@ html:root {
 .wpcf7-form textarea:user-invalid {
   border-color: #a11f18;
   outline-color: #a11f18;
+}
+
+/* ==========================================================================
+ * The "ננעלתם בחוץ" CTA band — three catalog photographs (scripts/cta-images.mjs)
+ *
+ * The vendored theme styles .cta-section, .grid-cta and .cta-box, but it has NO rule at all for
+ * .img-block-cta or the image inside it. The three photographs were 952x552 rasters with their
+ * corner radius BAKED IN as alpha (measured: ~34px at 2x), laid out by nothing but the global
+ * "img { height:auto; max-width:100% }". A generated JPEG has square corners and a 16:9 frame, so
+ * without this the corners go hard and each cell falls ~10px short of the 276px grid row.
+ *
+ * No tie with the theme: .img-block-cta appears in neither main.css nor rtl.css, and
+ * ".img-block-cta img" (0,1,1) outranks the theme's bare "img" (0,0,1) on specificity rather than
+ * on source order — which matters because app/enrich.css loads FIRST and the theme loads ninth.
+ * See scripts/check-css-cascade.mjs.
+ *
+ * The 20px radius matches the .cta-box beside it (main.css:3719) rather than the ~17px measured
+ * off the old raster: one radius across the band reads better than a faithful copy of the artwork.
+ *
+ * height:100% resolves against the stretched grid item on desktop, where the row is
+ * minmax(276px, auto). Below 992px the grid collapses to one column with auto rows, the height
+ * becomes indefinite, and the image falls back to its natural 16:9 — which is correct there.
+ * ==========================================================================*/
+.img-block-cta {
+  border-radius: 20px;
+  overflow: hidden;
+}
+.img-block-cta img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }

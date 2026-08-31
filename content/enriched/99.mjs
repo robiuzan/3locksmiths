@@ -62,6 +62,84 @@ export default {
       ["מפתח חדש ללא מקור", "רישום מלא ל-PATS", "גבוהה מאוד", "60–90 דקות", "לפי דגם"],
     ],
   },
+  // 🔶 confirm — the model → key-type mapping below is general Ford market knowledge, not an
+  // owner-supplied parts list, and trims vary within a generation. The owner cuts these keys
+  // daily and is the only person who can sign it off. See docs/business-facts.md §D.5.
+  // Deliberately carries NO price: the page states its ranges once, in `pricing` and
+  // `specsTable` above. Eight more copies would be eight more numbers to keep in sync.
+  keyModels: {
+    heading: "דגמי מפתחות פורד שאנחנו משכפלים",
+    intro:
+      "לכל דגם פורד מפתח משלו – להב עם שבב, מארז מתקפל עם שלט מובנה או מפתח חכם עם התנעת לחצן. אתרו למטה את הדגם שברשותכם, ותדעו עוד לפני שאנחנו יוצאים אליכם איזה סוג מפתח מותקן בו ומה נדרש כדי לשכפל אותו.",
+    items: [
+      {
+        model: "פורד פוקוס",
+        years: "2011 ואילך",
+        keyType: "מפתח מתקפל עם שלט",
+        buttons: "3 לחצנים",
+        note: "המפתח הנפוץ ביותר שאנחנו משכפלים לפורד: מארז שנפתח בלחיצה עם שלט נעילה מובנה. בגימורים גבוהים מגיע גם כמפתח חכם.",
+        image: "ford-key-focus",
+      },
+      {
+        model: "פורד פיאסטה",
+        years: "2009 ואילך",
+        keyType: "מפתח להב עם שבב",
+        buttons: "עם שלט נפרד או בלעדיו",
+        note: "אחד המפתחות הפשוטים בקטלוג פורד: חיתוך להב ורישום שבב למערכת ה-PATS, בלי מארז שלט מורכב.",
+        image: "ford-key-fiesta",
+      },
+      {
+        model: "פורד קוגה",
+        years: "2013 ואילך",
+        keyType: "מפתח מתקפל או מפתח חכם",
+        buttons: "3 לחצנים",
+        note: "בדורות המוקדמים מפתח מתקפל רגיל, ובדור החדש מפתח חכם עם כניסה ללא מגע שדורש רישום ארוך יותר.",
+        image: "ford-key-kuga",
+      },
+      {
+        model: "פורד פומה",
+        years: "2019 ואילך",
+        keyType: "מפתח חכם או מתקפל",
+        buttons: "3 לחצנים",
+        note: "דגם חדש יחסית. בגימורי Keyless המפתח אינו נכנס לחריץ כלל, והשכפול מחייב ציוד שתומך במערכת ה-PATS העדכנית.",
+        image: "ford-key-puma",
+      },
+      {
+        model: "פורד טרנזיט",
+        years: "2012 ואילך",
+        keyType: "מפתח מתקפל עם שלט",
+        buttons: "3 לחצנים",
+        note: "רכב מסחרי שלא יכול לעמוד מושבת. משכפלים בשטח ליד הרכב, וגם כמה מפתחות לצי באותו ביקור.",
+        image: "ford-key-transit",
+      },
+      {
+        model: "פורד ריינג׳ר",
+        years: "2012 ואילך",
+        keyType: "מפתח מתקפל, חכם בגימורים גבוהים",
+        buttons: "3 לחצנים",
+        note: "טנדר עבודה ושטח. במפתח המתקפל השכפול קצר יחסית, ובגימורים עם התנעת לחצן נדרש רישום מלא למערכת ה-PATS.",
+        image: "ford-key-ranger",
+      },
+      {
+        model: "פורד מונדאו",
+        years: "2007 ואילך",
+        keyType: "מפתח מתקפל, חכם בדור האחרון",
+        buttons: "3 לחצנים",
+        note: "בדורות הוותיקים מפתח מתקפל ובדור האחרון מפתח חכם, ולכן חשוב למסור שנת ייצור מדויקת לזיהוי המערכת.",
+        image: "ford-key-mondeo",
+      },
+      {
+        model: "פורד אקוספורט",
+        years: "2013 ואילך",
+        keyType: "מפתח מתקפל עם שלט",
+        buttons: "3 לחצנים",
+        note: "קרוסאובר קומפקטי עם מפתח מתקפל סטנדרטי. השכפול כולל חיתוך להב, שבב וסנכרון לחצני השלט.",
+        image: "ford-key-ecosport",
+      },
+    ],
+    outro:
+      "לא מצאתם את הדגם שלכם? אנחנו משכפלים מפתחות לכל דגמי פורד. התקשרו עם דגם הרכב ושנת הייצור ונמסור טווח מחיר כבר בשיחה.",
+  },
   scenarios: [
     {
       icon: "key",

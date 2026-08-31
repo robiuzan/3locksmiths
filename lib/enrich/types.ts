@@ -60,6 +60,23 @@ export interface GuideSection {
   columns?: boolean; // render paragraphs in 2 columns (desktop)
 }
 
+/**
+ * One key/remote variant on a brand page's model grid.
+ *
+ * Presentational only — no Product or Offer JSON-LD is emitted from these, and the card carries
+ * no price: the page already publishes its ranges once, in `pricing` and `specsTable`, and
+ * repeating them per model invited eight more numbers to keep in sync for no reader benefit.
+ */
+export interface KeyModelCard {
+  model: string; // "פורד פוקוס"
+  years?: string; // "2011–2018" — its own text run, so bidi resolves it LTR inside RTL copy
+  keyType: string; // "מפתח מתקפל עם שלט"
+  buttons?: string; // "3 לחצנים"
+  note: string; // ONE short sentence: what the owner sees, not a parts-catalogue spec
+  image?: string; // catalog slot name, e.g. "ford-key-focus"; unpublished → key-glyph placeholder
+  alt?: string; // overrides the catalog's own alt once the slot is published
+}
+
 export interface StatItem {
   value: string;
   label: string;
@@ -99,4 +116,12 @@ export interface EnrichedPage {
   guides?: GuideSection[];
   stats?: StatItem[];
   areas?: AreaItem[];
+
+  // Per-model key grid (brand-key pages). Absent → section skipped.
+  keyModels?: {
+    heading?: string;
+    intro?: string;
+    items: KeyModelCard[];
+    outro?: string; // closing line above the call CTA — never write the phone number here
+  };
 }
