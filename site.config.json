@@ -238,6 +238,45 @@
           },
           "legacySrc": null,
           "category": "homepage"
+        },
+        {
+          "key": "3locksmiths/gallery/key-blade-chip.jpg",
+          "sha256": "3026f105715b35242b7a17d7adcc3c98ef5582c645a96b843166eafbf137c857",
+          "alt": "A one-piece car key with a plain black head and no buttons, its blade fixed straight out, lying on a pale grey surface",
+          "altHe": "מפתח רכב מלהב יחיד עם ראש שחור חלק וללא לחצנים, הלהב קבוע וישר, מונח על משטח אפור בהיר",
+          "width": 2048,
+          "height": 2048,
+          "bytes": 548144,
+          "kind": "raster",
+          "focal": null,
+          "legacySrc": null,
+          "category": null
+        },
+        {
+          "key": "3locksmiths/gallery/key-flip-3btn.jpg",
+          "sha256": "52fb980a8f729bef78eddae7c88528dfe2e07678f17557e82d5757650befa6a7",
+          "alt": "A black flip car key with three buttons and its blade folded out, lying on a pale grey surface",
+          "altHe": "מפתח רכב מתקפל שחור עם שלושה לחצנים והלהב פתוח, מונח על משטח אפור בהיר",
+          "width": 2048,
+          "height": 2048,
+          "bytes": 691659,
+          "kind": "raster",
+          "focal": null,
+          "legacySrc": null,
+          "category": null
+        },
+        {
+          "key": "3locksmiths/gallery/key-flip-or-smart.jpg",
+          "sha256": "4d9df7640364ed224d6266f48a22ec475bcf0f87a8cb764d0023bc4bf89e7d7f",
+          "alt": "Two alternative car key types side by side - a flip key with its blade folded out, or instead a sealed smart key fob with no blade",
+          "altHe": "שני סוגי מפתח חלופיים זה לצד זה – מפתח מתקפל עם להב פתוח, או לחלופין מפתח חכם אטום ללא להב",
+          "width": 2048,
+          "height": 2048,
+          "bytes": 606430,
+          "kind": "raster",
+          "focal": null,
+          "legacySrc": null,
+          "category": null
         }
       ]
     }

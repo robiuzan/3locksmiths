@@ -113,65 +113,31 @@ const SLOTS = [
     fallback: "stock: drilling a garden fence (not locksmithing)",
   },
 
-  // --- brand-page key-model tiles (content/enriched/99.mjs keyModels) ---
-  // Product shots, not scene photography: square, the key centred on a plain light ground, shot
-  // or rendered so an owner can match it to the fob in their hand. They fall back to a glyph
-  // rather than to a stock photo, so an empty slot is honest instead of misleading.
+  // --- key-type plates (content/enriched/99.mjs keyModels) ---
+  // Three plates serve all eight Ford cards, and will serve the other 31 brand pages unchanged:
+  // they are named for the KEY TYPE they show, never for a model. Cards whose copy declares the
+  // same key deliberately share a file — see the note above `keyModels` in 99.mjs. Product shots,
+  // square, fit=contain, falling back to a glyph rather than to a stock photo.
   {
-    name: "ford-key-focus",
-    label: "key model — פורד פוקוס",
+    name: "key-flip-3btn",
+    label: "key type — flip, 3 buttons",
     ratio: "1:1",
     pages: 1,
-    fallback: "key glyph placeholder (no photo)",
+    fallback: "key glyph placeholder (serves פוקוס, טרנזיט, אקוספורט)",
   },
   {
-    name: "ford-key-fiesta",
-    label: "key model — פורד פיאסטה",
+    name: "key-blade-chip",
+    label: "key type — blade with chip",
     ratio: "1:1",
     pages: 1,
-    fallback: "key glyph placeholder (no photo)",
+    fallback: "key glyph placeholder (serves פיאסטה)",
   },
   {
-    name: "ford-key-kuga",
-    label: "key model — פורד קוגה",
+    name: "key-flip-or-smart",
+    label: "key type — flip or smart",
     ratio: "1:1",
     pages: 1,
-    fallback: "key glyph placeholder (no photo)",
-  },
-  {
-    name: "ford-key-puma",
-    label: "key model — פורד פומה",
-    ratio: "1:1",
-    pages: 1,
-    fallback: "key glyph placeholder (no photo)",
-  },
-  {
-    name: "ford-key-transit",
-    label: "key model — פורד טרנזיט",
-    ratio: "1:1",
-    pages: 1,
-    fallback: "key glyph placeholder (no photo)",
-  },
-  {
-    name: "ford-key-ranger",
-    label: "key model — פורד ריינג׳ר",
-    ratio: "1:1",
-    pages: 1,
-    fallback: "key glyph placeholder (no photo)",
-  },
-  {
-    name: "ford-key-mondeo",
-    label: "key model — פורד מונדאו",
-    ratio: "1:1",
-    pages: 1,
-    fallback: "key glyph placeholder (no photo)",
-  },
-  {
-    name: "ford-key-ecosport",
-    label: "key model — פורד אקוספורט",
-    ratio: "1:1",
-    pages: 1,
-    fallback: "key glyph placeholder (no photo)",
+    fallback: "key glyph placeholder (serves קוגה, ריינג׳ר, מונדאו, פומה)",
   },
 ];
 

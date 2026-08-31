@@ -358,6 +358,26 @@ this. Until then the grid is accurate-as-hedged, not verified.
 **Before this pattern is copied to the other 31 brand pages**, get that pass — otherwise one
 unverified mapping becomes thirty-two.
 
+**Update 2026-08-31 — the grid now shows three key TYPES, not eight models.** The copy declares
+only three types across the eight cards (פוקוס, טרנזיט and אקוספורט all declare the identical
+`מפתח מתקפל עם שלט`; קוגה, ריינג׳ר, מונדאו and פומה all declare flip-or-smart). Eight distinct
+photographs could therefore only be made distinct by inventing differences no card claims — a
+half-open blade, a twin pair, a split ring, staged wear. Cards that declare the same key now share
+one image, and `intro` discloses it. Nothing on the page asserts a mapping as fact.
+
+**The four questions that would buy a fourth picture — owner only:**
+
+| Question                                                                                       | What it unblocks                                                                                            |
+| ---------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| For each of the eight models: one key type, or genuinely two? If two, from which year or trim? | The whole mapping; every hedge on the page                                                                  |
+| Are the eight year spans right?                                                                | The `years` line on each card                                                                               |
+| פומה — smart-key only in Israel, or does a trim ship a flip key?                               | "smart only" drops `או מתקפל`, moves it to a fourth plate, and yields the most distinctive frame in the set |
+| פיאסטה — is the separate remote the common Israeli case, or the bare key?                      | Whether Plate A should show one object or two                                                               |
+
+Until these come back the page stays hedged, which is the truth. The plates are named for the key
+type and are brand-agnostic, so the answers change which plate a card points at — never invalidate
+a generated image.
+
 ---
 
 ## E. Coverage
