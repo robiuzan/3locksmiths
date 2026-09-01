@@ -71,8 +71,8 @@ included because a Stop hook formats changed files — an unformatted file means
 ## 2. Route and sitemap parity
 
 ```bash
-find out -name index.html | wc -l          # grows as pages are added; compare to the last run
-grep -c '<url>' out/sitemap.xml            # routes minus /step/ x4, /thank-you/ and the 404s
+find out -name index.html | wc -l          # 119 as of 2026-09-01; grows as pages are added
+grep -c '<url>' out/sitemap.xml            # 112 — routes minus /step/ x4, /thank-you/ and the 404s
 test -f out/robots.txt && echo ok
 ```
 
@@ -128,7 +128,7 @@ grep -rho 'tel:%5Bphone%5D\|tel:\[phone\]' out --include=index.html | wc -l
 # the business node must not publish a personal address. Must show the manifest email.
 grep -o '"email":"[^"]*"' out/index.html
 
-# GTM click tracking. Expect MANY distinct values (13 as of 2026-08-25) and the homepage
+# GTM click tracking. Expect MANY distinct values (15 as of 2026-09-01) and the homepage
 # must carry at least one — it had a single sitewide value until then. See backlog §13.3.
 grep -rho 'data-cta="[^"]*"' out --include=index.html | sort | uniq -c
 grep -rL 'data-cta=' out --include=index.html      # must not list out/index.html
@@ -138,7 +138,7 @@ grep -rL 'data-cta=' out --include=index.html      # must not list out/index.htm
 
 ```bash
 grep -rL 'application/ld+json' out --include=index.html      # only 404s, /thank-you/, 4x /step/
-grep -rl 'BreadcrumbList' out --include=index.html | wc -l   # every authored + generated page
+grep -rl 'BreadcrumbList' out --include=index.html | wc -l   # 111 — every authored + generated page
 grep -rl 'aggregateRating\|"@type": *"Review"' out --include=index.html   # MUST be empty
 ```
 
@@ -163,18 +163,42 @@ is a blocking CI step.
 ```bash
 find out -type f -size +500k -exec ls -lh {} \; | sort -k5 -h -r | head -15
 find out -name '*.js' -size +1M -exec ls -lh {} \;    # expect nothing
-du -sh out                                             # ~58 MB today
+du -sh out                                             # ~127 MB (123 MB apparent) as of 2026-09-01
+
+# where the weight actually is — run this before blaming any one asset
+node -e '
+const fs=require("fs"),path=require("path");const by={};
+(function w(d){for(const e of fs.readdirSync(d,{withFileTypes:true})){const p=path.join(d,e.name);
+if(e.isDirectory())w(p);else{const m=e.name.match(/\.[^.]+$/);const k=m?m[0]:"(none)";
+(by[k]=by[k]||{n:0,b:0}).n++;by[k].b+=fs.statSync(p).size;}}})("out");
+Object.entries(by).sort((a,b)=>b[1].b-a[1].b).slice(0,8)
+.forEach(([k,v])=>console.log((v.b/1048576).toFixed(1).padStart(8)+" MB "+String(v.n).padStart(6)+" files  "+k));'
 ```
 
-The bulk is vendored theme assets, dominated by ~8 MB of legacy Font Awesome SVG fonts
-(backlog §10.2). Do not delete from `out/` — it is regenerated. See `/performance-web-vitals`.
+**The old "~58 MB" figure in this file was written at 64 routes and is gone; there are 119 now.**
+Measured 2026-09-01, the breakdown is not what the prose used to claim:
+
+| Bytes   | Files | Type    | What it is                                                       |
+| ------- | ----- | ------- | ---------------------------------------------------------------- |
+| 59.8 MB | 826   | `.txt`  | **Next RSC payloads — bigger than the HTML itself.** Unexamined. |
+| 43.0 MB | 120   | `.html` | 119 routes, ~370 KB mean (the homepage is ~780 KB)               |
+| 8.5 MB  | 15    | `.svg`  | the known legacy Font Awesome fonts (backlog §10.2)              |
+
+So the bulk is **not** vendored theme assets any more — it is RSC payloads and inlined page HTML.
+1,126 files total, well inside Cloudflare Pages' 20,000-file cap. Do not delete from `out/` — it is
+regenerated. See `/performance-web-vitals`.
 
 ## 9. Content floors
 
 Spot-check that nothing regressed below `docs/content-standards.md` §1. Strip tags **and**
 `<script>`/`<style>` before counting — the ported pages carry large inline blocks that wreck a naive
-count. The median is ~1,500 words; investigate anything under 900 that isn't a `/step/` fragment or a
-legal page.
+count. The median is **~3,000 words** as of 2026-09-01 (112 content pages, range 613–4,396) — the
+site roughly doubled its depth after the guides and brand-key build-out, so the old "~1,500" figure
+no longer describes it. Investigate anything under 900 that is not a `/step/` fragment, a legal page
+or a hub.
+
+Expected to sit under the floor today, all legitimately: `/contact/`, `/privacy-policy/`,
+`/services/` and `/מדריכים/` (both hub indexes) and `/sitemap/`.
 
 ## 10. Auditor sweep
 
@@ -206,7 +230,10 @@ For a substantive change, run the relevant agents against the **fresh** `out/`:
   `ENRICH PROBLEMS`.
 - A live claim that `docs/business-facts.md` marks 🔶 or ⛔.
 
-> All stop-ship items pass as of 2026-08-25 — the §4.1/§4.2/§8.1/§2.1 defects were fixed and their
+> All stop-ship items pass as of **2026-09-01**, re-verified on the merged tree carrying the homepage
+> CTA photographs and the פורד key grid: 533 JSON-LD blocks parse and 0 fail, 0 `tel:[phone]`
+> placeholders, the manifest email, no `Review`/`aggregateRating`, exactly one `<h1>` everywhere, and
+> 119 − 112 = 7 route/sitemap gap. The §4.1/§4.2/§8.1/§2.1 defects were fixed on 2026-08-25 and their
 > checks promoted to blocking in `.github/workflows/ci.yml`. If one fails now, it is a regression.
 
 ## Then

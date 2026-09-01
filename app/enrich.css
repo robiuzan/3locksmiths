@@ -159,6 +159,16 @@
   grid-template-columns: repeat(4, 1fr);
   gap: 22px;
 }
+/* Ford has eight cards and fills two rows of four. A type-led page has three, which in a
+ * four-column grid leaves a hole where a fourth tile would be — and in RTL that hole sits on the
+ * left, reading as a missing card rather than as a complete set. Match the columns to the count. */
+.content-blocks .enrich-keygrid--n2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+.content-blocks .enrich-keygrid--n3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
 @media (max-width: 1199px) {
   .content-blocks .enrich-keygrid {
     grid-template-columns: repeat(3, 1fr);

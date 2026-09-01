@@ -378,6 +378,39 @@ Until these come back the page stays hedged, which is the truth. The plates are 
 type and are brand-agnostic, so the answers change which plate a card points at — never invalidate
 a generated image.
 
+### D.6 The buttonless-key rows were wrong on every page that named a current model — CORRECTED 2026-09-01
+
+**Found by the owner**, who looked at the key grid on the קיה page and said the picture was not his
+customers' key. It was not an imagery defect. The grid is generated from each page's own
+`specsTable`, and that row said the Picanto takes a plain chip key with no buttons. It does not.
+
+Fifteen rows across the brand pages made that claim. Every one that named a car still on the road
+was checked against retailer listings and OEM part numbers. **All seven were wrong.**
+
+| Page     | Claimed                     | Actually                                                                                         | Evidence                                         |
+| -------- | --------------------------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------ |
+| קיה      | `Picanto, Rio` chip key     | Picanto is a flip remote — 2-btn `95430-1Y600`, 3-btn `95430-G6600`, plus a smart key. Rio 3-btn | keyshop-online, car-keys.co.il, shop-locks.co.il |
+| יונדאי   | `i10 / i20` chip key        | 3-btn flip, every generation — `95430-B9500`, `95430-K7000`, `95430-1JAB1`, `95430-Q0000`        | advanced-keys, keyshop-online                    |
+| יונדאי   | `אקסנט / i25` chip key      | 3-btn flip `95430-J0700`, blade `81996-H5000`                                                    | key4, mk3                                        |
+| סוזוקי   | `Jimny, Ignis` chip key     | Jimny 2018+ is a 2-btn remote flip, transponder on the board                                     | reidsremotes                                     |
+| שברולט   | `Spark, Aveo` chip key      | Spark 3-btn remote head `A2GM3AFUS03`; Aveo 2-btn remote                                         | transponderisland, car-keys-online               |
+| סובארו   | `אימפרזה / XV` chip key     | 3–4 btn flip `CWTWB1U811`; XV also 3-btn smart                                                   | car-keys-online, remkeys                         |
+| מיצובישי | `ספייס סטאר / ASX` chip key | ASX 2-btn flip on `MIT11`; Space Star 2-btn remote head                                          | autokeystore, keyshop-online                     |
+
+**The fix**, applied to all seven: the buttonless row keeps its description but stops naming a
+modern car, and the model moves onto the flip row. Eight further rows make the same claim but hedge
+it — "ישנות", "ותיקים", or commercial vans — and were left alone as defensible.
+
+**The standard these corrections meet.** They are sourced to retailer listings and OEM part
+numbers, **not to the owner**. That is a real improvement on what was published — which was sourced
+to nothing — but it is not his word, and he has not personally confirmed a single row. Approved by
+him on 2026-09-01 as good enough to publish on that basis.
+
+**What this says about §D.5.** That entry warned the model-to-key-type mapping was unsourced and
+should not be copied to 31 more pages unverified. A 7-of-7 error rate on the first rows actually
+checked is the strongest possible confirmation. **The remaining rows — flip, smart, remote and card
+— have NOT been audited.** Assume they carry a similar error rate until they have been.
+
 ---
 
 ## E. Coverage

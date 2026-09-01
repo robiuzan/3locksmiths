@@ -56,9 +56,9 @@ export default {
       "לקיה מספר סוגי מפתחות לפי דגם ושנת ייצור. הטבלה מסכמת את הסוגים הנפוצים, רמת המורכבות והטווח המחירי:",
     columns: ["סוג מפתח", "מערכת", "מורכבות", "זמן ביצוע", "טווח מחיר"],
     rows: [
-      ["מפתח עם שבב (Picanto, Rio)", "אימובילייזר בסיסי", "נמוכה", "20–30 דקות", "200 – 350 ₪"],
+      ["מפתח עם שבב (דגמים ותיקים)", "אימובילייזר בסיסי", "נמוכה", "20–30 דקות", "200 – 350 ₪"],
       [
-        "מפתח מתקפל עם שלט (Sportage, Ceed)",
+        "מפתח מתקפל עם שלט (Picanto, Rio, Sportage, Ceed)",
         "אימובילייזר + שלט מובנה",
         "בינונית",
         "30–45 דקות",
@@ -73,6 +73,44 @@ export default {
       ],
       ["מפתח חדש ללא מקור", "קידוד מלא למערכת הרכב", "גבוהה מאוד", "60–90 דקות", "לפי דגם"],
     ],
+  },
+  // Type-led key grid. Every field is lifted from this page's own `specsTable` rows above, so the
+  // grid restates a claim the page already makes rather than adding one — that is what lets it ship
+  // while the model-to-key-type mapping is still 🔶 unconfirmed (docs/business-facts.md §D.5).
+  //
+  // `model` holds the KEY TYPE here, not a car model: קיה's table is type-led, unlike פורד's.
+  // The specsTable row `מפתח חדש ללא מקור` gets no card on purpose — it is a service, not an object.
+  keyModels: {
+    heading: "איך נראה כל סוג מפתח של קיה",
+    intro:
+      "הטבלה שלמעלה מפרטת את סוגי המפתחות של קיה; כאן אפשר לראות אותם. אתרו את המפתח הדומה לזה שברשותכם – התמונות מדגימות את סוג המפתח, לא דגם מסוים.",
+    items: [
+      {
+        model: "מפתח עם שבב",
+        years: "דגמים ותיקים",
+        keyType: "אימובילייזר בסיסי",
+        note: "חיתוך להב ורישום שבב לאימובילייזר, בלי מארז שלט. זו העבודה הקצרה מבין סוגי המפתחות של קיה – 20–30 דקות.",
+        image: "key-blade-chip",
+        alt: "מפתח עם שבב לקיה",
+      },
+      {
+        model: "מפתח מתקפל עם שלט",
+        years: "Picanto · Rio · Sportage · Ceed",
+        keyType: "אימובילייזר + שלט מובנה",
+        note: "מארז שנפתח בלחיצה עם שלט נעילה מובנה. השכפול כולל חיתוך להב, שבב וסנכרון לחצני השלט – 30–45 דקות.",
+        image: "key-flip-3btn",
+        alt: "מפתח מתקפל עם שלט לקיה",
+      },
+      {
+        model: "מפתח חכם",
+        years: "Niro · Sorento",
+        keyType: "Smart Key + כניסה ללא מגע",
+        note: "מפתח אטום עם כניסה ללא מגע והתנעת לחצן. הרישום ארוך יותר ומחייב ציוד ייעודי – 45–60 דקות.",
+        image: "key-smart-3btn",
+        alt: "מפתח חכם לקיה",
+      },
+    ],
+    outro: "לא בטוחים איזה מהם שלכם? התקשרו עם דגם הרכב ושנת הייצור ונדע מיד באיזה סוג מפתח מדובר.",
   },
   scenarios: [
     {
