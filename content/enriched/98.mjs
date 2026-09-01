@@ -58,14 +58,35 @@ export default {
     rows: [
       ["מפתח עם שבב (דגמים ותיקים)", "אימובילייזר בסיסי", "נמוכה", "20–30 דקות", "200 – 350 ₪"],
       [
-        "מפתח מתקפל עם שלט (Picanto, Rio, Sportage, Ceed)",
+        "מפתח מתקפל, 2 לחצנים (Picanto עד 2017)",
         "אימובילייזר + שלט מובנה",
         "בינונית",
         "30–45 דקות",
         "300 – 600 ₪",
       ],
       [
-        "מפתח חכם (Niro, Sorento, Push-Start)",
+        "מפתח מתקפל, 3 לחצנים (Picanto מ-2018, Rio, Sportage עד 2014)",
+        "אימובילייזר + שלט מובנה",
+        "בינונית",
+        "30–45 דקות",
+        "300 – 600 ₪",
+      ],
+      [
+        "מפתח מתקפל, 4 לחצנים (Ceed, Sportage מ-2019)",
+        "אימובילייזר + שלט מובנה",
+        "בינונית",
+        "30–45 דקות",
+        "300 – 600 ₪",
+      ],
+      [
+        "מפתח חכם, 3 לחצנים (Picanto, Sportage)",
+        "Smart Key + כניסה ללא מגע",
+        "גבוהה",
+        "45–60 דקות",
+        "450 – 900 ₪",
+      ],
+      [
+        "מפתח חכם, 4 לחצנים (Sorento, Carnival)",
         "Smart Key + כניסה ללא מגע",
         "גבוהה",
         "45–60 דקות",
@@ -80,10 +101,17 @@ export default {
   //
   // `model` holds the KEY TYPE here, not a car model: קיה's table is type-led, unlike פורד's.
   // The specsTable row `מפתח חדש ללא מקור` gets no card on purpose — it is a service, not an object.
+  // Type-led key grid, split by BUTTON COUNT so each tile shows a different key. Kia spans 2, 3 and
+  // 4 buttons across its range, so the single "מפתח מתקפל" row could never be photographed
+  // truthfully — that is why the tiles used to look identical to פורד's.
+  //
+  // Every count is sourced per model (OEM part numbers, keyshop-online, car-keys.co.il); see
+  // docs/business-facts.md §D.6. `model` holds the KEY TYPE here, not a car model — קיה's table is
+  // type-led. נירו is named nowhere: it is a smart key but no source gives its button count.
   keyModels: {
     heading: "איך נראה כל סוג מפתח של קיה",
     intro:
-      "הטבלה שלמעלה מפרטת את סוגי המפתחות של קיה; כאן אפשר לראות אותם. אתרו את המפתח הדומה לזה שברשותכם – התמונות מדגימות את סוג המפתח, לא דגם מסוים.",
+      "לקיה שישה סוגי מפתח לפי דגם ושנת ייצור, והם נבדלים זה מזה במספר הלחצנים. אתרו למטה את המפתח הדומה לזה שברשותכם – התמונות מדגימות את סוג המפתח, לא דגם מסוים.",
     items: [
       {
         model: "מפתח עם שבב",
@@ -94,23 +122,48 @@ export default {
         alt: "מפתח עם שבב לקיה",
       },
       {
-        model: "מפתח מתקפל עם שלט",
-        years: "Picanto · Rio · Sportage · Ceed",
+        model: "מפתח מתקפל, 2 לחצנים",
+        years: "Picanto עד 2017",
         keyType: "אימובילייזר + שלט מובנה",
-        note: "מארז שנפתח בלחיצה עם שלט נעילה מובנה. השכפול כולל חיתוך להב, שבב וסנכרון לחצני השלט – 30–45 דקות.",
-        image: "key-flip-3btn",
-        alt: "מפתח מתקפל עם שלט לקיה",
+        note: "נעילה ושחרור בלבד, בלי לחצן תא מטען. השכפול כולל חיתוך להב, שבב וסנכרון השלט – 30–45 דקות.",
+        image: "key-flip-2btn",
+        alt: "מפתח מתקפל, 2 לחצנים לקיה",
       },
       {
-        model: "מפתח חכם",
-        years: "Niro · Sorento",
+        model: "מפתח מתקפל, 3 לחצנים",
+        years: "Picanto מ-2018 · Rio · Sportage עד 2014",
+        keyType: "אימובילייזר + שלט מובנה",
+        note: "המפתח הנפוץ ביותר בקיה: נעילה, שחרור ותא מטען במארז שנפתח בלחיצה – 30–45 דקות.",
+        image: "key-flip-3btn",
+        alt: "מפתח מתקפל, 3 לחצנים לקיה",
+      },
+      {
+        model: "מפתח מתקפל, 4 לחצנים",
+        years: "Ceed · Sportage מ-2019",
+        keyType: "אימובילייזר + שלט מובנה",
+        note: "כמו המפתח בן שלושת הלחצנים, בתוספת לחצן רביעי. אותה עבודה ואותו טווח מחיר – 30–45 דקות.",
+        image: "key-flip-4btn",
+        alt: "מפתח מתקפל, 4 לחצנים לקיה",
+      },
+      {
+        model: "מפתח חכם, 3 לחצנים",
+        years: "Picanto · Sportage",
         keyType: "Smart Key + כניסה ללא מגע",
         note: "מפתח אטום עם כניסה ללא מגע והתנעת לחצן. הרישום ארוך יותר ומחייב ציוד ייעודי – 45–60 דקות.",
         image: "key-smart-3btn",
-        alt: "מפתח חכם לקיה",
+        alt: "מפתח חכם, 3 לחצנים לקיה",
+      },
+      {
+        model: "מפתח חכם, 4 לחצנים",
+        years: "Sorento · Carnival",
+        keyType: "Smart Key + כניסה ללא מגע",
+        note: "מפתח חכם עם לחצן רביעי, נפוץ בדגמים הגדולים של קיה. אותו רישום ואותו טווח מחיר – 45–60 דקות.",
+        image: "key-smart-4btn",
+        alt: "מפתח חכם, 4 לחצנים לקיה",
       },
     ],
-    outro: "לא בטוחים איזה מהם שלכם? התקשרו עם דגם הרכב ושנת הייצור ונדע מיד באיזה סוג מפתח מדובר.",
+    outro:
+      "לא בטוחים איזה מהם שלכם? ספרו לנו כמה לחצנים יש במפתח ומה דגם הרכב ושנת הייצור – זה כל מה שצריך כדי לדעת במה מדובר.",
   },
   scenarios: [
     {

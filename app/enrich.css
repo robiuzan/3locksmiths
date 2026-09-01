@@ -165,7 +165,11 @@
 .content-blocks .enrich-keygrid--n2 {
   grid-template-columns: repeat(2, 1fr);
 }
-.content-blocks .enrich-keygrid--n3 {
+.content-blocks .enrich-keygrid--n3,
+.content-blocks .enrich-keygrid--n5,
+.content-blocks .enrich-keygrid--n6 {
+  /* 5 and 6 sit better on three columns: four-wide leaves an orphan row of one or two, which in
+   * RTL opens a hole on the left and reads as a missing tile. */
   grid-template-columns: repeat(3, 1fr);
 }
 

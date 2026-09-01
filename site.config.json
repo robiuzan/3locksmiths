@@ -292,6 +292,19 @@
           "category": null
         },
         {
+          "key": "3locksmiths/gallery/key-flip-4btn.jpg",
+          "sha256": "75a9a16f40a066f9fb5481aa097744d061c65fdb326e487dc5ec3ecc12565d9a",
+          "alt": "A black flip car key with four buttons and its blade folded out, lying on a pale grey surface",
+          "altHe": "מפתח רכב מתקפל שחור עם ארבעה לחצנים והלהב פתוח, מונח על משטח אפור בהיר",
+          "width": 2048,
+          "height": 2048,
+          "bytes": 635169,
+          "kind": "raster",
+          "focal": null,
+          "legacySrc": null,
+          "category": null
+        },
+        {
           "key": "3locksmiths/gallery/key-flip-or-smart.jpg",
           "sha256": "4d9df7640364ed224d6266f48a22ec475bcf0f87a8cb764d0023bc4bf89e7d7f",
           "alt": "Two alternative car key types side by side - a flip key with its blade folded out, or instead a sealed smart key fob with no blade",
@@ -325,6 +338,19 @@
           "width": 2048,
           "height": 2048,
           "bytes": 557839,
+          "kind": "raster",
+          "focal": null,
+          "legacySrc": null,
+          "category": null
+        },
+        {
+          "key": "3locksmiths/gallery/key-smart-4btn.jpg",
+          "sha256": "6913da82f1150ce001a2d5d733fb4eaa2e02a6aff821a846c94b7131187012a3",
+          "alt": "A sealed black smart key fob with four buttons and no blade, lying on a pale grey surface",
+          "altHe": "מפתח חכם שחור אטום עם ארבעה לחצנים וללא להב, מונח על משטח אפור בהיר",
+          "width": 2048,
+          "height": 2048,
+          "bytes": 519391,
           "kind": "raster",
           "focal": null,
           "legacySrc": null,
