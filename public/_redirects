@@ -1,43 +1,55 @@
 # Cloudflare Pages redirects — 3locksmiths.co.il
 #
-# Ships in out/ from public/ (next build copies public/ wholesale; verified: out/_headers is
-# byte-identical to public/_headers). wrangler auto-detects it at the root of the deploy dir —
-# ops/deploy-site.ps1 does NOT special-case it, line 255 is a plain `npx wrangler pages deploy`.
+# ⛔⛔ THIS FILE DOES NOT WORK FOR THIS SITE'S URLS, AND CANNOT BE MADE TO. READ BEFORE EDITING. ⛔⛔
 #
+# Deployed and measured 2026-09-02 against production:
+#
+#   UPPERCASE request  /locations/%D7%A9%D7%9B...%9C/   -> 301 -> /%D7%90%D7%96...%AA/   ✅ rule fires
+#   lowercase request  /locations/%d7%a9%d7%9b...%9c/   -> 404                            ❌ no match
+#
+# Cloudflare Pages UPPERCASE-NORMALISES the source path of a rule at parse time, then matches it
+# against the RAW request path. This site emits LOWERCASE %d7% everywhere — sitemap.xml, every
+# canonical, every authored href — so every real, indexed URL is lowercase and can never match a
+# rule. Writing the rule in lowercase does not help: it is normalised to uppercase too. Raw
+# unencoded Hebrew does not help: dalita.co.il proves it normalises to uppercase as well.
+#
+# THE ASYMMETRY THAT HIDES THIS: static ASSET lookup IS case-insensitive — both cases of a live
+# page return 200 — while RULE matching is case-sensitive. So poking a live URL by hand tells you
+# nothing about whether a rule would match, and a reviewer who tests only assets concludes the
+# opposite of the truth. I made exactly that error on the first pass.
+#
+# CONSEQUENCE: the seven withdrawn location pages return 404 on the form Google indexed. The
+# rules below still earn their place — they catch uppercase-encoded backlinks and crawlers — but
+# they are a partial mitigation, not the fix.
+#
+# THE ACTUAL FIX IS A ZONE-LEVEL REDIRECT RULE (owner action — CLAUDE.md §13 says Cloudflare zone
+# settings are the owner's to change). Dashboard → the 3locksmiths.co.il zone → Rules → Redirect
+# Rules → Create. Use a lower() transform so BOTH cases match:
+#
+#   When incoming requests match:
+#     lower(http.request.uri.path) in {
+#       "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%91%d7%90%d7%a8-%d7%a9%d7%91%d7%a2/"
+#       "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%91%d7%99%d7%a8%d7%95%d7%a9%d7%9c%d7%99%d7%9d/"
+#       "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%91%d7%99%d7%aa-%d7%a9%d7%9e%d7%a9/"
+#       "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%90%d7%a9%d7%a7%d7%9c%d7%95%d7%9f/"
+#       "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%9b%d7%a8%d7%9e%d7%99%d7%90%d7%9c/"
+#       "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%a2%d7%9b%d7%95/"
+#       "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%a2%d7%a4%d7%95%d7%9c%d7%94/"
+#     }
+#   Then: Static redirect → /%d7%90%d7%96%d7%95%d7%a8%d7%99-%d7%a9%d7%99%d7%a8%d7%95%d7%aa/ , 301
+#
+# ⚠️ FLEET-WIDE: every sibling site with Hebrew slugs has the same latent defect. galbath.co.il's
+# uppercase rules only catch uppercase traffic; dalita.co.il's raw-Hebrew rules likewise. None of
+# them redirect the lowercase URLs their own sitemaps publish.
+#
+# Ships in out/ from public/ (next build copies public/ wholesale). wrangler auto-detects it —
+# ops/deploy-site.ps1 does not special-case it; line 255 is a plain `npx wrangler pages deploy`.
 # Format: <from>  <to>  <status>. First match wins.
 #
-# ── THREE THINGS THAT MAKE A RULE HERE SILENTLY DO NOTHING ────────────────────
-#
-# 1. CASE. Rule matching is a case-SENSITIVE byte comparison of the percent-encoded request path
-#    — verified 2026-09-02: galbath.co.il/public/_redirects:40 holds an UPPERCASE rule; the
-#    uppercase request 301s and its byte-identical lowercase twin 404s.
-#
-#    This site emits LOWERCASE %d7% everywhere — sitemap.xml, every canonical, every authored
-#    href — so lowercase is what Google indexed and the only form that must match. Uppercase is
-#    what encodeURI() and most editors produce, so an uppercase-only rule set would be a 100%
-#    silent no-op against every real URL.
-#
-#    The uppercase lines below are NOT insurance against Cloudflare uppercase-normalising these
-#    rules at parse time. If it does that, the lowercase lines are dead and real traffic 404s
-#    regardless of what the uppercase lines say. They cover exactly one thing: a third-party
-#    backlink that re-encoded the path in uppercase. No sibling site has a lowercase rule, so
-#    the lowercase form has no prior art anywhere in the fleet — hence the VERIFY block below.
-#
-#    Do NOT copy the raw-Hebrew idiom from dalita.co.il/public/_redirects:11 — Cloudflare
-#    normalises a raw rule to UPPERCASE, so that file matches only uppercase requests and is
-#    half-broken live today. It also refutes galbath's own comment at :19.
-#
-# 2. TRAILING SLASH. A rule written with a slash does not match a request without one. Today the
-#    no-slash form 308s, and its Location header carries RAW unencoded Hebrew — a response no
-#    _redirects rule here could produce, which proves it is Pages' own directory resolution. It
-#    dies the moment the directory leaves out/, turning a working URL into a hard 404. Hence
-#    both forms for every path.
-#
-# 3. NO WILDCARDS UNDER /locations/. _redirects outranks existing static assets on Pages
-#    (verified on thermoleak.co.il: /404/ redirects although out/404/index.html exists), so a
-#    convenient `/locations/*` catch-all would black-hole all 25 surviving city pages. Exact
-#    paths only. (410 is reportedly not expressible on Pages — UNVERIFIED, repeated from
-#    galbath _redirects:33. Irrelevant here: 301 is correct regardless.)
+# NO WILDCARDS UNDER /locations/. _redirects outranks existing static assets on Pages, and a
+# `/locations/*` catch-all cannot be fenced off — the per-survivor rules that would protect the
+# 25 live city pages get uppercase-normalised too, so lowercase survivor traffic would fall
+# through the fence and be redirected away. Exact paths only.
 #
 # ── WHY THESE SEVEN ────────────────────────────────────────────────────────────
 #

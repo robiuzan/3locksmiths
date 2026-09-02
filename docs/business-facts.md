@@ -554,6 +554,40 @@ the local specificity that makes the pages pass the doorway test. Likewise **`ש
 neighbourhood from that page. Same trap: `הגליל` on four pages is the lock _cylinder_, and
 `הצפון`/`הדרום` on the תל אביב page are Tel Aviv's own neighbourhoods.
 
+### E.1.1 ⛔ The 301s do NOT fire — Cloudflare limitation, owner action required
+
+**Measured against production on 2026-09-02, after deploying `public/_redirects`:**
+
+| Request form                                | Result               |
+| ------------------------------------------- | -------------------- |
+| UPPERCASE `%D7%A9…` (nobody links this way) | **301 → the hub** ✅ |
+| lowercase `%d7%a9…` (what Google indexed)   | **404** ❌           |
+
+**Cloudflare Pages uppercase-normalises a rule's source path at parse time, then matches it
+against the raw request path.** This site emits lowercase percent-encoding everywhere — sitemap,
+canonicals, every authored href — so no exact-path rule can ever match a real URL. Writing the rule
+in lowercase does not help (it is normalised); raw unencoded Hebrew does not help (same). A
+`/locations/*` catch-all cannot be fenced, because the per-survivor rules that would protect the 25
+live pages get normalised too.
+
+**The asymmetry that hides it:** static _asset_ lookup **is** case-insensitive — both cases of a
+live page return 200 — while _rule_ matching is case-sensitive. Hand-testing a live URL therefore
+proves nothing about whether a rule matches. I asserted the opposite from a broken test (my
+uppercasing also mangled `locations` → `loCAtions`, so I was probing a path that never existed) and
+had to reverse it.
+
+**So the seven withdrawn URLs currently 404 on the indexed form.** The pages are gone as intended;
+what is missing is the signal-preserving 301. The shipped rules are a partial mitigation — they do
+catch uppercase-encoded backlinks and crawlers.
+
+**The fix is a zone-level Redirect Rule and it is the owner's to apply** (CLAUDE.md §13). The exact
+expression, using `lower()` so both cases match, is written out in the header of
+`public/_redirects`. Do not assume it has been done — verify with the curl in that same header.
+
+⚠️ **This is fleet-wide.** Every sibling site with Hebrew slugs has the same latent defect:
+galbath.co.il's uppercase rules catch only uppercase traffic, dalita.co.il's raw-Hebrew rules
+likewise. None of them redirect the lowercase URLs their own sitemaps publish.
+
 ### E.2 "פריסה ארצית" → "פריסה רחבה" — 2026-09-02
 
 With the Negev, the Jerusalem corridor and the western Galilee withdrawn, the surviving 25 cities
