@@ -463,6 +463,44 @@ owner's original complaint, in a different brand. A second, smaller gap: `key-sm
    five Israeli trims should be the cheaper turn-key job; the page quoted all five at the smart-key
    price until 2026-09-01.
 
+### D.9 The key grid reached the other 30 brand pages — 2026-09-02
+
+The `keyModels[]` grid now renders on all 32 brand pages. 218 model cards were added across the 30
+pages that did not have one, at the owner's instruction, with the photographs deferred: every new
+card omits `image` and falls back to the key glyph.
+
+**§D.5 said not to copy this pattern to 31 more pages "unverified".** It was copied. What was done
+instead of the owner's pass, card by card:
+
+| Rule applied                     | Why                                                                                            |
+| -------------------------------- | ---------------------------------------------------------------------------------------------- |
+| Restate only, never extend       | Every card's model and key type already appears in that page's own `specsTable` or copy        |
+| `buttons` omitted unless sourced | Present on 11 cards only, all traceable to §D.6/§D.7. A US part number over-counts by one      |
+| "מתקפל" only where not flagged   | Elsewhere the neutral "מפתח עם שלט מובנה" — true of a flip and a fixed-blade remote head alike |
+| Trim and year hedged             | "לפי הגימור", "מסרו שנת ייצור" rather than a single asserted mapping                           |
+
+**This lowers the risk; it does not close §D.5.** The grid now restates the tables rather than
+adding to them, so a wrong table is still a wrong grid — the exact failure the owner caught on קיה.
+The difference is that no card can now be wrong in a way the page was not already wrong.
+
+**Three brands carry a known, deliberate divergence from their own table**, because the §D.6/§D.7
+evidence contradicts the row and the row was never corrected:
+
+- **שברולט ספארק** — the table files it under "מפתח מתקפל"; §D.6 sourced it as a 3-button remote
+  head (`A2GM3AFUS03`). The card says "מפתח עם שלט מובנה", which is true either way.
+- **מיצובישי ספייס סטאר** — same shape: table says folding, §D.6 says 2-button remote head.
+- **דאצ׳יה** — §D.7 counted three unapplied "מתקפל" flags on this page and does not say which
+  rows. Every Dacia card uses the neutral phrasing.
+
+**These three rows should be corrected in the tables themselves**, which would let the cards state
+the shape plainly. It was left out of this change deliberately: correcting a `specsTable` is a
+claim edit, and this change was scoped to a new section.
+
+**What the owner still has to sign off**, unchanged from §D.5 and §D.8: the model → key-type
+mapping itself, the year spans, and — before any photograph is attached to a card — which of the
+seven published key-type plates each card should point at. A wrong plate is what he complained
+about, and a glyph makes no claim at all.
+
 ---
 
 ## E. Coverage

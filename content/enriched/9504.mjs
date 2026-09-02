@@ -117,6 +117,68 @@ export default {
       ],
     ],
   },
+  // Per-model key grid. Every card restates a claim this page's own specsTable already makes —
+  // no new model, no new key type. `buttons` appears only where docs/business-facts.md §D.6
+  // sources the count, and "מתקפל" only where the shape is not one the §D.7 audit flagged;
+  // elsewhere the neutral "מפתח עם שלט מובנה" covers a flip and a fixed-blade remote head alike.
+  // No `image`: the renderer falls back to a key glyph until the owner supplies photographs.
+  keyModels: {
+    heading: "דגמי מפתחות סיאט שאנחנו משכפלים",
+    intro:
+      "בסיאט המחיר ומשך העבודה נקבעים לפי דור מערכת האימובילייזר ולפי סוג הלהב – HU66 בדגמים הוותיקים ו-HU162T בדגמי MQB. אתרו למטה את הדגם שברשותכם ותדעו לאיזה דור הוא שייך.",
+    items: [
+      {
+        model: "סיאט איביזה (6L / 6J)",
+        years: "2002–2017",
+        keyType: "מפתח מתקפל עם שלט, להב HU66",
+        note: "התאום של פולו 9N ו-6R. מערכות Immo 3 ו-Immo 4, ולכן השכפול פשוט וזול יחסית.",
+      },
+      {
+        model: "סיאט איביזה (6F)",
+        years: "2017 ואילך",
+        keyType: "מפתח מתקפל, להב HU162T",
+        note: "מערכת Immo 5 על תשתית MQB A0, שדורשת ציוד דיאגנוסטי מעודכן וזמן עבודה ארוך יותר.",
+      },
+      {
+        model: "סיאט ארונה",
+        years: "2017 ואילך",
+        keyType: "מפתח מתקפל, להב HU162T",
+        note: "התאום של T-Cross. מפתח שמתאים ללאון לא בהכרח יתאים כאן, למרות התשתית המשותפת.",
+      },
+      {
+        model: "סיאט לאון (1P)",
+        years: "2005–2012",
+        keyType: "מפתח מתקפל עם שלט, להב HU66",
+        note: "אותו להב שמכיר כל מי שעבד על גולף 5. מערכת Immo 4, והעבודה מתבצעת כולה ליד הרכב.",
+      },
+      {
+        model: "סיאט לאון (5F)",
+        years: "2013–2020",
+        keyType: "מפתח מתקפל או מפתח חכם KESSY",
+        note: "התאום של גולף 7. שני סוגי המפתח מופיעים לפי הגימור, וכל אחד דורש רכיב אחר.",
+      },
+      {
+        model: "סיאט לאון (KL) וקופרה",
+        years: "2020 ואילך",
+        keyType: "מפתח חכם עם התנעת לחצן",
+        note: "בדגמי MQB Evo ובקופרה החשמליים רישום מפתח דורש לעיתים הרשאה מקוונת מול היצרן.",
+      },
+      {
+        model: "סיאט אטקה",
+        years: "2016 ואילך",
+        keyType: "מפתח מתקפל או מפתח חכם KESSY",
+        note: "התאום של טיגואן. מסרו דגם, שנת ייצור וגימור ונדע איזה רכיב מתאים בדיוק.",
+      },
+      {
+        model: "סיאט טאראקו",
+        years: "2018 ואילך",
+        keyType: "מפתח מתקפל או מפתח חכם KESSY",
+        note: "התאום של קודיאק. מערכת Immo 5 עם רישום מלא מול מחשב הרכב דרך שקע האבחון.",
+      },
+    ],
+    outro:
+      "לא מצאתם את הדגם שלכם? אנחנו משכפלים מפתחות לכל דגמי סיאט. התקשרו עם דגם הרכב ושנת הייצור ונמסור טווח מחיר כבר בשיחה.",
+  },
   scenarios: [
     {
       icon: "key",

@@ -76,6 +76,56 @@ export default {
       ["כל דגם", "שלט נפרד בלבד", "שכפול שלט ללא ברזל", "20–35 דקות", "300 – 600 ₪"],
     ],
   },
+  // Per-model key grid. Every card restates a claim this page's own specsTable already makes —
+  // no new model, no new key type. `buttons` appears only where docs/business-facts.md §D.6
+  // sources the count, and "מתקפל" only where the shape is not one the §D.7 audit flagged;
+  // elsewhere the neutral "מפתח עם שלט מובנה" covers a flip and a fixed-blade remote head alike.
+  // No `image`: the renderer falls back to a key glyph until the owner supplies photographs.
+  keyModels: {
+    heading: "דגמי מפתחות קאדילק שאנחנו משכפלים",
+    intro:
+      "בקאדילק המפתח עבר מלהב ברזל עם שבב, דרך מפתח עם שלט נפרד, ועד מפתח חכם עם כניסה ללא מגע והתנעת לחצן. אתרו למטה את הדגם ואת שנת הייצור שברשותכם ותדעו מה מותקן בו.",
+    items: [
+      {
+        model: "קאדילק אסקלייד",
+        years: "2002–2006",
+        keyType: "מפתח ברזל עם שבב",
+        note: "להב מתכת עם שבב אימובילייזר. זו העבודה הקצרה מבין דורות אסקלייד.",
+      },
+      {
+        model: "קאדילק אסקלייד",
+        years: "2007–2014",
+        keyType: "מפתח ברזל עם שבב ושלט נפרד",
+        note: "המפתח והשלט הם שני רכיבים נפרדים, ולכן אפשר לשכפל כל אחד מהם בנפרד.",
+      },
+      {
+        model: "קאדילק אסקלייד",
+        years: "2015 ואילך",
+        keyType: "מפתח חכם עם התנעת לחצן",
+        note: "אותו שם דגם, מפתח אחר לגמרי. לכן השאלה הראשונה שנשאל בטלפון היא שנת הייצור.",
+      },
+      {
+        model: "קאדילק CTS",
+        years: "2003–2013",
+        keyType: "מפתח ברזל עם שבב, ובשנים המאוחרות מפתח חכם",
+        note: "סוג המפתח השתנה במהלך שנות הייצור, ולכן חשוב למסור שנת ייצור מדויקת.",
+      },
+      {
+        model: "קאדילק CTS",
+        years: "2014 ואילך",
+        keyType: "מפתח חכם עם כניסה ללא מגע",
+        note: "המפתח נשאר בכיס והרכב מותנע בלחצן. הרישום מחייב חיבור לשקע האבחון עם ציוד מתאים.",
+      },
+      {
+        model: "קאדילק SRX",
+        years: "2004–2016",
+        keyType: "מפתח עם שבב או מפתח חכם לפי שנה",
+        note: "שני הסוגים מופיעים בדגם הזה. מסרו שנת ייצור ונדע מיד באיזה מהם מדובר.",
+      },
+    ],
+    outro:
+      "לא מצאתם את הדגם שלכם? אנחנו משכפלים מפתחות לכל דגמי קאדילק. התקשרו עם דגם הרכב ושנת הייצור ונמסור טווח מחיר כבר בשיחה.",
+  },
   scenarios: [
     {
       icon: "key",

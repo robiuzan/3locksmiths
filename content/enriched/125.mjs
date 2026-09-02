@@ -63,6 +63,68 @@ export default {
       ["מפתח חדש ללא מקור (All Keys Lost)", "קידוד מלא למערכת הרכב", "מורכבת ביותר", "מספר שעות", "לפי דגם"],
     ],
   },
+  // Per-model key grid. Every card restates a claim this page's own specsTable already makes —
+  // no new model, no new key type. `buttons` appears only where docs/business-facts.md §D.6
+  // sources the count, and "מתקפל" only where the shape is not one the §D.7 audit flagged;
+  // elsewhere the neutral "מפתח עם שלט מובנה" covers a flip and a fixed-blade remote head alike.
+  // No `image`: the renderer falls back to a key glyph until the owner supplies photographs.
+  keyModels: {
+    heading: "דגמי מפתחות מרצדס שאנחנו משכפלים",
+    intro:
+      "במרצדס מה שקובע את העבודה אינו הדגם אלא דור מערכת האבטחה שמאחוריו: FBS3 בדגמים עד אמצע העשור הקודם, ו-FBS4 בדגמי הדור החדש. אתרו למטה את הדגם שברשותכם ותדעו לאיזה דור הוא שייך ומה נדרש כדי לשכפל לו מפתח.",
+    items: [
+      {
+        model: "מרצדס A-Class",
+        years: "2013 ואילך",
+        keyType: "מפתח חכם KEYLESS-GO",
+        note: "מפתח שנשאר בכיס עם התנעת לחצן. בדגמי הדור החדש הפקת מפתח מחייבת בדיקת היתכנות מראש.",
+      },
+      {
+        model: "מרצדס B-Class",
+        years: "2012 ואילך",
+        keyType: "מפתח חכם KEYLESS-GO",
+        note: "אותה משפחת מפתחות של A-Class. שנת הייצור היא שקובעת אם מדובר ב-FBS3 או ב-FBS4.",
+      },
+      {
+        model: "מרצדס C-Class",
+        years: "2007 ואילך",
+        keyType: "מפתח אינפרא FBS3, ובדור החדש FBS4",
+        note: "הדגם הנפוץ ביותר שאנחנו משכפלים למרצדס. מסרו שנת ייצור – היא קובעת אם העבודה אפשרית בשטח.",
+      },
+      {
+        model: "מרצדס E-Class",
+        years: "2009 ואילך",
+        keyType: "מפתח אינפרא FBS3, ובדור החדש FBS4",
+        note: "בדגמי FBS3 העבודה מתבצעת ליד הרכב, ובדגמי FBS4 נדרשת בדיקה פרטנית לפני שאנחנו יוצאים.",
+      },
+      {
+        model: "מרצדס GLA",
+        years: "2014 ואילך",
+        keyType: "מפתח חכם KEYLESS-GO",
+        note: "קרוסאובר עירוני עם כניסה ללא מגע. בתוך המארז מוסתר להב חירום לפתיחת הדלת בלבד.",
+      },
+      {
+        model: "מרצדס GLC",
+        years: "2015 ואילך",
+        keyType: "מפתח חכם KEYLESS-GO",
+        note: "רכב שטח מדור FBS4 ברוב שנות הייצור, ולכן אנחנו בודקים היתכנות בטלפון לפני היציאה.",
+      },
+      {
+        model: "מרצדס ויטו",
+        years: "2004 ואילך",
+        keyType: "מפתח אינפרא עם שלט מובנה",
+        note: "מסחרית שלא יכולה לעמוד מושבתת. משכפלים בשטח ליד הרכב, וגם כמה מפתחות לצי באותו ביקור.",
+      },
+      {
+        model: "מרצדס ספרינטר",
+        years: "2006 ואילך",
+        keyType: "מפתח אינפרא עם שלט מובנה",
+        note: "מסחרית גדולה. סוג המפתח משתנה בין הדורות, ולכן חשוב למסור שנת ייצור מדויקת.",
+      },
+    ],
+    outro:
+      "לא מצאתם את הדגם שלכם? אנחנו משכפלים מפתחות לכל דגמי מרצדס. התקשרו עם דגם הרכב ושנת הייצור ונמסור טווח מחיר כבר בשיחה.",
+  },
   scenarios: [
     {
       icon: "key",

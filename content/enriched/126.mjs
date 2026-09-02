@@ -63,6 +63,56 @@ export default {
       ["מפתח חדש ללא מקור", "קידוד מלא למחשב הרכב", "גבוהה מאוד", "60–90 דקות", "לפי דגם"],
     ],
   },
+  // Per-model key grid. Every card restates a claim this page's own specsTable already makes —
+  // no new model, no new key type. `buttons` appears only where docs/business-facts.md §D.6
+  // sources the count, and "מתקפל" only where the shape is not one the §D.7 audit flagged;
+  // elsewhere the neutral "מפתח עם שלט מובנה" covers a flip and a fixed-blade remote head alike.
+  // No `image`: the renderer falls back to a key glyph until the owner supplies photographs.
+  keyModels: {
+    heading: "דגמי מפתחות הונדה שאנחנו משכפלים",
+    intro:
+      "בהונדה שלוש משפחות מפתח: להב עם שבב במערכת HISS בדגמים הוותיקים, מפתח מתקפל בדגמי הביניים, ומפתח חכם Honda Smart Key עם התנעת לחצן בחדשים. אתרו למטה את הדגם שברשותכם ותדעו לאיזו משפחה הוא שייך.",
+    items: [
+      {
+        model: "הונדה ג׳אז",
+        years: "2008 ואילך",
+        keyType: "מפתח עם שבב, ובדורות החדשים מפתח חכם",
+        note: "בדגמים הוותיקים להב עם שבב HISS, ובדורות האחרונים מפתח שנשאר בכיס עם התנעת לחצן.",
+      },
+      {
+        model: "הונדה סיוויק",
+        years: "2006 ואילך",
+        keyType: "מפתח מתקפל, ובדורות החדשים מפתח חכם",
+        note: "הדגם הנפוץ ביותר שאנחנו משכפלים להונדה. מסרו שנת ייצור – היא שקובעת את סוג המפתח.",
+      },
+      {
+        model: "הונדה אקורד",
+        years: "2008 ואילך",
+        keyType: "מפתח עם שלט מובנה, ובדורות החדשים מפתח חכם",
+        note: "משפחתי גדול. בדור האחרון הדלת נפתחת בלחיצה על הידית והרכב מותנע בלחצן.",
+      },
+      {
+        model: "הונדה HR-V",
+        years: "2015 ואילך",
+        keyType: "מפתח חכם Honda Smart Key",
+        note: "קרוסאובר עירוני עם כניסה חכמה. בתוך המארז מוסתר להב חירום לפתיחת הדלת בלבד.",
+      },
+      {
+        model: "הונדה CR-V",
+        years: "2012 ואילך",
+        keyType: "מפתח מתקפל או מפתח חכם",
+        note: "שני הסוגים מופיעים בדגם הזה לפי הגימור ושנת הייצור. מסרו את שניהם ונדע במה מדובר.",
+      },
+      {
+        model: "הונדה אינסייט",
+        years: "2009–2014",
+        keyType: "מפתח עם שבב",
+        note: "היברידי ותיק עם להב ושבב אימובילייזר. החיתוך והרישום מהירים וזולים יחסית.",
+      },
+    ],
+    outro:
+      "לא מצאתם את הדגם שלכם? אנחנו משכפלים מפתחות לכל דגמי הונדה. התקשרו עם דגם הרכב ושנת הייצור ונמסור טווח מחיר כבר בשיחה.",
+  },
   scenarios: [
     {
       icon: "key",

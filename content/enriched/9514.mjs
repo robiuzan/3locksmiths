@@ -76,6 +76,56 @@ export default {
       ["כל דגם", "שלט נפרד בלבד", "שכפול שלט ללא ברזל", "20–35 דקות", "300 – 600 ₪"],
     ],
   },
+  // Per-model key grid. Every card restates a claim this page's own specsTable already makes —
+  // no new model, no new key type. `buttons` appears only where docs/business-facts.md §D.6
+  // sources the count, and "מתקפל" only where the shape is not one the §D.7 audit flagged;
+  // elsewhere the neutral "מפתח עם שלט מובנה" covers a flip and a fixed-blade remote head alike.
+  // No `image`: the renderer falls back to a key glyph until the owner supplies photographs.
+  keyModels: {
+    heading: "דגמי מפתחות אינפיניטי שאנחנו משכפלים",
+    intro:
+      "באינפיניטי כמעט כל הדגמים שנמכרו בישראל מגיעים עם מפתח חכם I-Key: המפתח נשאר בכיס, הדלת נפתחת בקרבת הידית והרכב מותנע בלחצן. אתרו למטה את הדגם שברשותכם ותדעו לאיזה דור מערכת הוא שייך.",
+    items: [
+      {
+        model: "אינפיניטי G35 / G37",
+        years: "2003–2013",
+        keyType: "מפתח חכם I-Key מדור מוקדם",
+        note: "הדור הראשון של המפתח החכם. הרישום מתבצע מול יחידת הבקרה דרך שקע האבחון.",
+      },
+      {
+        model: "אינפיניטי FX35 / FX45",
+        years: "2003–2013",
+        keyType: "מפתח חכם, ובדגמים מוקדמים מפתח עם שבב",
+        note: "שני הסוגים מופיעים בטווח השנים הזה. מסרו שנת ייצור ונדע במה מדובר.",
+      },
+      {
+        model: "אינפיניטי M / Q70",
+        years: "2006–2019",
+        keyType: "מפתח חכם I-Key",
+        note: "כניסה ללא מגע והתנעת לחצן. בתוך המארז מוסתר להב חירום לפתיחת הדלת בלבד.",
+      },
+      {
+        model: "אינפיניטי Q50",
+        years: "2014 ואילך",
+        keyType: "מפתח חכם עם התנעת לחצן",
+        note: "המפתח נושא מזהה מוצפן שנרשם מול מחשב הרכב, ולכן השכפול מחייב ציוד מעודכן.",
+      },
+      {
+        model: "אינפיניטי Q30",
+        years: "2016–2019",
+        keyType: "מפתח חכם על בסיס משותף עם מרצדס",
+        note: "בנוי על תשתית מרצדס, ולכן פרוטוקול הרישום שונה משאר דגמי אינפיניטי.",
+      },
+      {
+        model: "אינפיניטי QX50 / QX60 / QX70",
+        years: "2013 ואילך",
+        keyType: "מפתח חכם I-Key",
+        note: "רכבי שטח גדולים. הרישום ארוך יותר ומחייב אימות בעלות מלא לפני תחילת העבודה.",
+      },
+    ],
+    outro:
+      "לא מצאתם את הדגם שלכם? אנחנו משכפלים מפתחות לכל דגמי אינפיניטי. התקשרו עם דגם הרכב ושנת הייצור ונמסור טווח מחיר כבר בשיחה.",
+  },
   scenarios: [
     {
       icon: "battery-full",

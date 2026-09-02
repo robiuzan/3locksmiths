@@ -78,6 +78,56 @@ export default {
       ["פסיפיקה", "2017 ואילך", "מפתח חכם עם התנעת לחצן", "50–75 דקות", "450 – 900 ₪"],
     ],
   },
+  // Per-model key grid. Every card restates a claim this page's own specsTable already makes —
+  // no new model, no new key type. `buttons` appears only where docs/business-facts.md §D.6
+  // sources the count, and "מתקפל" only where the shape is not one the §D.7 audit flagged;
+  // elsewhere the neutral "מפתח עם שלט מובנה" covers a flip and a fixed-blade remote head alike.
+  // No `image`: the renderer falls back to a key glyph until the owner supplies photographs.
+  keyModels: {
+    heading: "דגמי מפתחות קרייזלר שאנחנו משכפלים",
+    intro:
+      "בקרייזלר עברו שלושה דורות מפתח: מפתח ברזל עם שבב Sentry Key, מפתח FOBIK שנשלף לחריץ ההתנעה, ומפתח חכם עם התנעת לחצן. אתרו למטה את הדגם שברשותכם ותדעו לאיזה דור הוא שייך.",
+    items: [
+      {
+        model: "קרייזלר PT קרוזר",
+        years: "2000–2010",
+        keyType: "מפתח ברזל עם שבב Sentry Key",
+        note: "רישום המפתח מחייב את קוד ה-PIN בן ארבע הספרות ששמור במודול הרכב, גם כשהלהב חתוך מושלם.",
+      },
+      {
+        model: "קרייזלר סברינג",
+        years: "2001–2010",
+        keyType: "מפתח ברזל עם שבב, ובדגמים המאוחרים FOBIK",
+        note: "סוג המפתח השתנה במהלך שנות הייצור, ולכן חשוב למסור שנת ייצור מדויקת.",
+      },
+      {
+        model: "קרייזלר גרנד וויאג׳ר",
+        years: "2001–2007",
+        keyType: "מפתח ברזל עם שבב ושלט נפרד",
+        note: "המפתח והשלט הם שני רכיבים נפרדים, ולכן אפשר לשכפל כל אחד מהם בנפרד.",
+      },
+      {
+        model: "קרייזלר גרנד וויאג׳ר",
+        years: "2008–2016",
+        keyType: "FOBIK נשלף לחריץ ההתנעה",
+        note: "אותו שם דגם, מפתח אחר לגמרי מהדור שלפניו. מודול ההתנעה WIN הוא שקובע את פרוטוקול הרישום.",
+      },
+      {
+        model: "קרייזלר 300C",
+        years: "2005 ואילך",
+        keyType: "מפתח ברזל עם שבב, ומ-2011 FOBIK או מפתח חכם",
+        note: "טווח שנים רחב עם שלושה סוגי מפתח. שנת הייצור היא הנתון הראשון שנשאל עליו בטלפון.",
+      },
+      {
+        model: "קרייזלר פסיפיקה",
+        years: "2017 ואילך",
+        keyType: "מפתח חכם עם התנעת לחצן",
+        note: "בדגמים מהשנים האחרונות נוסף מודול אבטחה SGW שחוסם פקודות כתיבה מגורם שאינו מאושר.",
+      },
+    ],
+    outro:
+      "לא מצאתם את הדגם שלכם? אנחנו משכפלים מפתחות לכל דגמי קרייזלר. התקשרו עם דגם הרכב ושנת הייצור ונמסור טווח מחיר כבר בשיחה.",
+  },
   scenarios: [
     {
       icon: "car-side",

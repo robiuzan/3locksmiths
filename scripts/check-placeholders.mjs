@@ -19,7 +19,7 @@
  */
 import { readFileSync, existsSync, readdirSync } from "node:fs";
 import { join, dirname, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { imageRef, _internals } from "../lib/enrich/catalog-image.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -253,6 +253,59 @@ if (awaiting.length) {
     `\n${awaiting.length} prompt(s) awaiting approval. Open the link, read it, change ` +
       `'approved: null' to today's date, save.`,
   );
+}
+
+/**
+ * The key grids are the one gap counted in CARDS rather than in slots.
+ *
+ * A `keyModels` card with no `image` renders a glyph, and 30 of the 32 brand pages are in that
+ * state deliberately until the owner supplies photographs (docs/business-facts.md §D.9). SLOTS
+ * above cannot see any of it — those cards name no slot — so without this the queue would report
+ * every slot published and say nothing about hundreds of empty tiles.
+ *
+ * Reported, never failing, even under --strict: an unattached card is a correct fallback, and the
+ * plate it should point at is an owner decision (a wrong plate is what he complained about).
+ */
+const ENRICHED = resolve(ROOT, "content", "enriched");
+const grids = [];
+for (const f of readdirSync(ENRICHED)) {
+  if (!f.endsWith(".mjs")) continue;
+  let page;
+  try {
+    page = (await import(pathToFileURL(join(ENRICHED, f)).href)).default;
+  } catch {
+    continue; // a module that will not import is the enrich step's problem to report, not ours
+  }
+  const items = page?.keyModels?.items;
+  if (!items?.length) continue;
+  const unattached = items.filter((m) => !m.image).length;
+  grids.push({
+    brand: page.brand ?? f.replace(/\.mjs$/, ""),
+    total: items.length,
+    unattached,
+  });
+}
+
+if (grids.length) {
+  const cards = grids.reduce((n, g) => n + g.total, 0);
+  const open = grids.reduce((n, g) => n + g.unattached, 0);
+  console.log(`key-grid cards: ${cards - open}/${cards} pointing at a published plate\n`);
+  for (const g of grids.sort(
+    (a, b) => b.unattached - a.unattached || a.brand.localeCompare(b.brand),
+  )) {
+    const mark = g.unattached ? "TODO" : "OK  ";
+    const state = g.unattached
+      ? `${g.unattached} of ${g.total} card(s) show the key glyph`
+      : `all ${g.total} card(s) attached`;
+    console.log(`  ${mark} ${pad(g.brand, 24)} ${state}`);
+  }
+  if (open) {
+    console.log(
+      `\n${open} card(s) await a plate. Pick from the key-type plates above — the card's own ` +
+        `keyType line says which, and the owner confirms it (docs/business-facts.md §D.9).`,
+    );
+  }
+  console.log("");
 }
 
 if (!_internals.IMAGES?.mediaHost) {

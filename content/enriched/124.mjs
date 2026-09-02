@@ -69,6 +69,58 @@ export default {
       ["מפתח חדש ללא מקור", "קידוד מלא למחשב הרכב", "גבוהה מאוד", "60–90 דקות", "לפי דגם"],
     ],
   },
+  // Per-model key grid. Every card restates a claim this page's own specsTable already makes —
+  // no new model, no new key type. `buttons` appears only where docs/business-facts.md §D.6
+  // sources the count, and "מתקפל" only where the shape is not one the §D.7 audit flagged;
+  // elsewhere the neutral "מפתח עם שלט מובנה" covers a flip and a fixed-blade remote head alike.
+  // No `image`: the renderer falls back to a key glyph until the owner supplies photographs.
+  keyModels: {
+    heading: "דגמי מפתחות סובארו שאנחנו משכפלים",
+    intro:
+      "בסובארו שתי משפחות מפתח עיקריות: מפתח שהשלט מובנה בראשו והלהב קבוע, ומפתח חכם Keyless Access שנשאר בכיס. אתרו למטה את הדגם שברשותכם ותדעו איזה מהם מותקן בו.",
+    items: [
+      {
+        model: "סובארו אימפרזה",
+        years: "2012–2016",
+        keyType: "מפתח עם ראש שלט ולהב קבוע",
+        buttons: "4 לחצנים",
+        note: "המפתח והשלט הם יחידה אחת, והלהב אינו מתקפל לתוך המארז. ארבעה לחצנים בראש המפתח.",
+      },
+      {
+        model: "סובארו XV",
+        years: "2013–2017",
+        keyType: "מפתח עם ראש שלט ולהב קבוע",
+        buttons: "4 לחצנים",
+        note: "אותו מפתח של אימפרזה מאותן שנים. בגימורים גבוהים קיים גם מפתח חכם – ציינו את הגימור.",
+      },
+      {
+        model: "סובארו פורסטר",
+        years: "2013 ואילך",
+        keyType: "מפתח חכם, ובגימורי בסיס מפתח עם שלט",
+        note: "שני הסוגים מופיעים בדגם הזה לפי הגימור, והם דורשים רכיב וזמן עבודה שונים.",
+      },
+      {
+        model: "סובארו אאוטבק",
+        years: "2010 ואילך",
+        keyType: "מפתח חכם Keyless Access",
+        note: "כניסה ללא מגע והתנעת לחצן. בתוך המארז מוסתר להב חירום לפתיחת הדלת בלבד.",
+      },
+      {
+        model: "סובארו לגאסי",
+        years: "2004–2015",
+        keyType: "מפתח עם שבב או מפתח עם שלט מובנה",
+        note: "סוג המפתח משתנה בין הדורות, ולכן חשוב למסור שנת ייצור מדויקת לפני שאנחנו יוצאים.",
+      },
+      {
+        model: "סובארו לבורג",
+        years: "2016 ואילך",
+        keyType: "מפתח חכם Keyless Access",
+        note: "מפתח שנשאר בכיס עם התנעת לחצן. הרישום מתבצע בחיבור לשקע האבחון ליד הרכב.",
+      },
+    ],
+    outro:
+      "לא מצאתם את הדגם שלכם? אנחנו משכפלים מפתחות לכל דגמי סובארו. התקשרו עם דגם הרכב ושנת הייצור ונמסור טווח מחיר כבר בשיחה.",
+  },
   scenarios: [
     {
       icon: "key",

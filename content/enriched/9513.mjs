@@ -90,6 +90,56 @@ export default {
       ["כל דגם", "שלט נפרד בלבד", "שכפול שלט ללא ברזל", "20–35 דקות", "300 – 600 ₪"],
     ],
   },
+  // Per-model key grid. Every card restates a claim this page's own specsTable already makes —
+  // no new model, no new key type. `buttons` appears only where docs/business-facts.md §D.6
+  // sources the count, and "מתקפל" only where the shape is not one the §D.7 audit flagged;
+  // elsewhere the neutral "מפתח עם שלט מובנה" covers a flip and a fixed-blade remote head alike.
+  // No `image`: the renderer falls back to a key glyph until the owner supplies photographs.
+  keyModels: {
+    heading: "דגמי מפתחות ביואיק שאנחנו משכפלים",
+    intro:
+      "בביואיק המפתח עבר מלהב ברזל עם שבב PASS-Key, דרך מפתח עם שלט נפרד או מובנה, ועד מפתח מתקפל ומפתח חכם בדגמים החדשים. אתרו למטה את הדגם שברשותכם ותדעו מה מותקן בו.",
+    items: [
+      {
+        model: "ביואיק לסבר",
+        years: "שנות התשעים ותחילת האלפיים",
+        keyType: "מפתח ברזל עם שבב PASS-Key",
+        note: "מערכת האבטחה הוותיקה של GM. הלהב נחרט והשבב נרשם למערכת ליד הרכב.",
+      },
+      {
+        model: "ביואיק פארק אבניו",
+        years: "שנות התשעים ותחילת האלפיים",
+        keyType: "מפתח ברזל עם שבב PASS-Key",
+        note: "אותה משפחת מפתחות של לסבר, עם אותו פרוטוקול רישום ואותו סוג להב.",
+      },
+      {
+        model: "ביואיק לקרוס",
+        years: "2005–2016",
+        keyType: "מפתח ברזל עם שלט, ובגרסאות מסוימות מפתח חכם",
+        note: "שני הסוגים מופיעים בדגם הזה לפי שנת הייצור והגימור. מסרו את שניהם בשיחה.",
+      },
+      {
+        model: "ביואיק אנקלייב",
+        years: "2008–2017",
+        keyType: "מפתח ברזל עם שבב ושלט נפרד",
+        note: "המפתח והשלט הם שני רכיבים נפרדים, ולכן אפשר לשכפל כל אחד מהם בנפרד.",
+      },
+      {
+        model: "ביואיק ריגאל",
+        years: "2011–2017",
+        keyType: "מפתח מתקפל עם שלט מובנה",
+        note: "מארז שנפתח בלחיצה. בגרסאות עם כניסה ללא מגע הרישום ארוך יותר.",
+      },
+      {
+        model: "ביואיק אנקור",
+        years: "2013 ואילך",
+        keyType: "מפתח מתקפל או מפתח חכם",
+        note: "קרוסאובר עירוני. סוג המפתח נקבע לפי הגימור – ציינו אותו ונדע איזה רכיב להביא.",
+      },
+    ],
+    outro:
+      "לא מצאתם את הדגם שלכם? אנחנו משכפלים מפתחות לכל דגמי ביואיק. התקשרו עם דגם הרכב ושנת הייצור ונמסור טווח מחיר כבר בשיחה.",
+  },
   scenarios: [
     {
       icon: "key",

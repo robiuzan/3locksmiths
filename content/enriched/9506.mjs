@@ -116,6 +116,40 @@ export default {
       ],
     ],
   },
+  // Per-model key grid. Every card restates a claim this page's own specsTable already makes —
+  // no new model, no new key type. `buttons` appears only where docs/business-facts.md §D.6
+  // sources the count, and "מתקפל" only where the shape is not one the §D.7 audit flagged;
+  // elsewhere the neutral "מפתח עם שלט מובנה" covers a flip and a fixed-blade remote head alike.
+  // No `image`: the renderer falls back to a key glyph until the owner supplies photographs.
+  keyModels: {
+    heading: "דגמי מפתחות ג׳ילי שאנחנו משכפלים",
+    intro:
+      "כמעט כל רכב ג׳ילי שנמכר בישראל יוצא מהסוכנות עם מפתח חכם והתנעת לחצן, בלי מתג התנעה מכני – כלומר יחידה אלקטרונית שרשומה במחשב הרכב ולא חתיכת מתכת. אתרו למטה את הדגם שברשותכם ותדעו מה נדרש כדי לשכפל לו מפתח.",
+    items: [
+      {
+        model: "ג׳ילי Geometry C",
+        keyType: "מפתח חכם עם התנעת לחצן",
+        note: "חשמלית בלי מתג התנעה מכני. להב החירום שבמארז מיועד לפתיחת הדלת בלבד ואינו מתניע את הרכב.",
+      },
+      {
+        model: "ג׳ילי Coolray",
+        keyType: "מפתח חכם עם כניסה ללא מגע",
+        note: "אימובילייזר עם שבב מוצפן מדור AES. הקידוד מתבצע מול מחשב הרכב דרך שקע ה-OBD.",
+      },
+      {
+        model: "ג׳ילי Okavango",
+        keyType: "מפתח חכם עם פונקציות נוחות מורחבות",
+        note: "מערכת PEPS עם מודול נוחות נפרד, ולכן השכפול כולל גם סנכרון של כל לחצני השלט.",
+      },
+      {
+        model: "ג׳ילי Emgrand וגרסאות בסיס",
+        keyType: "מפתח מתקפל עם להב ושלט מובנה",
+        note: "כאן עדיין יש להב מכני ושבב טרנספונדר, ולכן זו העבודה הקצרה מבין דגמי ג׳ילי.",
+      },
+    ],
+    outro:
+      "לא מצאתם את הדגם שלכם? אנחנו מקודדים מפתחות לדגמי ג׳ילי הנמכרים בישראל. התקשרו עם דגם הרכב, שנת הייצור ומספר השלדה – זה מה שקובע אם המפתח מוכן היום או בהמשך השבוע.",
+  },
   scenarios: [
     {
       icon: "key",

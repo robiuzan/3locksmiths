@@ -72,6 +72,68 @@ export default {
       ["מפתח חדש ללא מקור (All Keys Lost)", "קידוד מלא למערכת הרכב", "מורכבת ביותר", "מספר שעות", "לפי דגם"],
     ],
   },
+  // Per-model key grid. Every card restates a claim this page's own specsTable already makes —
+  // no new model, no new key type. `buttons` appears only where docs/business-facts.md §D.6
+  // sources the count, and "מתקפל" only where the shape is not one the §D.7 audit flagged;
+  // elsewhere the neutral "מפתח עם שלט מובנה" covers a flip and a fixed-blade remote head alike.
+  // No `image`: the renderer falls back to a key glyph until the owner supplies photographs.
+  keyModels: {
+    heading: "דגמי מפתחות BMW שאנחנו משכפלים",
+    intro:
+      "ב-BMW מה שקובע את העבודה הוא דור מערכת האבטחה – EWS בדגמים הוותיקים, CAS בדגמי הביניים ו-FEM/BDC בחדשים – ולא רק הדגם עצמו. אתרו למטה את הדגם שברשותכם ותדעו לאיזה דור הוא שייך.",
+    items: [
+      {
+        model: "BMW סדרה 1",
+        years: "2004 ואילך",
+        keyType: "מפתח נשלף לחריץ, ובדור החדש מפתח חכם",
+        note: "בדגמי CAS המפתח נשלף לתוך חריץ ההתנעה, ובדגמי FEM/BDC הוא נשאר בכיס. מסרו שנת ייצור.",
+      },
+      {
+        model: "BMW סדרה 3",
+        years: "2005 ואילך",
+        keyType: "מפתח נשלף לחריץ, ובדור החדש מפתח חכם",
+        note: "הדגם הנפוץ ביותר שאנחנו משכפלים ל-BMW. דור מערכת האבטחה הוא שקובע את משך העבודה.",
+      },
+      {
+        model: "BMW סדרה 5",
+        years: "2003 ואילך",
+        keyType: "מפתח נשלף לחריץ, ובדור החדש מפתח חכם",
+        note: "בדגמים הוותיקים ביותר עדיין מערכת EWS, שדורשת פרוטוקול רישום שונה לגמרי.",
+      },
+      {
+        model: "BMW סדרה 7",
+        years: "2008 ואילך",
+        keyType: "מפתח חכם Comfort Access",
+        note: "דגם הדגל. בגימורים מסוימים מותקן Display Key עם מסך, שדורש רכיב וציוד ייעודיים.",
+      },
+      {
+        model: "BMW X1",
+        years: "2010 ואילך",
+        keyType: "מפתח נשלף או מפתח חכם",
+        note: "שני הסוגים מופיעים בדגם הזה לפי שנת הייצור והגימור. מסרו את שניהם ונדע במה מדובר.",
+      },
+      {
+        model: "BMW X3",
+        years: "2004 ואילך",
+        keyType: "מפתח נשלף או מפתח חכם",
+        note: "בדגמים הוותיקים מערכת EWS או CAS, ובחדשים FEM/BDC עם Comfort Access.",
+      },
+      {
+        model: "BMW X5",
+        years: "2000 ואילך",
+        keyType: "מפתח עם שבב EWS בוותיקים, מפתח חכם בחדשים",
+        note: "טווח שנים רחב במיוחד. שנת הייצור היא שקובעת אם מדובר בעבודה קצרה או בעבודה של שעה ומעלה.",
+      },
+      {
+        model: "BMW i3",
+        years: "2014 ואילך",
+        keyType: "מפתח חכם עם התנעת לחצן",
+        note: "חשמלי בלי מתג התנעה מכני. אם מצבר ה-12 וולט נחלש הרכב עלול שלא לזהות את המפתח כלל.",
+      },
+    ],
+    outro:
+      "לא מצאתם את הדגם שלכם? אנחנו משכפלים מפתחות לכל דגמי BMW. התקשרו עם דגם הרכב ושנת הייצור ונמסור טווח מחיר כבר בשיחה.",
+  },
   scenarios: [
     {
       icon: "key",

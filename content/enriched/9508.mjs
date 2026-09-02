@@ -83,6 +83,56 @@ export default {
       ["כל דור", "שלט נפרד בלבד", "שכפול שלט ללא ברזל", "20–35 דקות", "300 – 600 ₪"],
     ],
   },
+  // Per-model key grid. Every card restates a claim this page's own specsTable already makes —
+  // no new model, no new key type. `buttons` appears only where docs/business-facts.md §D.6
+  // sources the count, and "מתקפל" only where the shape is not one the §D.7 audit flagged;
+  // elsewhere the neutral "מפתח עם שלט מובנה" covers a flip and a fixed-blade remote head alike.
+  // No `image`: the renderer falls back to a key glyph until the owner supplies photographs.
+  keyModels: {
+    heading: "דגמי מפתחות מיני שאנחנו משכפלים",
+    intro:
+      "במיני סוג המפתח נקבע לפי הדור: מפתח מסורתי עם שבב בדור הראשון, מפתח אובלי שנשלף לחריץ בדור השני, ומפתח חכם עם Comfort Access בדור השלישי. אתרו למטה את הדגם שברשותכם ותדעו לאיזה דור הוא שייך.",
+    items: [
+      {
+        model: "מיני קופר (R50 / R53)",
+        years: "2001–2006",
+        keyType: "מפתח מסורתי עם שבב",
+        note: "להב מתכת עם שבב אימובילייזר. זו העבודה הקצרה מבין דורות מיני.",
+      },
+      {
+        model: "מיני קופר (R56)",
+        years: "2007–2013",
+        keyType: "מפתח אובלי נשלף עם שלט",
+        note: "המפתח נשלף לתוך חריץ ההתנעה. רכיב ייעודי שדורש התאמה מדויקת לדגם ולשנת הייצור.",
+      },
+      {
+        model: "מיני קלאבמן (R55)",
+        years: "2007–2014",
+        keyType: "מפתח אובלי נשלף עם שלט",
+        note: "אותה משפחת מפתחות של R56, על אותה תשתית אבטחה ואותו פרוטוקול רישום.",
+      },
+      {
+        model: "מיני קאנטרימן (R60)",
+        years: "2010–2016",
+        keyType: "מפתח נשלף, ובחלק מהדגמים מפתח חכם",
+        note: "שני הסוגים מופיעים בדגם הזה לפי הגימור. מסרו אותו בשיחה ונדע איזה רכיב להביא.",
+      },
+      {
+        model: "מיני קופר (F56)",
+        years: "2014 ואילך",
+        keyType: "מפתח חכם Comfort Access",
+        note: "כניסה ללא מגע והתנעת לחצן. הרישום ארוך יותר ומחייב ציוד שתומך בפרוטוקול העדכני.",
+      },
+      {
+        model: "מיני קאנטרימן (F60)",
+        years: "2017 ואילך",
+        keyType: "מפתח חכם עם התנעת לחצן",
+        note: "המפתח נשאר בכיס והדלת נפתחת בקרבת הידית. העבודה מתבצעת בחיבור לשקע האבחון.",
+      },
+    ],
+    outro:
+      "לא מצאתם את הדגם שלכם? אנחנו משכפלים מפתחות לכל דגמי מיני. התקשרו עם דגם הרכב ושנת הייצור ונמסור טווח מחיר כבר בשיחה.",
+  },
   scenarios: [
     {
       icon: "key",
