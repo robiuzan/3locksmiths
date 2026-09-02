@@ -411,6 +411,58 @@ should not be copied to 31 more pages unverified. A 7-of-7 error rate on the fir
 checked is the strongest possible confirmation. **The remaining rows — flip, smart, remote and card
 — have NOT been audited.** Assume they carry a similar error rate until they have been.
 
+### D.7 The 32-brand key-spec audit — 198 rows checked, 2026-09-01
+
+Every row in every brand page's `specsTable` was checked against parts catalogues and OEM part
+numbers, and each suspected error was then argued against by an independent reviewer before it was
+accepted.
+
+|                                                |                     |
+| ---------------------------------------------- | ------------------- |
+| Rows audited                                   | 198 across 32 pages |
+| Flagged on first pass                          | 103                 |
+| **Refuted** — the "fix" was worse than the row | **79**              |
+| **Confirmed wrong or materially imprecise**    | **24 (12%)**        |
+
+**The 12% corrects §D.6's warning.** That entry said to assume the 7-of-7 rate held site-wide. It
+does not. The buttonless slice was pre-filtered to the worst possible shape — a row naming a
+current high-volume car and claiming a no-button chip blade — and every row of that shape was
+wrong. Swept across everything, including hedged rows about twenty-year-old cars, the rate is 12%.
+
+**⛔ RULE FOR ANY FUTURE PASS: a North American part number is inadmissible evidence for button
+count on this site.** It was the single most common cause of the 79 refutations. US keys are 315 MHz
+and carry a panic button; the same car sold here is 433 MHz without one. Sourcing a US part yields
+a count one too high, and would have introduced fresh errors across Toyota, Honda, Infiniti, Subaru
+and Mitsubishi.
+
+**The site's signature error is not the chip blade — it is "מתקפל".** Eleven of the 24 call a key
+folding when it does not fold: Suzuki (whole brand), Isuzu, Dacia ×3, Nissan Micra, Subaru, Buick
+Enclave, Ford Fiesta, plus Jeep and Mercedes in mirror image. **One of those eleven was mine** — I
+"corrected" Suzuki on 2026-09-01 by moving the Jimny onto a folding row. Suzuki's factory key is a
+one-piece remote head; the flip is an aftermarket conversion.
+
+**Applied 2026-09-01:** the nine rows that cause a wrong quote or the wrong part on the van —
+פורד פיאסטה (live, with a photograph), ג׳יפ WK2, שברולט Captiva, איסוזו D-Max, קאדילק אסקלייד,
+ביואיק אנקלייב, סובארו, ניסאן מיקרה, BYD. The remaining 15 are text-only on pages with no key grid.
+
+**The largest hole in the plate vocabulary: `key-remote-head-2btn`** — a one-piece key, fixed
+blade, two buttons in a thick head. Needed by 20+ rows fleet-wide (Suzuki entire, Isuzu, Dacia,
+Nissan Micra, Toyota 2006–2014, Mitsubishi non-smart, Peugeot 206, Opel Astra G, Renault Kangoo).
+Every row needing it is today plate-less or at risk of being given a folding-key photograph — the
+owner's original complaint, in a different brand. A second, smaller gap: `key-smart-2btn`.
+
+### D.8 🔶 Three questions only the owner can answer
+
+1. **A photograph of a Subaru Impreza or XV key (2012–2017).** The 4-button count is certain. That
+   the blade does **not fold** rests on four suppliers filing 57497-FJ031 as a remote head key,
+   contradicted by marketplace seller titles. No OEM diagram exists. One photo settles it.
+2. **Geely — has he ever worked on a Coolray, Okavango or Emgrand in Israel?** The registry shows
+   zero registrations of each. If he has never seen one, those rows go. If he services personal
+   imports, they stay and get labelled as such — real work must not be deleted off his site.
+3. **Isuzu D-Max 2020+ — which trims have push-button start and which turn a key?** Three of the
+   five Israeli trims should be the cheaper turn-key job; the page quoted all five at the smart-key
+   price until 2026-09-01.
+
 ---
 
 ## E. Coverage
