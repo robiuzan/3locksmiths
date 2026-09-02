@@ -42,9 +42,11 @@ Consequences you must internalise:
 - **Business:** שלושה מנעולנים (3 Locksmiths) — locksmith for car and home. Key cutting and coding,
   lock opening, cylinder and lock replacement, door repair.
 - **Phone (click-to-call):** `055-6601006` · WhatsApp same number · `info@3locksmiths.co.il`.
-- **Coverage:** 17 location pages across Israel; the homepage claims פריסה ארצית.
+- **Coverage:** 25 location pages. Seven cities were withdrawn 2026-09-02 because the business no
+  longer services them — see `docs/business-facts.md` §E.1. The sitewide phrase is now פריסה רחבה,
+  not פריסה ארצית (§E.2), and it is still 🔶 — it is NOT in the homepage title, which §E used to say.
 - **Conversion goals, in order:** (1) phone call, (2) WhatsApp, (3) the Web3Forms lead form.
-- **Scale:** 71+ pages — 30 services, 17 locations, 7 top-level Hebrew landers, a /מדריכים/ guides
+- **Scale:** 71+ pages — 30 services, 25 locations, 7 top-level Hebrew landers, a /מדריכים/ guides
   hub + guides, an emergency cluster, 4 calculator steps, 4 legal/utility, 1 service hub, 1 homepage.
   Counts move as content ships — read `content/enriched/_manifest.json`, never assume.
 

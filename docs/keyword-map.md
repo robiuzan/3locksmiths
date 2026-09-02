@@ -66,8 +66,13 @@ Also Tier 2 on the door side: `דלת פלדלת`, `דלת ממד`, `מנעול 
 
 ### Tier 3 — local terms
 
-`שכפול מפתח ב<city>` across 17 cities: תל אביב, חיפה, ירושלים, ראשון לציון, פתח תקווה, נתניה (×2
-slugs), חולון (×2 slugs), רמת גן, גבעתיים, בת ים, באר שבע, כפר סבא, רעננה, חדרה, קריות.
+`שכפול מפתח ב<city>` across 25 cities: תל אביב, חיפה, ראשון לציון, פתח תקווה, נתניה (×2 slugs),
+חולון (×2 slugs), רמת גן, גבעתיים, בת ים, כפר סבא, רעננה, חדרה, קריות, אשדוד, הרצליה, רחובות,
+בני ברק, מודיעין, רמת השרון, הוד השרון, לוד, נס ציונה, ראש העין.
+
+> ירושלים, באר שבע, אשקלון, בית שמש, כרמיאל, עכו and עפולה were **withdrawn 2026-09-02** — the
+> business no longer services them (`docs/business-facts.md` §E.1). All seven 301 to
+> `/אזורי-שירות/` via `public/_redirects`. Do not re-add them as keyword targets.
 
 > Note the duplicate-city slugs: `שכפול-מפתח-בנתניה` **and** `שכפול-מפתחות-בנתניה`;
 > `שכפול-מפתח-חולון` **and** `שכפול-מפתחות-חולון`. Both of each pair are live. Treat as §7 — do not

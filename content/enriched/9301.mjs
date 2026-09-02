@@ -18,7 +18,7 @@
 //
 // ⚠️ `advantages` and `stats` below are NOT optional decoration — DO NOT DELETE THEM.
 // lib/enrich/render.mjs falls back to DEFAULT_FEATURES / DEFAULT_STATS when a page omits them,
-// and those defaults assert "25+ שנות ניסיון" (⛔ business-facts §A.1), "פריסה ארצית" (🔶 §E),
+// and those defaults assert "25+ שנות ניסיון" (⛔ business-facts §A.1), "פריסה רחבה" (🔶 §E),
 // "30–60 ד׳ זמן מענה ממוצע" (🔶 §D.3) and "אחריות מלאה" (🔶 §D.2), plus an "אלפי לקוחות מרוצים"
 // intro (🔶 §B). Overriding them here is the only way a single page can keep those claims off
 // itself. `advantages.features` must stay at EXACTLY 6 items — render.mjs reverts to the
@@ -446,8 +446,8 @@ export default {
         href: "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%97%d7%99%d7%a4%d7%94/",
       },
       {
-        label: "שכפול מפתח בירושלים",
-        href: "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%91%d7%99%d7%a8%d7%95%d7%a9%d7%9c%d7%99%d7%9d/",
+        label: "שכפול מפתח בראשון לציון",
+        href: "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%a8%d7%90%d7%a9%d7%95%d7%9f-%d7%9c%d7%a6%d7%99%d7%95%d7%9f/",
       },
     ],
   },

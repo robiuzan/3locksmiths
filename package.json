@@ -10,8 +10,8 @@
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "snapshot": "node scripts/scrape.mjs && node scripts/transform.mjs && node scripts/pages.mjs && node scripts/build-manifest.mjs && node scripts/enrich.mjs && node scripts/claims.mjs && node scripts/scraped-copy.mjs && node scripts/footer.mjs && node scripts/form.mjs && node scripts/hero-gallery.mjs && node scripts/cta-images.mjs && node scripts/assets.mjs && node scripts/fix-links.mjs",
-    "enrich": "node scripts/pages.mjs && node scripts/build-manifest.mjs && node scripts/enrich.mjs && node scripts/claims.mjs && node scripts/scraped-copy.mjs && node scripts/footer.mjs && node scripts/form.mjs && node scripts/hero-gallery.mjs && node scripts/cta-images.mjs && node scripts/assets.mjs && node scripts/fix-links.mjs"
+    "snapshot": "node scripts/scrape.mjs && node scripts/transform.mjs && node scripts/pages.mjs && node scripts/build-manifest.mjs && node scripts/enrich.mjs && node scripts/claims.mjs && node scripts/scraped-copy.mjs && node scripts/footer.mjs && node scripts/form.mjs && node scripts/hero-gallery.mjs && node scripts/cta-images.mjs && node scripts/assets.mjs && node scripts/prune-chrome-links.mjs && node scripts/fix-links.mjs",
+    "enrich": "node scripts/pages.mjs && node scripts/build-manifest.mjs && node scripts/enrich.mjs && node scripts/claims.mjs && node scripts/scraped-copy.mjs && node scripts/footer.mjs && node scripts/form.mjs && node scripts/hero-gallery.mjs && node scripts/cta-images.mjs && node scripts/assets.mjs && node scripts/prune-chrome-links.mjs && node scripts/fix-links.mjs"
   },
   "dependencies": {
     "@ishub/site-kit": "file:vendor/ishub-site-kit-0.0.0.tgz",

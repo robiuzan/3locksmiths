@@ -174,9 +174,14 @@ Two corrections:
 - **`{ "@type": "Country", name: "IL" }`** should carry the country name (`"Israel"`) or use a proper
   identifier. `"IL"` is an ISO code in a `name` field.
 
-The business node's own `areaServed` is a hardcoded 15-city array in `enrich.mjs` that does not match
-the 17 location pages. Derive it from the location set, or from `schema.areaServed` in the manifest
-once that is confirmed (`docs/business-facts.md` §E).
+The business node's own `areaServed` **is** now derived from the location set — `scripts/enrich.mjs`
+builds `CITIES` from `content/enriched/_manifest.json`, so it tracks the routes automatically and
+cannot go stale the way the old hardcoded 15-city array did. It currently emits 23 unique `City`
+nodes (25 location pages, minus the נתניה and חולון duplicate-slug pairs).
+
+⚠️ This means the schema makes a **machine-readable coverage claim on ~100 pages** even though
+`schema.areaServed` is `null` in the roster manifest. `docs/business-facts.md` §E asserted the
+opposite until 2026-09-02, which is why a coverage change was planned twice from the wrong premise.
 
 ---
 

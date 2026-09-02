@@ -25,7 +25,7 @@
 // `advantages` and `stats` are authored DELIBERATELY, and must not be deleted. Omitting either one
 // does not remove the section — it makes lib/enrich/render.mjs fall back to DEFAULT_FEATURES and
 // DEFAULT_STATS, which state "אחריות מלאה" (§D.2), "זמינות מיידית … 7 ימים בשבוע" and
-// "30–60 ד׳ זמן מענה ממוצע לקריאה" (§D.3), "25+ שנות ניסיון" (⛔ §A.1), "פריסה ארצית" (§E) and an
+// "30–60 ד׳ זמן מענה ממוצע לקריאה" (§D.3), "25+ שנות ניסיון" (⛔ §A.1), "פריסה רחבה" (§E) and an
 // "אלפי לקוחות מרוצים" intro (§B). Every value below restates something this page already proves.
 //
 // Safety: a child, an elderly person or an animal locked inside is answered with 100 / 101 first,
@@ -430,7 +430,7 @@ export default {
       },
       {
         q: "אתם מגיעים לכל הארץ?",
-        a: "יש לנו פריסה ארצית, והעבודה כולה מתבצעת בשטח – ליד הדלת שלכם, מתוך ניידת שנושאת את הכלים ומלאי צילינדרים. מסרו כתובת מדויקת בשיחה, ותדעו מיד אם אנחנו מכסים את האזור ומה טווח המחיר לדלת ולמנעול שתיארתם.",
+        a: "יש לנו פריסה רחבה, והעבודה כולה מתבצעת בשטח – ליד הדלת שלכם, מתוך ניידת שנושאת את הכלים ומלאי צילינדרים. מסרו כתובת מדויקת בשיחה, ותדעו מיד אם אנחנו מכסים את האזור ומה טווח המחיר לדלת ולמנעול שתיארתם.",
       },
       {
         q: "אפשר לתאם פתיחת דלת מראש, למשל לדירה ריקה או לדירת ירושה?",
@@ -523,8 +523,8 @@ export default {
         href: "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%97%d7%99%d7%a4%d7%94/",
       },
       {
-        label: "שכפול מפתח בירושלים",
-        href: "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%91%d7%99%d7%a8%d7%95%d7%a9%d7%9c%d7%99%d7%9d/",
+        label: "שכפול מפתח בראשון לציון",
+        href: "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%a8%d7%90%d7%a9%d7%95%d7%9f-%d7%9c%d7%a6%d7%99%d7%95%d7%9f/",
       },
     ],
   },

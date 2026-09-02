@@ -1,6 +1,6 @@
 {
   "referenceId": 95,
-  "count": 106,
+  "count": 99,
   "lookup": {
     "7": {
       "path": "/",
@@ -169,14 +169,6 @@
     "143": {
       "path": "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%91%d7%aa-%d7%99%d7%9d/",
       "title": "שכפול מפתח בת ים"
-    },
-    "144": {
-      "path": "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%91%d7%90%d7%a8-%d7%a9%d7%91%d7%a2/",
-      "title": "שכפול מפתח באר שבע"
-    },
-    "146": {
-      "path": "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%91%d7%99%d7%a8%d7%95%d7%a9%d7%9c%d7%99%d7%9d/",
-      "title": "שכפול מפתח בירושלים"
     },
     "147": {
       "path": "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97%d7%95%d7%aa-%d7%97%d7%95%d7%9c%d7%95%d7%9f/",
@@ -426,14 +418,6 @@
       "path": "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%9e%d7%95%d7%93%d7%99%d7%a2%d7%99%d7%9f/",
       "title": "שכפול מפתח במודיעין"
     },
-    "9606": {
-      "path": "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%91%d7%99%d7%aa-%d7%a9%d7%9e%d7%a9/",
-      "title": "שכפול מפתח בבית שמש"
-    },
-    "9607": {
-      "path": "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%90%d7%a9%d7%a7%d7%9c%d7%95%d7%9f/",
-      "title": "שכפול מפתח באשקלון"
-    },
     "9608": {
       "path": "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%a8%d7%9e%d7%aa-%d7%94%d7%a9%d7%a8%d7%95%d7%9f/",
       "title": "שכפול מפתח ברמת השרון"
@@ -453,18 +437,6 @@
     "9612": {
       "path": "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%a8%d7%90%d7%a9-%d7%94%d7%a2%d7%99%d7%9f/",
       "title": "שכפול מפתח בראש העין"
-    },
-    "9613": {
-      "path": "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%9b%d7%a8%d7%9e%d7%99%d7%90%d7%9c/",
-      "title": "שכפול מפתח בכרמיאל"
-    },
-    "9614": {
-      "path": "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%a2%d7%9b%d7%95/",
-      "title": "שכפול מפתח בעכו"
-    },
-    "9615": {
-      "path": "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%a2%d7%a4%d7%95%d7%9c%d7%94/",
-      "title": "שכפול מפתח בעפולה"
     }
   },
   "pages": [
@@ -1141,48 +1113,6 @@
       "path": "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%91%d7%aa-%d7%99%d7%9d/",
       "canonical": "https://3locksmiths.co.il/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%91%d7%aa-%d7%99%d7%9d/",
       "city": "בת ים",
-      "relatedServices": [
-        95,
-        93,
-        94
-      ],
-      "relatedLocations": [
-        137,
-        138,
-        139,
-        140,
-        141
-      ]
-    },
-    {
-      "id": 144,
-      "kind": "location",
-      "title": "שכפול מפתח באר שבע",
-      "keyword": "שכפול מפתח באר שבע",
-      "path": "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%91%d7%90%d7%a8-%d7%a9%d7%91%d7%a2/",
-      "canonical": "https://3locksmiths.co.il/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%91%d7%90%d7%a8-%d7%a9%d7%91%d7%a2/",
-      "city": "באר שבע",
-      "relatedServices": [
-        95,
-        93,
-        94
-      ],
-      "relatedLocations": [
-        137,
-        138,
-        139,
-        140,
-        141
-      ]
-    },
-    {
-      "id": 146,
-      "kind": "location",
-      "title": "שכפול מפתח בירושלים",
-      "keyword": "שכפול מפתח בירושלים",
-      "path": "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%91%d7%99%d7%a8%d7%95%d7%a9%d7%9c%d7%99%d7%9d/",
-      "canonical": "https://3locksmiths.co.il/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%91%d7%99%d7%a8%d7%95%d7%a9%d7%9c%d7%99%d7%9d/",
-      "city": "ירושלים",
       "relatedServices": [
         95,
         93,
@@ -2014,48 +1944,6 @@
       ]
     },
     {
-      "id": 9606,
-      "kind": "location",
-      "title": "שכפול מפתח בבית שמש",
-      "keyword": "שכפול מפתח בבית שמש",
-      "path": "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%91%d7%99%d7%aa-%d7%a9%d7%9e%d7%a9/",
-      "canonical": "https://3locksmiths.co.il/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%91%d7%99%d7%aa-%d7%a9%d7%9e%d7%a9/",
-      "city": "בית שמש",
-      "relatedServices": [
-        95,
-        93,
-        94
-      ],
-      "relatedLocations": [
-        137,
-        138,
-        139,
-        140,
-        141
-      ]
-    },
-    {
-      "id": 9607,
-      "kind": "location",
-      "title": "שכפול מפתח באשקלון",
-      "keyword": "שכפול מפתח באשקלון",
-      "path": "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%90%d7%a9%d7%a7%d7%9c%d7%95%d7%9f/",
-      "canonical": "https://3locksmiths.co.il/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%90%d7%a9%d7%a7%d7%9c%d7%95%d7%9f/",
-      "city": "אשקלון",
-      "relatedServices": [
-        95,
-        93,
-        94
-      ],
-      "relatedLocations": [
-        137,
-        138,
-        139,
-        140,
-        141
-      ]
-    },
-    {
       "id": 9608,
       "kind": "location",
       "title": "שכפול מפתח ברמת השרון",
@@ -2147,69 +2035,6 @@
       "path": "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%a8%d7%90%d7%a9-%d7%94%d7%a2%d7%99%d7%9f/",
       "canonical": "https://3locksmiths.co.il/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%a8%d7%90%d7%a9-%d7%94%d7%a2%d7%99%d7%9f/",
       "city": "ראש העין",
-      "relatedServices": [
-        95,
-        93,
-        94
-      ],
-      "relatedLocations": [
-        137,
-        138,
-        139,
-        140,
-        141
-      ]
-    },
-    {
-      "id": 9613,
-      "kind": "location",
-      "title": "שכפול מפתח בכרמיאל",
-      "keyword": "שכפול מפתח בכרמיאל",
-      "path": "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%9b%d7%a8%d7%9e%d7%99%d7%90%d7%9c/",
-      "canonical": "https://3locksmiths.co.il/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%9b%d7%a8%d7%9e%d7%99%d7%90%d7%9c/",
-      "city": "כרמיאל",
-      "relatedServices": [
-        95,
-        93,
-        94
-      ],
-      "relatedLocations": [
-        137,
-        138,
-        139,
-        140,
-        141
-      ]
-    },
-    {
-      "id": 9614,
-      "kind": "location",
-      "title": "שכפול מפתח בעכו",
-      "keyword": "שכפול מפתח בעכו",
-      "path": "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%a2%d7%9b%d7%95/",
-      "canonical": "https://3locksmiths.co.il/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%a2%d7%9b%d7%95/",
-      "city": "עכו",
-      "relatedServices": [
-        95,
-        93,
-        94
-      ],
-      "relatedLocations": [
-        137,
-        138,
-        139,
-        140,
-        141
-      ]
-    },
-    {
-      "id": 9615,
-      "kind": "location",
-      "title": "שכפול מפתח בעפולה",
-      "keyword": "שכפול מפתח בעפולה",
-      "path": "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%a2%d7%a4%d7%95%d7%9c%d7%94/",
-      "canonical": "https://3locksmiths.co.il/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%a2%d7%a4%d7%95%d7%9c%d7%94/",
-      "city": "עפולה",
       "relatedServices": [
         95,
         93,

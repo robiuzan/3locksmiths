@@ -71,8 +71,8 @@ included because a Stop hook formats changed files — an unformatted file means
 ## 2. Route and sitemap parity
 
 ```bash
-find out -name index.html | wc -l          # 119 as of 2026-09-01; grows as pages are added
-grep -c '<url>' out/sitemap.xml            # 112 — routes minus /step/ x4, /thank-you/ and the 404s
+find out -name index.html | wc -l          # 112 as of 2026-09-02 (was 119 — 7 cities withdrawn)
+grep -c '<url>' out/sitemap.xml            # 105 — routes minus /step/ x4, /thank-you/ and the 404s
 test -f out/robots.txt && echo ok
 ```
 
@@ -175,13 +175,13 @@ Object.entries(by).sort((a,b)=>b[1].b-a[1].b).slice(0,8)
 .forEach(([k,v])=>console.log((v.b/1048576).toFixed(1).padStart(8)+" MB "+String(v.n).padStart(6)+" files  "+k));'
 ```
 
-**The old "~58 MB" figure in this file was written at 64 routes and is gone; there are 119 now.**
+**The old "~58 MB" figure in this file was written at 64 routes and is gone; there are 112 now.**
 Measured 2026-09-01, the breakdown is not what the prose used to claim:
 
 | Bytes   | Files | Type    | What it is                                                       |
 | ------- | ----- | ------- | ---------------------------------------------------------------- |
 | 59.8 MB | 826   | `.txt`  | **Next RSC payloads — bigger than the HTML itself.** Unexamined. |
-| 43.0 MB | 120   | `.html` | 119 routes, ~370 KB mean (the homepage is ~780 KB)               |
+| 43.0 MB | 113   | `.html` | 112 routes, ~370 KB mean (the homepage is ~780 KB)               |
 | 8.5 MB  | 15    | `.svg`  | the known legacy Font Awesome fonts (backlog §10.2)              |
 
 So the bulk is **not** vendored theme assets any more — it is RSC payloads and inlined page HTML.
@@ -233,7 +233,7 @@ For a substantive change, run the relevant agents against the **fresh** `out/`:
 > All stop-ship items pass as of **2026-09-01**, re-verified on the merged tree carrying the homepage
 > CTA photographs and the פורד key grid: 533 JSON-LD blocks parse and 0 fail, 0 `tel:[phone]`
 > placeholders, the manifest email, no `Review`/`aggregateRating`, exactly one `<h1>` everywhere, and
-> 119 − 112 = 7 route/sitemap gap. The §4.1/§4.2/§8.1/§2.1 defects were fixed on 2026-08-25 and their
+> 112 − 105 = 7 route/sitemap gap. The §4.1/§4.2/§8.1/§2.1 defects were fixed on 2026-08-25 and their
 > checks promoted to blocking in `.github/workflows/ci.yml`. If one fails now, it is a regression.
 
 ## Then

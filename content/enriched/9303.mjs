@@ -21,7 +21,7 @@
 //     fires unless `features.length === 6` EXACTLY — keep six cards, never five or seven.
 //   • `stats` is authored for the SAME reason, and this trap is easier to miss: renderStats()
 //     has no early return, so a page with no `stats` array renders DEFAULT_STATS on every
-//     page — "25+ שנות ניסיון" (⛔ §A.1), "פריסה ארצית" (🔶 §E), "30–60 ד׳ זמן מענה ממוצע
+//     page — "25+ שנות ניסיון" (⛔ §A.1), "פריסה רחבה" (🔶 §E), "30–60 ד׳ זמן מענה ממוצע
 //     לקריאה" (🔶 §D.3 — an arrival promise) and "100% אחריות מלאה" (🔶 §D.2). Source-level
 //     grepping this module will NOT reveal them; you have to render it. The four stats below
 //     are all verifiable against this page's own content. Do not delete the array.
@@ -380,7 +380,7 @@ export default {
       },
       {
         q: "אתם מגיעים לכל הארץ ולקריאות דחופות?",
-        a: "יש לנו פריסה ארצית והעבודה מתבצעת בשטח – ליד הדלת או ליד הרכב, בלי גרירה ובלי לפרק את הדלת. אנחנו נותנים מענה לקריאות דחופות. חייגו 055-6601006, תארו היכן נשבר המפתח והאם קצה השבר בולט החוצה.",
+        a: "יש לנו פריסה רחבה והעבודה מתבצעת בשטח – ליד הדלת או ליד הרכב, בלי גרירה ובלי לפרק את הדלת. אנחנו נותנים מענה לקריאות דחופות. חייגו 055-6601006, תארו היכן נשבר המפתח והאם קצה השבר בולט החוצה.",
       },
       {
         q: "איך מונעים שהמפתח הבא יישבר?",
@@ -483,8 +483,8 @@ export default {
         href: "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%97%d7%99%d7%a4%d7%94/",
       },
       {
-        label: "שכפול מפתח בירושלים",
-        href: "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%91%d7%99%d7%a8%d7%95%d7%a9%d7%9c%d7%99%d7%9d/",
+        label: "שכפול מפתח בראשון לציון",
+        href: "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%a8%d7%90%d7%a9%d7%95%d7%9f-%d7%9c%d7%a6%d7%99%d7%95%d7%9f/",
       },
     ],
   },

@@ -119,7 +119,7 @@ const BLOCKING_RAW = [
 /** 🔶 — unconfirmed, reported but never failing. See docs/business-facts.md. */
 const INFO = [
   { id: "warranty", re: /אחריות מלאה|באחריות מלאה|שנת אחריות/g },
-  { id: "coverage", re: /פריסה ארצית|בכל הארץ/g },
+  { id: "coverage", re: /פריסה ארצית|פריסה רחבה|בכל הארץ/g },
   { id: "price", re: /\d{2,4}\s*[–-]\s*\d{2,4}\s*₪/g },
 ];
 
