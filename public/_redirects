@@ -1,16 +1,19 @@
 # Cloudflare Pages redirects — 3locksmiths.co.il
 #
-# ⛔⛔ THIS FILE DOES NOT WORK FOR THIS SITE'S URLS, AND CANNOT BE MADE TO. READ BEFORE EDITING. ⛔⛔
+# ⚠️ THE RULES BELOW ARE A FALLBACK. The 301 that production actually serves for these paths comes
+# from a ZONE-LEVEL Cloudflare Redirect Rule, not from this file. Read both sections before editing.
 #
-# Deployed and measured 2026-09-02 against production:
+# ── THE PAGES DEFECT THIS FILE CANNOT ESCAPE ───────────────────────────────────
+#
+# Deployed and measured 2026-09-02 against production, before the zone rule existed:
 #
 #   UPPERCASE request  /locations/%D7%A9%D7%9B...%9C/   -> 301 -> /%D7%90%D7%96...%AA/   ✅ rule fires
 #   lowercase request  /locations/%d7%a9%d7%9b...%9c/   -> 404                            ❌ no match
 #
 # Cloudflare Pages UPPERCASE-NORMALISES the source path of a rule at parse time, then matches it
 # against the RAW request path. This site emits LOWERCASE %d7% everywhere — sitemap.xml, every
-# canonical, every authored href — so every real, indexed URL is lowercase and can never match a
-# rule. Writing the rule in lowercase does not help: it is normalised to uppercase too. Raw
+# canonical, every authored href — so every real URL is lowercase and can never match a rule in
+# this file. Writing the rule in lowercase does not help: it is normalised to uppercase too. Raw
 # unencoded Hebrew does not help: dalita.co.il proves it normalises to uppercase as well.
 #
 # THE ASYMMETRY THAT HIDES THIS: static ASSET lookup IS case-insensitive — both cases of a live
@@ -18,29 +21,31 @@
 # nothing about whether a rule would match, and a reviewer who tests only assets concludes the
 # opposite of the truth. I made exactly that error on the first pass.
 #
-# CONSEQUENCE: the seven withdrawn location pages return 404 on the form Google indexed. The
-# rules below still earn their place — they catch uppercase-encoded backlinks and crawlers — but
-# they are a partial mitigation, not the fix.
+# ── THE FIX, DEPLOYED AND VERIFIED 2026-09-02 ──────────────────────────────────
 #
-# THE ACTUAL FIX IS A ZONE-LEVEL REDIRECT RULE (owner action — CLAUDE.md §13 says Cloudflare zone
-# settings are the owner's to change). Dashboard → the 3locksmiths.co.il zone → Rules → Redirect
-# Rules → Create. Use a lower() transform so BOTH cases match:
+# Cloudflare → 3locksmiths.co.il → Rules → Overview → Redirect Rules, named
+# "Withdrawn cities → service areas hub":
 #
-#   When incoming requests match:
-#     lower(http.request.uri.path) in {
-#       "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%91%d7%90%d7%a8-%d7%a9%d7%91%d7%a2/"
-#       "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%91%d7%99%d7%a8%d7%95%d7%a9%d7%9c%d7%99%d7%9d/"
-#       "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%91%d7%99%d7%aa-%d7%a9%d7%9e%d7%a9/"
-#       "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%90%d7%a9%d7%a7%d7%9c%d7%95%d7%9f/"
-#       "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%9b%d7%a8%d7%9e%d7%99%d7%90%d7%9c/"
-#       "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%a2%d7%9b%d7%95/"
-#       "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%a2%d7%a4%d7%95%d7%9c%d7%94/"
-#     }
-#   Then: Static redirect → /%d7%90%d7%96%d7%95%d7%a8%d7%99-%d7%a9%d7%99%d7%a8%d7%95%d7%aa/ , 301
+#   If:   lower(http.request.uri.path) in { the seven paths listed below }
+#   Then: Static redirect -> https://3locksmiths.co.il/%d7%90%d7%96%d7%95%d7%a8%d7%99-%d7%a9%d7%99%d7%a8%d7%95%d7%aa/  301
+#
+# `lower()` is the entire point: it matches BOTH encodings, which nothing in this file can do.
+# Verified on deployment — all seven cities return 301 in lowercase AND uppercase, one hop,
+# landing 200 on the hub, and all 25 surviving location pages still return 200 (no over-match).
+#
+# IT ALSO OUTRANKS THE CACHE. Cloudflare held stale 200s of the withdrawn pages under a 7-day
+# s-maxage that NEITHER a fresh deploy NOR a zone "Purge Everything" cleared — both were tried on
+# 2026-09-02: `Age` kept climbing and cf-cache-status stayed DYNAMIC, while 3locksmiths.pages.dev
+# itself already returned 404. The stale copy lives in the Pages asset layer, which a zone purge
+# does not reach. Redirect Rules execute BEFORE cache lookup, so the stale copy is never consulted.
+# That is why the rule fixed the symptom instantly instead of waiting out the TTL.
+#
+# WHY KEEP THIS FILE: it is version-controlled and travels with the repo, so it still catches
+# uppercase traffic if the zone rule is ever deleted. Defence in depth, not the mechanism.
 #
 # ⚠️ FLEET-WIDE: every sibling site with Hebrew slugs has the same latent defect. galbath.co.il's
 # uppercase rules only catch uppercase traffic; dalita.co.il's raw-Hebrew rules likewise. None of
-# them redirect the lowercase URLs their own sitemaps publish.
+# them redirect the lowercase URLs their own sitemaps publish, and none has a zone rule yet.
 #
 # Ships in out/ from public/ (next build copies public/ wholesale). wrangler auto-detects it —
 # ops/deploy-site.ps1 does not special-case it; line 255 is a plain `npx wrangler pages deploy`.
@@ -53,29 +58,32 @@
 #
 # ── WHY THESE SEVEN ────────────────────────────────────────────────────────────
 #
-# Seven location pages withdrawn 2026-09-02 because the business no longer services those
-# cities (docs/business-facts.md §E.1). באר שבע and ירושלים are original pre-migration
-# WordPress permalinks holding real ranking signal, which is what CLAUDE.md golden rule 5 is
-# about; the other five were generated by this project and are redirected too because they were
-# live and in the sitemap.
+# Seven location pages withdrawn 2026-09-02 because the business no longer services those cities
+# (docs/business-facts.md §E.1). באר שבע and ירושלים are original pre-migration WordPress
+# permalinks, which is why CLAUDE.md golden rule 5 requires a redirect plan rather than a bare
+# deletion; the other five were generated by this project and are redirected too because they
+# were live and in the sitemap.
+#
+# ⚠️ THEY HELD NO RANKING SIGNAL. Search Console URL Inspection on all seven, 2026-09-02:
+# "URL is unknown to Google — last crawled: never". An earlier version of this comment asserted
+# they "return 404 on the form Google indexed" — that was never measured, and it is false. The
+# redirect earns its place for people following old links and for honesty about coverage, not to
+# rescue rankings. Do not let that false premise justify urgency it does not deserve.
 #
 # Target is the service-areas hub, not the homepage: a visitor who searched for a specific city
 # can self-select one that is actually served, and the hub no longer claims the withdrawn ones.
 # Not a nearest-city map — there is no honest substitute for ירושלים or באר שבע among the
 # survivors, and Google treats a redirect to a non-equivalent page as a soft 404 anyway.
 #
-# VERIFY AFTER EVERY DEPLOY. This is the only gate: ops/deploy-site.ps1 asserts nothing about
-# this file, so `ls out/_redirects` plus the curl below is the whole check.
+# ── VERIFYING ──────────────────────────────────────────────────────────────────
 #
 #   curl -sSI 'https://3locksmiths.co.il/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%9b%d7%a8%d7%9e%d7%99%d7%90%d7%9c/' | grep -iE 'HTTP/|location'
 #   expect: HTTP/2 301  +  location: /%d7%90%d7%96%d7%95%d7%a8%d7%99-%d7%a9%d7%99%d7%a8%d7%95%d7%aa/
 #
-# A 404 there means the lowercase rules were normalised away at parse time and the only lever
-# left is a zone-level Cloudflare Redirect Rule. The test is meaningful because asset lookup on
-# this site is ALSO case-sensitive — verified 2026-09-02 on a surviving page: the lowercase path
-# returns 200 and its uppercase twin returns 404 — so a 301 on the lowercase form can only have
-# come from a lowercase rule matching.
-
+# ⚠️ READ THE RESULT CORRECTLY. A 301 there now proves the ZONE RULE is working. It says NOTHING
+# about the rules in this file, and it does NOT mean the Pages normalisation defect is fixed — it
+# is not. Testing this file alone requires disabling the zone rule first. Never read a passing
+# curl as evidence that lowercase _redirects entries have started matching.
 # באר שבע — scraped WordPress permalink
 /locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%91%d7%90%d7%a8-%d7%a9%d7%91%d7%a2/  /%d7%90%d7%96%d7%95%d7%a8%d7%99-%d7%a9%d7%99%d7%a8%d7%95%d7%aa/  301
 /locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%91%d7%90%d7%a8-%d7%a9%d7%91%d7%a2   /%d7%90%d7%96%d7%95%d7%a8%d7%99-%d7%a9%d7%99%d7%a8%d7%95%d7%aa/  301
