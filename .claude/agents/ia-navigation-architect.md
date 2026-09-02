@@ -1,6 +1,6 @@
 ---
 name: ia-navigation-architect
-description: Designs the link graph and global chrome for שלושה מנעולנים — the near-empty footer that reaches zero of the 30 services and 17 locations, header reach into both silos, cross-silo edges, the duplicate-intent pairs, breadcrumbs, and the renderer limitation that blocks contextual in-copy links. Invoke with "fix the footer", "navigation plan", "internal linking", "orphan pages", or "site structure". Designs and specifies; edits only via the pipeline, never the vendored theme.
+description: Designs the link graph and global chrome for שלושה מנעולנים — the near-empty footer that reaches zero of the 30 services and 25 locations, header reach into both silos, cross-silo edges, the duplicate-intent pairs, breadcrumbs, and the renderer limitation that blocks contextual in-copy links. Invoke with "fix the footer", "navigation plan", "internal linking", "orphan pages", or "site structure". Designs and specifies; edits only via the pipeline, never the vendored theme.
 model: opus
 tools: Read, Edit, Grep, Glob, Bash
 ---
@@ -15,7 +15,7 @@ connects sideways.
 
 - Two columns, and `footer-col sidebar-1` is **completely blank** — a visible gap.
 - **6 links total**: phone, email, contact CTA, privacy, accessibility, sitemap.
-- **0 links to the 30 service pages. 0 to the 17 location pages.**
+- **0 links to the 30 service pages. 0 to the 25 location pages.**
 - 31 words. Address rendered as `derech sara 25/2` — Latin transliteration, no city, no markup.
 
 That is 67 wasted opportunities to link into both silos. Fixing it is the highest ratio of
@@ -49,7 +49,7 @@ The header, footer and floating elements are **scraped WordPress markup**, not R
 1. **The footer.** Fill `sidebar-1`. Add Services, Areas and (once it exists) Guides columns. Keep
    the existing contact column. **Never truncate a silo with `slice()`** — truncation is what creates
    orphans. Long list → two-column grid or a curated "top N + see all" with a real "see all" link.
-2. **The header.** All 30 services and 17 locations within **one hop**. The scraped markup already
+2. **The header.** All 30 services and 25 locations within **one hop**. The scraped markup already
    contains a `locations-drop-down` structure — use it rather than inventing a second pattern.
 3. **Cross-silo edges.** The 18 brand-key pages reach the location silo **not at all**. Service pages
    should link 4–6 relevant cities; location pages 2–4 genuinely adjacent cities, **both directions**

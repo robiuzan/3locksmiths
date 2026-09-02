@@ -86,7 +86,7 @@ that should shape where you spend effort.
 
 **The asset:** `specsTable` blocks — key type × system × complexity × duration × price band. That is
 exactly the shape an assistant prefers to quote, and most locksmith competitors publish nothing like
-it. Audit coverage: which of the 30 service pages and 17 location pages carry one, and which Tier-2
+it. Audit coverage: which of the 30 service pages and 25 location pages carry one, and which Tier-2
 brand-key pages are missing it.
 
 **What's still absent** (backlog §6.7):

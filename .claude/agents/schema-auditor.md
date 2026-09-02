@@ -52,8 +52,9 @@ time. **That asymmetry is the root cause of the most important finding on this s
      `docs/business-facts.md` §C.1). Route it to business-facts; **never invent one.**
 3. **Opening hours vs the title.** The node claims Sun–Fri 08:00–18:00 and Sat 08:00–17:00 while the
    homepage title claims `מנעולן 24/7`. One is wrong and both are 🔶 (§4.4).
-4. **`areaServed`.** The business node hardcodes 15 `City` nodes that don't match the 17 location
-   pages (§4.6). Location pages type their city as `City` — but **קריות is a region** and must be
+4. **`areaServed`.** The business node derives its `City` nodes from the build manifest, so they
+   track the 25 location pages automatically (23 unique, after the duplicate-slug pairs). It still
+   publishes a coverage claim on ~100 pages while the manifest says `areaServed: null` (§4.6). Location pages type their city as `City` — but **קריות is a region** and must be
    `AdministrativeArea` (§4.5). `{ "@type": "Country", name: "IL" }` puts an ISO code in a `name`
    field (§4.7).
 5. **Per-route coverage.** 53 pages carry `BreadcrumbList`; `FAQPage` 55, `HowTo` 53, `Service` 46.

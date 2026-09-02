@@ -112,8 +112,14 @@ confirm capability before publishing** 🔶.
 
 **Tier D1 (central, high value):** אשדוד · רחובות · הרצליה · רמת השרון · הוד השרון · ראש העין ·
 מודיעין · נס ציונה · לוד · רמלה · קרית אונו · אור יהודה · יבנה
-**Tier D2 (further):** אשקלון · בית שמש · אריאל · עפולה · נצרת · טבריה · כרמיאל
+**Tier D2 (further):** אריאל · נצרת · טבריה
 **Tier D3 (only if genuinely serviced):** אילת · צפת · דימונה
+
+> ⛔ **Do not target ירושלים, באר שבע, אשקלון, בית שמש, כרמיאל, עכו or עפולה.** All seven had
+> location pages and all seven were **withdrawn 2026-09-02 — the business does not service them**
+> (`docs/business-facts.md` §E.1). They 301 to `/אזורי-שירות/`. Re-adding any of them as a keyword
+> target would rebuild a page for work the business cannot do, which is the "leads it cannot
+> fulfil" failure §E exists to prevent. That is also why Tier D3 is worded the way it is.
 
 ### D.1 The sub-city opportunity
 
@@ -121,8 +127,10 @@ For the three largest cities, neighbourhood pages can outrank city pages for loc
 **but only where three or more genuinely local facts exist** (`/new-city`):
 
 - **תל אביב:** פלורנטין · נווה צדק · רמת אביב · הצפון הישן · יפו · הבורסה
-- **ירושלים:** תלפיות · גילה · רמות · פסגת זאב · הר נוף
 - **חיפה:** הדר · אחוזה · נווה שאנן · קריית אליעזר
+- **ראשון לציון:** רמת אליהו · נווה ים · קרית ראשון
+
+(ירושלים's neighbourhoods were listed here until 2026-09-02 and are gone with the city — §E.1.)
 
 ### D.2 The highest-value location play: emergency × city
 

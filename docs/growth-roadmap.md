@@ -14,7 +14,7 @@ Be precise about this, because it changes what the work should be.
 
 **Strong already — protect it:**
 
-- Content depth is genuinely good: median ~1,500 unique words per page, and the 17 location pages
+- Content depth is genuinely good: median ~1,500 unique words per page, and the 25 location pages
   **pass the doorway test** with named neighbourhoods and real local reasoning (§3).
 - Technical SEO foundations are sound: canonicals on every page, sitemap derived from data with no
   hand-maintained array, exactly one `<h1>` on all 66 pages (build-enforced), zero duplicate titles or
@@ -253,7 +253,7 @@ links (blocked on a renderer change — `docs/information-architecture.md` §4),
 calculator decision.
 
 1. **Service ↔ location cross-links** — the largest missing edge in the graph. The 24 brand-key pages
-   don't reach the 17 location pages at all (§9.3).
+   don't reach the 25 location pages at all (§9.3).
 2. **Contextual in-copy anchors** with descriptive Hebrew text. Nearly every internal link today is a
    nav label or card title, so the site emits almost no anchor-text diversity (§9.4).
 3. **Relevance-based `related`**, not array order — otherwise the flagship pages hoard internal equity

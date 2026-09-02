@@ -5,7 +5,7 @@ description: Israeli local-SEO doctrine for שלושה מנעולנים — the 
 
 # Local SEO — Israel
 
-One business, **no published address**, 17 location pages. Everything below follows from that
+One business, **no published address**, 25 location pages. Everything below follows from that
 asymmetry.
 
 ## 0. Start from the right premise
@@ -98,12 +98,12 @@ for `מנעולן-לבית` and `קודן-לרכב`.
 
 ## 6. Coverage honesty — four different answers
 
-| Source                       | Says                |
-| ---------------------------- | ------------------- |
-| Manifest `schema.areaServed` | `null`              |
-| Homepage title               | פריסה ארצית         |
-| `scripts/enrich.mjs:CITIES`  | 15 hardcoded cities |
-| `/locations/` routes         | 17 cities           |
+| Source                        | Says              |
+| ----------------------------- | ----------------- |
+| Manifest `schema.areaServed`  | `null`            |
+| Sitewide copy (not the title) | פריסה רחבה        |
+| `scripts/enrich.mjs:CITIES`   | 23 derived cities |
+| `/locations/` routes          | 25 cities         |
 
 An `areaServed` the business cannot actually service is a liability — it produces leads it can't serve
 and a claim it can't defend. Reconcile via `docs/business-facts.md` §E, then derive the schema list
@@ -128,7 +128,7 @@ it in `docs/business-facts.md` §E rather than padding. Full spec: `docs/content
 
 ## 9. The expansion cap
 
-30 services × 17 locations = 510 possible cells. **Do not build them.** Order of operations
+30 services × 25 locations = 750 possible cells. **Do not build them.** Order of operations
 (`docs/keyword-map.md` §7):
 
 1. Author `content/enriched/95.mjs` — a Tier-1 term currently on the site's weakest page.

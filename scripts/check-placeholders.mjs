@@ -37,7 +37,7 @@ const SLOTS = [
     name: "hero",
     label: "page hero — both",
     ratio: "4:3",
-    pages: 49,
+    pages: 42,
     fallback: "157336036_m.jpg (stock: a computer power supply)",
   },
   {
@@ -58,7 +58,7 @@ const SLOTS = [
     name: "avatar",
     label: "contact-form avatar",
     ratio: "1:1",
-    pages: 112,
+    pages: 105,
     fallback: "avatar-1-1.png (stock: a woman who does not work here)",
   },
   {

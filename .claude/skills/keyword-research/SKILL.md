@@ -30,7 +30,7 @@ console.log("authored pages:", m.count);'
 grep -o '"kind": "[a-z-]*"' content/enriched/*.mjs | sed 's/.*: //' | sort | uniq -c
 ```
 
-64 routes: 30 services (18 brand-key), 17 locations, 7 top-level Hebrew landers, 4 calculator steps,
+64 routes: 30 services (18 brand-key), 25 locations, 7 top-level Hebrew landers, 4 calculator steps,
 4 legal/utility, 1 service hub, 1 homepage. 54 have authored modules.
 
 ## Step 2 — map demand to routes

@@ -187,7 +187,7 @@ see `docs/schema-graph.md` §5.
 
 ## 7. The expansion cap
 
-30 services × 17 locations = 510 possible cells. **Do not build them.**
+30 services × 25 locations = 750 possible cells. **Do not build them.**
 
 Order of operations:
 

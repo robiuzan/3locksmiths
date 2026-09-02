@@ -8,24 +8,36 @@
 #
 # ── THREE THINGS THAT MAKE A RULE HERE SILENTLY DO NOTHING ────────────────────
 #
-# 1. CASE. Matching is a case-SENSITIVE byte comparison of the percent-encoded request path.
-#    This site emits LOWERCASE %d7% everywhere — sitemap.xml, every canonical, every authored
-#    href — so lowercase is the form Google indexed and the form that must match. Uppercase is
-#    what encodeURI() and most editors produce, and an uppercase-only rule set would be a 100%
-#    no-op against every real URL. Both cases are listed below; the lowercase line is the one
-#    that matters and the uppercase line is defence.
+# 1. CASE. Rule matching is a case-SENSITIVE byte comparison of the percent-encoded request path
+#    — verified 2026-09-02: galbath.co.il/public/_redirects:40 holds an UPPERCASE rule; the
+#    uppercase request 301s and its byte-identical lowercase twin 404s.
 #
-#    Do NOT copy the raw-Hebrew idiom from dalita.co.il/public/_redirects: Cloudflare normalises
-#    a raw rule to UPPERCASE, so that file only matches uppercase requests and is half-broken
-#    live today. Verified 2026-09-02 by curl against both siblings.
+#    This site emits LOWERCASE %d7% everywhere — sitemap.xml, every canonical, every authored
+#    href — so lowercase is what Google indexed and the only form that must match. Uppercase is
+#    what encodeURI() and most editors produce, so an uppercase-only rule set would be a 100%
+#    silent no-op against every real URL.
+#
+#    The uppercase lines below are NOT insurance against Cloudflare uppercase-normalising these
+#    rules at parse time. If it does that, the lowercase lines are dead and real traffic 404s
+#    regardless of what the uppercase lines say. They cover exactly one thing: a third-party
+#    backlink that re-encoded the path in uppercase. No sibling site has a lowercase rule, so
+#    the lowercase form has no prior art anywhere in the fleet — hence the VERIFY block below.
+#
+#    Do NOT copy the raw-Hebrew idiom from dalita.co.il/public/_redirects:11 — Cloudflare
+#    normalises a raw rule to UPPERCASE, so that file matches only uppercase requests and is
+#    half-broken live today. It also refutes galbath's own comment at :19.
 #
 # 2. TRAILING SLASH. A rule written with a slash does not match a request without one. Today the
-#    no-slash form 308s because the DIRECTORY exists in out/ — that 308 disappears the moment the
-#    page is deleted, turning a working URL into a hard 404. Hence both forms for every path.
+#    no-slash form 308s, and its Location header carries RAW unencoded Hebrew — a response no
+#    _redirects rule here could produce, which proves it is Pages' own directory resolution. It
+#    dies the moment the directory leaves out/, turning a working URL into a hard 404. Hence
+#    both forms for every path.
 #
-# 3. NO WILDCARDS UNDER /locations/. _redirects outranks existing static assets on Pages, so a
+# 3. NO WILDCARDS UNDER /locations/. _redirects outranks existing static assets on Pages
+#    (verified on thermoleak.co.il: /404/ redirects although out/404/index.html exists), so a
 #    convenient `/locations/*` catch-all would black-hole all 25 surviving city pages. Exact
-#    paths only. (410 is not expressible on Pages — only 301/302/303/307/308 — so 301 it is.)
+#    paths only. (410 is reportedly not expressible on Pages — UNVERIFIED, repeated from
+#    galbath _redirects:33. Irrelevant here: 301 is correct regardless.)
 #
 # ── WHY THESE SEVEN ────────────────────────────────────────────────────────────
 #
@@ -40,10 +52,17 @@
 # Not a nearest-city map — there is no honest substitute for ירושלים or באר שבע among the
 # survivors, and Google treats a redirect to a non-equivalent page as a soft 404 anyway.
 #
-# VERIFY AFTER EVERY DEPLOY (the lowercase form is the one with no prior art anywhere in the
-# fleet — if Cloudflare uppercase-normalises rules at parse time these lines are dead):
+# VERIFY AFTER EVERY DEPLOY. This is the only gate: ops/deploy-site.ps1 asserts nothing about
+# this file, so `ls out/_redirects` plus the curl below is the whole check.
+#
 #   curl -sSI 'https://3locksmiths.co.il/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%9b%d7%a8%d7%9e%d7%99%d7%90%d7%9c/' | grep -iE 'HTTP/|location'
 #   expect: HTTP/2 301  +  location: /%d7%90%d7%96%d7%95%d7%a8%d7%99-%d7%a9%d7%99%d7%a8%d7%95%d7%aa/
+#
+# A 404 there means the lowercase rules were normalised away at parse time and the only lever
+# left is a zone-level Cloudflare Redirect Rule. The test is meaningful because asset lookup on
+# this site is ALSO case-sensitive — verified 2026-09-02 on a surviving page: the lowercase path
+# returns 200 and its uppercase twin returns 404 — so a 301 on the lowercase form can only have
+# come from a lowercase rule matching.
 
 # באר שבע — scraped WordPress permalink
 /locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%91%d7%90%d7%a8-%d7%a9%d7%91%d7%a2/  /%d7%90%d7%96%d7%95%d7%a8%d7%99-%d7%a9%d7%99%d7%a8%d7%95%d7%aa/  301

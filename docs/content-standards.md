@@ -49,7 +49,7 @@ highest-value content task on the site.** See `/new-service`.
 > Replace the city name (or the service name) with a different one. Is the page now correct and
 > publishable for that other city or service? **If yes, it does not ship.**
 
-**The existing 17 location pages pass**, and that is worth stating plainly because it is unusual.
+**The existing 25 location pages pass**, and that is worth stating plainly because it is unusual.
 `content/enriched/137.mjs` (תל אביב) names דיזנגוף, רוטשילד, פלורנטין, נווה צדק, רמת אביב, הבורסה and
 שכונת התקווה, and reasons about מרכז העיר parking and the older buildings of לב העיר. Substituting
 "חיפה" would make the page wrong, not merely generic. That is the standard.

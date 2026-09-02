@@ -139,7 +139,7 @@ sites, key management — not "we'll be there fast".
 | Page            | Words today | Target                                  | Status |
 | --------------- | ----------- | --------------------------------------- | ------ |
 | `/services/`    | 371         | 350+ with real prose + contextual links | ⬜     |
-| `/אזורי-שירות/` | —           | intro prose linking into all 17 cities  | ⬜     |
+| `/אזורי-שירות/` | —           | intro prose linking into all 25 cities  | ⬜     |
 | `/contact/`     | 411         | + map, hours, NAP from manifest         | ⬜ 🔶  |
 | `/מחירון/`      | —           | the magnet for every "כמה עולה" query   | ⬜ 🔶  |
 

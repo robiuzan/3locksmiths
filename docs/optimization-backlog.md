@@ -125,7 +125,7 @@ Spot-check any new block type for a skipped level.
 ## §3 Content depth — 🟢
 
 **This is the site's strongest area.** Median ~1,500 unique words; the deepest location pages reach
-~1,600. The 17 location pages **pass the doorway test** — `content/enriched/137.mjs` (תל אביב) names
+~1,600. The 25 location pages **pass the doorway test** — `content/enriched/137.mjs` (תל אביב) names
 דיזנגוף, רוטשילד, פלורנטין, נווה צדק, רמת אביב and שכונת התקווה and reasons about the city's parking
 and building stock. Substituting another city would make the page wrong, not merely generic.
 
@@ -212,8 +212,10 @@ them from `site.config.json` instead; change values in the roster.
 **4.5 `קריות` is typed as a `City`.** It is a region and must be `AdministrativeArea`. Add an explicit
 `kind` field rather than special-casing the string. `docs/schema-graph.md` §5.
 
-**4.6 The business node's `areaServed` is a hardcoded 15-city array** in `enrich.mjs:38` that does not
-match the 17 location pages. Derive it, or take it from the manifest once confirmed.
+**4.6 ~~The business node's `areaServed` is a hardcoded 15-city array~~ — FIXED.** It is now derived
+from `content/enriched/_manifest.json` (`scripts/enrich.mjs` `CITIES`) and emits 23 unique `City`
+nodes, so it tracks the routes and cannot drift. Note the consequence: the schema DOES publish a
+coverage claim on ~100 pages even though the manifest carries `areaServed: null`.
 
 **4.7 `{ "@type": "Country", name: "IL" }`** puts an ISO code in a `name` field. Use `"Israel"`.
 
@@ -252,7 +254,8 @@ task.
 the schema (`+972-55-6601006`). One number, four strings.
 
 **5.4 Coverage is unreconciled.** `schema.areaServed: null` in the manifest; "פריסה ארצית" in the
-homepage title; 15 hardcoded cities in the schema; 17 location pages. Four different answers.
+homepage title (it is NOT — see business-facts §E); 23 derived cities in the schema; 25 location
+pages. The schema and the routes now agree; the manifest and the copy still do not.
 
 **5.5 No geo signals.** No `GeoCoordinates`, no `hasMap`, no map embed on `/contact/`.
 
@@ -440,7 +443,7 @@ Measured on the export 2026-08-25:
 | Columns                        | 2 — and `footer-col sidebar-1` is **completely blank**         |
 | Total links                    | **6** (phone, email, contact CTA, privacy, a11y, sitemap)      |
 | Links to the 30 service pages  | **0**                                                          |
-| Links to the 17 location pages | **0**                                                          |
+| Links to the 25 location pages | **0**                                                          |
 | Unique words                   | 31                                                             |
 | Address                        | `derech sara 25/2` — Latin transliteration, no city, no markup |
 

@@ -371,7 +371,13 @@ function sitemapBody(groups) {
 // ⚠️ These strings are matched with a raw `Set.has(p.path)` — no decode, no normalisation. They
 // must be LOWERCASE percent-encoded exactly as content/site.json stores them. A decoded Hebrew
 // literal does not match, and nothing asserts that an entry hit: it fails silently and the page
-// simply keeps shipping. After editing, confirm the log says "pruned 4", not "pruned 2".
+// simply keeps shipping.
+//
+// The log below reports which entries actually matched. Expect the two demo paths to show as
+// unmatched every run — scrape.mjs stopped capturing them, so they are a guard for a future
+// snapshot, not a live prune. Same for the two location paths once they are out of site.json:
+// they matched on the run that removed them and report 0 thereafter. A NEW entry that reports
+// unmatched on its first run is the real signal — it means the string is in the wrong form.
 const PRUNE_PATHS = new Set([
   "/hello-world/",
   "/sample-page/",

@@ -105,7 +105,7 @@ Find a page's `id` in `content/enriched/_manifest.json` → `lookup` (id → pat
 | `/sitemap.xml` `/robots.txt` | `app/sitemap.ts` `robots.ts`  | —     |
 
 The catch-all sets `dynamicParams = false` and generates from `getContentPages()`, so the emitted
-route set cannot drift from `content/site.json`. Breakdown: 30 services + 1 service hub, 17 locations,
+route set cannot drift from `content/site.json`. Breakdown: 30 services + 1 service hub, 25 locations,
 7 top-level Hebrew landers, 4 `/step/` calculator fragments, 4 legal/utility, 1 homepage. **104 appear
 in `sitemap.xml`** — the `/step/` pages are excluded deliberately.
 

@@ -56,7 +56,7 @@ use=reference`. **No repo change overrides this** — it is injected at the edge
 5. **Citable substance — the site's strongest AEO asset.** The `specsTable` blocks (key type × system
    × complexity × duration × price band) are exactly the shape an assistant prefers to quote, and most
    locksmith competitors publish nothing like it. Assess coverage: which of the 30 service pages and
-   17 location pages have one, and which of the Tier-2 brand-key pages are missing it. What is still
+   25 location pages have one, and which of the Tier-2 brand-key pages are missing it. What is still
    absent: a cost breakdown by scenario, a "מפתח עם שבב מול מפתח חכם" comparison, what to do when the
    only key is lost, and honest timing (§6.7).
 

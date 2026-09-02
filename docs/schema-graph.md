@@ -43,7 +43,7 @@ validation at render time.
 | `/`                                                        | `LocalBusiness`+`Locksmith`, scraped `FAQPage` (**broken**), scraped `WebSite` | business node + valid `FAQPage` + `WebSite`    |
 | `/services/<slug>/` ×29                                    | `BreadcrumbList` · `Service` · `HowTo` · `FAQPage`                             | unchanged — this is correct                    |
 | `/services/שכפול-מפתח-לרכב/`                               | scraped only (**broken**)                                                      | full set — needs `content/enriched/95.mjs`     |
-| `/locations/<slug>/` ×17                                   | `BreadcrumbList` · `Service`+`areaServed` · `HowTo` · `FAQPage`                | unchanged, but fix the `קריות` area type (§5)  |
+| `/locations/<slug>/` ×25                                   | `BreadcrumbList` · `Service`+`areaServed` · `HowTo` · `FAQPage`                | unchanged, but fix the `קריות` area type (§5)  |
 | Top-level landers ×7                                       | `BreadcrumbList` · `Service` · `HowTo` · `FAQPage`                             | unchanged                                      |
 | `/services/` (hub)                                         | **nothing**                                                                    | `CollectionPage` + `BreadcrumbList`            |
 | `/contact/`                                                | **nothing**                                                                    | `ContactPage` + `BreadcrumbList`               |
@@ -75,17 +75,17 @@ The dual type is correct — `Locksmith` matches `schema.type` in the manifest, 
 **Everything else about this node is hardcoded in `enrich.mjs` rather than read from the manifest, and
 three fields are wrong:**
 
-| Field          | Emitted                              | Manifest                 | Verdict                         |
-| -------------- | ------------------------------------ | ------------------------ | ------------------------------- |
-| `name`         | `שלושה מנעולנים`                     | same                     | correct by coincidence          |
-| `telephone`    | `+972-55-6601006`                    | `+972556601006`          | ⚠️ two NAP spellings            |
-| `email`        | **`robiuzan@gmail.com`**             | `info@3locksmiths.co.il` | 🔴 **Critical — §4.2**          |
-| `priceRange`   | `₪₪`                                 | `₪₪`                     | correct by coincidence          |
-| `address`      | **absent**                           | **absent**               | blocked — business-facts §C.1   |
-| `areaServed`   | 15 hardcoded `City` nodes            | `areaServed: null`       | ⚠️ drift, and קריות is mistyped |
-| `openingHours` | Sun–Fri 08:00–18:00, Sat 08:00–17:00 | —                        | ⚠️ contradicts the "24/7" title |
-| `foundingDate` | absent                               | `foundedYear: null`      | correct — do not infer it       |
-| `sameAs`       | absent                               | `[]`                     | correct — blocked on owner      |
+| Field          | Emitted                              | Manifest                 | Verdict                             |
+| -------------- | ------------------------------------ | ------------------------ | ----------------------------------- |
+| `name`         | `שלושה מנעולנים`                     | same                     | correct by coincidence              |
+| `telephone`    | `+972-55-6601006`                    | `+972556601006`          | ⚠️ two NAP spellings                |
+| `email`        | **`robiuzan@gmail.com`**             | `info@3locksmiths.co.il` | 🔴 **Critical — §4.2**              |
+| `priceRange`   | `₪₪`                                 | `₪₪`                     | correct by coincidence              |
+| `address`      | **absent**                           | **absent**               | blocked — business-facts §C.1       |
+| `areaServed`   | 23 `City` nodes, derived             | `areaServed: null`       | tracks routes; קריות still mistyped |
+| `openingHours` | Sun–Fri 08:00–18:00, Sat 08:00–17:00 | —                        | ⚠️ contradicts the "24/7" title     |
+| `foundingDate` | absent                               | `foundedYear: null`      | correct — do not infer it           |
+| `sameAs`       | absent                               | `[]`                     | correct — blocked on owner          |
 
 **Fix direction:** `localBusinessSchema()` should read from `site.config.json` (already imported by
 `app/layout.tsx` as the manifest) rather than carrying its own literals. Values themselves change in
@@ -147,7 +147,7 @@ must stay simple — no scripts, no attributes.
 
 ### 4.6 No `LocalBusiness` node per location
 
-One business, one node. The 17 location pages emit `Service` with `areaServed`, which is right.
+One business, one node. The 25 location pages emit `Service` with `areaServed`, which is right.
 Seventeen `LocalBusiness` nodes would imply seventeen premises that do not exist and is a recognised
 local-spam pattern.
 

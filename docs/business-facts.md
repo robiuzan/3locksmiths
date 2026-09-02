@@ -253,7 +253,7 @@ Fixed by `scripts/claims.mjs` (`us-phone-number-in-cta`), substituting
 
 | Fact                | Value                                            | Status                      |
 | ------------------- | ------------------------------------------------ | --------------------------- |
-| Service list        | 30 service pages + 17 location pages             | ✅ (in `content/site.json`) |
+| Service list        | 30 service pages + 25 location pages             | ✅ (in `content/site.json`) |
 | Price ranges        | per-page `pricing[]` in `content/enriched/*.mjs` | 🔶                          |
 | `priceRange`        | `₪₪`                                             | ✅ manifest                 |
 | Warranty ("אחריות") | claimed widely, no term stated                   | 🔶                          |

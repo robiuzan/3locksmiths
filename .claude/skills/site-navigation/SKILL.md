@@ -97,7 +97,7 @@ instead of prepending again.
 The scraped markup already contains a `locations-drop-down sub-menu` structure. Use it rather than
 inventing a second pattern.
 
-Target: **all 30 services and 17 locations within one hop.** Keyboard support (`aria-expanded`,
+Target: **all 30 services and 25 locations within one hop.** Keyboard support (`aria-expanded`,
 `aria-controls`, Escape, focus return) is missing from the theme's jQuery menu — fix it with a
 **scoped enhancement layer** that attaches after `ThemeScripts` has run, never by editing vendored JS
 (backlog §11.3).

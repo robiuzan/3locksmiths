@@ -53,7 +53,7 @@ Two consequences:
    `<loc>`. Sourced from the scraped `seo.canonical`, so they match the WordPress originals (§1.2).
 6. **Thin and duplicate-intent content.** Strip tags, subtract ~120–200 words of gogo chrome, count
    unique body words against `docs/content-standards.md` §1. **Set expectations correctly: the median
-   is ~1,500 words and the 17 location pages pass the doorway test.** The real gaps are the 11
+   is ~1,500 words and the 25 location pages pass the doorway test.** The real gaps are the 11
    un-enriched pages (§3.1), above all `/services/שכפול-מפתח-לרכב/` — a Tier-1 term on the site's
    weakest page (§3.2).
 7. **Duplicate-intent pairs.** `/מנעולן-רכב/` ↔ `/services/מנעולן-רכב/`, the same for `מנעולן-לבית`

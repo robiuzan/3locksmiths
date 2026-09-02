@@ -38,7 +38,7 @@ almost nothing connects sideways.
       © 2025 · מדיניות פרטיות · הצהרת נגישות · מפת אתר
 ```
 
-**6 links total, on all 67 routes.** Zero reach into the 30 services or 17 locations. One empty
+**6 links total, on all 67 routes.** Zero reach into the 30 services or 25 locations. One empty
 column. The address is a Latin transliteration with no city
 (`docs/business-facts.md` §C.1).
 
@@ -79,7 +79,7 @@ exists in the scraped markup).
 
 **Targets:**
 
-- All 30 services and 17 locations reachable **within one hop** of any page.
+- All 30 services and 25 locations reachable **within one hop** of any page.
 - The dropdowns are the natural home for this — they already exist structurally.
 - Keyboard operable: `aria-expanded`, `aria-controls`, Escape closes, focus returns. The current
   mobile menu has none of these (backlog §11.3) and the fix is an **enhancement layer**, never an
@@ -96,7 +96,7 @@ exists in the scraped markup).
 ├── /services/                       hub  → 30 service pages
 │   ├── /services/<service>/         incl. 18 brand-key pages
 │   └── (planned) emergency cluster
-├── /אזורי-שירות/                    hub  → 17 location pages
+├── /אזורי-שירות/                    hub  → 25 location pages
 │   └── /locations/<city>/
 ├── /מדריכים/            (planned)   hub  → guides
 ├── /מחירון/                         pricing — the magnet for every "כמה עולה" query
@@ -172,7 +172,7 @@ percent-encoded — decode consistently on both sides or the diff is meaningless
 ## 7. Checklist for any IA change
 
 - [ ] Footer reaches both silos; no `slice()` truncation; no empty column.
-- [ ] All 30 services and 17 locations within one hop of the header.
+- [ ] All 30 services and 25 locations within one hop of the header.
 - [ ] Every internal link has a trailing slash and is written unescaped.
 - [ ] Cross-silo edges present, and location adjacency set on **both** sides.
 - [ ] Duplicate-intent pairs cross-link rather than compete.
