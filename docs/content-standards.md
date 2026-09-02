@@ -162,7 +162,7 @@ stays in a codebase far longer than intended.
 
 - Hebrew only in user-facing strings. No mid-sentence language mixing — a Latin brand or model name
   (BMW, Multilock) gets its own clause.
-- Israeli formats: phone `055-6601006`, `₪` **after** the number, dates `dd/mm/yyyy`.
+- Israeli formats: phone `076-599-1266`, `₪` **after** the number, dates `dd/mm/yyyy`.
 - Ranges use an en dash: `200 – 350 ₪`, `20–45 דקות`. The existing modules use a spaced en dash in
   prices and an unspaced one in durations — **match the neighbouring module** rather than normalising
   unilaterally.

@@ -78,7 +78,7 @@ three fields are wrong:**
 | Field          | Emitted                              | Manifest                 | Verdict                             |
 | -------------- | ------------------------------------ | ------------------------ | ----------------------------------- |
 | `name`         | `שלושה מנעולנים`                     | same                     | correct by coincidence              |
-| `telephone`    | `+972-55-6601006`                    | `+972556601006`          | ⚠️ two NAP spellings                |
+| `telephone`    | `+972-55-6601006`                    | `+972765991266`          | ⚠️ two NAP spellings                |
 | `email`        | **`robiuzan@gmail.com`**             | `info@3locksmiths.co.il` | 🔴 **Critical — §4.2**              |
 | `priceRange`   | `₪₪`                                 | `₪₪`                     | correct by coincidence              |
 | `address`      | **absent**                           | **absent**               | blocked — business-facts §C.1       |

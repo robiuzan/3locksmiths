@@ -152,7 +152,7 @@ Everything below is `<h2>`/`<h3>` with no skipped levels. `lib/enrich/render.mjs
 150–160 characters, unique per route. Present on 104 of 108 pages today.
 
 ```
-<שירות> ב<מקום/מותג> <בידול אמיתי>. <מה קורה בפועל>. חייגו 055-6601006.
+<שירות> ב<מקום/מותג> <בידול אמיתי>. <מה קורה בפועל>. חייגו 076-599-1266.
 ```
 
 Rules:

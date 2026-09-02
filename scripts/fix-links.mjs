@@ -45,9 +45,16 @@ const manifest = JSON.parse(readFileSync(join(ROOT, "site.config.json"), "utf8")
 const pageManifest = JSON.parse(
   readFileSync(join(ROOT, "content", "enriched", "_manifest.json"), "utf8"),
 );
-const PHONE_TEL = manifest.contact?.phoneE164 ?? "+972556601006";
-const PHONE_DIGITS = PHONE_TEL.replace(/\D/g, ""); // 972556601006
-const PHONE_LOCAL = "0" + PHONE_DIGITS.slice(3); // 0556601006
+const PHONE_TEL = manifest.contact?.phoneE164 ?? "+972765991266";
+const PHONE_DIGITS = PHONE_TEL.replace(/\D/g, ""); // 972765991266
+const PHONE_LOCAL = "0" + PHONE_DIGITS.slice(3); // 0765991266
+// The number this business used until 2026-09-02, frozen in the WordPress scrape in four
+// spellings. It has to stay recognised here or every legacy tel: href in content/site.json
+// keeps dialling the retired line: the manifest only ever tells us the CURRENT number, so
+// without this list ~750 call buttons would silently strand. Same idea as LEGACY_EMAILS.
+// NOT the WhatsApp number - whatsappE164 is deliberately still +972556601006 (the 076 line
+// is not WhatsApp-capable), and wa.me links are not tel: hrefs, so they never reach here.
+const LEGACY_PHONE_DIGITS = ["972556601006", "0556601006"];
 // Web3Forms full-page redirect on success — the site's only URL-based conversion signal.
 // English path matching /contact/ etc.; a Hebrew route directory breaks the Next 16 exporter
 // (see app/thank-you/page.tsx).
@@ -64,7 +71,11 @@ function isBusinessTel(rawTel) {
   const v = decode(rawTel).trim();
   if (/^\[phone\]$/i.test(v)) return true;
   const digits = v.replace(/\D/g, "");
-  return digits === PHONE_DIGITS || digits === PHONE_LOCAL;
+  return (
+    digits === PHONE_DIGITS ||
+    digits === PHONE_LOCAL ||
+    LEGACY_PHONE_DIGITS.includes(digits)
+  );
 }
 
 /** GTM click-trigger surface for a CTA link: which chrome region contains it. */

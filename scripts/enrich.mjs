@@ -51,8 +51,7 @@ const HOME_SEO = {
   // 58 chars, inside the ~60 limit. "פתיחה" stays dropped: the H1 and the two פתיחה service
   // pages already carry that intent, and the length has to pay for "24/7".
   title: "מנעולן 24/7 לרכב ולבית – שכפול וקידוד | שלושה מנעולנים",
-  description:
-    "שלושה מנעולנים – מנעולן 24/7 לרכב ולבית: שכפול וקידוד מפתחות, פתיחת דלת נעולה והחלפת מנעולים אצלכם בשטח, במחיר שקוף מראש. חייגו 055-6601006 בכל שעה.",
+  description: `שלושה מנעולנים – מנעולן 24/7 לרכב ולבית: שכפול וקידוד מפתחות, פתיחת דלת נעולה והחלפת מנעולים אצלכם בשטח, במחיר שקוף מראש. חייגו ${manifest.contact.phoneDisplay} בכל שעה.`,
 };
 
 const site = JSON.parse(readFileSync(SITE, "utf8"));

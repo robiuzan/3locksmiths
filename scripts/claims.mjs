@@ -42,7 +42,7 @@ const PATH = "content/site.json";
 // The display phone comes from the manifest. CLAUDE.md §6: a phone number typed anywhere but the
 // roster is a bug — which is exactly the defect the `us-phone-number-in-cta` rule below cleans up.
 const manifest = JSON.parse(readFileSync("site.config.json", "utf8"));
-const PHONE = manifest.contact?.phoneDisplay ?? "055-6601006";
+const PHONE = manifest.contact?.phoneDisplay ?? "076-599-1266";
 
 /** Enumerated rewrites. `from` must be the exact scraped text. */
 const REWRITES = [
@@ -68,6 +68,10 @@ const REWRITES = [
   // confirmed 24/7 availability on 2026-08-30 (docs/business-facts.md §D.3), the schema in
   // scripts/enrich.mjs now publishes 00:00–23:59 all week, and the claim is sourced.
   //
+  // The `from` below deliberately still names the RETIRED 055-6601006 line: it describes text
+  // that already sits in content/site.json (or that the un-migrated WordPress origin still
+  // serves), so it must match history, not the current manifest. scripts/phone.mjs is what
+  // carries the retired number forward to the live one, and it runs after this pass.
   // They are reversed rather than deleted because content/site.json PERSISTS: the earlier pass
   // already overwrote the original scraped wording, so simply removing the rules would leave the
   // hedged 08:00–18:00 copy frozen on the homepage forever. `from` is therefore the text this
@@ -85,7 +89,7 @@ const REWRITES = [
   {
     id: "home-faq-247",
     from: "שעות הפעילות המפורסמות שלנו הן א׳–ו׳ 08:00–18:00 ושבת 08:00–17:00. לקריאה דחופה מחוץ לשעות אלה התקשרו ל-055-6601006 ונאמר לכם מיד אם יש ניידת פנויה באזורכם.",
-    to: "כן. אנחנו זמינים 24/7, כולל לילות, שבתות וחגים. התקשרו ל-055-6601006 ונמסור לכם זמן הגעה מדויק.",
+    to: `כן. אנחנו זמינים 24/7, כולל לילות, שבתות וחגים. התקשרו ל-${PHONE} ונמסור לכם זמן הגעה מדויק.`,
   },
 ];
 
@@ -165,7 +169,7 @@ const HTML_REWRITES = [
     // §nap — a HOUSTON, TEXAS phone number printed on the homepage of an Israeli locksmith.
     // `(281) 843-8447` is leftover from the gogo theme's US origin and it is live right now.
     //
-    // fix-links.mjs already normalised the href to tel:+972556601006, so the button DIALS
+    // fix-links.mjs already normalised the href to the manifest E.164, so the button DIALS
     // correctly — which is precisely why this survived: the link works, only the text a human
     // reads is wrong. Anyone on a desktop reads a US number off the page, and a US area code on
     // an Israeli service site is an instant trust failure.

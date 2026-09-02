@@ -22,6 +22,11 @@ rewriting pages that already pass.
 
 The name, address and phone must be **byte-identical** everywhere. They are not:
 
+> ℹ️ **The counts and spellings below are a dated audit record.** The number itself changed to
+> **076-599-1266** on 2026-09-02 (`docs/business-facts.md` §C.5); `scripts/phone.mjs` now fails the
+> build if the retired 055-6601006 reaches the browser outside the WhatsApp URL. Read the digits
+> here as history, not as something to restore.
+
 | Where                        | Value                 | Count        |
 | ---------------------------- | --------------------- | ------------ |
 | `tel:` in the ported HTML    | `tel:0556601006`      | 385          |
@@ -29,7 +34,7 @@ The name, address and phone must be **byte-identical** everywhere. They are not:
 | `tel:` in the ported HTML    | `tel:+972556601006`   | 4            |
 | `tel:` in the ported HTML    | **`tel:%5Bphone%5D`** | **3 — dead** |
 | `LocalBusiness` JSON-LD      | `+972-55-6601006`     | —            |
-| Manifest `contact.phoneE164` | `+972556601006`       | —            |
+| Manifest `contact.phoneE164` | `+972765991266`       | —            |
 
 The `tel:[phone]` entries are an unresolved WordPress shortcode, **live on the homepage** (6
 occurrences in the served HTML). Tapping them does nothing. Fix in the pipeline

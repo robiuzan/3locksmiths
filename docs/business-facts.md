@@ -160,14 +160,14 @@ of the grid.
 
 ## C. Contact & NAP
 
-| Fact               | Value                                                      | Status | Source                                                      |
-| ------------------ | ---------------------------------------------------------- | ------ | ----------------------------------------------------------- |
-| Phone (display)    | 055-6601006                                                | ✅     | manifest `contact.phoneDisplay`                             |
-| Phone (E.164)      | +972556601006                                              | ✅     | manifest `contact.phoneE164`                                |
-| WhatsApp           | +972556601006                                              | ✅     | manifest `contact.whatsappE164`                             |
-| Email              | info@3locksmiths.co.il                                     | ✅     | **verified 2026-08-24** — live routing rule, see §C.3       |
-| **Street address** | —                                                          | 🔶     | **the manifest has no address field at all**                |
-| Opening hours      | 2 `OpeningHoursSpecification` nodes in the scraped JSON-LD | 🔶     | scraped from WordPress, never verified against the business |
+| Fact               | Value                                                      | Status | Source                                                                  |
+| ------------------ | ---------------------------------------------------------- | ------ | ----------------------------------------------------------------------- |
+| Phone (display)    | 076-599-1266                                               | ✅     | manifest `contact.phoneDisplay` — changed 2026-09-02, §C.5              |
+| Phone (E.164)      | +972765991266                                              | ✅     | manifest `contact.phoneE164` — changed 2026-09-02, §C.5                 |
+| WhatsApp           | +972556601006                                              | ✅     | manifest `contact.whatsappE164` — **deliberately the old number**, §C.5 |
+| Email              | info@3locksmiths.co.il                                     | ✅     | **verified 2026-08-24** — live routing rule, see §C.3                   |
+| **Street address** | —                                                          | 🔶     | **the manifest has no address field at all**                            |
+| Opening hours      | 2 `OpeningHoursSpecification` nodes in the scraped JSON-LD | 🔶     | scraped from WordPress, never verified against the business             |
 
 ### C.1 The address — CORRECTED 2026-08-25
 
@@ -248,6 +248,76 @@ Fixed by `scripts/claims.mjs` (`us-phone-number-in-cta`), substituting
 `(NNN) NNN-NNNN` string sitewide (`foreign-phone-number`).
 
 **NAP integrity has to be checked on what is displayed, not only on what is linked.**
+
+### C.5 The phone number changed — 2026-09-02
+
+The business moved from **055-6601006** to **076-599-1266** (E.164 `+972765991266`). Owner-supplied,
+so it is a ✅, not a 🔶.
+
+**WhatsApp deliberately stayed on +972556601006.** `076` is an Israeli non-geographic/VoIP prefix
+and is not WhatsApp-capable, so pointing `contact.whatsappE164` at it would have turned conversion
+goal #2 (CLAUDE.md §2) into a dead link on every page — the sticky CTA, /thank-you/ and the contact
+block all read that one field. Confirmed with the owner on 2026-09-02. **This is the only place in
+the codebase where 055-6601006 is still correct**, and `scripts/phone.mjs` exempts exactly it.
+
+Where the change had to be applied, and why it is not one edit:
+
+| Layer                       | Mechanism                                                                 |
+| --------------------------- | ------------------------------------------------------------------------- |
+| roster → `site.config.json` | `ops/sync-manifest.ps1 -Confirm` — the only legal entry point (§3 rule 3) |
+| app shell, schema, footer   | already read the manifest; no edit needed                                 |
+| `content/enriched/*.mjs`    | 258 literals in 98 authored modules, replaced                             |
+| renderer + pipeline         | 18 hardcodes, converted to read the manifest so they cannot drift again   |
+| scraped WordPress chrome    | `scripts/phone.mjs` — a new pass; see below                               |
+
+**Why the scraped chrome needs a pipeline pass.** The header CTA, the footer panel and the mobile
+call strip are WordPress markup living in `content/site.json`, which may not be hand-edited (§3
+rule 2) and which `npm run snapshot` re-fetches from an origin that still publishes 055-6601006.
+`scripts/phone.mjs` runs last in both chains, rewrites every retired spelling, and **exits non-zero
+if one survives** — so a future number change cannot half-land. Its `RETIRED` array is the list to
+append to next time.
+
+⚠️ **The WordPress origin still serves the old number.** Until the owner updates it there, a
+`npm run snapshot` re-imports 055-6601006 into the chrome and `phone.mjs` corrects it on the same
+run. That is by design, but it means the repo — not WordPress — is now the source of truth for the
+displayed number.
+
+#### C.5a Two "icons" are actually HTML copies of the old homepage — FOUND 2026-09-02
+
+Chasing the last occurrences of the retired number out of `out/` turned up something bigger.
+
+**`public/wp-content/themes/gogo/img/icons/favicon.ico` and `touch.png` are not images.** They are
+**byte-identical** (`md5 2bce7dcb15ee07ce0a15c07557652150`) 391 KB HTML copies of the old WordPress
+homepage. The scraper requested those icon paths, WordPress answered with a page rather than a file,
+and the response was written under the icon's name. `content/site.json` `assets.headLinks` points
+`icons.icon` and `icons.apple` at them, so `app/layout.tsx` declares them as the site's favicon and
+Apple touch icon and both are copied to `out/`.
+
+At a live, fetchable URL they published:
+
+| Content                                  | Count each | Status elsewhere in this repo           |
+| ---------------------------------------- | ---------- | --------------------------------------- |
+| the retired phone number                 | 15         | fixed 2026-09-02 by `scripts/phone.mjs` |
+| `tel:[phone]` — the dead shortcode       | 3          | §8.1, believed fixed since 2026-08-17   |
+| `GoogleRating` badge — a fabricated 5.0★ | 1          | ⛔ `claims.mjs` FORBIDDEN, §B           |
+| "ניסיון של 25 שנה"                       | 2          | ⛔ `claims.mjs` FORBIDDEN, §D           |
+| `robiuzan@gmail.com`                     | 2          | 🔴 backlog §4.2, believed fixed         |
+
+**Why this matters more than the two files.** Every content guard in this repo — `claims.mjs`,
+`check-claims.mjs`, `check-typography.mjs` — reads `content/site.json` and nothing else. So these
+two files sat outside all of them and quietly re-published claims the project had already decided
+were policy violations. It is the same shape of miss as §rating in `claims.mjs`: the guard looked
+in the one place the defect was not.
+
+`scripts/phone.mjs` pass 2 now sweeps **every text file under `public/`**, identified by content
+rather than by extension, and its self-verify covers them.
+
+🔶 **Still open — the owner's call, not a code fix.** The phone number and the dead shortcode are
+corrected, but these files remain: a broken favicon (a browser asking for an icon gets 391 KB of
+HTML), 783 KB of dead weight in the export, an indexable stale clone of the homepage, and the
+fabricated rating badge plus the 25-years claim still inside them. The right fix is to delete both
+and point `icons` at a real icon — which changes the favicon, so it is not folded into a
+phone-number change. Recommend doing it as its own task.
 
 ## D. Services & pricing
 

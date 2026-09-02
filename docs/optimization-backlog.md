@@ -202,7 +202,7 @@ Ship the fix ahead of anything cosmetic.
 
 **4.3 The business node is hardcoded, not manifest-driven.** `name`, `telephone`, `email`,
 `priceRange`, `areaServed` and `openingHoursSpecification` are all string literals in `enrich.mjs`.
-`telephone` is `+972-55-6601006` against the manifest's `+972556601006` — two NAP spellings. Read
+`telephone` is `+972-55-6601006` against the manifest's `+972765991266` — two NAP spellings. Read
 them from `site.config.json` instead; change values in the roster.
 
 **4.4 Opening hours contradict the homepage title.** The schema says Sun–Fri 08:00–18:00, Sat
@@ -352,9 +352,16 @@ unresolved WordPress `[phone]` shortcode — are **live on the homepage**, verif
 them does nothing. On a locksmith site where the phone call _is_ the conversion, this is the single
 most expensive defect on the list.
 
-> Counting note: a raw `grep -c 'tel:%5Bphone%5D' out/index.html` returns **6**, because the static
-> export embeds a second copy of the markup in its payload. Count `href="tel:` for rendered anchors.
-> The same doubling affects any raw attribute grep over `out/` — see §13.3.
+> ⚠️ **The counting note here was WRONG — corrected 2026-09-02.** It read: "a raw grep returns 6
+> because the static export embeds a second copy of the markup in its payload." It does not. All 6
+> live in `public/wp-content/themes/gogo/img/icons/favicon.ico` and `touch.png`, 3 each — two files
+> that are not images at all but HTML copies of the old homepage, saved there by the scraper and
+> then declared as the site's favicon. `content/site.json` has carried **zero** `tel:[phone]` since
+> the 2026-08-17 fix, so `fix-links.mjs` never had anything left to catch; the survivors were
+> outside its reach entirely. Fixed 2026-09-02 by `scripts/phone.mjs` pass 2, which sweeps
+> `public/` by content rather than by extension. **The two files themselves are still there** —
+> see `docs/business-facts.md` §C.5a. RSC-payload doubling is real for other attributes (§13.3);
+> it just was not the explanation for this one.
 
 Full `tel:` inventory across all 108 pages in `content/site.json`:
 

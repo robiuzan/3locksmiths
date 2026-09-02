@@ -68,13 +68,13 @@ Latin and numeric content inside Hebrew must be isolated or the bidi algorithm r
 numbers render backwards, prices lose their currency position, URLs fragment.
 
 ```html
-<span dir="ltr">055-6601006</span> <a href="tel:+972556601006" dir="ltr">055-6601006</a>
+<span dir="ltr">076-599-1266</span> <a href="tel:+972765991266" dir="ltr">076-599-1266</a>
 ```
 
 Use it for phone numbers, emails, URLs, prices with `₪`, and Latin model or brand names embedded
 mid-sentence.
 
-**Write the plain value in `content/enriched/<id>.mjs`** — `055-6601006`, `200 – 350 ₪`. The renderer
+**Write the plain value in `content/enriched/<id>.mjs`** — `076-599-1266`, `200 – 350 ₪`. The renderer
 adds the isolation. Never put markup in the content module.
 
 ## The live RTL defect
@@ -87,7 +87,8 @@ built HTML.
 
 ## Israeli formats
 
-- Phone: `055-6601006` displayed; `+972556601006` in `tel:` — both from the manifest.
+- Phone: `076-599-1266` displayed; `+972765991266` in `tel:` — both from the manifest. WhatsApp is
+  the one exception: still `+972556601006` (docs/business-facts.md §C.5).
   **Note the site currently ships four different spellings, one of them dead.** See `/conversion-cro`.
 - Currency: `₪` **after** the number — `350 ₪`.
 - Dates: `dd/mm/yyyy`.

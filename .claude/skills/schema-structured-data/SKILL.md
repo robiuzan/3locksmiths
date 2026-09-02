@@ -78,7 +78,7 @@ better fix is to make those pages generate their own: author `content/enriched/9
 ```js
 // scripts/enrich.mjs — CURRENT (wrong)
 name: "שלושה מנעולנים",
-telephone: "+972-55-6601006",        // manifest: +972556601006
+telephone: "+972-55-6601006",        // manifest: +972765991266
 email: "robiuzan@gmail.com",         // 🔴 a personal Gmail, LIVE on the homepage
 ```
 

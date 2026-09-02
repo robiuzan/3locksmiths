@@ -47,7 +47,7 @@ time. **That asymmetry is the root cause of the most important finding on this s
    `scripts/enrich.mjs`**, not read from the manifest, and:
    - `email` is **`robiuzan@gmail.com`** — a personal Gmail, live on the homepage, against the
      manifest's `info@3locksmiths.co.il`. This is **Critical** (§4.2).
-   - `telephone` is `+972-55-6601006` against the manifest's `+972556601006` — two NAP spellings.
+   - `telephone` is `+972-55-6601006` against the manifest's `+972765991266` — two NAP spellings.
    - There is **no `address`**, because the manifest has no address field at all (§5.1 /
      `docs/business-facts.md` §C.1). Route it to business-facts; **never invent one.**
 3. **Opening hours vs the title.** The node claims Sun–Fri 08:00–18:00 and Sat 08:00–17:00 while the

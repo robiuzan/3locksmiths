@@ -41,7 +41,9 @@ Consequences you must internalise:
 
 - **Business:** שלושה מנעולנים (3 Locksmiths) — locksmith for car and home. Key cutting and coding,
   lock opening, cylinder and lock replacement, door repair.
-- **Phone (click-to-call):** `055-6601006` · WhatsApp same number · `info@3locksmiths.co.il`.
+- **Phone (click-to-call):** `076-599-1266` (E.164 `+972765991266`) · **WhatsApp is still
+  `+972556601006`** — the 076 line is not WhatsApp-capable, see `docs/business-facts.md` §C.5 ·
+  `info@3locksmiths.co.il`.
 - **Coverage:** 25 location pages. Seven cities were withdrawn 2026-09-02 because the business no
   longer services them — see `docs/business-facts.md` §E.1. The sitewide phrase is now פריסה רחבה,
   not פריסה ארצית (§E.2), and it is still 🔶 — it is NOT in the homepage title, which §E used to say.
@@ -140,6 +142,7 @@ lib/
 scripts/               scrape → transform → pages → build-manifest → enrich → footer → form → fix-links
                        + check-freshness.mjs / check-orphans.mjs / check-catalog-images.mjs
                        + check-placeholders.mjs (release guards + the image approval queue)
+                       + phone.mjs (carries a NAP phone change into the scraped chrome)
 content/
   site.json            ⭐ 18.5 MB build artifact — NEVER hand-edit
   enriched/<id>.mjs    ⭐ 57 authored pages + _manifest.json (92xx guides, 93xx emergency)
@@ -224,6 +227,7 @@ npm run build      # next build → out/
 | `form.mjs`           | normalises the lead form (validation, phone field, RTL, consent)                   |
 | `hero-gallery.mjs`   | rebuilds the 4 homepage hero tiles from the image catalog (no-ops until published) |
 | `fix-links.mjs`      | repairs/validates every internal link, `tel:`, `data-cta`, form redirect           |
+| `phone.mjs`          | rewrites every retired phone spelling in `site.json` **and** `public/`             |
 
 > ⚠️ **`transform.mjs` runs ONLY in `npm run snapshot`.** A chrome change made there will not appear
 > from `npm run enrich`. Anything that must apply on every ordinary rebuild belongs in the enrich
@@ -244,6 +248,11 @@ literal Hebrew route **directory** (`app/מדריכים/`) breaks the Next 16 ex
   now repairs or drops unparseable **scraped** blocks too. Exits non-zero on any problem.
 - `pages.mjs` asserts no duplicate paths and that every generated page has one `<h1>` and metadata.
 - `fix-links.mjs` **fails the build** on any internal link that points at a non-existent route.
+- `scripts/phone.mjs` — **in the enrich chain, and it self-verifies.** A phone number lives in the
+  scraped chrome and in two `public/` assets that are HTML pretending to be icons, neither of which
+  any authored module or other guard can reach. It exits non-zero if a retired spelling survives
+  outside the WhatsApp URL. Its `RETIRED` array is what you append to on the next number change.
+  See `docs/business-facts.md` §C.5.
 - `scripts/check-freshness.mjs` — run before shipping. `npm run build` does **not** regenerate
   `content/site.json`, so editing a module and building without `npm run enrich` silently ships the
   previous copy. That reached production once; don't repeat it.
@@ -263,7 +272,7 @@ literal Hebrew route **directory** (`app/מדריכים/`) breaks the Next 16 ex
 ## 8. RTL & localization — NON-NEGOTIABLE
 
 - `<html lang="he" dir="rtl">` is set in `app/layout.tsx`. Do not remove it.
-- Israeli formats: phone `055-6601006`, currency `₪` **after** the number, dates `dd/mm/yyyy`, en
+- Israeli formats: phone `076-599-1266`, currency `₪` **after** the number, dates `dd/mm/yyyy`, en
   dashes in ranges.
 - Hebrew abbreviations use גרש `׳` (U+05F3) and גרשיים `״` (U+05F4) — not ASCII `'` / `"`, and not the
   typographic `’` (U+2019). `lib/enrich/render.mjs:29` currently gets this wrong.

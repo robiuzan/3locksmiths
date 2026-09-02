@@ -1,4 +1,5 @@
 {
+  "_comment": "Normalized per-site manifest. SYNCED FROM THE HUB: 'Israeli services sites'/roster/sites/<domain>.json. Edit there (the canonical roster) and run ops/sync-manifest.ps1. Never edit this file directly. Conforms to @ishub/site-kit SiteManifest.",
   "domain": "3locksmiths.co.il",
   "url": "https://3locksmiths.co.il",
   "brandName": "שלושה מנעולנים",
@@ -10,8 +11,8 @@
   "tagline": null,
   "shortPitch": null,
   "contact": {
-    "phoneDisplay": "055-6601006",
-    "phoneE164": "+972556601006",
+    "phoneDisplay": "076-599-1266",
+    "phoneE164": "+972765991266",
     "whatsappE164": "+972556601006",
     "email": "info@3locksmiths.co.il",
     "formAccessKey": "cea18712-6fba-46ca-abb1-2f140806a35a",
