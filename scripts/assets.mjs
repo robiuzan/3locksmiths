@@ -41,6 +41,12 @@
  *      loading hint: the hero is eager with `fetchpriority="high"`, everything below it is
  *      `loading="lazy"`. Before this, 0 of 23 homepage images were lazy.
  *
+ *   4. Derives the site icon set from the brand mark. The scraped head declared two files as
+ *      the favicon and Apple touch icon that are not images at all but 391 KB HTML copies of
+ *      the old WordPress homepage (docs/business-facts.md §C.5a), so the site shipped with no
+ *      working icon. A real .ico plus PNG and apple-touch variants are generated here from the
+ *      70×70 WebP upload and declared by app/layout.tsx.
+ *
  *   node scripts/assets.mjs      (runs in the enrich chain, after pages.mjs has pruned sections)
  */
 import { readFileSync, writeFileSync, mkdirSync, statSync, existsSync } from "node:fs";
@@ -159,6 +165,11 @@ site.assets.headLinks = site.assets.headLinks.filter((l) => {
   }
   return true;
 });
+
+// Snapshot the count HERE, not at log time. Step 5 below removes the two dead icon links from
+// the same array, and the log line for this step runs after it — reading the live length would
+// bill those two removals to the stylesheet pruner and report a range that never happened.
+const afterStylesheets = site.assets.headLinks.length;
 
 let swapped = 0;
 for (const l of site.assets.headLinks) {
@@ -295,6 +306,152 @@ for (const l of site.assets.headLinks) {
   }
 }
 
+// --- 5. site icons: derive a real favicon set from the brand mark ---------------------------
+// WHY — the scraped head pointed `icons.icon` and `icons.apple` at
+// `public/wp-content/themes/gogo/img/icons/favicon.ico` and `touch.png`, which are NOT images.
+// Each is a 391 KB HTML copy of the old WordPress homepage: the scraper requested those icon
+// paths, WordPress answered with a page, and the response was saved under the icon's name
+// (docs/business-facts.md §C.5a). Every browser that asked this site for an icon got HTML back,
+// so the site has shipped with no working favicon at all.
+//
+// The brand mark is a 70×70 WebP upload on a transparent ground. WebP favicons are not accepted
+// everywhere and iOS does not accept one for `apple-touch-icon` at all, so the shipped set is
+// derived here instead of referenced directly:
+//
+//   public/favicon.ico                        16/32/48 PNG-in-ICO — a bare GET /favicon.ico
+//                                             resolves, which browsers and crawlers request
+//                                             unconditionally whether or not a <link> exists
+//   public/assets/icons/apple-touch-icon.png  180×180, opaque, inset
+//
+// Those two are the whole set ON PURPOSE. A standalone icon-32.png / icon-48.png was tried and
+// removed: each was byte-identical to a payload already inside the .ico, so the extra <link>
+// carried no pixels the .ico does not already have — three rel="icon" tags on 112 routes for
+// one icon's worth of information. Every browser in use reads PNG-in-ICO and picks the right
+// entry itself. The set to ADD, if the mark is ever redrawn as a vector, is an SVG icon plus a
+// web app manifest with 192/512 PNGs — not more raster sizes of the same thing.
+//
+// `app/layout.tsx` declares this set directly rather than reading it back out of the scrape. The
+// site's own identity should not be a function of what the old WordPress origin happened to
+// serve — that indirection is exactly how the broken pair became the declared favicon.
+//
+// ⚠️ The source is only 70×70 (64×60 of actual mark), so `apple-touch-icon` is a 2.6× upscale.
+// It is flat art and lanczos3 holds up, but a ≥512 px master or an SVG would be sharper and
+// would unlock the manifest icons above. Note the tracked logo
+// `uploads/2025/11/3-מנעולנים-לוגו.webp` carries a 153×144 crop of the same three-figure mark —
+// higher resolution, but visibly DIFFERENT artwork (wider gaps, slimmer limbs), so swapping to
+// it is a brand decision for the owner, not a free quality win. See docs/business-facts.md §C.5a.
+const ICON_SRC = join(
+  ROOT,
+  "public",
+  "wp-content",
+  "uploads",
+  "2025",
+  "11",
+  "3locksmiths_favicon.webp",
+);
+const ICON_DIR = join(ROOT, "public", "assets", "icons");
+const ICO_OUT = join(ROOT, "public", "favicon.ico");
+const ICO_SIZES = [16, 32, 48];
+const APPLE_PX = 180;
+// iOS masks the tile to a rounded rect and clips the corners, so the mark is inset rather than
+// bled to the edge. 0.82 keeps the whole pictogram inside the mask on every iOS corner radius.
+const APPLE_INSET = 0.82;
+// iOS composites a transparent apple-touch-icon onto BLACK, so the ground has to be chosen here.
+// White is not a placeholder — it is the only ground this mark reads on. The lightest opaque
+// pixel in the source has a luminance of 146/255 (channel maxima 255/145/173: no light pixel
+// exists anywhere), and the gutters BETWEEN the three figures are transparent. So any dark
+// ground — brand navy #13263B included — swallows the navy figure and erases the separations.
+// Do not "make it on-brand" without re-checking those two facts.
+const APPLE_BG = { r: 255, g: 255, b: 255, alpha: 1 };
+const TRANSPARENT = { r: 0, g: 0, b: 0, alpha: 0 };
+
+if (!existsSync(ICON_SRC)) {
+  console.error(`assets: brand icon source missing — expected ${ICON_SRC}`);
+  console.error(`Place the square brand mark there, then re-run \`npm run enrich\`.`);
+  process.exit(1);
+}
+
+/** Square PNG of the mark at `px`, alpha preserved, aspect kept by padding. */
+const iconPng = (px) =>
+  sharp(ICON_SRC)
+    .resize(px, px, { fit: "contain", kernel: "lanczos3", background: TRANSPARENT })
+    .png({ compressionLevel: 9 })
+    .toBuffer();
+
+/**
+ * Packs PNGs into a multi-resolution .ico. sharp has no ICO encoder, and the container is
+ * small enough to build directly:
+ *
+ *   ICONDIR         6 bytes   reserved=0, type=1 (icon), image count
+ *   ICONDIRENTRY   16 bytes   per image, immediately after the ICONDIR
+ *   payloads                  the PNG bytes, in entry order
+ *
+ * All multi-byte fields are little-endian. Width and height are ONE byte each, so 0 encodes
+ * 256 — irrelevant at these sizes but wrong to hardcode. PNG-in-ICO (rather than a BMP
+ * DIB) has been read by every browser since IE11 and keeps the alpha channel intact.
+ */
+function packIco(images) {
+  const DIR = 6;
+  const ENTRY = 16;
+  const header = Buffer.alloc(DIR + ENTRY * images.length);
+  header.writeUInt16LE(0, 0); // reserved
+  header.writeUInt16LE(1, 2); // 1 = icon (2 would be a cursor)
+  header.writeUInt16LE(images.length, 4);
+
+  let offset = header.length;
+  images.forEach(({ size, png }, i) => {
+    const at = DIR + ENTRY * i;
+    header.writeUInt8(size >= 256 ? 0 : size, at); // width  — 0 means 256
+    header.writeUInt8(size >= 256 ? 0 : size, at + 1); // height — 0 means 256
+    header.writeUInt8(0, at + 2); // palette entries — 0 for truecolour
+    header.writeUInt8(0, at + 3); // reserved
+    header.writeUInt16LE(1, at + 4); // colour planes
+    header.writeUInt16LE(32, at + 6); // bits per pixel
+    header.writeUInt32LE(png.length, at + 8); // bytes in this image
+    header.writeUInt32LE(offset, at + 12); // absolute offset of this image
+    offset += png.length;
+  });
+
+  return Buffer.concat([header, ...images.map((i) => i.png)]);
+}
+
+mkdirSync(ICON_DIR, { recursive: true });
+
+const icoParts = [];
+for (const px of ICO_SIZES) icoParts.push({ size: px, png: await iconPng(px) });
+writeFileSync(ICO_OUT, packIco(icoParts));
+
+const markPx = Math.round(APPLE_PX * APPLE_INSET);
+const mark = await sharp(ICON_SRC)
+  .resize(markPx, markPx, { fit: "contain", kernel: "lanczos3", background: TRANSPARENT })
+  .png()
+  .toBuffer();
+// `palette` is applied HERE ONLY, and the numbers are measured, not assumed. Against the same
+// image encoded truecolour: max channel delta 14, mean 0.26, 19.4 KB → 7.8 KB (−60%). It
+// quantises this well because it is flat art on an opaque ground. The .ico payloads above are
+// the opposite case — they carry alpha, and quantising an alpha channel costs a max delta of
+// 113–181; at 16px the palette file is also LARGER than the truecolour one. Do not generalise
+// this flag to them.
+const appleIcon = await sharp({
+  create: { width: APPLE_PX, height: APPLE_PX, channels: 4, background: APPLE_BG },
+})
+  .composite([{ input: mark, gravity: "center" }])
+  .flatten({ background: APPLE_BG })
+  .removeAlpha()
+  .png({ compressionLevel: 9, palette: true })
+  .toBuffer();
+writeFileSync(join(ICON_DIR, "apple-touch-icon.png"), appleIcon);
+
+// The two scraped icon links are now dead weight: they name files that are not images, and
+// app/layout.tsx no longer reads them. Dropping them here stops anything downstream — or a
+// future reader of `assets.headLinks` — resurrecting a 391 KB HTML "icon".
+const staleIcons = [];
+site.assets.headLinks = site.assets.headLinks.filter((l) => {
+  if (!/icon/.test(l.rel ?? "")) return true;
+  staleIcons.push(`${l.rel} → ${l.href}`);
+  return false;
+});
+
 writeFileSync(SITE, JSON.stringify(site, null, 2), "utf8");
 
 const srcKb = (fa.length / 1024).toFixed(0);
@@ -304,10 +461,18 @@ console.log(
 );
 console.log(
   dropped.length
-    ? `assets: dropped ${dropped.length} unused stylesheet(s): ${dropped.join(", ")} (${before} → ${site.assets.headLinks.length} head links)`
+    ? `assets: dropped ${dropped.length} unused stylesheet(s): ${dropped.join(", ")} (${before} → ${afterStylesheets} head links)`
     : `assets: no stylesheets dropped (all still referenced)`,
 );
 console.log(
   `assets: images → ${converted.size} converted to WebP (${(savedBytes / 1024 / 1024).toFixed(2)} MB smaller), ` +
     `${rewritten} reference(s) repointed, ${lazied} image(s) set to lazy-load`,
 );
+console.log(
+  `assets: icons → favicon.ico (${ICO_SIZES.join("/")}) + apple-touch ${APPLE_PX}px, ` +
+    `both from ${basename(ICON_SRC)}` +
+    (staleIcons.length
+      ? `; dropped ${staleIcons.length} broken scraped icon link(s)`
+      : ``),
+);
+for (const link of staleIcons) console.log(`   icon link dropped: ${link}`);

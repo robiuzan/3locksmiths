@@ -312,12 +312,35 @@ in the one place the defect was not.
 `scripts/phone.mjs` pass 2 now sweeps **every text file under `public/`**, identified by content
 rather than by extension, and its self-verify covers them.
 
-🔶 **Still open — the owner's call, not a code fix.** The phone number and the dead shortcode are
-corrected, but these files remain: a broken favicon (a browser asking for an icon gets 391 KB of
-HTML), 783 KB of dead weight in the export, an indexable stale clone of the homepage, and the
-fabricated rating badge plus the 25-years claim still inside them. The right fix is to delete both
-and point `icons` at a real icon — which changes the favicon, so it is not folded into a
-phone-number change. Recommend doing it as its own task.
+✅ **The favicon half is FIXED — 2026-09-03.** The site now ships a real icon set derived from the
+brand mark by `scripts/assets.mjs` step 5 and declared in `app/layout.tsx`:
+
+| Path                                       | What                                                                                       |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------ |
+| `public/favicon.ico`                       | 16/32/48 PNG-in-ICO, 6.4 KB — also answers a bare `/favicon.ico`, which had been a **404** |
+| `public/assets/icons/apple-touch-icon.png` | 180×180, opaque, 7.8 KB                                                                    |
+
+Source: `public/wp-content/uploads/2025/11/3locksmiths_favicon.webp`, 70×70 (64×60 of actual mark).
+Verified against the **rendered** export, not the source: 112 of 112 routes carry both links, and
+zero reference `themes/gogo/img/icons` any more.
+
+🔶 **Still open — the owner's call, not a code fix.** The two files themselves remain: 783 KB of
+dead weight in the export, and the fabricated rating badge plus the 25-years claim and the personal
+Gmail still inside them. They are now **unreferenced** — nothing in the export links to them, and
+`assets.mjs` drops their `headLinks` entries — so deleting them is a clean, self-contained change.
+
+> ⚠️ **A claim in the paragraph above was overstated and is corrected here (2026-09-03).** It said
+> "an indexable stale clone of the homepage". Checked live: both URLs return `200` with an image
+> `Content-Type` (`image/vnd.microsoft.icon` and `image/png`) **and `x-content-type-options:
+nosniff`**, which forbids MIME sniffing — so neither is parsed or indexed as HTML. The real
+> residual exposure is narrower but still real: anything that reads the raw bytes finds the
+> personal email, the 25-years claim and the 5.0★ badge at a live URL.
+
+🔶 **A sharper master would help.** The mark is only 70×70, so the 180 px Apple icon is a 2.6×
+upscale. A ≥512 px master or an SVG would be crisper and would unlock an SVG `rel="icon"` plus a
+web app manifest with 192/512 icons. Note the tracked logo `3-מנעולנים-לוגו.webp` contains the same
+three-figure mark at 153×144 — higher resolution, but measurably **different artwork** (wider gaps
+between figures, slimmer limbs), so adopting it is a brand decision, not a free upgrade.
 
 ## D. Services & pricing
 

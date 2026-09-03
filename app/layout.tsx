@@ -19,10 +19,25 @@ const gtmNoScript = gtmNoScriptSrc(manifest.analytics?.gtmId);
 
 /** CDN host for manifest-managed media (the OG card today). Drives the <head> preconnect. */
 const mediaHost = manifest.images?.mediaHost;
-const iconLink = site.assets.headLinks.find(
-  (l) => (l.rel ?? "").includes("icon") && !(l.rel ?? "").includes("apple"),
-);
-const appleLink = site.assets.headLinks.find((l) => (l.rel ?? "").includes("apple"));
+
+// Site icons. These were derived from `site.assets.headLinks` until 2026-09-03, which pointed
+// them at `/wp-content/themes/gogo/img/icons/{favicon.ico,touch.png}` — two files that are not
+// images at all but 391 KB HTML copies of the old WordPress homepage, saved under the icons'
+// names by the scraper (docs/business-facts.md §C.5a). So the site declared a favicon that
+// served HTML, on every route, since the migration.
+//
+// The set below is generated from the brand mark by the site-icons step of `scripts/assets.mjs`
+// and declared here rather than read back out of the scrape: the site's identity must not be a
+// function of what
+// the old WordPress origin happened to answer with. `/favicon.ico` also sits at the document
+// root, because browsers and crawlers request that path whether or not a <link> names it.
+//
+// ⚠️ Do NOT add `app/favicon.ico` or `app/icon.png` on top of this. Next 16 resolves the file
+// convention against this config, not alongside it: `resolve-metadata.js` unshifts an
+// `app/favicon.ico` onto `icons.icon` unconditionally, so the page would emit TWO rel="icon"
+// tags — while `app/icon.*` is dropped entirely whenever config icons exist, so it would look
+// like it silently did nothing. `public/` is never scanned by that convention, which is why
+// `public/favicon.ico` and this config coexist without duplicating.
 
 // Base metadata shared by every route. Per-page title/description/canonical/robots are
 // supplied by each route's generateMetadata() and merged over this by Next.js.
@@ -31,8 +46,13 @@ const appleLink = site.assets.headLinks.find((l) => (l.rel ?? "").includes("appl
 export const metadata: Metadata = {
   metadataBase: new URL(site.wpUrl),
   icons: {
-    icon: iconLink?.href,
-    apple: appleLink?.href,
+    // One rel="icon" is deliberate. The .ico carries 16/32/48 as separate PNG payloads and
+    // every browser picks the right one from inside it, so a standalone icon-32/icon-48 link
+    // would repeat bytes the .ico already ships. See the site-icons step in scripts/assets.mjs.
+    icon: [{ url: "/favicon.ico", sizes: "16x16 32x32 48x48", type: "image/x-icon" }],
+    apple: [
+      { url: "/assets/icons/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
   },
   ...(manifest.analytics?.googleSiteVerification
     ? { verification: { google: manifest.analytics.googleSiteVerification } }
