@@ -326,6 +326,13 @@ powershell -File "c:/Users/robiu/antigravity/Projects/Israeli services sites/ops
 > ✅ **The second origin was retired 2026-08-25.** `robiuzan.github.io` now serves a redirect to
 > production (GitHub does not allow disabling Pages on a user-site repo), and the repo is archived.
 >
+> ✅ **The Pages domain claim was released 2026-09-05.** Retiring that origin did **not** disable
+> Pages on `robiuzan/3locksmiths` itself. The repo kept `cname: 3locksmiths.co.il` in its Pages
+> _settings_ — where deleting `deploy.yml` and `public/CNAME` could not reach it — with its ACME cert
+> stuck in `bad_authz` for a month. Cleared with `gh api -X DELETE repos/robiuzan/3locksmiths/pages`
+> (all six fleet repos held the same stale claim); `has_pages` is now `false` and the Pages API 404s.
+> **Deleting a CNAME file never releases a Pages custom domain — only deleting the Pages site does.**
+>
 > ⚠️ **Never deploy while anything is still writing to `content/enriched/`.** `npm run build` does
 > not regenerate `content/site.json`, so a build started mid-edit ships the previous copy **silently**.
 > That reached production once. Run `node scripts/check-freshness.mjs` first — it is also a CI gate.
