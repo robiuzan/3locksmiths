@@ -25,8 +25,8 @@ comparing "not measured" to "measured", not "worse" to "better". Say so rather t
 | Impressions, clicks, CTR, position | Search Console     | ✅ once verified + sitemap submitted |
 | Indexed page count                 | Search Console     | ✅                                   |
 | Core Web Vitals (field)            | Search Console     | 🟡 needs traffic volume              |
-| Map pack performance               | Business Profile   | 🟡 profile live 2026-09-05, unread   |
-| Reviews                            | Business Profile   | 🔶 count unread — §B.4               |
+| Map pack performance               | Business Profile   | 🟢 profile live, claimed and correct |
+| Reviews                            | Business Profile   | 🔴 **0** (owner, 2026-09-05)         |
 | AI citations                       | manual             | 🔴 all crawlers blocked (§6.1)       |
 
 Two of the most important rows are red for the same reason: the owner-blocked critical path in

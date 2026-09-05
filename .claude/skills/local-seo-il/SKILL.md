@@ -1,6 +1,6 @@
 ---
 name: local-seo-il
-description: Israeli local-SEO doctrine for שלושה מנעולנים — the missing address that has no field in the manifest, the Google עסק שלי profile that arrived 2026-09-05 with its NAP verified and its service areas still unread, four spellings of one phone number including a dead placeholder, the region-typed-as-City fix for קריות, duplicate-city slugs, coverage honesty, and the expansion cap. Use when populating locations for local ranking or auditing local visibility. Triggers "local SEO", "NAP", "city pages", "Google עסק שלי", "doorway pages", "areaServed", "add a city".
+description: Israeli local-SEO doctrine for שלושה מנעולנים — the missing address that has no field in the manifest, the Google עסק שלי profile that arrived 2026-09-05 — claimed, verified, NAP-checked and holding 0 reviews, four spellings of one phone number including a dead placeholder, the region-typed-as-City fix for קריות, duplicate-city slugs, coverage honesty, and the expansion cap. Use when populating locations for local ranking or auditing local visibility. Triggers "local SEO", "NAP", "city pages", "Google עסק שלי", "doorway pages", "areaServed", "add a city".
 ---
 
 # Local SEO — Israel
@@ -69,12 +69,13 @@ hours were read straight off the profile on 2026-09-05 and all match what we pub
 §B.4 carries the values and the cookieless `/maps/preview/place` command that reads them — use it
 rather than assuming, and rather than parking these on the owner.
 
-**Three things it does not answer**, and only the dashboard does: whether the listing is claimed and
-ownership-verified, whether its service areas still include the 7 cities withdrawn 2026-09-02 (§E.1),
-and the review count. Do not state any of the three.
+**Three things the endpoint cannot answer, all confirmed by the owner 2026-09-05:** the listing is
+claimed and ownership-verified, its service areas have been corrected to drop the 7 cities withdrawn
+2026-09-02 (§E.1), and it holds **0 reviews**.
 
-We hold no citable review, so §B's ban on `Review` and `AggregateRating` without a verifiable public
-source is untouched by any of this.
+So the profile is complete, correct and empty. **Reviews are now the only local lever left** — and
+§B's ban on `Review` and `AggregateRating` without a verifiable public source is untouched, because
+zero reviews is nothing to cite.
 
 If further profiles appear (social, directories): URLs go in the **roster manifest** `schema.sameAs`,
 then `ops/sync-manifest.ps1`, then `npm run enrich`. Never into `site.config.json` directly.

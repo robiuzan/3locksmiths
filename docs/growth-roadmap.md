@@ -43,18 +43,18 @@ mostly done; the trust, measurement and reachability work has barely started.
 These gate the highest-value work and **only the owner can unblock them**. Everything else can proceed
 in parallel, but these determine the ceiling. Chase them first and chase them hard.
 
-| #   | Decision needed                                                                  | Unblocks                                     |
-| --- | -------------------------------------------------------------------------------- | -------------------------------------------- |
-| 1   | 🔶 Business Profile — supplied 2026-09-05; is it CLAIMED and ownership-verified? | map pack, reviews, `sameAs`, entity identity |
-| 2   | **A review-collection process**                                                  | §7.2, `Review` schema, conversion rate       |
-| 3   | Founding year — or approval to drop "25+ שנים"                                   | §7.1, `foundingDate`, every trust card       |
-| 4   | Real opening hours — is it 24/7 or 08:00–18:00?                                  | §4.4, emergency positioning, schema          |
-| 5   | Address: real premises, or service-area business?                                | §5.1, `LocalBusiness` completeness, GBP type |
-| 6   | Licence / insurance / ח.פ. — any verifiable credential                           | §7.4, the whole authority dimension          |
-| 7   | A named human + photo (owner or lead technician)                                 | §7.3, article authorship, AEO                |
-| 8   | Sign-off on the price ranges already published                                   | §7.6, `Offer` schema, pricing page           |
-| 9   | Cloudflare AI-crawler policy decision                                            | **the entire AEO/GEO dimension** (§6.1)      |
-| 10  | ~~Correct business email~~ ✅ confirmed 2026-08-24                               | §4.2 — done, see business-facts §C.3         |
+| #   | Decision needed                                                         | Unblocks                                     |
+| --- | ----------------------------------------------------------------------- | -------------------------------------------- |
+| 1   | ✅ ~~Business Profile~~ — claimed, verified, areas corrected 2026-09-05 | map pack, reviews, `sameAs`, entity identity |
+| 2   | **A review-collection process**                                         | §7.2, `Review` schema, conversion rate       |
+| 3   | Founding year — or approval to drop "25+ שנים"                          | §7.1, `foundingDate`, every trust card       |
+| 4   | Real opening hours — is it 24/7 or 08:00–18:00?                         | §4.4, emergency positioning, schema          |
+| 5   | Address: real premises, or service-area business?                       | §5.1, `LocalBusiness` completeness, GBP type |
+| 6   | Licence / insurance / ח.פ. — any verifiable credential                  | §7.4, the whole authority dimension          |
+| 7   | A named human + photo (owner or lead technician)                        | §7.3, article authorship, AEO                |
+| 8   | Sign-off on the price ranges already published                          | §7.6, `Offer` schema, pricing page           |
+| 9   | Cloudflare AI-crawler policy decision                                   | **the entire AEO/GEO dimension** (§6.1)      |
+| 10  | ~~Correct business email~~ ✅ confirmed 2026-08-24                      | §4.2 — done, see business-facts §C.3         |
 
 Record every answer in `docs/business-facts.md`. **Nothing here gets invented in the meantime.**
 
@@ -108,11 +108,10 @@ this becomes measurable.
 
 This is the highest-leverage dimension for this site, and most of it is owner-blocked (§1 above).
 
-1. **Google Business Profile — live since 2026-09-05; name, phone, website, category and hours
-   verified clean** (`docs/business-facts.md` §B.4). Three things are still open and only the
-   dashboard shows them: whether the listing is **claimed and ownership-verified**, whether the
-   **service areas** still list the 7 cities withdrawn 2026-09-02, and the **review count**. For a
-   local trade this outranks nearly all on-page work.
+1. ✅ **Google Business Profile — done 2026-09-05.** Live, claimed, ownership-verified, service areas
+   corrected, and its name, phone, website, category and hours all verified against ours
+   (`docs/business-facts.md` §B.4). Nothing about the profile itself is outstanding. **It holds 0
+   reviews**, which is now the single highest-value gap on this site and the subject of §2 below.
 2. **Review generation as a process, not a request.** A short SMS/WhatsApp with a direct review link,
    sent same-day after every completed job. Target the first 20 reviews, then keep the cadence.
    **Never** publish a `Review` or `AggregateRating` without a verifiable public source (§4.10).
@@ -339,14 +338,14 @@ triage.
 
 ## KPIs
 
-| Dimension   | Metric                                                             | Today              |
-| ----------- | ------------------------------------------------------------------ | ------------------ |
-| Conversion  | calls, WhatsApp, form leads — by page and surface                  | partly unmeasured  |
-| Local       | GBP views, calls, direction requests, review count and rating      | GBP live, unread   |
-| Rankings    | head terms, brand-key cluster, emergency cluster, location cluster | untracked          |
-| Indexation  | indexed pages, impressions, CTR (Search Console)                   | 104 URLs submitted |
-| AEO         | citations in AI answers; crawler reachability                      | blocked at edge    |
-| Performance | LCP / CLS / INP field data, mobile                                 | unmeasured         |
-| Trust       | reviews published, credentials shown, claims sourced               | zero               |
+| Dimension   | Metric                                                             | Today               |
+| ----------- | ------------------------------------------------------------------ | ------------------- |
+| Conversion  | calls, WhatsApp, form leads — by page and surface                  | partly unmeasured   |
+| Local       | GBP views, calls, direction requests, review count and rating      | GBP live, 0 reviews |
+| Rankings    | head terms, brand-key cluster, emergency cluster, location cluster | untracked           |
+| Indexation  | indexed pages, impressions, CTR (Search Console)                   | 104 URLs submitted  |
+| AEO         | citations in AI answers; crawler reachability                      | blocked at edge     |
+| Performance | LCP / CLS / INP field data, mobile                                 | unmeasured          |
+| Trust       | reviews published, credentials shown, claims sourced               | zero                |
 
 Set the baseline **after Phase 1** — before then, most of these cannot be read honestly.

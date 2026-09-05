@@ -41,8 +41,8 @@ returns personalised or blocked results — **do not present anything it returns
 
 - **The map pack sits above organic** for `מנעולן <city>` and `מנעולן קרוב אליי`. It is won with a
   Google Business Profile and reviews, not on-page work. **The profile arrived 2026-09-05; its
-  review count is unread and we hold no citable review** — which is why reviews are the critical path
-  for local, and no amount of content substitutes.
+  profile holds 0 reviews, confirmed by the owner 2026-09-05** — which is why reviews are the
+  critical path for local, and no amount of content substitutes.
 - **Lead aggregators own the bare head terms.** Competing head-on for `מנעולן` is expensive; the
   winnable ground is specificity — brand-key, model-level, emergency long-tail.
 - **Most individual locksmith sites are thin** — a few pages, no pricing, no structured data.
@@ -57,7 +57,7 @@ pricing · an 18-page brand-key silo.
 
 ## Where we are behind
 
-Business Profile live, reviews unread · no emergency coverage · no editorial content · **all major AI
+Business Profile live but 0 reviews · no emergency coverage · no editorial content · **all major AI
 crawlers blocked at the Cloudflare edge** (backlog §6.1), so we cannot be cited by assistants at all.
 
 ## Method

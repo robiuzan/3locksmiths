@@ -81,8 +81,8 @@ guides (`scripts/enrich.mjs:132-137`). A fabricated byline is worse than an abse
 
 | Fact                    | Value                           | Status | Source                                      |
 | ----------------------- | ------------------------------- | ------ | ------------------------------------------- |
-| Google Business Profile | live, linked from `sameAs`      | ✅     | owner, 2026-09-05 — §B.4                    |
-| Reviews on the profile  | —                               | 🔶     | no rating in the profile payload — §B.4     |
+| Google Business Profile | live, claimed and verified      | ✅     | owner, 2026-09-05 — §B.4                    |
+| Reviews on the profile  | **0**                           | ✅     | owner, 2026-09-05 — §B.4                    |
 | Review count / rating   | "Google rating 5.0 ★★★★★"       | ⛔     | see §B.1                                    |
 | Testimonials            | 3 named reviews on the homepage | ⛔     | see §B.2                                    |
 | Social profiles         | —                               | 🔶     | `sameAs` holds the profile and nothing else |
@@ -93,12 +93,14 @@ Business Profile and `schema.sameAs` now points at it. For a single-trade local 
 highest-leverage asset there is: it drives the map pack, it is where reviews will live, and it is what
 makes `sameAs` mean anything.
 
-**The NAP agrees.** Business name, phone, website, primary category and opening hours on the profile
-were read directly and all match what we publish (§B.4, verified 2026-09-05). Service areas, review
-count, and whether the listing is claimed and ownership-verified are still unknown.
+**Everything about the profile is now confirmed.** Name, phone, website, category and hours were read
+straight off it and match what we publish; the owner confirmed on 2026-09-05 that the listing is
+claimed and ownership-verified, that the service areas have been corrected, and that it holds
+**0 reviews** (§B.4). Nothing about this profile is outstanding.
 
-**None of that licenses a rating.** A review may not be published without a verifiable public source,
-however healthy the profile looks.
+**Which makes reviews the whole game.** The profile is the venue and it is empty. A rating still may
+not be published without a verifiable public source — and at zero there is nothing to publish. This
+is the one gap on the site that cannot be closed with code, copy or schema.
 
 **`Review` and `AggregateRating` must never ship without a verifiable public source URL.** Not as
 sample data, not "to test the markup". The export emits zero of both in _schema_ — which is why both
@@ -224,14 +226,22 @@ It discriminates rather than echoing the request back: flip the last hex digit o
 | Category      | `מנעולן` (secondary: `Service establishment`)          | ✅ locksmith is primary, as it should be           |
 | Hours         | `פתוח 24 שעות`                                         | ✅ agrees with the 00:00–23:59 spec we ship (§D.3) |
 
-**Still genuinely unknown — the endpoint does not carry these, so they stay owner checks:**
+**The three the endpoint could not answer — ✅ ANSWERED BY THE OWNER 2026-09-05:**
 
-| Open question      | Why it is still open                                                                                                                                     |
-| ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Service areas      | no city name and no service-area phrasing appears anywhere in the payload. The 7 cities withdrawn 2026-09-02 (§E.1) may still be listed. Dashboard only. |
-| Reviews            | no rating float and no `ביקורות` token in 17.7 KB. Consistent with none, but absence from this payload is weak evidence — stays 🔶.                      |
-| Claimed + verified | whether the owner has claimed the listing and passed ownership verification is not exposed. **A public place page is not proof of a claimed profile.**   |
-| Address            | none exposed — the only `ישראל` strings are the timezone name. Consistent with a hidden address, still an inference (§C.1).                              |
+| Question           | Answer                                                                                                              |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------- |
+| Claimed + verified | **Yes.** The listing is claimed and ownership-verified, so the owner controls it and can receive reviews on it.     |
+| Service areas      | **Corrected.** The 7 cities withdrawn 2026-09-02 (§E.1) have been removed, so the profile and the site now agree.   |
+| Reviews            | **0.** Confirmed, not inferred — which is why the `/maps/preview/place` payload carried no rating and no `ביקורות`. |
+
+The **address** stays an inference: the payload exposes none (the only `ישראל` strings are the timezone
+name), which is consistent with a hidden address on a service-area listing but is not a statement from
+the owner. §C.1 is still open.
+
+**Zero is now a sourced fact, so say it plainly.** Before 2026-09-05 "zero reviews" was an assumption
+about a profile nobody had read, and this register was right to forbid it. It is now the owner's own
+answer. What has not changed one inch: no `Review` and no `AggregateRating` may ship, because zero
+reviews is exactly nothing to cite.
 
 **A profile does not unblock a rating.** `Review` and `AggregateRating` stay forbidden until there is
 a real count with a verifiable public source. The move is to earn reviews on the profile — not to
@@ -500,12 +510,12 @@ They are hedged and remain 🔶 — but see D.4 for the version that was not hed
 every page which does not author its own `stats`. It asserted, as a four-item metrics strip
 captioned "למה אנחנו **במספרים**":
 
-| Rendered claim                 | Pages | Status                                           |
-| ------------------------------ | ----- | ------------------------------------------------ |
-| `25+ שנות ניסיון במנעולנות`    | 61    | ⛔ manifest `foundedYear` is `null`              |
-| `30–60 ד׳ זמן מענה ממוצע`      | 60    | ⛔ an unhedged averaged response-time promise    |
-| `100% אחריות מלאה על כל עבודה` | 62    | 🔶 no term, no scope                             |
-| `אלפי לקוחות מרוצים`           | 59    | ⛔ no citable review corpus — no possible source |
+| Rendered claim                 | Pages | Status                                        |
+| ------------------------------ | ----- | --------------------------------------------- |
+| `25+ שנות ניסיון במנעולנות`    | 61    | ⛔ manifest `foundedYear` is `null`           |
+| `30–60 ד׳ זמן מענה ממוצע`      | 60    | ⛔ an unhedged averaged response-time promise |
+| `100% אחריות מלאה על כל עבודה` | 62    | 🔶 no term, no scope                          |
+| `אלפי לקוחות מרוצים`           | 59    | ⛔ 0 reviews (owner, 2026-09-05) — no source  |
 
 `DEFAULT_FEATURES` added `7 ימים בשבוע` and a second warranty assertion on the same pages.
 
