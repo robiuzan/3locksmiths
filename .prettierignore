@@ -13,6 +13,7 @@ yarn.lock
 content/site.json
 content/enriched/_manifest.json
 public/assets/fa-subset.css
+public/assets/main.css
 
 # Vendored WordPress theme + plugin output — never edited, never formatted.
 public/wp-content

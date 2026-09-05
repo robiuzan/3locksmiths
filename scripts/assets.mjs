@@ -47,6 +47,14 @@
  *      working icon. A real .ico plus PNG and apple-touch variants are generated here from the
  *      70×70 WebP upload and declared by app/layout.tsx.
  *
+ *   5. Derives main.css. The vendored copy opens with an `@import` to Google Fonts, which
+ *      serialises a third-party round trip inside the render-blocking critical path, and paints
+ *      the band behind every hero from a 970 KB / 256 KB PNG pair that step 3 cannot see because
+ *      they are referenced from CSS rather than from an `<img>`. The derived copy drops the
+ *      @import and re-encodes both backgrounds to AVIF + WebP; the Alexandria/Poppins stylesheet
+ *      is dropped alongside it, because rtl.css overrides every family either one declares. Same
+ *      idiom as the Font Awesome subset: repo-owned output, vendored original untouched.
+ *
  *   node scripts/assets.mjs      (runs in the enrich chain, after pages.mjs has pruned sections)
  */
 import { readFileSync, writeFileSync, mkdirSync, statSync, existsSync } from "node:fs";
@@ -184,11 +192,22 @@ const IMG_OUT_DIR = join(ROOT, "public", "assets", "img");
 const CONVERT_OVER = 20 * 1024; // below this a WebP round-trip is not worth an extra file
 const MAX_W = 1600;
 
-// Collect every referenced upload once, so a file used on 95 pages is encoded a single time.
+// Collect every referenced image once, so a file used on 95 pages is encoded a single time.
+//
+// `themes/` and `.svg` are in the net for their INTRINSIC SIZE, not for conversion. Until
+// 2026-09-05 this only matched `uploads/**` rasters, which left five images on the homepage with
+// no width/height at all — four vector icons plus the theme's own star.png — and an unreserved
+// box for each is a layout shift. They are filtered back out before the encode loop below.
 const referenced = new Set();
 for (const p of site.pages) {
   for (const m of (p.bodyHtml || "").matchAll(
-    /\/wp-content\/uploads\/[^"'\s)]+?\.(?:png|jpe?g)/gi,
+    // GREEDY on purpose. Three uploads are named `<brand>.svg.webp` — a WordPress import of an
+    // SVG logo that was then re-encoded — and a lazy quantifier stops at the FIRST extension it
+    // sees, yielding `Mercedes-Logo.svg`, a path that does not exist. The file was skipped and
+    // the <img> shipped with no reserved box. The character class already excludes quotes,
+    // whitespace and `)`, so greedy runs to the end of the URL token and backtracks to the last
+    // real extension.
+    /\/wp-content\/(?:uploads|themes)\/[^"'\s)]+\.(?:png|jpe?g|svg|webp)/gi,
   ))
     referenced.add(m[0]);
 }
@@ -213,6 +232,14 @@ for (const url of referenced) {
   const outW = Math.min(meta.width || MAX_W, MAX_W);
   const outH = Math.round(((meta.height || 0) * outW) / (meta.width || outW));
   dims.set(url, { width: outW, height: outH });
+
+  // Everything above is size bookkeeping and applies to every image. Conversion does not.
+  // An SVG must never be rasterised — sharp would happily do it, and freeze vector art at one
+  // resolution — and a `.webp` is already in the target format, so re-encoding it would only
+  // lose a generation. The theme's own `themes/**` sprites are all under the threshold anyway;
+  // keeping the encoder pointed exclusively at `uploads/**` rasters preserves the pre-2026-09-05
+  // output byte for byte, so widening the scan above cannot change which files get written.
+  if (/\.(?:svg|webp)$/i.test(url) || !url.startsWith("/wp-content/uploads/")) continue;
   if (size < CONVERT_OVER) continue;
 
   const name =
@@ -232,6 +259,8 @@ for (const url of referenced) {
 const HERO_SRC = "/wp-content/uploads/2025/04/157336036_m.jpg";
 let rewritten = 0;
 let lazied = 0;
+let sized = 0;
+let emptySrc = 0;
 
 for (const p of site.pages) {
   if (typeof p.bodyHtml !== "string") continue;
@@ -257,6 +286,15 @@ for (const p of site.pages) {
   let seenHero = false;
   let imgIndex = 0;
   out = out.replace(/<img\b[^>]*>/g, (tag) => {
+    // `<img src="">` — two of these sit in the scraped services mega-menu, in a `.pre-icon`
+    // span whose icon was never filled in. An empty src is not a no-op: the HTML spec makes a
+    // browser resolve it against the document's base URL, so some engines re-request the page
+    // itself as an image. Dropping the tag leaves the empty span, which is what the theme CSS
+    // already lays out.
+    if (/\bsrc=""/.test(tag)) {
+      emptySrc++;
+      return "";
+    }
     const srcM = tag.match(/\bsrc="([^"]+)"/);
     if (!srcM) return tag;
     const src = srcM[1];
@@ -272,8 +310,10 @@ for (const p of site.pages) {
         [...converted.entries()].find(([, v]) => v.url === src)?.[1] ??
         dims.get(src) ??
         dims.get([...dims.keys()].find((k) => k === src));
-      if (d?.width && d?.height)
+      if (d?.width && d?.height) {
         next = next.replace(/^<img\b/, `<img width="${d.width}" height="${d.height}"`);
+        sized++;
+      }
     }
 
     if (!/\bdecoding=/.test(next))
@@ -452,6 +492,207 @@ site.assets.headLinks = site.assets.headLinks.filter((l) => {
   return false;
 });
 
+// --- 6. main.css: the two defects on the critical path that no other pass can reach ----------
+//
+// main.css is the largest render-blocking stylesheet on every route, and it carries two problems
+// that only a derived copy can fix — `public/wp-content/**` is vendored and never edited (§3
+// rule 4), and neither problem is visible from the HTML, so steps 3 and 4 above cannot see them.
+//
+//   a. LINE 1 IS AN `@import` TO GOOGLE FONTS. An `@import` at the top of a render-blocking
+//      sheet serialises a third-party round trip INSIDE the critical path: the browser cannot
+//      apply main.css until fonts.googleapis.com answers, and it cannot even start that request
+//      until main.css itself arrives. Measured on the live homepage that is four sequential hops
+//      before first paint — HTML → main.css → googleapis → gstatic — with no preconnect for
+//      either font origin. It pulls Inter, Lato and Manrope.
+//
+//   b. THE LCP ELEMENT IS A CSS BACKGROUND IMAGE. `.page-template-builder` (105 of 109 pages)
+//      paints the dark band behind the hero at `background-size: 100% 760px`, from:
+//        desktop  Group1948753244-ezgif.com-crop-1.png   970,349 B
+//        mobile   Group-1948753239-1-ezgif.com-crop.png  256,778 B  (@media max-width: 768px)
+//      Step 4 collects images referenced from `<img>` tags, so it has never seen either. They
+//      re-encode to roughly 28 KB and 8.6 KB — the largest single paint on the site, at 3% of
+//      its bytes.
+//
+// Same idiom as the Font Awesome subset above: derive into public/assets/, repoint the <link>,
+// leave the vendored original untouched and unreferenced. The derived copy is listed in
+// .prettierignore for the same reason fa-subset.css is.
+const THEME_CSS_DIR = join(
+  ROOT,
+  "public",
+  "wp-content",
+  "themes",
+  "gogo",
+  "assets",
+  "css",
+);
+const THEME_IMG_DIR = join(
+  ROOT,
+  "public",
+  "wp-content",
+  "themes",
+  "gogo",
+  "assets",
+  "img",
+);
+const THEME_IMG_OUT = join(IMG_OUT_DIR, "theme");
+const MAIN_OUT = join(FA_OUT_DIR, "main.css");
+const MAIN_HREF = "/assets/main.css";
+const BG_CONVERT_OVER = 8 * 1024;
+
+// WHICH FONT FAMILIES ACTUALLY RENDER — the analysis behind dropping the Alexandria/Poppins
+// stylesheet below, recorded because it is not obvious and is worth re-checking if the theme CSS
+// is ever re-scraped.
+//
+// rtl.css loads AFTER main.css and re-declares both `body` and `h1–h6` in Rubik, the heading rule
+// with `!important`. Every competing declaration on this site is therefore dead:
+//   Manrope  11 rules — `body` (lost to rtl.css's body rule), seven on h3/h4 elements (lost to
+//            the !important heading rule, `.quiz-step .step-title` included: it is an <h4>), and
+//            three on `.s-latest-posts` / `.widget-posts` markup that exists on 0 pages
+//   Lato      1 rule  — `h6`, lost to the same !important rule
+//   Poppins   1 rule  — `.feedback-widget-sd .saswp-*`, and `saswp-` appears on 0 pages
+//   Inter     0 rules — requested by the @import and never named by any declaration
+//   Alexandria 0 rules — requested by the <link> and never named by any declaration
+// Leaving Rubik as the only family that paints a pixel. Three Google Fonts stylesheet requests
+// across two extra origins collapse to one.
+//
+// That conclusion rests entirely on the two rtl.css rules, so they are asserted rather than
+// assumed. If a re-scrape ever drops them, this fails here instead of silently shipping Hebrew
+// body text in a fallback face.
+const rtlCss = readFileSync(join(THEME_CSS_DIR, "rtl.css"), "utf8");
+const RTL_OVERRIDES = [
+  {
+    re: /h1,\s*h2,\s*h3,\s*h4,\s*h5,\s*h6\s*\{\s*font-family:\s*'Rubik',\s*serif\s*!important;?\s*\}/,
+    what: "the h1–h6 `font-family: 'Rubik' !important` rule",
+  },
+  {
+    re: /body\s*\{[^}]*font-family:\s*'Rubik'/,
+    what: "the `body { font-family: 'Rubik' }` rule",
+  },
+];
+for (const g of RTL_OVERRIDES) {
+  if (g.re.test(rtlCss)) continue;
+  console.error(
+    `assets: rtl.css no longer contains ${g.what}.\n` +
+      "  Dropping the Alexandria/Poppins stylesheet is only safe while rtl.css overrides every\n" +
+      "  other font-family on the site. Re-run the analysis in scripts/assets.mjs step 6 before\n" +
+      "  shipping — see the comment above this check.",
+  );
+  process.exit(1);
+}
+
+let mainCss = readFileSync(join(THEME_CSS_DIR, "main.css"), "utf8");
+
+// 6a. the @import. Absence is not an error — a re-scrape may simply not have it — but it is
+// worth reporting, because "0 removed" and "1 removed" mean very different things here.
+const FONT_IMPORT =
+  /^@import\s+url\((['"])https:\/\/fonts\.googleapis\.com[^)]*\1\);?[ \t]*\r?\n?/m;
+const hadImport = FONT_IMPORT.test(mainCss);
+if (hadImport) mainCss = mainCss.replace(FONT_IMPORT, "");
+
+// 6b. the background rasters. Encode first, then rewrite — a file referenced by both the desktop
+// rule and a media query is encoded once.
+mkdirSync(THEME_IMG_OUT, { recursive: true });
+/** '../img/x.png' -> { webp, avif, from, to } — absolute URLs, ready to substitute */
+const bgImages = new Map();
+let bgSaved = 0;
+for (const m of mainCss.matchAll(
+  /url\((['"]?)(\.\.\/img\/([^)'"]+?\.(?:png|jpe?g)))\1\)/gi,
+)) {
+  const rel = m[2];
+  if (bgImages.has(rel)) continue;
+  const file = decodeURIComponent(m[3]);
+  const abs = join(THEME_IMG_DIR, file);
+  if (!existsSync(abs)) continue;
+  const size = statSync(abs).size;
+  // Below the threshold an extra file and an extra `image-set()` declaration cost more than the
+  // bytes they save; those references only need their relative path made absolute.
+  if (size < BG_CONVERT_OVER) {
+    bgImages.set(rel, { absolute: `/wp-content/themes/gogo/assets/img/${file}` });
+    continue;
+  }
+  const stem = basename(file, extname(file));
+  const webp = await sharp(abs).webp({ quality: 82 }).toBuffer();
+  const avif = await sharp(abs).avif({ quality: 55 }).toBuffer();
+  if (webp.length >= size) continue; // never adopt a "conversion" that grew
+  writeFileSync(join(THEME_IMG_OUT, `${stem}.webp`), webp);
+  writeFileSync(join(THEME_IMG_OUT, `${stem}.avif`), avif);
+  bgSaved += size - Math.min(webp.length, avif.length);
+  bgImages.set(rel, {
+    webp: `/assets/img/theme/${stem}.webp`,
+    avif: `/assets/img/theme/${stem}.avif`,
+  });
+}
+
+// `background-image:` declarations get the two-declaration pattern: a plain WebP url() that every
+// browser understands, then an image-set() that only browsers supporting it will apply. A browser
+// that does not know image-set() discards the second declaration as invalid and keeps the WebP.
+let bgRules = 0;
+mainCss = mainCss.replace(
+  /(background-image:\s*)url\((['"]?)(\.\.\/img\/[^)'"]+?\.(?:png|jpe?g))\2\)(\s*;)/gi,
+  (all, prop, _q, rel, tail) => {
+    const img = bgImages.get(rel);
+    if (!img?.webp) return all;
+    bgRules++;
+    return (
+      `${prop}url('${img.webp}')${tail}\n\t${prop}image-set(` +
+      `url('${img.avif}') type('image/avif'), url('${img.webp}') type('image/webp'))${tail}`
+    );
+  },
+);
+
+// Anything still relative would 404: the derived copy lives at /assets/main.css, so `../img/…`
+// and `../fonts/…` no longer resolve against the theme directory.
+mainCss = mainCss.replace(/url\((['"]?)\.\.\/([^)'"]+?)\1\)/g, (all, _q, rest) => {
+  const img = bgImages.get(`../${rest}`);
+  if (img) return `url('${img.absolute ?? img.webp}')`;
+  return `url('/wp-content/themes/gogo/assets/${rest}')`;
+});
+
+mainCss =
+  `/* Generated by scripts/assets.mjs — do not edit. Source: themes/gogo/assets/css/main.css.\n` +
+  ` * The Google Fonts @import is removed and the background rasters are re-encoded; everything\n` +
+  ` * else is byte-identical to the vendored original. Regenerate with \`npm run enrich\`. */\n` +
+  mainCss;
+
+mkdirSync(FA_OUT_DIR, { recursive: true });
+writeFileSync(MAIN_OUT, mainCss, "utf8");
+
+// content/site.json is stateful — nothing regenerates the scraped head between runs — so this
+// has to converge, not fire once. Matching the vendored path ALONE made the second `npm run
+// enrich` a hard failure: run 1 rewrote the href, run 2 found nothing left to rewrite and could
+// not tell that from main.css having vanished. Counting an href that is ALREADY the derived copy
+// as a hit is what makes repeated runs idempotent, the same way hero-gallery.mjs matches both
+// spellings of the avatar. The check below is still worth keeping: zero hits now genuinely means
+// the stylesheet is absent from the head.
+let mainSwapped = 0;
+for (const l of site.assets.headLinks) {
+  if (!l.href) continue;
+  if (l.href === MAIN_HREF) {
+    mainSwapped++;
+  } else if (/themes\/gogo\/assets\/css\/main\.css/.test(l.href)) {
+    l.href = MAIN_HREF;
+    mainSwapped++;
+  }
+}
+if (mainSwapped === 0) {
+  console.error(
+    "assets: main.css is in neither its vendored nor its derived position in\n" +
+      "  site.assets.headLinks — the theme's largest stylesheet would never load. Re-scrape, or\n" +
+      "  check whether an earlier pass dropped it.",
+  );
+  process.exit(1);
+}
+
+// 6c. the Alexandria + Poppins stylesheet. Neither family is named by a single declaration that
+// survives rtl.css (see the analysis above), and the request costs a full round trip to a third
+// origin — Poppins alone is asked for in 18 static weights.
+const droppedFonts = [];
+site.assets.headLinks = site.assets.headLinks.filter((l) => {
+  if (!/fonts\.googleapis\.com\/css2\?family=Alexandria/.test(l.href || "")) return true;
+  droppedFonts.push(l.href);
+  return false;
+});
+
 writeFileSync(SITE, JSON.stringify(site, null, 2), "utf8");
 
 const srcKb = (fa.length / 1024).toFixed(0);
@@ -466,7 +707,14 @@ console.log(
 );
 console.log(
   `assets: images → ${converted.size} converted to WebP (${(savedBytes / 1024 / 1024).toFixed(2)} MB smaller), ` +
-    `${rewritten} reference(s) repointed, ${lazied} image(s) set to lazy-load`,
+    `${rewritten} reference(s) repointed, ${lazied} image(s) set to lazy-load, ` +
+    `${sized} given explicit width/height` +
+    (emptySrc ? `, ${emptySrc} empty-src tag(s) removed` : ``),
+);
+console.log(
+  `assets: main.css → ${MAIN_HREF} (${hadImport ? "Google Fonts @import removed" : "no @import found"}, ` +
+    `${bgRules} background rule(s) re-encoded, ${(bgSaved / 1024).toFixed(0)} KB smaller)` +
+    (droppedFonts.length ? `; dropped the Alexandria/Poppins stylesheet` : ``),
 );
 console.log(
   `assets: icons → favicon.ico (${ICO_SIZES.join("/")}) + apple-touch ${APPLE_PX}px, ` +

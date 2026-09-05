@@ -74,6 +74,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <link rel="dns-prefetch" href={`https://${mediaHost}`} />
           </>
         )}
+        {/* Rubik is the only font family that paints a pixel on this site — rtl.css re-declares
+            body and h1–h6 in it, the heading rule with !important, so every other family the
+            theme asks for is overridden or attached to markup that does not exist. The analysis
+            and the guard that keeps it honest are in step 6 of scripts/assets.mjs.
+
+            The stylesheet still comes from Google's CDN, as the scrape does, which means the
+            font is two round trips behind the HTML: fonts.googleapis.com for the CSS, then
+            fonts.gstatic.com for the file itself. Both origins are opened here so the handshakes
+            overlap the HTML parse instead of following it. `crossOrigin` is required on BOTH —
+            font files are fetched in CORS mode, and a preconnect whose credentials mode does not
+            match the eventual request opens a connection the browser then declines to reuse. */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" crossOrigin="" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         {/* GTM belongs in <head> (backlog §13.1) — body placement delays container load
             and competes with the theme-script replay for parse time. The <noscript>
             iframe stays in <body>, where Google's install puts it. */}

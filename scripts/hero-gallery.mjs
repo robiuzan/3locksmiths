@@ -75,11 +75,20 @@ if (!grid) {
 
 // Tiles are 632x426 (3:2) in a box capped at max-height:213px with object-fit:cover, so the
 // composition is cropped vertically — the catalog's focal point is what keeps subjects in frame.
-// They sit below the fold of the hero's left column on mobile, so none is the LCP element and all
-// four stay lazy.
+//
+// LOADING — the first ROW is not below the fold on mobile, which is what this said until
+// 2026-09-05. media.css stacks `.s-home-hero .row > div` to full width under 992px, so the
+// gallery follows the hero text rather than sitting beside it, and a PageSpeed capture at
+// 412x823 (Moto G Power) shows both tiles of the first row inside the initial viewport. Marking
+// an in-viewport image `loading="lazy"` defers its discovery until after layout, which is the one
+// thing lazy-loading should never be asked to do.
+//
+// The first row is therefore `lazy: false` and the second stays lazy. Deliberately NOT `eager`:
+// that would add `fetchpriority="high"` and put these tiles in front of the actual LCP element,
+// which is the `.page-template-builder` background painting the whole band behind the hero.
 const html = refs
-  .map((ref) => {
-    const img = catalogImg(ref, { sizes: SIZES.tile });
+  .map((ref, i) => {
+    const img = catalogImg(ref, { sizes: SIZES.tile, lazy: i >= 2 });
     return `<div class="gallery-item">${img}</div>`;
   })
   .join("");
