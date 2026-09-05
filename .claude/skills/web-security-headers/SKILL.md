@@ -67,7 +67,7 @@ Notes before shipping it:
 
 - **HSTS `preload` is close to irreversible.** The token is deliberately omitted above. Only add it if
   the owner accepts that the domain and every subdomain must stay HTTPS indefinitely.
-- `SAMEORIGIN` over `DENY` leaves room for a future Business Profile or map embed of the site itself.
+- `SAMEORIGIN` over `DENY` leaves room for a Business Profile or map embed of the site itself (a profile has existed since 2026-09-05).
 - Cloudflare Pages **merges** `_headers` with its defaults; it does not replace them.
 - Verify with `curl -sSI` after deploy. A header that isn't in the live response didn't ship.
 
