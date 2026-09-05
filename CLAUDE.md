@@ -53,9 +53,13 @@ Consequences you must internalise:
   Counts move as content ships — read `content/enriched/_manifest.json`, never assume.
 
 > ⚠️ Several claims on this site are **not substantiated**: "מעל 25 שנות ניסיון" (the manifest has
-> `foundedYear: null`), "24/7" (the schema says 08:00–18:00), every price, the warranty term, and
-> coverage. See [docs/business-facts.md](docs/business-facts.md). **Never present an unconfirmed value
-> as fact.**
+> `foundedYear: null`), every price, the warranty term, and coverage. See
+> [docs/business-facts.md](docs/business-facts.md). **Never present an unconfirmed value as fact.**
+>
+> ✅ **"24/7" is no longer one of them**, and this line said it was for six days. The owner confirmed
+> it 2026-08-30, the schema has shipped 00:00–23:59 ever since, and the Business Profile has
+> published `פתוח 24 שעות` since 2026-09-05 — the owner's word plus a public source anyone can
+> check (§D.3, §B.4).
 
 ---
 
