@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { preconnect } from "react-dom";
 import "./globals.css";
 import "./enrich.css";
 import SiteAssets from "@/components/SiteAssets";
@@ -59,7 +60,43 @@ export const metadata: Metadata = {
     : {}),
 };
 
+/**
+ * Opens the two Google Fonts origins before the stylesheet that needs them.
+ *
+ * WHY NOT A <link rel="preconnect"> IN THE JSX, WHICH IS WHAT THIS WAS FIRST
+ *
+ *   SiteAssets renders the theme stylesheets with `precedence`, and React 19 HOISTS those into
+ *   its own head ordering — resource hints, then preloads, then stylesheets by precedence. A raw
+ *   <link> written in this component is not part of that ordering and lands wherever it renders.
+ *   Measured on the built homepage: the Google Fonts stylesheet was hoisted to byte 269 while the
+ *   preconnects sat at byte 12,706 — 12 KB of <head> AFTER the request they were supposed to
+ *   warm, which is the one position where a preconnect can do nothing at all.
+ *
+ *   `react-dom`'s preconnect() emits the hint through React's own resource-hint channel, so it is
+ *   ordered ahead of the hoisted stylesheets. Next 16 documents this as the supported way to emit
+ *   a preconnect (generate-metadata.md, "Resource hints" — the Metadata API has no field for it).
+ *   Their example marks the component "use client"; it is called here during the server render
+ *   instead, which React 19 supports and which keeps ThemeScripts the only client component on
+ *   the site (CLAUDE.md §9).
+ *
+ * WHY ONLY GSTATIC IS `crossOrigin`
+ *
+ *   Credentials mode is part of the connection-pool key, so a preconnect only helps if it matches
+ *   the request that follows. fonts.gstatic.com serves the font binaries, which are fetched in
+ *   CORS mode — anonymous, so it needs crossOrigin. fonts.googleapis.com serves only the
+ *   stylesheet, and <link rel="stylesheet"> without a crossorigin attribute is a no-CORS,
+ *   credentialed request. Marking that one anonymous opens a socket the stylesheet then declines
+ *   to reuse — a wasted third-party handshake on every page. This asymmetry is why Google's own
+ *   documented snippet preconnects googleapis WITHOUT crossorigin and gstatic WITH it; an earlier
+ *   revision here asserted it was "required on BOTH", which was wrong.
+ */
+function preconnectFonts() {
+  preconnect("https://fonts.googleapis.com");
+  preconnect("https://fonts.gstatic.com", { crossOrigin: "anonymous" });
+}
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  preconnectFonts();
   // Hebrew / RTL document root — matches the WordPress source exactly.
   return (
     <html lang="he" dir="rtl">
@@ -74,19 +111,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <link rel="dns-prefetch" href={`https://${mediaHost}`} />
           </>
         )}
-        {/* Rubik is the only font family that paints a pixel on this site — rtl.css re-declares
-            body and h1–h6 in it, the heading rule with !important, so every other family the
-            theme asks for is overridden or attached to markup that does not exist. The analysis
-            and the guard that keeps it honest are in step 6 of scripts/assets.mjs.
-
-            The stylesheet still comes from Google's CDN, as the scrape does, which means the
-            font is two round trips behind the HTML: fonts.googleapis.com for the CSS, then
-            fonts.gstatic.com for the file itself. Both origins are opened here so the handshakes
-            overlap the HTML parse instead of following it. `crossOrigin` is required on BOTH —
-            font files are fetched in CORS mode, and a preconnect whose credentials mode does not
-            match the eventual request opens a connection the browser then declines to reuse. */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" crossOrigin="" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        {/* The font preconnects are NOT <link> tags here — see the preconnectFonts() call in
+            this file. Writing them as JSX put them 12 KB deep in the emitted <head>, after the
+            stylesheet they were meant to warm. */}
         {/* GTM belongs in <head> (backlog §13.1) — body placement delays container load
             and competes with the theme-script replay for parse time. The <noscript>
             iframe stays in <body>, where Google's install puts it. */}
