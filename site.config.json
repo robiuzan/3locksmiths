@@ -30,7 +30,9 @@
     "type": "Locksmith",
     "priceRange": "₪₪",
     "areaServed": null,
-    "sameAs": []
+    "sameAs": [
+      "https://www.google.com/maps/place/%D7%A9%D7%9C%D7%95%D7%A9%D7%94+%D7%9E%D7%A0%D7%A2%D7%95%D7%9C%D7%A0%D7%99%D7%9D/data=!4m2!3m1!1s0x8bea25d577ac0a5:0xdb88c9f20e72c98b"
+    ]
   },
   "analytics": {
     "gtmId": "GTM-KWGGH438",

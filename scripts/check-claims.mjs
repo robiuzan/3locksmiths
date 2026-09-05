@@ -60,7 +60,7 @@ const BLOCKING = [
   {
     id: "customer-count",
     re: /אלפי לקוחות|מאות לקוחות|אלפי מפתחות/,
-    why: "no review corpus and an empty sameAs — the count has no source.",
+    why: "no review corpus — a Business Profile exists but holds no reviews we can cite.",
   },
   {
     id: "ratings",

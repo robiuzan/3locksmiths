@@ -27,7 +27,7 @@ Be precise about this, because it changes what the work should be.
 
 | Gap              | State                                                                            |
 | ---------------- | -------------------------------------------------------------------------------- |
-| **Proof**        | zero reviews, zero ratings, no named human, no credentials, `sameAs: []`         |
+| **Proof**        | zero reviews, zero ratings, no named human, no credentials; GBP live 2026-09-05  |
 | **Reachability** | every major AI crawler blocked at the Cloudflare edge (§6.1)                     |
 | **Measurement**  | ✅ fixed 2026-08-24 — 13 per-surface `data-cta`, `/thank-you/` conversion        |
 | **Live defects** | ✅ all cleared 2026-08-24 and guarded by blocking CI checks                      |
@@ -45,7 +45,7 @@ in parallel, but these determine the ceiling. Chase them first and chase them ha
 
 | #   | Decision needed                                        | Unblocks                                     |
 | --- | ------------------------------------------------------ | -------------------------------------------- |
-| 1   | **Google Business Profile** — claim + verify           | map pack, reviews, `sameAs`, entity identity |
+| 1   | ✅ ~~Business Profile~~ — done 2026-09-05; audit it    | map pack, reviews, `sameAs`, entity identity |
 | 2   | **A review-collection process**                        | §7.2, `Review` schema, conversion rate       |
 | 3   | Founding year — or approval to drop "25+ שנים"         | §7.1, `foundingDate`, every trust card       |
 | 4   | Real opening hours — is it 24/7 or 08:00–18:00?        | §4.4, emergency positioning, schema          |
@@ -64,7 +64,7 @@ Record every answer in `docs/business-facts.md`. **Nothing here gets invented in
 
 All five fixes are **live in production** and asserted as blocking CI checks. The remote
 `robiuzan.github.io` origin was retired 2026-08-23 — it now redirects to production (GitHub does
-not allow disabling Pages on a user-site repo), and the repo is re-archived. All of it is **live and verified** as of 2026-08-24.
+not allow disabling Pages on a user-site repo), and the repo is re-archived. All of it is **live and verified** as of 2026-08-24. The separate **Pages custom-domain claim** on the source repo outlived this by a month and was released 2026-09-05 — see §12.1 in `docs/optimization-backlog.md`.
 
 | Fix                                                          | Why it's first                                     | §    |
 | ------------------------------------------------------------ | -------------------------------------------------- | ---- |
@@ -108,8 +108,9 @@ this becomes measurable.
 
 This is the highest-leverage dimension for this site, and most of it is owner-blocked (§1 above).
 
-1. **Google Business Profile live**, fully populated, categories correct, service areas listed, photos
-   uploaded. For a local trade this outranks nearly all on-page work.
+1. **Google Business Profile — live since 2026-09-05, contents unaudited.** Next: confirm it is fully
+   populated — categories, service areas, hours, phone, website link, photos — against the checklist
+   in `docs/business-facts.md` §B.4. For a local trade this outranks nearly all on-page work.
 2. **Review generation as a process, not a request.** A short SMS/WhatsApp with a direct review link,
    sent same-day after every completed job. Target the first 20 reviews, then keep the cadence.
    **Never** publish a `Review` or `AggregateRating` without a verifiable public source (§4.10).
@@ -121,7 +122,7 @@ This is the highest-leverage dimension for this site, and most of it is owner-bl
 6. **State the warranty precisely** — duration, scope, exclusions (§7.5).
 7. **Fix the 25-years claim at `DEFAULT_FEATURES`** in `lib/enrich/render.mjs:42` — one constant that
    reaches every page (§7.1).
-8. **Populate `sameAs`** in the roster manifest once GBP and any social profiles exist.
+8. ✅ **`sameAs` populated** 2026-09-05 with the Business Profile. Add social profiles as they exist.
 9. Rebuild `/אודותינו/` around real substance rather than the unverified claim.
 
 ---
@@ -339,7 +340,7 @@ triage.
 | Dimension   | Metric                                                             | Today              |
 | ----------- | ------------------------------------------------------------------ | ------------------ |
 | Conversion  | calls, WhatsApp, form leads — by page and surface                  | partly unmeasured  |
-| Local       | GBP views, calls, direction requests, review count and rating      | no GBP             |
+| Local       | GBP views, calls, direction requests, review count and rating      | GBP live, unread   |
 | Rankings    | head terms, brand-key cluster, emergency cluster, location cluster | untracked          |
 | Indexation  | indexed pages, impressions, CTR (Search Console)                   | 104 URLs submitted |
 | AEO         | citations in AI answers; crawler reachability                      | blocked at edge    |

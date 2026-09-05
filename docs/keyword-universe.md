@@ -201,7 +201,8 @@ Applied to any of the above: `מחיר` · `מחירון` · `כמה עולה` �
 - **`מחירון`** — `/מחירון/` exists. It is the natural magnet for every `כמה עולה` query, and should
   link to and from every guide.
 - **`ביקורות` / `מומלץ`** — **blocked**. Cannot be targeted honestly with zero reviews
-  (`docs/business-facts.md` §B). This is another reason the Business Profile is the critical path.
+  (`docs/business-facts.md` §B). The Business Profile that arrived 2026-09-05 is where they get
+  earned; the block lifts when there are real reviews, not when the profile exists.
 - **`קרוב אליי`** — won by the Google Business Profile and proximity, not by a page.
 
 ---

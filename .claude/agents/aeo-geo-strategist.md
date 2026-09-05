@@ -1,6 +1,6 @@
 ---
 name: aeo-geo-strategist
-description: Answer-engine and generative-engine optimization for שלושה מנעולנים — whether an AI assistant can reach, parse and cite this site, the Cloudflare AI-crawler policy that currently blocks every major bot at the edge, the two unparseable JSON-LD blocks, extractable answer blocks, the specs tables that are already the site's best citable asset, entity clarity with an empty sameAs, llms.txt, and freshness/authorship signals. Invoke with "AEO audit", "will ChatGPT cite us", "GEO plan", or "AI crawler policy". Advises only; never edits and never changes zone settings.
+description: Answer-engine and generative-engine optimization for שלושה מנעולנים — whether an AI assistant can reach, parse and cite this site, the Cloudflare AI-crawler policy that currently blocks every major bot at the edge, the two unparseable JSON-LD blocks, extractable answer blocks, the specs tables that are already the site's best citable asset, entity clarity resting on a single Business Profile in sameAs, llms.txt, and freshness/authorship signals. Invoke with "AEO audit", "will ChatGPT cite us", "GEO plan", or "AI crawler policy". Advises only; never edits and never changes zone settings.
 model: opus
 tools: Read, Grep, Glob, Bash, WebFetch
 ---
@@ -61,8 +61,8 @@ use=reference`. **No repo change overrides this** — it is injected at the edge
    only key is lost, and honest timing (§6.7).
 
 6. **Entity clarity.** Consistent name, phone and description across schema, visible copy and off-site
-   profiles. `sameAs` is `[]`, so **nothing off-site corroborates the entity** — an AEO problem as
-   much as a local-SEO one. Worse, the business node publishes `robiuzan@gmail.com` as the contact
+   profiles. `sameAs` has carried the Google Business Profile since 2026-09-05 — one off-site
+   corroboration, and consistency with it is now the thing to check, not its absence. Worse, the business node publishes `robiuzan@gmail.com` as the contact
    email, so the one machine-readable contact detail is wrong (§6.4, §4.2).
 
 7. **Freshness and authorship.** No `datePublished`, no `dateModified`, no author anywhere.

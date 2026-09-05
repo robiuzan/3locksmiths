@@ -1,6 +1,6 @@
 ---
 name: local-seo-il
-description: Israeli local-SEO doctrine for שלושה מנעולנים — the missing address that has no field in the manifest, Google עסק שלי as the top lever, four spellings of one phone number including a dead placeholder, the region-typed-as-City fix for קריות, duplicate-city slugs, coverage honesty, and the expansion cap. Use when populating locations for local ranking or auditing local visibility. Triggers "local SEO", "NAP", "city pages", "Google עסק שלי", "doorway pages", "areaServed", "add a city".
+description: Israeli local-SEO doctrine for שלושה מנעולנים — the missing address that has no field in the manifest, the Google עסק שלי profile that arrived 2026-09-05 and has never been audited, four spellings of one phone number including a dead placeholder, the region-typed-as-City fix for קריות, duplicate-city slugs, coverage honesty, and the expansion cap. Use when populating locations for local ranking or auditing local visibility. Triggers "local SEO", "NAP", "city pages", "Google עסק שלי", "doorway pages", "areaServed", "add a city".
 ---
 
 # Local SEO — Israel
@@ -57,15 +57,24 @@ So this is two questions, in order:
 2. If yes, adding it is a **manifest-schema change** in the hub
    (`roster/manifest.schema.json`), then the roster entry, then sync — not a local edit.
 
-## 3. Google עסק שלי — the top lever
+## 3. Google עסק שלי — the top lever, and it now exists
 
-`schema.sameAs` is `[]`. **There is no Business Profile link anywhere on the site.** For a
-single-trade local business the Business Profile outranks almost everything else you can do on-page:
-it drives the map pack, it is where reviews live, and it is the entity anchor that makes `sameAs`
-meaningful.
+**Supplied by the owner 2026-09-05.** `schema.sameAs` carries the profile URL, so the `LocalBusiness`
+node on every enriched page finally points at something off-site. For a single-trade local business
+the profile outranks almost everything else you can do on-page: it drives the map pack, it is where
+reviews live, and it is the entity anchor that makes `sameAs` meaningful.
 
-This is a `docs/business-facts.md` §B blocker, not a code task. Escalate it rather than working around
-it. Once supplied: URLs go in the **roster manifest** `schema.sameAs`, then sync.
+**Do not treat this as finished.** Nobody has read the profile's own contents — Maps renders them in
+JavaScript, so no fetch from here can. Phone, website link, business name, primary category, service
+areas, hours, address visibility and review count are all unverified, and each is a NAP-consistency
+risk. The checklist lives in `docs/business-facts.md` §B.4; it is an owner task in the profile
+dashboard, not a code task. **A profile whose phone disagrees with the site is worse than no profile.**
+
+Reviews are still zero as far as this repo knows, so §B's ban on `Review` and `AggregateRating`
+without a verifiable public source is untouched by any of this.
+
+If further profiles appear (social, directories): URLs go in the **roster manifest** `schema.sameAs`,
+then `ops/sync-manifest.ps1`, then `npm run enrich`. Never into `site.config.json` directly.
 
 ## 4. Hebrew grammar and area typing
 
@@ -156,7 +165,7 @@ contextually into the city set, and no location links to an adjacent city beyond
 - [ ] The `LocalBusiness` node reads NAP from the manifest, not from literals.
 - [ ] The address question is answered in `docs/business-facts.md` §C.1 — or explicitly deferred.
 - [ ] Every location has an explicit `areaKind`; קריות is `AdministrativeArea`.
-- [ ] `sameAs` populated, or a 🔶 row exists.
+- [ ] `sameAs` populated (Business Profile since 2026-09-05), or a 🔶 row exists.
 - [ ] `areaServed` derived from the location set, not hardcoded.
 - [ ] Every location page passes the doorway test.
 

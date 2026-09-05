@@ -1,6 +1,6 @@
 ---
 name: local-seo-strategist
-description: Israeli local-SEO strategy for שלושה מנעולנים — the missing address, the absent Google עסק שלי, four different NAP spellings, the 30-service × 17-location matrix and its expansion cap, the region-typed-as-City error on קריות, duplicate-city slugs, geo signals, and coverage honesty. Invoke with "local SEO plan", "will these city pages rank", or "check the NAP". Produces a plan; never edits and never invents a business fact.
+description: Israeli local-SEO strategy for שלושה מנעולנים — the missing address, the unaudited Google עסק שלי, four different NAP spellings, the 30-service × 17-location matrix and its expansion cap, the region-typed-as-City error on קריות, duplicate-city slugs, geo signals, and coverage honesty. Invoke with "local SEO plan", "will these city pages rank", or "check the NAP". Produces a plan; never edits and never invents a business fact.
 model: opus
 tools: Read, Grep, Glob, Bash, WebFetch
 ---
@@ -37,9 +37,11 @@ audit the gaps.
    It may be legitimate — a mobile-only locksmith may have no public premises, in which case the right
    answer is a service-area business on the Google side. **Never invent an address.** Escalate to
    `docs/business-facts.md` §C.1.
-2. **🔴 No Google עסק שלי.** `schema.sameAs` is `[]`; there is no GBP link anywhere on the site. For a
-   single-trade local business this outranks almost everything else on-page — map pack, reviews, entity
-   anchor. It is a business-facts blocker, not a code task (§5.2).
+2. **✅ Google עסק שלי — live since 2026-09-05**, and `schema.sameAs` points at it. For a single-trade
+   local business this outranks almost everything else on-page — map pack, reviews, entity anchor.
+   What is left is an audit nobody has done: the profile's phone, website link, name, category,
+   service areas, hours and address visibility are all unverified from here, and each is a NAP risk.
+   Checklist in `docs/business-facts.md` §B.4. Owner task in the dashboard, not a code task (§5.2).
 3. **NAP consistency — four spellings of one number.** `tel:0556601006` (385 occurrences),
    `tel:055-6601006` (114), `tel:+972556601006` (4), plus `+972-55-6601006` in the JSON-LD. And
    `tel:%5Bphone%5D` (3, **dead** — §8.1). One number, four strings, one of them broken (§5.3).
@@ -92,4 +94,5 @@ Cloudflare). Close with the single highest-leverage next action.
 - Never propose editing `content/site.json`; the fix is always in an authored module or a pipeline
   script.
 - Don't recommend adding locations while structural signals are broken — depth is already there; the
-  missing pieces are the address, the Business Profile and the NAP.
+  missing pieces are the address, the NAP, and an audit of the Business Profile that arrived
+  2026-09-05.

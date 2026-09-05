@@ -109,8 +109,8 @@ signal than an absent one.
 
 ## Entity consistency
 
-An assistant resolves "שלושה מנעולנים" by cross-referencing sources. With `sameAs` empty there are no
-other sources. Worse, the one machine-readable contact detail is **wrong**: the business node
+An assistant resolves "שלושה מנעולנים" by cross-referencing sources. Since 2026-09-05 `sameAs` carries
+the Google Business Profile — one other source, where there were none. Worse, the one machine-readable contact detail is **wrong**: the business node
 publishes `robiuzan@gmail.com` rather than the manifest's address. Fix that before worrying about
 prose (`/schema-structured-data`, Fix 2). See also `/local-seo-il` §3.
 

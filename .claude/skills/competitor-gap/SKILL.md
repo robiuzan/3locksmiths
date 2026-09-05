@@ -29,8 +29,9 @@ blocked results — never present what it returns as a ranking.**
 ## Market structure — established, cite freely
 
 - **The map pack sits above organic** for `מנעולן <city>` and `מנעולן קרוב אליי`. It is won with a
-  Google Business Profile and reviews. **We have neither**, so those queries are not winnable with
-  content at all — that is a Business Profile task (`docs/business-facts.md` §B).
+  Google Business Profile and reviews. **We have a profile since 2026-09-05 and zero reviews**, so
+  those queries are still not winnable with content — that is a Business Profile task
+  (`docs/business-facts.md` §B.4).
 - **Lead aggregators hold the bare head terms.** `מנעולן` head-on is expensive. Winnable ground is
   specificity: brand-key, model-level, emergency long-tail.
 - **Most individual locksmith sites are thin** — a few pages, no pricing, no structured data.
@@ -51,7 +52,7 @@ Verify from our own export before asserting it, then say it plainly:
 
 ## Where we are behind
 
-No Business Profile · zero reviews · no emergency coverage · no editorial content · **every major AI
+Unaudited Business Profile · zero reviews · no emergency coverage · no editorial content · **every major AI
 crawler blocked at the Cloudflare edge** (backlog §6.1).
 
 ## The winnability framework

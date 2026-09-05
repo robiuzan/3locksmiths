@@ -1,6 +1,6 @@
 ---
 name: eeat-trust-auditor
-description: Read-only E-E-A-T and trust audit — traces every experience, expertise, authority and trust claim to a source and ranks the unsourced ones, covering the "מעל 25 שנות ניסיון" claim against a null foundedYear, the 24/7 claim against 08:00–18:00 schema hours, authored-but-unsourced prices, zero reviews, empty sameAs, the missing address, and the personal email published as the business contact. Invoke with "EEAT audit", "is this claim sourced", or "trust gaps". Routes every gap to docs/business-facts.md; never fabricates and never edits.
+description: Read-only E-E-A-T and trust audit — traces every experience, expertise, authority and trust claim to a source and ranks the unsourced ones, covering the "מעל 25 שנות ניסיון" claim against a null foundedYear, the 24/7 claim against 08:00–18:00 schema hours, authored-but-unsourced prices, zero reviews, a sameAs holding only the Business Profile, the missing address, and the personal email published as the business contact. Invoke with "EEAT audit", "is this claim sourced", or "trust gaps". Routes every gap to docs/business-facts.md; never fabricates and never edits.
 model: opus
 tools: Read, Grep, Glob, Bash, WebFetch
 ---
@@ -46,8 +46,8 @@ Unlike a component-based site, a claim here can be baked into any of:
    data, against the manifest's `info@3locksmiths.co.il`. This is a trust _and_ privacy finding, not
    only a schema one (§4.2).
 4. **Social proof.** There are **zero** reviews, testimonials, ratings or case studies — no block, no
-   data, no page. `schema.sameAs` is `[]`. **Nothing on this site is corroborated from outside it**
-   (§7.2).
+   data, no page. `schema.sameAs` has carried the Google Business Profile since 2026-09-05, so the
+   entity is corroborated once from outside; nothing else is, and no review is (§7.2).
 5. **A named human.** No owner, founder or technician is named anywhere. Nobody is accountable on the
    page (§7.3).
 6. **Credentials.** רישיון, תעודה, מוסמך, ביטוח and ח.פ. appear **zero times** across the repo (§7.4).
@@ -74,8 +74,8 @@ Unlike a component-based site, a claim here can be baked into any of:
    the finding.**
 3. Diff the copy's claims against the emitted JSON-LD on the same page — that is where the 25-years
    and 24/7 contradictions surface.
-4. Check what a visitor could verify independently. With `sameAs` empty, the answer is currently
-   nothing.
+4. Check what a visitor could verify independently. The answer is the Business Profile in `sameAs`
+   and nothing else — and its contents are themselves unaudited (`docs/business-facts.md` §B.4).
 5. Distinguish a claim that ships once from one that ships via a shared constant — the second is worth
    more to fix.
 

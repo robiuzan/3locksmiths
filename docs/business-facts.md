@@ -79,18 +79,23 @@ guides (`scripts/enrich.mjs:132-137`). A fabricated byline is worse than an abse
 
 ## B. Reputation & social proof
 
-| Fact                    | Value                           | Status | Source                  |
-| ----------------------- | ------------------------------- | ------ | ----------------------- |
-| Google Business Profile | —                               | 🔶     | `schema.sameAs` is `[]` |
-| Review count / rating   | "Google rating 5.0 ★★★★★"       | ⛔     | see §B.1                |
-| Testimonials            | 3 named reviews on the homepage | ⛔     | see §B.2                |
-| Social profiles         | —                               | 🔶     | `sameAs: []`            |
-| Case studies            | —                               | 🔶     | none                    |
+| Fact                    | Value                           | Status | Source                                      |
+| ----------------------- | ------------------------------- | ------ | ------------------------------------------- |
+| Google Business Profile | live, linked from `sameAs`      | ✅     | owner, 2026-09-05 — §B.4                    |
+| Reviews on the profile  | —                               | 🔶     | not readable from this machine — §B.4       |
+| Review count / rating   | "Google rating 5.0 ★★★★★"       | ⛔     | see §B.1                                    |
+| Testimonials            | 3 named reviews on the homepage | ⛔     | see §B.2                                    |
+| Social profiles         | —                               | 🔶     | `sameAs` holds the profile and nothing else |
+| Case studies            | —                               | 🔶     | none                                        |
 
-**Nothing on this site is corroborated from outside it.** For a single-trade local business the
-Business Profile is the highest-leverage missing asset — it drives the map pack, it is where reviews
-live, and it is the entity anchor that makes `sameAs` meaningful. This is an owner action, not a code
-task.
+**As of 2026-09-05 one thing off this site corroborates the entity.** The owner supplied a Google
+Business Profile and `schema.sameAs` now points at it. For a single-trade local business that is the
+highest-leverage asset there is: it drives the map pack, it is where reviews will live, and it is what
+makes `sameAs` mean anything.
+
+**It licenses no new claim on the page.** Nobody here has read the profile's own contents — phone,
+website link, categories, service areas, hours, review count are all still unverified (§B.4), and a
+rating still may not be published without a source.
 
 **`Review` and `AggregateRating` must never ship without a verifiable public source URL.** Not as
 sample data, not "to test the markup". The export emits zero of both in _schema_ — which is why both
@@ -158,6 +163,55 @@ would still need a human to notice it — which is what §G exists for.
 (`main.css:1788`), so dropping the 5th tile would otherwise make the 4th photo jump into the middle
 of the grid.
 
+### B.4 The Business Profile — SUPPLIED 2026-09-05
+
+The owner supplied `https://maps.app.goo.gl/uV3rFPQDsYP1cZ4X9`. It resolves (302) to a public Google
+Maps place page for **שלושה מנעולנים**, so the profile exists and is publicly reachable.
+
+**What we publish, and where.** The roster manifest's `schema.sameAs` carries the resolved,
+non-redirecting form — Google's own server resolves it to the place, and it carries the feature id in
+the URL rather than hiding it behind a shortener:
+
+```
+https://www.google.com/maps/place/%D7%A9%D7%9C%D7%95%D7%A9%D7%94+%D7%9E%D7%A0%D7%A2%D7%95%D7%9C%D7%A0%D7%99%D7%9D/data=!4m2!3m1!1s0x8bea25d577ac0a5:0xdb88c9f20e72c98b
+```
+
+roster → `site.config.json` → `localBusinessSchema()` → `sameAs` on the 99 enriched pages.
+
+| Signal              | Value                                                                   |
+| ------------------- | ----------------------------------------------------------------------- |
+| Profile name        | `שלושה מנעולנים` — exact match for manifest `brandName`                 |
+| Feature id (FID)    | `0x8bea25d577ac0a5:0xdb88c9f20e72c98b`                                  |
+| CID (decimal)       | `15819115732600539531`                                                  |
+| Knowledge-graph mid | `/g/11nvt22jhs`                                                         |
+| Map pin             | `32.231112, 34.797214` at zoom 9 — a wide centroid, ~3 km off the coast |
+
+**Read the pin correctly.** A centroid in the sea at zoom 9, with no address anywhere in the place
+URL, is what Google serves for a **service-area business with a hidden address**. That is consistent
+with §C.1 and with a mobile locksmith — but it is an inference drawn from a URL, not a fact. Do not
+promote it into a row above.
+
+**The profile's contents cannot be read from here** — Maps renders them in JavaScript, so a fetch
+returns the app shell and nothing else. Every row below is an owner check in the Business Profile
+dashboard, and each is a live NAP-consistency risk until confirmed:
+
+| Check on the profile | Must be                                                                   |
+| -------------------- | ------------------------------------------------------------------------- |
+| Phone                | `076-599-1266` — a different number there splits the NAP four ways (§C.5) |
+| Website              | `https://3locksmiths.co.il/` — apex, trailing slash                       |
+| Business name        | `שלושה מנעולנים` exactly — no city and no keyword suffix appended         |
+| Primary category     | מנעולן; car-key work as a secondary category, not the primary             |
+| Service areas        | the 23 cities we publish across 25 pages — **not** the 7 withdrawn (§E.1) |
+| Hours                | 24/7, or the profile contradicts the schema we ship on every page (§D.3)  |
+| Address              | shown or hidden? If shown, is it דרך שרה 25/2 — and in which city? (§C.1) |
+| Reviews              | how many, and at what rating                                              |
+
+**A profile does not unblock a rating.** `Review` and `AggregateRating` stay forbidden until there is
+a real count with a verifiable public source. The move is to earn reviews on the profile — not to
+mirror a number onto the site.
+
+---
+
 ## C. Contact & NAP
 
 | Fact               | Value                                                      | Status | Source                                                                  |
@@ -186,8 +240,10 @@ of the grid.
 ### C.1b The manifest has no address field
 
 `roster/sites/3locksmiths.json` `schema` carries `type`, `priceRange`, `areaServed` and `sameAs` —
-**no `address`**. No page renders one. For a `Locksmith` node this is the largest local-SEO gap after
-the missing Business Profile, and it is blocked on the owner: a mobile-only locksmith may legitimately
+**no `address`**. No page renders one. For a `Locksmith` node this is now the largest local-SEO gap
+left — the Business Profile it used to sit behind arrived 2026-09-05 (§B.4), and that profile is also
+where the answer is: whatever it shows (or hides) is what the site should say. It is blocked on the
+owner: a mobile-only locksmith may legitimately
 have no public premises, in which case the correct answer is a service-area business on the Business
 Profile side, not an invented address.
 

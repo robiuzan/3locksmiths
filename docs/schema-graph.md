@@ -85,7 +85,7 @@ three fields are wrong:**
 | `areaServed`   | 23 `City` nodes, derived             | `areaServed: null`       | tracks routes; קריות still mistyped |
 | `openingHours` | Sun–Fri 08:00–18:00, Sat 08:00–17:00 | —                        | ⚠️ contradicts the "24/7" title     |
 | `foundingDate` | absent                               | `foundedYear: null`      | correct — do not infer it           |
-| `sameAs`       | absent                               | `[]`                     | correct — blocked on owner          |
+| `sameAs`       | 1 Business Profile URL               | same                     | ✅ live 2026-09-05 — facts §B.4     |
 
 **Fix direction:** `localBusinessSchema()` should read from `site.config.json` (already imported by
 `app/layout.tsx` as the manifest) rather than carrying its own literals. Values themselves change in

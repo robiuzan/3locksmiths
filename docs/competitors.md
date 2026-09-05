@@ -16,8 +16,9 @@ Owned by the `competitor-analyst` agent.
 Structural facts about the market, not claims about specific competitors:
 
 - **The map pack dominates.** For `מנעולן <city>` and `מנעולן קרוב אליי`, the local pack sits above
-  the organic results. Winning it is a Google Business Profile game, not an on-page one — which is
-  why the missing GBP (`docs/business-facts.md` §B) is the critical path, not a content task.
+  the organic results. Winning it is a Google Business Profile game, not an on-page one. A profile
+  exists as of 2026-09-05 (`docs/business-facts.md` §B.4); reviews on it are now the critical path,
+  and neither is a content task.
 - **Lead aggregators occupy the head terms.** Directory and lead-gen sites typically outrank
   individual tradespeople for bare `מנעולן`. Competing head-on there is expensive; the winnable
   ground is specificity — brand-key, model-level and emergency long-tail.
@@ -47,13 +48,13 @@ Confirmed by inspection of our own export, not by comparison:
 
 ## 3. Where this site is behind
 
-| Gap                   | Consequence                                                 |
-| --------------------- | ----------------------------------------------------------- |
-| No Business Profile   | invisible in the map pack — the largest single disadvantage |
-| Zero reviews          | loses the pack and loses the click even when ranked         |
-| No emergency coverage | absent from the highest-intent half of the market           |
-| No editorial content  | no topical-authority signal, no AEO citations               |
-| AI crawlers blocked   | cannot be cited by any assistant (backlog §6.1)             |
+| Gap                   | Consequence                                                   |
+| --------------------- | ------------------------------------------------------------- |
+| Unaudited GBP         | in the pack since 2026-09-05, but its contents are unverified |
+| Zero reviews          | loses the pack and loses the click even when ranked           |
+| No emergency coverage | absent from the highest-intent half of the market             |
+| No editorial content  | no topical-authority signal, no AEO citations                 |
+| AI crawlers blocked   | cannot be cited by any assistant (backlog §6.1)               |
 
 ---
 

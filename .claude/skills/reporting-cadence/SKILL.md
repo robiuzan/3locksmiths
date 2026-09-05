@@ -25,7 +25,7 @@ comparing "not measured" to "measured", not "worse" to "better". Say so rather t
 | Impressions, clicks, CTR, position | Search Console     | ✅ once verified + sitemap submitted |
 | Indexed page count                 | Search Console     | ✅                                   |
 | Core Web Vitals (field)            | Search Console     | 🟡 needs traffic volume              |
-| Map pack performance               | Business Profile   | 🔴 **no profile exists**             |
+| Map pack performance               | Business Profile   | 🟡 profile live 2026-09-05, unread   |
 | Reviews                            | Business Profile   | 🔴 **zero**                          |
 | AI citations                       | manual             | 🔴 all crawlers blocked (§6.1)       |
 
@@ -65,7 +65,7 @@ curl -o /dev/null -s -w '%{http_code}\n' https://3locksmiths.co.il/thank-you/
    | links, footer, nav        | `ia-navigation-architect` |
    | keywords, coverage        | `keyword-strategist`      |
 
-5. **Business Profile** (once it exists): views, calls, direction requests, new reviews.
+5. **Business Profile** (live since 2026-09-05): views, calls, direction requests, new reviews.
 6. **Update the docs.** `docs/content-calendar.md` status keys, `docs/competitors.md` observations.
 
 ## Quarterly
@@ -102,6 +102,6 @@ noise makes the next signal harder to read.
 ## What good looks like, in order
 
 1. **Leads attributable to a page and a surface** — now possible for the first time.
-2. Business Profile live with a growing review count — the biggest lever, still blocked.
+2. Business Profile live (2026-09-05) with a growing review count — the reviews half is still open.
 3. Emergency and guide clusters ranking (`docs/content-calendar.md` Batches 1–2).
 4. AI assistants citing the site — blocked until the crawler policy changes.

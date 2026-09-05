@@ -33,7 +33,8 @@ verified 2026-08-16. Where a finding says "live", it was confirmed with `curl` a
 > every authored surface; after page 95 was authored (2026-08-24) the claim survives **only** in
 > the homepage's original scraped WordPress body (id 7). §12.1 is
 > **done** (2026-08-23): local publisher and `public/CNAME` removed, and `robiuzan.github.io` now
-> serves a redirect to production (user-site repos cannot have Pages disabled); repo re-archived. **DEPLOYED to production 2026-08-24** and verified live: 0 dead
+> serves a redirect to production (user-site repos cannot have Pages disabled); repo re-archived.
+> The **Pages domain claim** on the source repo was a separate half, missed until 2026-09-05 — see §12.1. **DEPLOYED to production 2026-08-24** and verified live: 0 dead
 > tel links, 0 personal-email occurrences, 3/3 homepage JSON-LD blocks parse, GTM in `<head>`,
 > sticky CTA bar on every route, `/thank-you/` returning 200. Per-item notes below are kept as written for history; trust
 > this note and the CI checks for current state.
@@ -46,7 +47,7 @@ verified 2026-08-16. Where a finding says "live", it was confirmed with `curl` a
 | 2   | On-page SEO     | 🟢    | fixed 2026-08-17/24; only 4 over-length titles remain (§2.2)     |
 | 3   | Content depth   | 🟢    | 57 authored; guides hub + 3 guides shipped 2026-08-25            |
 | 4   | Structured data | 🟢    | all real pages carry schema 2026-08-25; §4.5 area type open      |
-| 5   | Local SEO       | 🔴    | no Business Profile, sameAs empty; address exists but Latin-only |
+| 5   | Local SEO       | 🔴    | Profile live + linked 2026-09-05; address exists but Latin-only  |
 | 6   | AEO / GEO       | 🔴    | crawlers blocked at edge; guides now exist to be cited when open |
 | 7   | E-E-A-T & trust | 🔴    | zero social proof; 25-years claim removed from authored copy     |
 | 8   | Conversion      | 🟢    | form fixed 2026-08-25: validation, phone field, consent, RTL     |
@@ -245,10 +246,14 @@ It may be legitimate — a mobile-only locksmith may have no public premises, in
 answer is a service-area business on the Google side, not an invented address. **Never invent one.**
 Resolve in `docs/business-facts.md` §C.1 first.
 
-**5.2 🔴 No Google Business Profile link.** `schema.sameAs` is `[]`. For a single-trade local business
-the Business Profile outranks almost everything else on-page: it drives the map pack, it is where
-reviews live, and it is the entity anchor that makes `sameAs` meaningful. Owner action, not a code
-task.
+**5.2 ✅ Google Business Profile — supplied and linked 2026-09-05.** `schema.sameAs` now carries the
+profile URL, so the `LocalBusiness` node on all 99 enriched pages points at an external anchor for the
+first time. For a single-trade local business the profile outranks almost everything else on-page: it
+drives the map pack, it is where reviews live, and it is what makes `sameAs` meaningful.
+
+**What remains is not a code task.** The profile's contents are unverified from here — phone, website
+link, categories, service areas, hours and review count are all owner checks, listed as a table in
+`docs/business-facts.md` §B.4. A profile whose phone disagrees with the site is worse than none.
 
 **5.3 NAP is internally inconsistent.** Three phone spellings in `tel:` hrefs (§8.1) plus a fourth in
 the schema (`+972-55-6601006`). One number, four strings.
@@ -296,8 +301,10 @@ scene-sets before answering. Tightening it across the 53 modules is cheap and hi
 CSS, not conditional rendering), and the `specsTable` blocks are real `<table>` markup at first paint.
 Preserve both properties.
 
-**6.4 Entity corroboration is zero.** `sameAs: []` — nothing off-site resolves this business. An
-assistant has no second source to confirm the entity against. Same blocker as §5.2.
+**6.4 Entity corroboration is one link deep.** Since 2026-09-05 `sameAs` carries the Google Business
+Profile (§5.2), so an assistant has exactly one off-site source to resolve this business against.
+That is the difference between zero and one, not between one and enough: no directory citation, no
+social profile, no press mention, and no reviews an assistant can read.
 
 **6.5 No freshness or authorship signals.** No `datePublished`, no `dateModified`, no author on any
 page.
@@ -322,7 +329,9 @@ the `LocalBusiness` node emits no `foundingDate`. The claim appears in the homep
 sitewide reach. `docs/business-facts.md` §A.1.
 
 **7.2 🔴 Zero social proof.** No reviews, no ratings, no testimonials, no case studies, no component
-and no data for any of them. `sameAs: []`. Nothing on this site is corroborated from outside it.
+and no data for any of them. The Business Profile linked from `sameAs` since 2026-09-05 is the venue
+where this gets fixed — reviews earned there are the only social proof that can ever ship here, since
+none may be published without a verifiable public source (`docs/business-facts.md` §B).
 
 **7.3 No named human.** No owner, founder or technician is named anywhere. Nobody is accountable on
 the page.
@@ -580,7 +589,20 @@ inaccurate — in either direction — must be flagged.
 
 ## §12 Security — 🔴
 
-**12.1 🔴 A stale second origin is live.** `https://robiuzan.github.io/` returns **200** with
+**12.1 ✅ done 2026-09-05 — the stale origin AND its domain claim are both gone.** The origin
+half shipped 2026-08-23 (redirect + `public/CNAME` removed + repo archived). The claim half was
+missed for a month: `robiuzan/3locksmiths` still had Pages enabled with `cname: 3locksmiths.co.il`
+held in its Pages **settings**, which no file deletion can reach, its ACME cert stuck in
+`bad_authz`. All six fleet repos were the same. Released with
+`gh api -X DELETE repos/robiuzan/<repo>/pages`; verified `has_pages: false`, Pages API 404, and all
+six production domains still 200 from Cloudflare. DNS never pointed at GitHub (no
+`185.199.108–111.153`), so there was no live duplicate-content or takeover exposure — only a
+reusable path back to one. **Lesson: a Pages custom domain is released by deleting the Pages site,
+not by deleting a CNAME file.**
+
+Original finding:
+
+**A stale second origin is live.** `https://robiuzan.github.io/` returns **200** with
 `Server: GitHub.com` and serves this site's content from an older build — its homepage `<title>` is
 the pre-fix bare `שלושה מנעולנים`, while production serves the enriched title. Two live origins
 serving the same site is a duplicate-content and brand risk.
@@ -683,7 +705,7 @@ Done 2026-08-17 (in the working tree; deploy to make live): ~~§4.2~~ · ~~§8.1
 §12.1 (local half).
 
 1. **Deploy** the 2026-08-17 batch — nothing above is live until it ships. `/deploy-3locksmiths`.
-2. ~~**§12.1**~~ done 2026-08-23 — `robiuzan.github.io` redirects to production.
+2. ~~**§12.1**~~ done 2026-08-23 (origin) + 2026-09-05 (Pages domain claim on all six fleet repos).
 3. **§3.2** author `content/enriched/95.mjs` — also removes the last scraped-body 25-years claim
    on that page.
 4. **§2.2/§2.3** remaining title lengths and the missing description on page 95.

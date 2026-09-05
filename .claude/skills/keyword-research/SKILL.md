@@ -58,8 +58,8 @@ For every candidate cluster, answer all five:
 2. **Can we serve it truthfully?** Capability, coverage, availability. Any doubt → 🔶 to
    `docs/business-facts.md`, and it does not ship until answered.
 3. **Does a page already exist that could absorb it?** Usually yes. Prefer depth.
-4. **Is it winnable?** Pack-dominated queries are won with a Business Profile and reviews, which the
-   site does not have. Aggregator-held head terms are expensive. Long-tail specificity is winnable.
+4. **Is it winnable?** Pack-dominated queries are won with a Business Profile and reviews. A profile
+   exists since 2026-09-05; reviews are still zero, so pack queries stay out of reach. Aggregator-held head terms are expensive. Long-tail specificity is winnable.
    See `competitor-analyst` — and **do not invent a difficulty score**.
 5. **What does it unlock?** A guide that feeds five service pages beats a page that stands alone.
 
