@@ -467,6 +467,15 @@ exclusions**. Do not state a term. Do not let "אחריות מלאה" be read as
 > The claim is only as good as the confirmation behind it, and it now appears in the schema, which
 > is what Google reads.
 
+**Independently corroborated 2026-09-05.** The Google Business Profile publishes `פתוח 24 שעות`,
+read cold from `/maps/preview/place` (§B.4). So the claim now rests on the owner's confirmation **and**
+on a public source any third party can check — the profile, the `openingHoursSpecification` we ship and
+the visible copy all say the same thing. That is as well-sourced as any claim on this site gets.
+
+⚠️ **CLAUDE.md §2 still lists "24/7" among the unsubstantiated claims, and still says the schema says
+08:00–18:00.** Both halves have been wrong since 2026-08-30. It is not corrected here because that
+file currently holds another session's uncommitted edit; whoever commits it next should fix that line.
+
 **The history is worth keeping**, because the defect was not "an unconfirmed claim" — it was a
 self-contradiction. Until 2026-08-25 every page published `openingHoursSpecification` 08:00–18:00
 (Sat 08:00–17:00) while the copy claimed 24/7, in the same HTML document, on the highest-value
