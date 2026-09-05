@@ -162,9 +162,14 @@ nothing at all (backlog §4.8).
 
 ## Missing fields and what blocks each
 
-`address`, `geo`, `hasMap`, `sameAs`, `foundingDate`, `founder`, `aggregateRating` — all blocked on
+`address`, `geo`, `hasMap`, `foundingDate`, `founder`, `aggregateRating` — all blocked on
 `docs/business-facts.md`. **Add the row; don't fill the value.** And they belong in the **roster
 manifest**, never in `site.config.json` directly.
+
+`sameAs` is **no longer blocked**: it carries one Google Business Profile URL as of 2026-09-05
+(`docs/business-facts.md` §B.4). Further URLs go in the roster manifest's `schema.sameAs`, then sync.
+`hasMap` is now sourceable from the same profile if anyone wants it, but `geo` is not — the pin
+Google serves is a service-area centroid, not premises.
 
 Note the manifest's `schema` block has **no `address` field at all**, so adding one is a manifest-schema
 change as well as a data question.

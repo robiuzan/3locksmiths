@@ -43,18 +43,18 @@ mostly done; the trust, measurement and reachability work has barely started.
 These gate the highest-value work and **only the owner can unblock them**. Everything else can proceed
 in parallel, but these determine the ceiling. Chase them first and chase them hard.
 
-| #   | Decision needed                                        | Unblocks                                     |
-| --- | ------------------------------------------------------ | -------------------------------------------- |
-| 1   | ✅ ~~Business Profile~~ — done 2026-09-05; audit it    | map pack, reviews, `sameAs`, entity identity |
-| 2   | **A review-collection process**                        | §7.2, `Review` schema, conversion rate       |
-| 3   | Founding year — or approval to drop "25+ שנים"         | §7.1, `foundingDate`, every trust card       |
-| 4   | Real opening hours — is it 24/7 or 08:00–18:00?        | §4.4, emergency positioning, schema          |
-| 5   | Address: real premises, or service-area business?      | §5.1, `LocalBusiness` completeness, GBP type |
-| 6   | Licence / insurance / ח.פ. — any verifiable credential | §7.4, the whole authority dimension          |
-| 7   | A named human + photo (owner or lead technician)       | §7.3, article authorship, AEO                |
-| 8   | Sign-off on the price ranges already published         | §7.6, `Offer` schema, pricing page           |
-| 9   | Cloudflare AI-crawler policy decision                  | **the entire AEO/GEO dimension** (§6.1)      |
-| 10  | ~~Correct business email~~ ✅ confirmed 2026-08-24     | §4.2 — done, see business-facts §C.3         |
+| #   | Decision needed                                                                  | Unblocks                                     |
+| --- | -------------------------------------------------------------------------------- | -------------------------------------------- |
+| 1   | 🔶 Business Profile — supplied 2026-09-05; is it CLAIMED and ownership-verified? | map pack, reviews, `sameAs`, entity identity |
+| 2   | **A review-collection process**                                                  | §7.2, `Review` schema, conversion rate       |
+| 3   | Founding year — or approval to drop "25+ שנים"                                   | §7.1, `foundingDate`, every trust card       |
+| 4   | Real opening hours — is it 24/7 or 08:00–18:00?                                  | §4.4, emergency positioning, schema          |
+| 5   | Address: real premises, or service-area business?                                | §5.1, `LocalBusiness` completeness, GBP type |
+| 6   | Licence / insurance / ח.פ. — any verifiable credential                           | §7.4, the whole authority dimension          |
+| 7   | A named human + photo (owner or lead technician)                                 | §7.3, article authorship, AEO                |
+| 8   | Sign-off on the price ranges already published                                   | §7.6, `Offer` schema, pricing page           |
+| 9   | Cloudflare AI-crawler policy decision                                            | **the entire AEO/GEO dimension** (§6.1)      |
+| 10  | ~~Correct business email~~ ✅ confirmed 2026-08-24                               | §4.2 — done, see business-facts §C.3         |
 
 Record every answer in `docs/business-facts.md`. **Nothing here gets invented in the meantime.**
 
@@ -108,9 +108,11 @@ this becomes measurable.
 
 This is the highest-leverage dimension for this site, and most of it is owner-blocked (§1 above).
 
-1. **Google Business Profile — live since 2026-09-05, contents unaudited.** Next: confirm it is fully
-   populated — categories, service areas, hours, phone, website link, photos — against the checklist
-   in `docs/business-facts.md` §B.4. For a local trade this outranks nearly all on-page work.
+1. **Google Business Profile — live since 2026-09-05; name, phone, website, category and hours
+   verified clean** (`docs/business-facts.md` §B.4). Three things are still open and only the
+   dashboard shows them: whether the listing is **claimed and ownership-verified**, whether the
+   **service areas** still list the 7 cities withdrawn 2026-09-02, and the **review count**. For a
+   local trade this outranks nearly all on-page work.
 2. **Review generation as a process, not a request.** A short SMS/WhatsApp with a direct review link,
    sent same-day after every completed job. Target the first 20 reviews, then keep the cadence.
    **Never** publish a `Review` or `AggregateRating` without a verifiable public source (§4.10).

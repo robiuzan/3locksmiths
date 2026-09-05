@@ -32,8 +32,9 @@ audit the gaps.
 
 1. **🔴 There is no address, anywhere.** The roster manifest's `schema` block carries `type`,
    `priceRange`, `areaServed` and `sameAs` — **no `address` field exists**. No page renders one; the
-   `LocalBusiness` node has none; the footer has none. For a `Locksmith` this is the largest structural
-   gap after the missing Business Profile (§5.1).
+   `LocalBusiness` node has none; the footer has none. For a `Locksmith` this is now the largest
+   structural gap on the schema side — the Business Profile it used to rank behind arrived 2026-09-05
+   (§5.1). That profile exposes no address either, which is itself evidence (§B.4).
    It may be legitimate — a mobile-only locksmith may have no public premises, in which case the right
    answer is a service-area business on the Google side. **Never invent an address.** Escalate to
    `docs/business-facts.md` §C.1.

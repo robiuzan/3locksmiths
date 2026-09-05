@@ -222,8 +222,10 @@ function faqSchema(data) {
  * `address` carries `addressCountry` only. docs/business-facts.md §C.1 records that no confirmed
  * street address exists and that inventing one is forbidden — but the country is a fact we can
  * source, and an address node with a country is better understood than no address node at all.
- * `sameAs` stays absent while the manifest's array is empty: an empty array is noise, not a
- * signal, and there is nothing to point it at until the owner has external profiles.
+ * `sameAs` is spread in only when the manifest's array is non-empty: an empty array is noise, not
+ * a signal. Since 2026-09-05 it carries the Google Business Profile (docs/business-facts.md §B.4),
+ * so the guard is what keeps the node clean if a future site has nothing to point at — not a
+ * statement that this one doesn't.
  */
 /**
  * The business image for JSON-LD.

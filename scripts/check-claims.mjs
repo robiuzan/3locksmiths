@@ -60,7 +60,7 @@ const BLOCKING = [
   {
     id: "customer-count",
     re: /אלפי לקוחות|מאות לקוחות|אלפי מפתחות/,
-    why: "no review corpus — a Business Profile exists but holds no reviews we can cite.",
+    why: "no citable review corpus — the profile's own count is unread (business-facts §B.4).",
   },
   {
     id: "ratings",

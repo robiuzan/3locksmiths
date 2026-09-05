@@ -26,7 +26,7 @@ comparing "not measured" to "measured", not "worse" to "better". Say so rather t
 | Indexed page count                 | Search Console     | ✅                                   |
 | Core Web Vitals (field)            | Search Console     | 🟡 needs traffic volume              |
 | Map pack performance               | Business Profile   | 🟡 profile live 2026-09-05, unread   |
-| Reviews                            | Business Profile   | 🔴 **zero**                          |
+| Reviews                            | Business Profile   | 🔶 count unread — §B.4               |
 | AI citations                       | manual             | 🔴 all crawlers blocked (§6.1)       |
 
 Two of the most important rows are red for the same reason: the owner-blocked critical path in

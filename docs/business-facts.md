@@ -82,7 +82,7 @@ guides (`scripts/enrich.mjs:132-137`). A fabricated byline is worse than an abse
 | Fact                    | Value                           | Status | Source                                      |
 | ----------------------- | ------------------------------- | ------ | ------------------------------------------- |
 | Google Business Profile | live, linked from `sameAs`      | ✅     | owner, 2026-09-05 — §B.4                    |
-| Reviews on the profile  | —                               | 🔶     | not readable from this machine — §B.4       |
+| Reviews on the profile  | —                               | 🔶     | no rating in the profile payload — §B.4     |
 | Review count / rating   | "Google rating 5.0 ★★★★★"       | ⛔     | see §B.1                                    |
 | Testimonials            | 3 named reviews on the homepage | ⛔     | see §B.2                                    |
 | Social profiles         | —                               | 🔶     | `sameAs` holds the profile and nothing else |
@@ -93,9 +93,12 @@ Business Profile and `schema.sameAs` now points at it. For a single-trade local 
 highest-leverage asset there is: it drives the map pack, it is where reviews will live, and it is what
 makes `sameAs` mean anything.
 
-**It licenses no new claim on the page.** Nobody here has read the profile's own contents — phone,
-website link, categories, service areas, hours, review count are all still unverified (§B.4), and a
-rating still may not be published without a source.
+**The NAP agrees.** Business name, phone, website, primary category and opening hours on the profile
+were read directly and all match what we publish (§B.4, verified 2026-09-05). Service areas, review
+count, and whether the listing is claimed and ownership-verified are still unknown.
+
+**None of that licenses a rating.** A review may not be published without a verifiable public source,
+however healthy the profile looks.
 
 **`Review` and `AggregateRating` must never ship without a verifiable public source URL.** Not as
 sample data, not "to test the markup". The export emits zero of both in _schema_ — which is why both
@@ -104,8 +107,9 @@ defects below went unnoticed for so long. Neither was in the structured data.
 ### B.1 The fabricated Google rating badge — REMOVED 2026-08-26
 
 The vendored gogo theme ships `assets/img/GoogleRating.png`: an image reading **"Google rating 5.0"**
-beside five filled stars. The scraped header placed it on **all 71 pages**. We hold zero reviews and
-have no Business Profile, so the badge asserted a rating that does not exist.
+beside five filled stars. The scraped header placed it on **all 71 pages**. At the time we held no
+citable reviews and no Business Profile, so the badge asserted a rating that did not exist. (A profile
+arrived 2026-09-05 — §B.4. It changes nothing here: we still hold no review we could cite.)
 
 **Why every previous audit missed it.** Every rating guard we had — `scripts/check-claims.mjs`, the
 schema auditor, the QA gate's "no `aggregateRating`" assertion — looks for `aggregateRating` or
@@ -191,20 +195,43 @@ URL, is what Google serves for a **service-area business with a hidden address**
 with §C.1 and with a mobile locksmith — but it is an inference drawn from a URL, not a fact. Do not
 promote it into a row above.
 
-**The profile's contents cannot be read from here** — Maps renders them in JavaScript, so a fetch
-returns the app shell and nothing else. Every row below is an owner check in the Business Profile
-dashboard, and each is a live NAP-consistency risk until confirmed:
+> ⚠️ **This section first said the profile's contents could not be read from here, and parked all
+> eight rows below on the owner. That was wrong, and an adversarial audit caught it the same day.**
+> The Maps _app shell_ renders in JavaScript, but its `<head>` carries a server-rendered preload to
+> `/maps/preview/place` — a path `google.com/robots.txt` allows — and that returns ~17.7 KB of JSON
+> with the profile's fields in it. Filing a confirmable fact as unconfirmable is the same class of
+> error as stating an unconfirmed one.
 
-| Check on the profile | Must be                                                                   |
-| -------------------- | ------------------------------------------------------------------------- |
-| Phone                | `076-599-1266` — a different number there splits the NAP four ways (§C.5) |
-| Website              | `https://3locksmiths.co.il/` — apex, trailing slash                       |
-| Business name        | `שלושה מנעולנים` exactly — no city and no keyword suffix appended         |
-| Primary category     | מנעולן; car-key work as a secondary category, not the primary             |
-| Service areas        | the 23 cities we publish across 25 pages — **not** the 7 withdrawn (§E.1) |
-| Hours                | 24/7, or the profile contradicts the schema we ship on every page (§D.3)  |
-| Address              | shown or hidden? If shown, is it דרך שרה 25/2 — and in which city? (§C.1) |
-| Reviews              | how many, and at what rating                                              |
+**How to read the profile, cold and cookieless** — no API key, no login:
+
+```bash
+UA="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/140.0 Safari/537.36"
+PLACE='https://www.google.com/maps/place/%D7%A9%D7%9C%D7%95%D7%A9%D7%94+%D7%9E%D7%A0%D7%A2%D7%95%D7%9C%D7%A0%D7%99%D7%9D/data=!4m2!3m1!1s0x8bea25d577ac0a5:0xdb88c9f20e72c98b'
+P=$(curl -s -A "$UA" "$PLACE" | grep -o '/maps/preview/place?[^"]*' | head -1 | sed 's/&amp;/\&/g')
+curl -s -A "$UA" "https://www.google.com$P"
+```
+
+It discriminates rather than echoing the request back: flip the last hex digit of the CID
+(`…c98b` → `…c98c`) and the same endpoint returns 3.4 KB containing none of the strings below.
+
+**Verified from the profile 2026-09-05 — the NAP agrees with ours on every readable field:**
+
+| Field         | The profile says                                       | Verdict                                            |
+| ------------- | ------------------------------------------------------ | -------------------------------------------------- |
+| Business name | `שלושה מנעולנים`                                       | ✅ exact match for manifest `brandName`            |
+| Phone         | `076-599-1266` · `+972 76-599-1266` · `tel:0765991266` | ✅ the 076 line, not the retired 055 (§C.5)        |
+| Website       | `https://3locksmiths.co.il/`                           | ✅ apex, trailing slash, no www and no query       |
+| Category      | `מנעולן` (secondary: `Service establishment`)          | ✅ locksmith is primary, as it should be           |
+| Hours         | `פתוח 24 שעות`                                         | ✅ agrees with the 00:00–23:59 spec we ship (§D.3) |
+
+**Still genuinely unknown — the endpoint does not carry these, so they stay owner checks:**
+
+| Open question      | Why it is still open                                                                                                                                     |
+| ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Service areas      | no city name and no service-area phrasing appears anywhere in the payload. The 7 cities withdrawn 2026-09-02 (§E.1) may still be listed. Dashboard only. |
+| Reviews            | no rating float and no `ביקורות` token in 17.7 KB. Consistent with none, but absence from this payload is weak evidence — stays 🔶.                      |
+| Claimed + verified | whether the owner has claimed the listing and passed ownership verification is not exposed. **A public place page is not proof of a claimed profile.**   |
+| Address            | none exposed — the only `ישראל` strings are the timezone name. Consistent with a hidden address, still an inference (§C.1).                              |
 
 **A profile does not unblock a rating.** `Review` and `AggregateRating` stay forbidden until there is
 a real count with a verifiable public source. The move is to earn reviews on the profile — not to
@@ -464,12 +491,12 @@ They are hedged and remain 🔶 — but see D.4 for the version that was not hed
 every page which does not author its own `stats`. It asserted, as a four-item metrics strip
 captioned "למה אנחנו **במספרים**":
 
-| Rendered claim                 | Pages | Status                                             |
-| ------------------------------ | ----- | -------------------------------------------------- |
-| `25+ שנות ניסיון במנעולנות`    | 61    | ⛔ manifest `foundedYear` is `null`                |
-| `30–60 ד׳ זמן מענה ממוצע`      | 60    | ⛔ an unhedged averaged response-time promise      |
-| `100% אחריות מלאה על כל עבודה` | 62    | 🔶 no term, no scope                               |
-| `אלפי לקוחות מרוצים`           | 59    | ⛔ zero reviews, `sameAs: []` — no possible source |
+| Rendered claim                 | Pages | Status                                           |
+| ------------------------------ | ----- | ------------------------------------------------ |
+| `25+ שנות ניסיון במנעולנות`    | 61    | ⛔ manifest `foundedYear` is `null`              |
+| `30–60 ד׳ זמן מענה ממוצע`      | 60    | ⛔ an unhedged averaged response-time promise    |
+| `100% אחריות מלאה על כל עבודה` | 62    | 🔶 no term, no scope                             |
+| `אלפי לקוחות מרוצים`           | 59    | ⛔ no citable review corpus — no possible source |
 
 `DEFAULT_FEATURES` added `7 ימים בשבוע` and a second warranty assertion on the same pages.
 

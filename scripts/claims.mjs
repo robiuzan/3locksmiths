@@ -16,8 +16,10 @@
  *
  * §rating — 2026-08-26. The vendored gogo theme ships `assets/img/GoogleRating.png`, which
  * renders the words "Google rating 5.0" beside five filled stars. The scraped header placed it
- * on ALL 71 pages. docs/business-facts.md §B records zero collected reviews, no Business Profile
- * and an empty `sameAs` — so the badge asserted a rating that does not exist.
+ * on ALL 71 pages. docs/business-facts.md §B recorded no collected reviews, no Business Profile
+ * and an empty `sameAs` — so the badge asserted a rating that did not exist. A profile arrived
+ * 2026-09-05 (§B.4) and `sameAs` now points at it; we still hold no citable review, so the rewrite
+ * stands unchanged.
  *
  * It survived every previous audit because every rating guard we had looks for `aggregateRating`
  * or `reviewCount` in MARKUP. This claim was baked into a PNG, where no schema validator and no
