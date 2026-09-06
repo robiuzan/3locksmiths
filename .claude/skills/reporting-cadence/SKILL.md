@@ -54,18 +54,22 @@ curl -o /dev/null -s -w '%{http_code}\n' https://3locksmiths.co.il/thank-you/
 3. **New/lost pages** in the index.
 4. **Auditor sweep** — run against a **fresh** `out/`:
 
-   | Changed                   | Run                       |
-   | ------------------------- | ------------------------- |
-   | metadata, routes, sitemap | `seo-auditor`             |
-   | JSON-LD                   | `schema-auditor`          |
-   | copy, claims, pricing     | `eeat-trust-auditor`      |
-   | components, images, CSS   | `perf-a11y-auditor`       |
-   | headers, form, deps       | `security-auditor`        |
-   | locations, NAP, coverage  | `local-seo-strategist`    |
-   | links, footer, nav        | `ia-navigation-architect` |
-   | keywords, coverage        | `keyword-strategist`      |
+   | Changed                     | Run                         |
+   | --------------------------- | --------------------------- |
+   | metadata, routes, sitemap   | `seo-auditor`               |
+   | JSON-LD                     | `schema-auditor`            |
+   | copy, claims, pricing       | `eeat-trust-auditor`        |
+   | components, images, CSS     | `perf-a11y-auditor`         |
+   | headers, form, deps         | `security-auditor`          |
+   | locations, NAP, coverage    | `local-seo-strategist`      |
+   | links, footer, nav          | `ia-navigation-architect`   |
+   | keywords, coverage          | `keyword-strategist`        |
+   | reviews, profile, citations | `local-presence-strategist` |
 
 5. **Business Profile** (live since 2026-09-05): views, calls, direction requests, new reviews.
+   Owned by `local-presence-strategist`, which reads the count rather than estimating it and appends
+   it to `docs/local-presence.md`. **Direction requests will read ~0** for a hidden-address
+   service-area business — that is correct, not a failure.
 6. **Update the docs.** `docs/content-calendar.md` status keys, `docs/competitors.md` observations.
 
 ## Quarterly

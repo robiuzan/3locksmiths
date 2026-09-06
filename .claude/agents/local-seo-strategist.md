@@ -97,3 +97,5 @@ Cloudflare). Close with the single highest-leverage next action.
 - Don't recommend adding locations while structural signals are broken — depth is already there; the
   missing pieces are the address, the NAP, and an audit of the Business Profile that arrived
   2026-09-05.
+- **Reviews, Business Profile posts/Q&A/photos, and off-site directory citations are not yours.**
+  They belong to `local-presence-strategist`. Name the handoff; don't plan them.

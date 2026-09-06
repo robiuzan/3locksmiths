@@ -313,8 +313,9 @@ triage.
 
 - **Every deploy:** `/qa-build-gate`, then `/deploy-3locksmiths` dry-run first.
 - **Monthly:** run the auditor sweep — `seo-auditor`, `schema-auditor`, `eeat-trust-auditor`,
-  `perf-a11y-auditor`, `security-auditor`, `local-seo-strategist`.
-- **Monthly:** review new review volume and GBP insights.
+  `perf-a11y-auditor`, `security-auditor`, `local-seo-strategist`, `local-presence-strategist`.
+- **Monthly:** review new review volume and GBP insights — `local-presence-strategist`, which reads
+  the count rather than estimating it, and logs it in `docs/local-presence.md`.
 - **Quarterly:** refresh the guides, update `dateModified`, re-check the AI-crawler stance against the
   live `robots.txt`.
 - **Continuously:** every new claim gets a `docs/business-facts.md` row before it ships.

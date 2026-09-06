@@ -80,6 +80,10 @@ zero reviews is nothing to cite.
 If further profiles appear (social, directories): URLs go in the **roster manifest** `schema.sameAs`,
 then `ops/sync-manifest.ps1`, then `npm run enrich`. Never into `site.config.json` directly.
 
+**Earning the reviews, running the profile as a channel, and building off-site citations are not this
+skill's.** This skill ends at the site boundary. Past it, see the `local-presence-strategist` agent
+and its ledger at `docs/local-presence.md`.
+
 ## 4. Hebrew grammar and area typing
 
 Location copy is **written per page**, not interpolated from a `ב${city}` template — which is why it
