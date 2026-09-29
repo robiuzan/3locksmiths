@@ -102,8 +102,10 @@ Applied to **every page unconditionally**, deliberately overriding the source Wo
 `noindex, nofollow` per the owner's decision. Consequences:
 
 - Per-page `seo.robots` values in the snapshot are **inert**. Never report one as the live directive.
-- There is currently **no way to `noindex` a single route** without changing this mapper. If the four
-  `/step/` fragments should be non-indexable (backlog §1.5), that is the code change required.
+- The one exception is applied **after** this mapper, in `app/[...slug]/page.tsx`: the four `/step/`
+  calculator fragments get `noindex, follow` via `isFunnelStep()` in `lib/content.ts` (since
+  2026-09-29, backlog §1.5). A robots value set inside `buildMetadata` would be overwritten; a new
+  per-route exception belongs beside that one.
 
 And separately: `app/robots.ts` is **not what serves**. Cloudflare prepends a managed block at the
 edge blocking every major AI crawler. See `/aeo-answer-content`.

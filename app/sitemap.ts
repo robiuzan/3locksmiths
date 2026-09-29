@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { getSite } from "@/lib/content";
+import { getSite, isFunnelStep } from "@/lib/content";
 import rawLastmod from "@/content/lastmod.json";
 
 export const dynamic = "force-static";
@@ -25,10 +25,9 @@ const lastmod = rawLastmod as unknown as Record<
 // live — do not spend effort tuning them.
 export default function sitemap(): MetadataRoute.Sitemap {
   const { pages } = getSite();
-  const excluded = (path: string) => path.startsWith("/step/");
 
   return pages
-    .filter((p) => p.seo?.canonical && !excluded(p.path))
+    .filter((p) => p.seo?.canonical && !isFunnelStep(p.path))
     .map((p) => {
       const isContent =
         p.path.startsWith("/services/") || p.path.startsWith("/locations/");

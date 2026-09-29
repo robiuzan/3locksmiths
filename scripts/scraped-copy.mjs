@@ -77,6 +77,15 @@ const REWRITES = [
     from: "שירותי מנעולנות רכב מתקדמים לכל סוגי הרכבים, זמינות מהירה וטכנולוגיה חדשנית.",
     to: "שכפול וקידוד מפתחות, פתיחת רכב נעול והחלפת מנעולים – הכל בשטח אצלכם, במחיר שנמסר מראש.",
   },
+
+  // --- §8 Hebrew punctuation in scraped labels ---
+  // The homepage brand grid's Peugeot card is scraped with an ASCII apostrophe. CLAUDE.md §8
+  // requires the geresh, and check-typography.mjs only sees authored modules, not scraped HTML.
+  {
+    id: "home-brand-card-peugeot",
+    from: "שכפול מפתח פיג'ו",
+    to: "שכפול מפתח פיג׳ו",
+  },
 ];
 
 /**

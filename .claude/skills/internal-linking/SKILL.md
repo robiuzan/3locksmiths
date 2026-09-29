@@ -53,6 +53,13 @@ Two rules:
 - **Location adjacency is bidirectional.** If תל אביב lists רמת גן, רמת גן must list תל אביב. A
   one-way edge is a modelling error, and here it has to be maintained by hand across two modules.
 
+A module that **omits** `related` gets a derived default from `scripts/build-manifest.mjs`: since
+2026-09-29 a rotating "next 5 siblings" window (so no brand or city is starved, as the old
+first-5 window starved 27 brands and all 10 newer cities), the car-keypad cluster linking its own
+hub, and the priority emergency services — never the `/services/` half of a duplicate-intent pair.
+That default is still array order, so it is a floor, not the rules above: author `related` when
+topic or adjacency matters.
+
 ## 3. The biggest missing edge: service ↔ location
 
 No service page links contextually into the city set, and the 24 brand-key pages don't reach the 17

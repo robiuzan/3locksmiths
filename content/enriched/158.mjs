@@ -328,10 +328,13 @@ export default {
         label: "שכפול מפתח לרכב",
         href: "/services/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%9c%d7%a8%d7%9b%d7%91/",
       },
-      { label: "מנעולן רכב", href: "/services/%d7%9e%d7%a0%d7%a2%d7%95%d7%9c%d7%9f-%d7%a8%d7%9b%d7%91/" },
       {
-        label: "מנעולן לבית",
-        href: "/services/%d7%9e%d7%a0%d7%a2%d7%95%d7%9c%d7%9f-%d7%9c%d7%91%d7%99%d7%aa/",
+        label: "פתיחת רכב נעול",
+        href: "/services/%d7%a4%d7%aa%d7%99%d7%97%d7%aa-%d7%a8%d7%9b%d7%91-%d7%a0%d7%a2%d7%95%d7%9c/",
+      },
+      {
+        label: "פתיחת דלת נעולה",
+        href: "/services/%d7%a4%d7%aa%d7%99%d7%97%d7%aa-%d7%93%d7%9c%d7%aa-%d7%a0%d7%a2%d7%95%d7%9c%d7%94/",
       },
       {
         label: "שחזור מפתח לרכב",
@@ -393,6 +396,10 @@ export default {
     {
       label: "שכפול מפתח בגבעתיים",
       href: "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%92%d7%91%d7%a2%d7%aa%d7%99%d7%99%d7%9d/",
+    },
+    {
+      label: "שכפול מפתח ברמת השרון",
+      href: "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%a8%d7%9e%d7%aa-%d7%94%d7%a9%d7%a8%d7%95%d7%9f/",
     },
   ],
   cta: {

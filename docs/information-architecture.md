@@ -101,7 +101,7 @@ exists in the scraped markup).
 ├── /מדריכים/            (planned)   hub  → guides
 ├── /מחירון/                         pricing — the magnet for every "כמה עולה" query
 ├── /אודותינו/  /contact/            trust
-└── /step/…                          calculator funnel (noindex candidate, §1.5)
+└── /step/…                          calculator funnel (noindex, follow — §1.5)
 ```
 
 ### 3.1 Cross-silo edges — the largest missing piece

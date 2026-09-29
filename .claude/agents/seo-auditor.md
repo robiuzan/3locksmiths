@@ -25,7 +25,8 @@ Two consequences:
   have. A doubled brand here means the authored title literally contains it twice.
 - `md.robots` is **forced to `{ index: true, follow: true }`** on every page, deliberately overriding
   the source WordPress `noindex` (`lib/content.ts:99`). So per-page robots directives in the snapshot
-  are inert — do not report them as live.
+  are inert — do not report them as live. Exception: `app/[...slug]/page.tsx` serves the four
+  `/step/` calculator fragments `noindex, follow` (`isFunnelStep()`, since 2026-09-29).
 
 ## Inputs you rely on
 

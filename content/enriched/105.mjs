@@ -176,6 +176,46 @@ export default {
       label: "שכפול מפתחות ברעננה",
       href: "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97%d7%95%d7%aa-%d7%a8%d7%a2%d7%a0%d7%a0%d7%94/",
     },
+    {
+      label: "שכפול מפתח באשדוד",
+      href: "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%90%d7%a9%d7%93%d7%95%d7%93/",
+    },
+    {
+      label: "שכפול מפתח בהרצליה",
+      href: "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%94%d7%a8%d7%a6%d7%9c%d7%99%d7%94/",
+    },
+    {
+      label: "שכפול מפתח ברחובות",
+      href: "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%a8%d7%97%d7%95%d7%91%d7%95%d7%aa/",
+    },
+    {
+      label: "שכפול מפתח בבני ברק",
+      href: "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%91%d7%a0%d7%99-%d7%91%d7%a8%d7%a7/",
+    },
+    {
+      label: "שכפול מפתח במודיעין",
+      href: "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%9e%d7%95%d7%93%d7%99%d7%a2%d7%99%d7%9f/",
+    },
+    {
+      label: "שכפול מפתח ברמת השרון",
+      href: "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%a8%d7%9e%d7%aa-%d7%94%d7%a9%d7%a8%d7%95%d7%9f/",
+    },
+    {
+      label: "שכפול מפתח בהוד השרון",
+      href: "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%94%d7%95%d7%93-%d7%94%d7%a9%d7%a8%d7%95%d7%9f/",
+    },
+    {
+      label: "שכפול מפתח בלוד",
+      href: "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%9c%d7%95%d7%93/",
+    },
+    {
+      label: "שכפול מפתח בנס ציונה",
+      href: "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%a0%d7%a1-%d7%a6%d7%99%d7%95%d7%a0%d7%94/",
+    },
+    {
+      label: "שכפול מפתח בראש העין",
+      href: "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%a8%d7%90%d7%a9-%d7%94%d7%a2%d7%99%d7%9f/",
+    },
   ],
   guides: [
     {
@@ -395,10 +435,13 @@ export default {
   },
   related: {
     services: [
-      { label: "מנעולן רכב", href: "/services/%d7%9e%d7%a0%d7%a2%d7%95%d7%9c%d7%9f-%d7%a8%d7%9b%d7%91/" },
       {
-        label: "מנעולן לבית",
-        href: "/services/%d7%9e%d7%a0%d7%a2%d7%95%d7%9c%d7%9f-%d7%9c%d7%91%d7%99%d7%aa/",
+        label: "פתיחת רכב נעול",
+        href: "/services/%d7%a4%d7%aa%d7%99%d7%97%d7%aa-%d7%a8%d7%9b%d7%91-%d7%a0%d7%a2%d7%95%d7%9c/",
+      },
+      {
+        label: "פתיחת דלת נעולה",
+        href: "/services/%d7%a4%d7%aa%d7%99%d7%97%d7%aa-%d7%93%d7%9c%d7%aa-%d7%a0%d7%a2%d7%95%d7%9c%d7%94/",
       },
       {
         label: "שחזור מפתח לרכב",
@@ -470,6 +513,46 @@ export default {
       {
         label: "שכפול מפתחות ברעננה",
         href: "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97%d7%95%d7%aa-%d7%a8%d7%a2%d7%a0%d7%a0%d7%94/",
+      },
+      {
+        label: "שכפול מפתח באשדוד",
+        href: "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%90%d7%a9%d7%93%d7%95%d7%93/",
+      },
+      {
+        label: "שכפול מפתח בהרצליה",
+        href: "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%94%d7%a8%d7%a6%d7%9c%d7%99%d7%94/",
+      },
+      {
+        label: "שכפול מפתח ברחובות",
+        href: "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%a8%d7%97%d7%95%d7%91%d7%95%d7%aa/",
+      },
+      {
+        label: "שכפול מפתח בבני ברק",
+        href: "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%91%d7%a0%d7%99-%d7%91%d7%a8%d7%a7/",
+      },
+      {
+        label: "שכפול מפתח במודיעין",
+        href: "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%9e%d7%95%d7%93%d7%99%d7%a2%d7%99%d7%9f/",
+      },
+      {
+        label: "שכפול מפתח ברמת השרון",
+        href: "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%a8%d7%9e%d7%aa-%d7%94%d7%a9%d7%a8%d7%95%d7%9f/",
+      },
+      {
+        label: "שכפול מפתח בהוד השרון",
+        href: "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%94%d7%95%d7%93-%d7%94%d7%a9%d7%a8%d7%95%d7%9f/",
+      },
+      {
+        label: "שכפול מפתח בלוד",
+        href: "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%9c%d7%95%d7%93/",
+      },
+      {
+        label: "שכפול מפתח בנס ציונה",
+        href: "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%a0%d7%a1-%d7%a6%d7%99%d7%95%d7%a0%d7%94/",
+      },
+      {
+        label: "שכפול מפתח בראש העין",
+        href: "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%a8%d7%90%d7%a9-%d7%94%d7%a2%d7%99%d7%9f/",
       },
     ],
   },

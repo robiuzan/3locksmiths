@@ -80,9 +80,10 @@ calculator fragments excluded. **No hand-maintained array anywhere** — better 
 reasonable. Adding a real per-page date would need a provenance source the snapshot doesn't carry —
 **do not stamp build time**; a date that changes every deploy is worth less than no date.
 
-**1.5 The `/step/` routes are indexable.** They are excluded from the sitemap but nothing stops a
-crawler reaching them, and they are 173–182 words. Decide deliberately: either `noindex` them via
-their `seo.robots`, or accept them as thin funnel pages. Do not pad them.
+**1.5 ✅ FIXED 2026-09-29 — the `/step/` routes were indexable.** They were excluded from the
+sitemap but nothing stopped a crawler reaching them, and they are 173–182 words. They now serve
+`noindex, follow` from `app/[...slug]/page.tsx` via `isFunnelStep()` in `lib/content.ts` — not via
+`seo.robots`, which `buildMetadata` overwrites on every page. Do not pad them.
 
 **1.6 `robots.txt` is not what serves.** `app/robots.ts` emits a blanket allow plus the sitemap.
 Cloudflare prepends a managed block at the edge that no repo change overrides. See §6.1.

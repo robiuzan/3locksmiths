@@ -448,10 +448,12 @@
       "path": "/%d7%9e%d7%a0%d7%a2%d7%95%d7%9c%d7%9f-%d7%a8%d7%9b%d7%91/",
       "canonical": "https://3locksmiths.co.il/%d7%9e%d7%a0%d7%a2%d7%95%d7%9c%d7%9f-%d7%a8%d7%9b%d7%91/",
       "relatedServices": [
-        93,
-        94,
+        9301,
+        9302,
+        9304,
+        9102,
         95,
-        96
+        93
       ],
       "relatedLocations": [
         137,
@@ -467,10 +469,12 @@
       "path": "/%d7%9e%d7%a0%d7%a2%d7%95%d7%9c%d7%9f-%d7%9c%d7%91%d7%99%d7%aa/",
       "canonical": "https://3locksmiths.co.il/%d7%9e%d7%a0%d7%a2%d7%95%d7%9c%d7%9f-%d7%9c%d7%91%d7%99%d7%aa/",
       "relatedServices": [
-        93,
-        94,
+        9301,
+        9302,
+        9304,
+        9102,
         95,
-        96
+        94
       ],
       "relatedLocations": [
         137,
@@ -486,10 +490,11 @@
       "path": "/%d7%90%d7%95%d7%93%d7%95%d7%aa%d7%99%d7%a0%d7%95/",
       "canonical": "https://3locksmiths.co.il/%d7%90%d7%95%d7%93%d7%95%d7%aa%d7%99%d7%a0%d7%95/",
       "relatedServices": [
-        93,
-        94,
-        95,
-        96
+        9301,
+        9302,
+        9304,
+        9102,
+        95
       ],
       "relatedLocations": [
         137,
@@ -505,10 +510,11 @@
       "path": "/%d7%9e%d7%97%d7%99%d7%a8%d7%95%d7%9f/",
       "canonical": "https://3locksmiths.co.il/%d7%9e%d7%97%d7%99%d7%a8%d7%95%d7%9f/",
       "relatedServices": [
-        93,
-        94,
-        95,
-        96
+        9301,
+        9302,
+        9304,
+        9102,
+        95
       ],
       "relatedLocations": [
         137,
@@ -524,11 +530,12 @@
       "path": "/services/%d7%9e%d7%a0%d7%a2%d7%95%d7%9c%d7%9f-%d7%a8%d7%9b%d7%91/",
       "canonical": "https://3locksmiths.co.il/services/%d7%9e%d7%a0%d7%a2%d7%95%d7%9c%d7%9f-%d7%a8%d7%9b%d7%91/",
       "relatedServices": [
-        94,
-        95,
         96,
-        97,
-        115,
+        192,
+        193,
+        194,
+        196,
+        95,
         77
       ],
       "relatedLocations": []
@@ -541,11 +548,12 @@
       "path": "/services/%d7%9e%d7%a0%d7%a2%d7%95%d7%9c%d7%9f-%d7%9c%d7%91%d7%99%d7%aa/",
       "canonical": "https://3locksmiths.co.il/services/%d7%9e%d7%a0%d7%a2%d7%95%d7%9c%d7%9f-%d7%9c%d7%91%d7%99%d7%aa/",
       "relatedServices": [
-        93,
-        95,
         96,
-        97,
-        115,
+        192,
+        193,
+        194,
+        196,
+        95,
         78
       ],
       "relatedLocations": []
@@ -558,11 +566,11 @@
       "path": "/services/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%9c%d7%a8%d7%9b%d7%91/",
       "canonical": "https://3locksmiths.co.il/services/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%9c%d7%a8%d7%9b%d7%91/",
       "relatedServices": [
-        93,
-        94,
         96,
-        97,
-        115
+        192,
+        193,
+        194,
+        196
       ],
       "relatedLocations": []
     },
@@ -574,11 +582,12 @@
       "path": "/services/%d7%a9%d7%97%d7%96%d7%95%d7%a8-%d7%9e%d7%a4%d7%aa%d7%97-%d7%9c%d7%a8%d7%9b%d7%91/",
       "canonical": "https://3locksmiths.co.il/services/%d7%a9%d7%97%d7%96%d7%95%d7%a8-%d7%9e%d7%a4%d7%aa%d7%97-%d7%9c%d7%a8%d7%9b%d7%91/",
       "relatedServices": [
-        93,
-        94,
-        95,
-        97,
-        115
+        192,
+        193,
+        194,
+        196,
+        9304,
+        95
       ],
       "relatedLocations": []
     },
@@ -590,11 +599,11 @@
       "path": "/services/%d7%a7%d7%95%d7%93%d7%9f-%d7%9c%d7%a8%d7%9b%d7%91/",
       "canonical": "https://3locksmiths.co.il/services/%d7%a7%d7%95%d7%93%d7%9f-%d7%9c%d7%a8%d7%9b%d7%91/",
       "relatedServices": [
-        93,
-        94,
+        9401,
+        9402,
+        9403,
+        9404,
         95,
-        96,
-        115,
         189
       ],
       "relatedLocations": []
@@ -626,11 +635,11 @@
       "canonical": "https://3locksmiths.co.il/services/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%9c%d7%a4%d7%95%d7%a8%d7%93/",
       "brand": "פורד",
       "relatedServices": [
-        98,
         100,
         101,
         109,
         117,
+        118,
         95
       ],
       "relatedLocations": []
@@ -644,11 +653,11 @@
       "canonical": "https://3locksmiths.co.il/services/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%9c%d7%a1%d7%a7%d7%95%d7%93%d7%94/",
       "brand": "סקודה",
       "relatedServices": [
-        98,
-        99,
         101,
         109,
         117,
+        118,
+        119,
         95
       ],
       "relatedLocations": []
@@ -662,11 +671,11 @@
       "canonical": "https://3locksmiths.co.il/services/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%9c%d7%a9%d7%91%d7%a8%d7%95%d7%9c%d7%98/",
       "brand": "שברולט",
       "relatedServices": [
-        98,
-        99,
-        100,
         109,
         117,
+        118,
+        119,
+        120,
         95
       ],
       "relatedLocations": []
@@ -679,10 +688,11 @@
       "path": "/%d7%90%d7%96%d7%95%d7%a8%d7%99-%d7%a9%d7%99%d7%a8%d7%95%d7%aa/",
       "canonical": "https://3locksmiths.co.il/%d7%90%d7%96%d7%95%d7%a8%d7%99-%d7%a9%d7%99%d7%a8%d7%95%d7%aa/",
       "relatedServices": [
-        93,
-        94,
-        95,
-        96
+        9301,
+        9302,
+        9304,
+        9102,
+        95
       ],
       "relatedLocations": [
         137,
@@ -699,11 +709,11 @@
       "canonical": "https://3locksmiths.co.il/services/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%a1%d7%95%d7%96%d7%95%d7%a7%d7%99/",
       "brand": "סוזוקי",
       "relatedServices": [
-        98,
-        99,
-        100,
-        101,
         117,
+        118,
+        119,
+        120,
+        121,
         95
       ],
       "relatedLocations": []
@@ -716,10 +726,11 @@
       "path": "/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%a9%d7%9c%d7%98-%d7%9c%d7%a8%d7%9b%d7%91-2/",
       "canonical": "https://3locksmiths.co.il/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%a9%d7%9c%d7%98-%d7%9c%d7%a8%d7%9b%d7%91-2/",
       "relatedServices": [
-        93,
-        94,
+        9301,
+        9302,
+        9304,
+        9102,
         95,
-        96,
         115
       ],
       "relatedLocations": [
@@ -736,11 +747,12 @@
       "path": "/services/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%a9%d7%9c%d7%98-%d7%9c%d7%a8%d7%9b%d7%91/",
       "canonical": "https://3locksmiths.co.il/services/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%a9%d7%9c%d7%98-%d7%9c%d7%a8%d7%9b%d7%91/",
       "relatedServices": [
-        93,
-        94,
-        95,
         96,
-        97,
+        192,
+        193,
+        194,
+        196,
+        95,
         113
       ],
       "relatedLocations": []
@@ -754,11 +766,11 @@
       "canonical": "https://3locksmiths.co.il/services/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%a8%d7%a0%d7%95/",
       "brand": "רנו",
       "relatedServices": [
-        98,
-        99,
-        100,
-        101,
-        109,
+        118,
+        119,
+        120,
+        121,
+        122,
         95
       ],
       "relatedLocations": []
@@ -772,11 +784,11 @@
       "canonical": "https://3locksmiths.co.il/services/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%98%d7%95%d7%99%d7%95%d7%98%d7%94/",
       "brand": "טויוטה",
       "relatedServices": [
-        98,
-        99,
-        100,
-        101,
-        109,
+        119,
+        120,
+        121,
+        122,
+        123,
         95
       ],
       "relatedLocations": []
@@ -790,11 +802,11 @@
       "canonical": "https://3locksmiths.co.il/services/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%9e%d7%90%d7%96%d7%93%d7%94/",
       "brand": "מאזדה",
       "relatedServices": [
-        98,
-        99,
-        100,
-        101,
-        109,
+        120,
+        121,
+        122,
+        123,
+        124,
         95
       ],
       "relatedLocations": []
@@ -808,11 +820,11 @@
       "canonical": "https://3locksmiths.co.il/services/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%a1%d7%99%d7%98%d7%a8%d7%95%d7%90%d7%9f/",
       "brand": "סיטרואן",
       "relatedServices": [
-        98,
-        99,
-        100,
-        101,
-        109,
+        121,
+        122,
+        123,
+        124,
+        125,
         95
       ],
       "relatedLocations": []
@@ -826,11 +838,11 @@
       "canonical": "https://3locksmiths.co.il/services/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%a4%d7%99%d7%92%d7%95/",
       "brand": "פיג'ו",
       "relatedServices": [
-        98,
-        99,
-        100,
-        101,
-        109,
+        122,
+        123,
+        124,
+        125,
+        126,
         95
       ],
       "relatedLocations": []
@@ -844,11 +856,11 @@
       "canonical": "https://3locksmiths.co.il/services/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%99%d7%95%d7%a0%d7%93%d7%90%d7%99/",
       "brand": "יונדאי",
       "relatedServices": [
-        98,
-        99,
-        100,
-        101,
-        109,
+        123,
+        124,
+        125,
+        126,
+        127,
         95
       ],
       "relatedLocations": []
@@ -862,11 +874,11 @@
       "canonical": "https://3locksmiths.co.il/services/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%9e%d7%99%d7%a6%d7%95%d7%91%d7%99%d7%a9%d7%99/",
       "brand": "מיצובישי",
       "relatedServices": [
-        98,
-        99,
-        100,
-        101,
-        109,
+        124,
+        125,
+        126,
+        127,
+        128,
         95
       ],
       "relatedLocations": []
@@ -880,11 +892,11 @@
       "canonical": "https://3locksmiths.co.il/services/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%a1%d7%95%d7%91%d7%90%d7%a8%d7%95/",
       "brand": "סובארו",
       "relatedServices": [
-        98,
-        99,
-        100,
-        101,
-        109,
+        125,
+        126,
+        127,
+        128,
+        129,
         95
       ],
       "relatedLocations": []
@@ -898,11 +910,11 @@
       "canonical": "https://3locksmiths.co.il/services/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%9e%d7%a8%d7%a6%d7%93%d7%a1/",
       "brand": "מרצדס",
       "relatedServices": [
-        98,
-        99,
-        100,
-        101,
-        109,
+        126,
+        127,
+        128,
+        129,
+        9501,
         95
       ],
       "relatedLocations": []
@@ -916,11 +928,11 @@
       "canonical": "https://3locksmiths.co.il/services/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%94%d7%95%d7%a0%d7%93%d7%94/",
       "brand": "הונדה",
       "relatedServices": [
-        98,
-        99,
-        100,
-        101,
-        109,
+        127,
+        128,
+        129,
+        9501,
+        9502,
         95
       ],
       "relatedLocations": []
@@ -934,11 +946,11 @@
       "canonical": "https://3locksmiths.co.il/services/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%90%d7%95%d7%a4%d7%9c/",
       "brand": "אופל",
       "relatedServices": [
-        98,
-        99,
-        100,
-        101,
-        109,
+        128,
+        129,
+        9501,
+        9502,
+        9503,
         95
       ],
       "relatedLocations": []
@@ -952,11 +964,11 @@
       "canonical": "https://3locksmiths.co.il/services/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%91%d7%9e%d7%95%d7%95/",
       "brand": "במוו",
       "relatedServices": [
-        98,
-        99,
-        100,
-        101,
-        109,
+        129,
+        9501,
+        9502,
+        9503,
+        9504,
         95
       ],
       "relatedLocations": []
@@ -970,11 +982,11 @@
       "canonical": "https://3locksmiths.co.il/services/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%a4%d7%95%d7%9c%d7%a7%d7%a1%d7%95%d7%95%d7%92%d7%9f/",
       "brand": "פולקסווגן",
       "relatedServices": [
-        98,
-        99,
-        100,
-        101,
-        109,
+        9501,
+        9502,
+        9503,
+        9504,
+        9505,
         95
       ],
       "relatedLocations": []
@@ -989,8 +1001,9 @@
       "city": "תל אביב",
       "relatedServices": [
         95,
-        93,
-        94
+        9301,
+        9302,
+        9304
       ],
       "relatedLocations": [
         138,
@@ -1010,15 +1023,16 @@
       "city": "קריות",
       "relatedServices": [
         95,
-        93,
-        94
+        9301,
+        9302,
+        9304
       ],
       "relatedLocations": [
-        137,
         139,
         140,
         141,
-        142
+        142,
+        143
       ]
     },
     {
@@ -1031,15 +1045,16 @@
       "city": "חדרה",
       "relatedServices": [
         95,
-        93,
-        94
+        9301,
+        9302,
+        9304
       ],
       "relatedLocations": [
-        137,
-        138,
         140,
         141,
-        142
+        142,
+        143,
+        147
       ]
     },
     {
@@ -1052,15 +1067,16 @@
       "city": "נתניה",
       "relatedServices": [
         95,
-        93,
-        94
+        9301,
+        9302,
+        9304
       ],
       "relatedLocations": [
-        137,
-        138,
-        139,
         141,
-        142
+        142,
+        143,
+        147,
+        148
       ]
     },
     {
@@ -1073,15 +1089,16 @@
       "city": "חיפה",
       "relatedServices": [
         95,
-        93,
-        94
+        9301,
+        9302,
+        9304
       ],
       "relatedLocations": [
-        137,
-        138,
-        139,
-        140,
-        142
+        142,
+        143,
+        147,
+        148,
+        149
       ]
     },
     {
@@ -1094,15 +1111,16 @@
       "city": "פתח תקווה",
       "relatedServices": [
         95,
-        93,
-        94
+        9301,
+        9302,
+        9304
       ],
       "relatedLocations": [
-        137,
-        138,
-        139,
-        140,
-        141
+        143,
+        147,
+        148,
+        149,
+        150
       ]
     },
     {
@@ -1115,15 +1133,16 @@
       "city": "בת ים",
       "relatedServices": [
         95,
-        93,
-        94
+        9301,
+        9302,
+        9304
       ],
       "relatedLocations": [
-        137,
-        138,
-        139,
-        140,
-        141
+        147,
+        148,
+        149,
+        150,
+        151
       ]
     },
     {
@@ -1136,15 +1155,16 @@
       "city": "חולון",
       "relatedServices": [
         95,
-        93,
-        94
+        9301,
+        9302,
+        9304
       ],
       "relatedLocations": [
-        137,
-        138,
-        139,
-        140,
-        141
+        148,
+        149,
+        150,
+        151,
+        153
       ]
     },
     {
@@ -1157,15 +1177,16 @@
       "city": "כפר סבא",
       "relatedServices": [
         95,
-        93,
-        94
+        9301,
+        9302,
+        9304
       ],
       "relatedLocations": [
-        137,
-        138,
-        139,
-        140,
-        141
+        149,
+        150,
+        151,
+        153,
+        154
       ]
     },
     {
@@ -1178,15 +1199,16 @@
       "city": "נתניה",
       "relatedServices": [
         95,
-        93,
-        94
+        9301,
+        9302,
+        9304
       ],
       "relatedLocations": [
-        137,
-        138,
-        139,
-        140,
-        141
+        150,
+        151,
+        153,
+        154,
+        158
       ]
     },
     {
@@ -1199,15 +1221,16 @@
       "city": "ראשון לציון",
       "relatedServices": [
         95,
-        93,
-        94
+        9301,
+        9302,
+        9304
       ],
       "relatedLocations": [
-        137,
-        138,
-        139,
-        140,
-        141
+        151,
+        153,
+        154,
+        158,
+        9601
       ]
     },
     {
@@ -1220,15 +1243,16 @@
       "city": "חולון",
       "relatedServices": [
         95,
-        93,
-        94
+        9301,
+        9302,
+        9304
       ],
       "relatedLocations": [
-        137,
-        138,
-        139,
-        140,
-        141
+        153,
+        154,
+        158,
+        9601,
+        9602
       ]
     },
     {
@@ -1241,15 +1265,16 @@
       "city": "רמת גן",
       "relatedServices": [
         95,
-        93,
-        94
+        9301,
+        9302,
+        9304
       ],
       "relatedLocations": [
-        137,
-        138,
-        139,
-        140,
-        141
+        154,
+        158,
+        9601,
+        9602,
+        9603
       ]
     },
     {
@@ -1262,15 +1287,16 @@
       "city": "גבעתיים",
       "relatedServices": [
         95,
-        93,
-        94
+        9301,
+        9302,
+        9304
       ],
       "relatedLocations": [
-        137,
-        138,
-        139,
-        140,
-        141
+        158,
+        9601,
+        9602,
+        9603,
+        9604
       ]
     },
     {
@@ -1283,15 +1309,16 @@
       "city": "רעננה",
       "relatedServices": [
         95,
-        93,
-        94
+        9301,
+        9302,
+        9304
       ],
       "relatedLocations": [
-        137,
-        138,
-        139,
-        140,
-        141
+        9601,
+        9602,
+        9603,
+        9604,
+        9605
       ]
     },
     {
@@ -1302,10 +1329,11 @@
       "path": "/%d7%a7%d7%95%d7%93%d7%9f-%d7%9c%d7%a8%d7%9b%d7%91/",
       "canonical": "https://3locksmiths.co.il/%d7%a7%d7%95%d7%93%d7%9f-%d7%9c%d7%a8%d7%9b%d7%91/",
       "relatedServices": [
-        93,
-        94,
+        9301,
+        9302,
+        9304,
+        9102,
         95,
-        96,
         97
       ],
       "relatedLocations": [
@@ -1322,11 +1350,12 @@
       "path": "/services/%d7%93%d7%9c%d7%aa-%d7%a4%d7%9c%d7%93%d7%9c%d7%aa/",
       "canonical": "https://3locksmiths.co.il/services/%d7%93%d7%9c%d7%aa-%d7%a4%d7%9c%d7%93%d7%9c%d7%aa/",
       "relatedServices": [
-        93,
-        94,
-        95,
-        96,
-        97
+        193,
+        194,
+        196,
+        9304,
+        9301,
+        95
       ],
       "relatedLocations": []
     },
@@ -1338,11 +1367,12 @@
       "path": "/services/%d7%93%d7%9c%d7%aa-%d7%9e%d7%9e%d7%93/",
       "canonical": "https://3locksmiths.co.il/services/%d7%93%d7%9c%d7%aa-%d7%9e%d7%9e%d7%93/",
       "relatedServices": [
-        93,
-        94,
-        95,
-        96,
-        97
+        194,
+        196,
+        9304,
+        9301,
+        9302,
+        95
       ],
       "relatedLocations": []
     },
@@ -1354,11 +1384,12 @@
       "path": "/services/%d7%9e%d7%a0%d7%a2%d7%95%d7%9c-%d7%a8%d7%91-%d7%91%d7%a8%d7%99%d7%97/",
       "canonical": "https://3locksmiths.co.il/services/%d7%9e%d7%a0%d7%a2%d7%95%d7%9c-%d7%a8%d7%91-%d7%91%d7%a8%d7%99%d7%97/",
       "relatedServices": [
-        93,
-        94,
-        95,
-        96,
-        97
+        196,
+        9304,
+        9301,
+        9302,
+        9303,
+        95
       ],
       "relatedLocations": []
     },
@@ -1370,11 +1401,12 @@
       "path": "/services/%d7%9e%d7%95%d7%9c%d7%98%d7%99%d7%9c%d7%95%d7%a7/",
       "canonical": "https://3locksmiths.co.il/services/%d7%9e%d7%95%d7%9c%d7%98%d7%99%d7%9c%d7%95%d7%a7/",
       "relatedServices": [
-        93,
-        94,
-        95,
-        96,
-        97
+        9304,
+        9301,
+        9302,
+        9303,
+        9101,
+        95
       ],
       "relatedLocations": []
     },
@@ -1386,11 +1418,12 @@
       "path": "/services/%d7%9e%d7%a0%d7%a2%d7%95%d7%9c%d7%9f-24-%d7%a9%d7%a2%d7%95%d7%aa/",
       "canonical": "https://3locksmiths.co.il/services/%d7%9e%d7%a0%d7%a2%d7%95%d7%9c%d7%9f-24-%d7%a9%d7%a2%d7%95%d7%aa/",
       "relatedServices": [
-        93,
-        94,
-        95,
-        96,
-        97
+        9301,
+        9302,
+        9303,
+        9101,
+        9102,
+        95
       ],
       "relatedLocations": []
     },
@@ -1402,11 +1435,12 @@
       "path": "/services/%d7%a4%d7%aa%d7%99%d7%97%d7%aa-%d7%a8%d7%9b%d7%91-%d7%a0%d7%a2%d7%95%d7%9c/",
       "canonical": "https://3locksmiths.co.il/services/%d7%a4%d7%aa%d7%99%d7%97%d7%aa-%d7%a8%d7%9b%d7%91-%d7%a0%d7%a2%d7%95%d7%9c/",
       "relatedServices": [
-        93,
-        94,
-        95,
+        9302,
+        9303,
+        9101,
+        9102,
         96,
-        97
+        95
       ],
       "relatedLocations": []
     },
@@ -1418,11 +1452,12 @@
       "path": "/services/%d7%a4%d7%aa%d7%99%d7%97%d7%aa-%d7%93%d7%9c%d7%aa-%d7%a0%d7%a2%d7%95%d7%9c%d7%94/",
       "canonical": "https://3locksmiths.co.il/services/%d7%a4%d7%aa%d7%99%d7%97%d7%aa-%d7%93%d7%9c%d7%aa-%d7%a0%d7%a2%d7%95%d7%9c%d7%94/",
       "relatedServices": [
-        93,
-        94,
-        95,
+        9303,
+        9101,
+        9102,
         96,
-        97
+        192,
+        95
       ],
       "relatedLocations": []
     },
@@ -1434,11 +1469,12 @@
       "path": "/services/%d7%9e%d7%a4%d7%aa%d7%97-%d7%a0%d7%a9%d7%91%d7%a8-%d7%91%d7%9e%d7%a0%d7%a2%d7%95%d7%9c/",
       "canonical": "https://3locksmiths.co.il/services/%d7%9e%d7%a4%d7%aa%d7%97-%d7%a0%d7%a9%d7%91%d7%a8-%d7%91%d7%9e%d7%a0%d7%a2%d7%95%d7%9c/",
       "relatedServices": [
-        93,
-        94,
-        95,
+        9101,
+        9102,
         96,
-        97
+        192,
+        193,
+        95
       ],
       "relatedLocations": []
     },
@@ -1450,11 +1486,12 @@
       "path": "/services/%d7%a0%d7%99%d7%aa%d7%95%d7%a7-%d7%a7%d7%95%d7%93%d7%9f-%d7%9c%d7%a8%d7%9b%d7%91/",
       "canonical": "https://3locksmiths.co.il/services/%d7%a0%d7%99%d7%aa%d7%95%d7%a7-%d7%a7%d7%95%d7%93%d7%9f-%d7%9c%d7%a8%d7%9b%d7%91/",
       "relatedServices": [
-        93,
-        94,
-        95,
-        96,
-        97
+        97,
+        9402,
+        9403,
+        9404,
+        9405,
+        95
       ],
       "relatedLocations": []
     },
@@ -1466,11 +1503,12 @@
       "path": "/services/%d7%94%d7%aa%d7%a7%d7%a0%d7%aa-%d7%a7%d7%95%d7%93%d7%9f-%d7%9c%d7%a8%d7%9b%d7%91/",
       "canonical": "https://3locksmiths.co.il/services/%d7%94%d7%aa%d7%a7%d7%a0%d7%aa-%d7%a7%d7%95%d7%93%d7%9f-%d7%9c%d7%a8%d7%9b%d7%91/",
       "relatedServices": [
-        93,
-        94,
-        95,
-        96,
-        97
+        97,
+        9403,
+        9404,
+        9405,
+        9406,
+        95
       ],
       "relatedLocations": []
     },
@@ -1482,11 +1520,12 @@
       "path": "/services/%d7%aa%d7%99%d7%a7%d7%95%d7%9f-%d7%a7%d7%95%d7%93%d7%9f-%d7%9c%d7%a8%d7%9b%d7%91/",
       "canonical": "https://3locksmiths.co.il/services/%d7%aa%d7%99%d7%a7%d7%95%d7%9f-%d7%a7%d7%95%d7%93%d7%9f-%d7%9c%d7%a8%d7%9b%d7%91/",
       "relatedServices": [
-        93,
-        94,
-        95,
-        96,
-        97
+        97,
+        9404,
+        9405,
+        9406,
+        9407,
+        95
       ],
       "relatedLocations": []
     },
@@ -1498,11 +1537,12 @@
       "path": "/services/%d7%a7%d7%95%d7%93%d7%9f-%d7%9e%d7%a6%d7%a4%d7%a6%d7%a3-%d7%91%d7%a8%d7%9b%d7%91/",
       "canonical": "https://3locksmiths.co.il/services/%d7%a7%d7%95%d7%93%d7%9f-%d7%9e%d7%a6%d7%a4%d7%a6%d7%a3-%d7%91%d7%a8%d7%9b%d7%91/",
       "relatedServices": [
-        93,
-        94,
-        95,
-        96,
-        97
+        97,
+        9405,
+        9406,
+        9407,
+        9401,
+        95
       ],
       "relatedLocations": []
     },
@@ -1514,11 +1554,12 @@
       "path": "/services/%d7%94%d7%97%d7%9c%d7%a4%d7%aa-%d7%9c%d7%95%d7%97-%d7%9e%d7%a7%d7%a9%d7%99%d7%9d-%d7%9c%d7%a7%d7%95%d7%93%d7%9f/",
       "canonical": "https://3locksmiths.co.il/services/%d7%94%d7%97%d7%9c%d7%a4%d7%aa-%d7%9c%d7%95%d7%97-%d7%9e%d7%a7%d7%a9%d7%99%d7%9d-%d7%9c%d7%a7%d7%95%d7%93%d7%9f/",
       "relatedServices": [
-        93,
-        94,
-        95,
-        96,
-        97
+        97,
+        9406,
+        9407,
+        9401,
+        9402,
+        95
       ],
       "relatedLocations": []
     },
@@ -1530,11 +1571,12 @@
       "path": "/services/%d7%a1%d7%95%d7%92%d7%99-%d7%a7%d7%95%d7%93%d7%9f-%d7%9c%d7%a8%d7%9b%d7%91/",
       "canonical": "https://3locksmiths.co.il/services/%d7%a1%d7%95%d7%92%d7%99-%d7%a7%d7%95%d7%93%d7%9f-%d7%9c%d7%a8%d7%9b%d7%91/",
       "relatedServices": [
-        93,
-        94,
-        95,
-        96,
-        97
+        97,
+        9407,
+        9401,
+        9402,
+        9403,
+        95
       ],
       "relatedLocations": []
     },
@@ -1546,11 +1588,12 @@
       "path": "/services/%d7%a7%d7%95%d7%93%d7%9f-%d7%9c%d7%a8%d7%9b%d7%91-%d7%a0%d7%a0%d7%a2%d7%9c/",
       "canonical": "https://3locksmiths.co.il/services/%d7%a7%d7%95%d7%93%d7%9f-%d7%9c%d7%a8%d7%9b%d7%91-%d7%a0%d7%a0%d7%a2%d7%9c/",
       "relatedServices": [
-        93,
-        94,
-        95,
-        96,
-        97
+        97,
+        9401,
+        9402,
+        9403,
+        9404,
+        95
       ],
       "relatedLocations": []
     },
@@ -1562,11 +1605,12 @@
       "path": "/services/%d7%aa%d7%99%d7%a7%d7%95%d7%9f-%d7%93%d7%9c%d7%aa%d7%95%d7%aa/",
       "canonical": "https://3locksmiths.co.il/services/%d7%aa%d7%99%d7%a7%d7%95%d7%9f-%d7%93%d7%9c%d7%aa%d7%95%d7%aa/",
       "relatedServices": [
-        93,
-        94,
-        95,
+        9102,
         96,
-        97
+        192,
+        193,
+        194,
+        95
       ],
       "relatedLocations": []
     },
@@ -1578,11 +1622,12 @@
       "path": "/services/%d7%94%d7%97%d7%9c%d7%a4%d7%aa-%d7%9e%d7%a0%d7%a2%d7%95%d7%9c%d7%99%d7%9d/",
       "canonical": "https://3locksmiths.co.il/services/%d7%94%d7%97%d7%9c%d7%a4%d7%aa-%d7%9e%d7%a0%d7%a2%d7%95%d7%9c%d7%99%d7%9d/",
       "relatedServices": [
-        93,
-        94,
-        95,
         96,
-        97
+        192,
+        193,
+        194,
+        196,
+        95
       ],
       "relatedLocations": []
     },
@@ -1595,11 +1640,11 @@
       "canonical": "https://3locksmiths.co.il/services/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%a0%d7%99%d7%a1%d7%90%d7%9f/",
       "brand": "ניסאן",
       "relatedServices": [
-        98,
-        99,
-        100,
-        101,
-        109,
+        9502,
+        9503,
+        9504,
+        9505,
+        9506,
         95
       ],
       "relatedLocations": []
@@ -1613,11 +1658,11 @@
       "canonical": "https://3locksmiths.co.il/services/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%90%d7%90%d7%95%d7%93%d7%99/",
       "brand": "אאודי",
       "relatedServices": [
-        98,
-        99,
-        100,
-        101,
-        109,
+        9503,
+        9504,
+        9505,
+        9506,
+        9507,
         95
       ],
       "relatedLocations": []
@@ -1631,11 +1676,11 @@
       "canonical": "https://3locksmiths.co.il/services/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%92%d7%99%d7%a4/",
       "brand": "ג׳יפ",
       "relatedServices": [
-        98,
-        99,
-        100,
-        101,
-        109,
+        9504,
+        9505,
+        9506,
+        9507,
+        9508,
         95
       ],
       "relatedLocations": []
@@ -1649,11 +1694,11 @@
       "canonical": "https://3locksmiths.co.il/services/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%a1%d7%99%d7%90%d7%98/",
       "brand": "סיאט",
       "relatedServices": [
-        98,
-        99,
-        100,
-        101,
-        109,
+        9505,
+        9506,
+        9507,
+        9508,
+        9509,
         95
       ],
       "relatedLocations": []
@@ -1667,11 +1712,11 @@
       "canonical": "https://3locksmiths.co.il/services/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%93%d7%90%d7%a6%d7%94/",
       "brand": "דאצ׳יה",
       "relatedServices": [
-        98,
-        99,
-        100,
-        101,
-        109,
+        9506,
+        9507,
+        9508,
+        9509,
+        9510,
         95
       ],
       "relatedLocations": []
@@ -1685,11 +1730,11 @@
       "canonical": "https://3locksmiths.co.il/services/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%92%d7%99%d7%9c%d7%99/",
       "brand": "ג׳ילי",
       "relatedServices": [
-        98,
-        99,
-        100,
-        101,
-        109,
+        9507,
+        9508,
+        9509,
+        9510,
+        9511,
         95
       ],
       "relatedLocations": []
@@ -1703,11 +1748,11 @@
       "canonical": "https://3locksmiths.co.il/services/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%91%d7%99-%d7%95%d7%95%d7%90%d7%99-%d7%93%d7%99/",
       "brand": "BYD",
       "relatedServices": [
-        98,
-        99,
-        100,
-        101,
-        109,
+        9508,
+        9509,
+        9510,
+        9511,
+        9512,
         95
       ],
       "relatedLocations": []
@@ -1721,11 +1766,11 @@
       "canonical": "https://3locksmiths.co.il/services/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%9e%d7%99%d7%a0%d7%99-%d7%a7%d7%95%d7%a4%d7%a8/",
       "brand": "מיני קופר",
       "relatedServices": [
-        98,
-        99,
-        100,
-        101,
-        109,
+        9509,
+        9510,
+        9511,
+        9512,
+        9513,
         95
       ],
       "relatedLocations": []
@@ -1739,11 +1784,11 @@
       "canonical": "https://3locksmiths.co.il/services/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%a7%d7%a8%d7%99%d7%99%d7%96%d7%9c%d7%a8/",
       "brand": "קרייזלר",
       "relatedServices": [
-        98,
-        99,
-        100,
-        101,
-        109,
+        9510,
+        9511,
+        9512,
+        9513,
+        9514,
         95
       ],
       "relatedLocations": []
@@ -1757,11 +1802,11 @@
       "canonical": "https://3locksmiths.co.il/services/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%a7%d7%90%d7%93%d7%99%d7%9c%d7%a7/",
       "brand": "קאדילק",
       "relatedServices": [
+        9511,
+        9512,
+        9513,
+        9514,
         98,
-        99,
-        100,
-        101,
-        109,
         95
       ],
       "relatedLocations": []
@@ -1775,11 +1820,11 @@
       "canonical": "https://3locksmiths.co.il/services/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%90%d7%99%d7%a1%d7%95%d7%96%d7%95/",
       "brand": "איסוזו",
       "relatedServices": [
+        9512,
+        9513,
+        9514,
         98,
         99,
-        100,
-        101,
-        109,
         95
       ],
       "relatedLocations": []
@@ -1793,11 +1838,11 @@
       "canonical": "https://3locksmiths.co.il/services/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%93%d7%99%d7%99%d7%94%d7%98%d7%a1%d7%95/",
       "brand": "דייהטסו",
       "relatedServices": [
+        9513,
+        9514,
         98,
         99,
         100,
-        101,
-        109,
         95
       ],
       "relatedLocations": []
@@ -1811,11 +1856,11 @@
       "canonical": "https://3locksmiths.co.il/services/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%91%d7%99%d7%95%d7%90%d7%99%d7%a7/",
       "brand": "ביואיק",
       "relatedServices": [
+        9514,
         98,
         99,
         100,
         101,
-        109,
         95
       ],
       "relatedLocations": []
@@ -1848,15 +1893,16 @@
       "city": "אשדוד",
       "relatedServices": [
         95,
-        93,
-        94
+        9301,
+        9302,
+        9304
       ],
       "relatedLocations": [
-        137,
-        138,
-        139,
-        140,
-        141
+        9602,
+        9603,
+        9604,
+        9605,
+        9608
       ]
     },
     {
@@ -1869,15 +1915,16 @@
       "city": "הרצליה",
       "relatedServices": [
         95,
-        93,
-        94
+        9301,
+        9302,
+        9304
       ],
       "relatedLocations": [
-        137,
-        138,
-        139,
-        140,
-        141
+        9603,
+        9604,
+        9605,
+        9608,
+        9609
       ]
     },
     {
@@ -1890,15 +1937,16 @@
       "city": "רחובות",
       "relatedServices": [
         95,
-        93,
-        94
+        9301,
+        9302,
+        9304
       ],
       "relatedLocations": [
-        137,
-        138,
-        139,
-        140,
-        141
+        9604,
+        9605,
+        9608,
+        9609,
+        9610
       ]
     },
     {
@@ -1911,15 +1959,16 @@
       "city": "בני ברק",
       "relatedServices": [
         95,
-        93,
-        94
+        9301,
+        9302,
+        9304
       ],
       "relatedLocations": [
-        137,
-        138,
-        139,
-        140,
-        141
+        9605,
+        9608,
+        9609,
+        9610,
+        9611
       ]
     },
     {
@@ -1932,15 +1981,16 @@
       "city": "מודיעין",
       "relatedServices": [
         95,
-        93,
-        94
+        9301,
+        9302,
+        9304
       ],
       "relatedLocations": [
-        137,
-        138,
-        139,
-        140,
-        141
+        9608,
+        9609,
+        9610,
+        9611,
+        9612
       ]
     },
     {
@@ -1953,15 +2003,16 @@
       "city": "רמת השרון",
       "relatedServices": [
         95,
-        93,
-        94
+        9301,
+        9302,
+        9304
       ],
       "relatedLocations": [
-        137,
-        138,
-        139,
-        140,
-        141
+        9609,
+        9610,
+        9611,
+        9612,
+        137
       ]
     },
     {
@@ -1974,15 +2025,16 @@
       "city": "הוד השרון",
       "relatedServices": [
         95,
-        93,
-        94
+        9301,
+        9302,
+        9304
       ],
       "relatedLocations": [
+        9610,
+        9611,
+        9612,
         137,
-        138,
-        139,
-        140,
-        141
+        138
       ]
     },
     {
@@ -1995,15 +2047,16 @@
       "city": "לוד",
       "relatedServices": [
         95,
-        93,
-        94
+        9301,
+        9302,
+        9304
       ],
       "relatedLocations": [
+        9611,
+        9612,
         137,
         138,
-        139,
-        140,
-        141
+        139
       ]
     },
     {
@@ -2016,15 +2069,16 @@
       "city": "נס ציונה",
       "relatedServices": [
         95,
-        93,
-        94
+        9301,
+        9302,
+        9304
       ],
       "relatedLocations": [
+        9612,
         137,
         138,
         139,
-        140,
-        141
+        140
       ]
     },
     {
@@ -2037,8 +2091,9 @@
       "city": "ראש העין",
       "relatedServices": [
         95,
-        93,
-        94
+        9301,
+        9302,
+        9304
       ],
       "relatedLocations": [
         137,
@@ -2056,10 +2111,11 @@
       "path": "/%d7%9e%d7%93%d7%a8%d7%99%d7%9b%d7%99%d7%9d/%d7%9b%d7%9e%d7%94-%d7%a2%d7%95%d7%9c%d7%94-%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%9c%d7%a8%d7%9b%d7%91/",
       "canonical": "https://3locksmiths.co.il/%d7%9e%d7%93%d7%a8%d7%99%d7%9b%d7%99%d7%9d/%d7%9b%d7%9e%d7%94-%d7%a2%d7%95%d7%9c%d7%94-%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%9c%d7%a8%d7%9b%d7%91/",
       "relatedServices": [
-        93,
-        94,
-        95,
-        96
+        9301,
+        9302,
+        9304,
+        9102,
+        95
       ],
       "relatedLocations": [
         137,
@@ -2075,10 +2131,11 @@
       "path": "/%d7%9e%d7%93%d7%a8%d7%99%d7%9b%d7%99%d7%9d/%d7%90%d7%91%d7%93-%d7%94%d7%9e%d7%a4%d7%aa%d7%97-%d7%94%d7%99%d7%97%d7%99%d7%93-%d7%9c%d7%a8%d7%9b%d7%91/",
       "canonical": "https://3locksmiths.co.il/%d7%9e%d7%93%d7%a8%d7%99%d7%9b%d7%99%d7%9d/%d7%90%d7%91%d7%93-%d7%94%d7%9e%d7%a4%d7%aa%d7%97-%d7%94%d7%99%d7%97%d7%99%d7%93-%d7%9c%d7%a8%d7%9b%d7%91/",
       "relatedServices": [
-        93,
-        94,
-        95,
-        96
+        9301,
+        9302,
+        9304,
+        9102,
+        95
       ],
       "relatedLocations": [
         137,
@@ -2094,10 +2151,11 @@
       "path": "/%d7%9e%d7%93%d7%a8%d7%99%d7%9b%d7%99%d7%9d/%d7%9e%d7%a4%d7%aa%d7%97-%d7%a2%d7%9d-%d7%a9%d7%91%d7%91-%d7%90%d7%95-%d7%9e%d7%a4%d7%aa%d7%97-%d7%97%d7%9b%d7%9d/",
       "canonical": "https://3locksmiths.co.il/%d7%9e%d7%93%d7%a8%d7%99%d7%9b%d7%99%d7%9d/%d7%9e%d7%a4%d7%aa%d7%97-%d7%a2%d7%9d-%d7%a9%d7%91%d7%91-%d7%90%d7%95-%d7%9e%d7%a4%d7%aa%d7%97-%d7%97%d7%9b%d7%9d/",
       "relatedServices": [
-        93,
-        94,
-        95,
-        96
+        9301,
+        9302,
+        9304,
+        9102,
+        95
       ],
       "relatedLocations": [
         137,
@@ -2113,10 +2171,11 @@
       "path": "/%d7%9e%d7%93%d7%a8%d7%99%d7%9b%d7%99%d7%9d/%d7%90%d7%99%d7%9a-%d7%9c%d7%91%d7%97%d7%95%d7%a8-%d7%9e%d7%a0%d7%a2%d7%95%d7%9c%d7%9f-%d7%90%d7%9e%d7%99%d7%9f/",
       "canonical": "https://3locksmiths.co.il/%d7%9e%d7%93%d7%a8%d7%99%d7%9b%d7%99%d7%9d/%d7%90%d7%99%d7%9a-%d7%9c%d7%91%d7%97%d7%95%d7%a8-%d7%9e%d7%a0%d7%a2%d7%95%d7%9c%d7%9f-%d7%90%d7%9e%d7%99%d7%9f/",
       "relatedServices": [
-        93,
-        94,
-        95,
-        96
+        9301,
+        9302,
+        9304,
+        9102,
+        95
       ],
       "relatedLocations": [
         137,
@@ -2132,10 +2191,11 @@
       "path": "/%d7%9e%d7%93%d7%a8%d7%99%d7%9b%d7%99%d7%9d/%d7%a0%d7%a0%d7%a2%d7%9c%d7%aa%d7%99-%d7%9e%d7%97%d7%95%d7%a5-%d7%9c%d7%91%d7%99%d7%aa/",
       "canonical": "https://3locksmiths.co.il/%d7%9e%d7%93%d7%a8%d7%99%d7%9b%d7%99%d7%9d/%d7%a0%d7%a0%d7%a2%d7%9c%d7%aa%d7%99-%d7%9e%d7%97%d7%95%d7%a5-%d7%9c%d7%91%d7%99%d7%aa/",
       "relatedServices": [
-        93,
-        94,
-        95,
-        96
+        9301,
+        9302,
+        9304,
+        9102,
+        95
       ],
       "relatedLocations": [
         137,
@@ -2151,10 +2211,11 @@
       "path": "/%d7%9e%d7%93%d7%a8%d7%99%d7%9b%d7%99%d7%9d/%d7%9b%d7%9e%d7%94-%d7%a2%d7%95%d7%9c%d7%94-%d7%94%d7%97%d7%9c%d7%a4%d7%aa-%d7%a6%d7%99%d7%9c%d7%99%d7%a0%d7%93%d7%a8/",
       "canonical": "https://3locksmiths.co.il/%d7%9e%d7%93%d7%a8%d7%99%d7%9b%d7%99%d7%9d/%d7%9b%d7%9e%d7%94-%d7%a2%d7%95%d7%9c%d7%94-%d7%94%d7%97%d7%9c%d7%a4%d7%aa-%d7%a6%d7%99%d7%9c%d7%99%d7%a0%d7%93%d7%a8/",
       "relatedServices": [
-        93,
-        94,
-        95,
-        96
+        9301,
+        9302,
+        9304,
+        9102,
+        95
       ],
       "relatedLocations": [
         137,
@@ -2170,10 +2231,11 @@
       "path": "/%d7%9e%d7%93%d7%a8%d7%99%d7%9b%d7%99%d7%9d/%d7%9e%d7%a4%d7%aa%d7%97-%d7%9e%d7%a7%d7%95%d7%a8%d7%99-%d7%90%d7%95-%d7%97%d7%9c%d7%99%d7%a4%d7%99/",
       "canonical": "https://3locksmiths.co.il/%d7%9e%d7%93%d7%a8%d7%99%d7%9b%d7%99%d7%9d/%d7%9e%d7%a4%d7%aa%d7%97-%d7%9e%d7%a7%d7%95%d7%a8%d7%99-%d7%90%d7%95-%d7%97%d7%9c%d7%99%d7%a4%d7%99/",
       "relatedServices": [
-        93,
-        94,
-        95,
-        96
+        9301,
+        9302,
+        9304,
+        9102,
+        95
       ],
       "relatedLocations": [
         137,
@@ -2189,10 +2251,11 @@
       "path": "/%d7%9e%d7%93%d7%a8%d7%99%d7%9b%d7%99%d7%9d/%d7%90%d7%99%d7%9a-%d7%a2%d7%95%d7%91%d7%93-%d7%90%d7%99%d7%9e%d7%95%d7%91%d7%99%d7%9c%d7%99%d7%99%d7%96%d7%a8/",
       "canonical": "https://3locksmiths.co.il/%d7%9e%d7%93%d7%a8%d7%99%d7%9b%d7%99%d7%9d/%d7%90%d7%99%d7%9a-%d7%a2%d7%95%d7%91%d7%93-%d7%90%d7%99%d7%9e%d7%95%d7%91%d7%99%d7%9c%d7%99%d7%99%d7%96%d7%a8/",
       "relatedServices": [
-        93,
-        94,
-        95,
-        96
+        9301,
+        9302,
+        9304,
+        9102,
+        95
       ],
       "relatedLocations": [
         137,
@@ -2208,10 +2271,11 @@
       "path": "/%d7%9e%d7%93%d7%a8%d7%99%d7%9b%d7%99%d7%9d/%d7%a1%d7%95%d7%92%d7%99-%d7%a6%d7%99%d7%9c%d7%99%d7%a0%d7%93%d7%a8%d7%99%d7%9d-%d7%9c%d7%93%d7%9c%d7%aa/",
       "canonical": "https://3locksmiths.co.il/%d7%9e%d7%93%d7%a8%d7%99%d7%9b%d7%99%d7%9d/%d7%a1%d7%95%d7%92%d7%99-%d7%a6%d7%99%d7%9c%d7%99%d7%a0%d7%93%d7%a8%d7%99%d7%9d-%d7%9c%d7%93%d7%9c%d7%aa/",
       "relatedServices": [
-        93,
-        94,
-        95,
-        96
+        9301,
+        9302,
+        9304,
+        9102,
+        95
       ],
       "relatedLocations": [
         137,
@@ -2227,10 +2291,11 @@
       "path": "/%d7%9e%d7%93%d7%a8%d7%99%d7%9b%d7%99%d7%9d/%d7%aa%d7%97%d7%96%d7%95%d7%a7%d7%aa-%d7%9e%d7%a4%d7%aa%d7%97-%d7%97%d7%9b%d7%9d/",
       "canonical": "https://3locksmiths.co.il/%d7%9e%d7%93%d7%a8%d7%99%d7%9b%d7%99%d7%9d/%d7%aa%d7%97%d7%96%d7%95%d7%a7%d7%aa-%d7%9e%d7%a4%d7%aa%d7%97-%d7%97%d7%9b%d7%9d/",
       "relatedServices": [
-        93,
-        94,
-        95,
-        96
+        9301,
+        9302,
+        9304,
+        9102,
+        95
       ],
       "relatedLocations": [
         137,
@@ -2246,10 +2311,11 @@
       "path": "/%d7%9e%d7%93%d7%a8%d7%99%d7%9b%d7%99%d7%9d/%d7%9e%d7%94-%d7%a2%d7%95%d7%a9%d7%99%d7%9d-%d7%90%d7%97%d7%a8%d7%99-%d7%a4%d7%a8%d7%99%d7%a6%d7%94-%d7%9c%d7%91%d7%99%d7%aa/",
       "canonical": "https://3locksmiths.co.il/%d7%9e%d7%93%d7%a8%d7%99%d7%9b%d7%99%d7%9d/%d7%9e%d7%94-%d7%a2%d7%95%d7%a9%d7%99%d7%9d-%d7%90%d7%97%d7%a8%d7%99-%d7%a4%d7%a8%d7%99%d7%a6%d7%94-%d7%9c%d7%91%d7%99%d7%aa/",
       "relatedServices": [
-        93,
-        94,
-        95,
-        96
+        9301,
+        9302,
+        9304,
+        9102,
+        95
       ],
       "relatedLocations": [
         137,
@@ -2265,10 +2331,11 @@
       "path": "/%d7%9e%d7%93%d7%a8%d7%99%d7%9b%d7%99%d7%9d/",
       "canonical": "https://3locksmiths.co.il/%d7%9e%d7%93%d7%a8%d7%99%d7%9b%d7%99%d7%9d/",
       "relatedServices": [
-        93,
-        94,
-        95,
-        96
+        9301,
+        9302,
+        9304,
+        9102,
+        95
       ],
       "relatedLocations": [
         137,

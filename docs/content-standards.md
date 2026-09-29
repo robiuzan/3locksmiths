@@ -83,7 +83,11 @@ The authored modules are typed by `lib/enrich/types.ts` (`EnrichedPage`) and ren
 5. `specsTable` — the citable artifact. Key types, systems, complexity, duration, price band.
 6. `scenarios[]` — when this service is the right call.
 7. `faq.items[]` — 4–6, **specific to this service**.
-8. `related.services[]` + `related.locations[]` — by relevance, never by array order.
+8. `related.services[]` + `related.locations[]` — by relevance, never by array order. A module
+   that omits `related` gets a derived default from `scripts/build-manifest.mjs` (since
+   2026-09-29 a rotating sibling window plus the priority services, so no page is starved of
+   links). That default is a floor, not relevance: author `related` when adjacency or topic
+   matters.
 9. `cta`.
 
 ### Location page (`kind: "location"`)

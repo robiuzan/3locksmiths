@@ -75,6 +75,15 @@ function decodeSeg(s: string): string {
   }
 }
 
+/**
+ * The /step/ pages are screens inside the price-calculator flow, not landing pages: left out of
+ * the sitemap (app/sitemap.ts) and served noindex,follow (app/[...slug]/page.tsx). One predicate
+ * so the two can never drift apart.
+ */
+export function isFunnelStep(path: string): boolean {
+  return path.startsWith("/step/");
+}
+
 /** Match a route's decoded slug segments against a snapshot page. */
 export function getPageBySegments(segments: string[]): SitePage | undefined {
   const key = segments.map(decodeSeg).join("/");

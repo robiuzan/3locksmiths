@@ -82,9 +82,15 @@ for (const f of files) {
  * This is a fallback for modules that omit it, which is now the preferred way to author one.
  */
 const MANIFEST_BY_ID = new Map(PAGE_MANIFEST.pages.map((p) => [p.id, p]));
+// Manifest titles are the scraped WordPress titles with curly quotes folded to ASCII for
+// matching (build-manifest.mjs dec()), so "שכפול מפתח פיג'ו" arrives with U+0027. A visible
+// label must use גרש/גרשיים (CLAUDE.md §8), and check-typography.mjs only scans authored
+// modules, so derived labels are the one place nothing else would catch it.
+const hebrewPunct = (s) =>
+  s.replace(/([א-ת])['’]/g, "$1׳").replace(/([א-ת])"(?=[א-ת])/g, "$1״");
 const linkTo = (id) => {
   const row = MANIFEST_BY_ID.get(id);
-  return row ? { label: row.title, href: row.path } : null;
+  return row ? { label: hebrewPunct(row.title), href: row.path } : null;
 };
 function withDerivedLinks(data) {
   const row = MANIFEST_BY_ID.get(data.id);

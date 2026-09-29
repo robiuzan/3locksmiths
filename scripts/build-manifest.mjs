@@ -142,48 +142,84 @@ for (const p of site.pages) {
   });
 }
 
-// Attach related-link candidates (ids) to drive the internal-link silo.
+// Attach related-link candidates (ids) to drive the internal-link silo. These only reach
+// modules that do not author `related` themselves (enrich.mjs withDerivedLinks) — relevance
+// and adjacency are still done by authoring it; this is the default for the rest.
 const byKind = (k) => rows.filter((r) => r.kind === k);
+const normKeyword = (r) => (r.keyword || r.title || "").replace(/\s+/g, " ").trim();
 const brandRows = byKind("brand-key");
-const serviceRows = byKind("service");
 const locationRows = byKind("location");
-const genericServiceLinks = serviceRows.slice(0, 6); // door/lock/generic services
 const topLocations = locationRows.slice(0, 6);
+
+// The /services/ half of each duplicate-intent pair (/services/מנעולן-רכב/ vs /מנעולן-רכב/ and
+// so on — see the twins block below) is never a DEFAULT link target. Until 2026-09-29
+// `serviceRows.slice(0, 6)` put two or three of them on every derived service, location, core
+// and guide page, sending the silo's default equity to the side of each pair Google had not
+// indexed. Every twin page authors its own `related`, so the core -> /services/ link that keeps
+// each /services/ half reachable lives in those authored lists (77, 78, 113, 189) — keep it there.
+const coreKeywords = new Set(byKind("core").map(normKeyword));
+const serviceRows = byKind("service").filter((r) => !coreKeywords.has(normKeyword(r)));
+
+// Default service links for location, core and guide pages: the emergency and Tier-1 pages
+// (docs/keyword-map.md §2), not "whichever rows happen to come first". Synthetic ids from
+// scripts/pages.mjs — stable, like REFERENCE_ID.
+const PRIORITY_SERVICE_IDS = [9301, 9302, 9304, 9102]; // פתיחת רכב / פתיחת דלת / 24 שעות / החלפת מנעולים
+// enrich.mjs drops an id it cannot resolve without a word, so a retired id would silently
+// shrink every derived page's links. Fail here instead.
+for (const id of PRIORITY_SERVICE_IDS) {
+  if (!serviceRows.some((s) => s.id === id)) {
+    console.error(
+      `build-manifest: PRIORITY_SERVICE_IDS has ${id}, which is not a live, non-twin service row`,
+    );
+    process.exit(1);
+  }
+}
+
+// The car-keypad (קודן) cluster: its pages link each other plus the cluster hub, and the rest
+// of the services link each other — so a lockout page never defaults to "ניתוק קודן לרכב".
+// The hub is the /services/ twin (excluded from serviceRows above), so it is added explicitly.
+const isKodan = (r) => normKeyword(r).includes("קודן");
+const kodanHub = byKind("service").find((r) => normKeyword(r) === "קודן לרכב");
+
+// The next `n` siblings AFTER `self` in `list`, wrapping round. Every sibling window used to be
+// `list.slice(0, 5)`, so the first five brands and the first five cities collected ~33 inbound
+// links each while the other 27 brands and all 10 newer cities got 3 or none (Search Console
+// 2026-09-29: none of the starved pages had been crawled). A rotating window gives every
+// DERIVED page in a silo the same number of sibling links, and stays deterministic for the CI
+// byte check.
+function nextSiblings(list, self, n) {
+  const i = list.findIndex((x) => x.id === self.id);
+  const ordered = i < 0 ? list : [...list.slice(i + 1), ...list.slice(0, i)];
+  return ordered.slice(0, n).map((x) => x.id);
+}
 
 for (const r of rows) {
   const relatedServices = [];
   const relatedLocations = [];
   if (r.kind === "brand-key") {
-    // 5 sibling brands + parent ref (95) + a couple generic services
-    relatedServices.push(
-      ...brandRows
-        .filter((b) => b.id !== r.id)
-        .slice(0, 5)
-        .map((b) => b.id),
-    );
+    // 5 sibling brands + parent ref (95)
+    relatedServices.push(...nextSiblings(brandRows, r, 5));
     if (r.id !== REFERENCE_ID) relatedServices.push(REFERENCE_ID);
   } else if (r.kind === "service") {
+    const kodan = isKodan(r);
+    if (kodan && kodanHub && kodanHub.id !== r.id) relatedServices.push(kodanHub.id);
     relatedServices.push(
-      ...serviceRows
-        .filter((s) => s.id !== r.id)
-        .slice(0, 5)
-        .map((s) => s.id),
+      ...nextSiblings(
+        serviceRows.filter((s) => s.id !== REFERENCE_ID && isKodan(s) === kodan),
+        r,
+        kodan ? 4 : 5,
+      ),
     );
     if (r.id !== REFERENCE_ID) relatedServices.push(REFERENCE_ID);
   } else if (r.kind === "location") {
-    relatedLocations.push(
-      ...locationRows
-        .filter((l) => l.id !== r.id)
-        .slice(0, 5)
-        .map((l) => l.id),
-    );
+    relatedLocations.push(...nextSiblings(locationRows, r, 5));
     relatedServices.push(
       ...(r.id !== REFERENCE_ID ? [REFERENCE_ID] : []),
-      ...genericServiceLinks.slice(0, 3).map((s) => s.id),
+      ...PRIORITY_SERVICE_IDS.slice(0, 3),
     );
   } else {
     relatedServices.push(
-      ...serviceRows.slice(0, 4).map((s) => s.id),
+      ...PRIORITY_SERVICE_IDS,
       ...(r.id !== REFERENCE_ID ? [REFERENCE_ID] : []),
     );
     relatedLocations.push(...topLocations.slice(0, 3).map((l) => l.id));
@@ -201,7 +237,6 @@ for (const r of rows) {
 //
 // This also fixes a real orphan: /שכפול-שלט-לרכב-2/ (the WordPress duplicate-slug suffix)
 // had ZERO inbound links sitewide until this edge existed.
-const normKeyword = (r) => (r.keyword || r.title || "").replace(/\s+/g, " ").trim();
 const byKeyword = new Map();
 for (const r of rows) {
   const k = normKeyword(r);
@@ -239,7 +274,7 @@ console.log(`manifest: ${rows.length} pages →`, byK);
 console.log("brands:", brandRows.map((b) => `${b.id}:${b.brand}`).join(", "));
 console.log("locations:", locationRows.map((l) => `${l.id}:${l.city}`).join(", "));
 console.log(
-  "services(generic):",
+  "services(generic, twins excluded):",
   serviceRows.map((s) => `${s.id}:${s.keyword}`).join(", "),
 );
 console.log(

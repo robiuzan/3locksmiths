@@ -131,7 +131,8 @@ things to know:
   layout-level brand suffix. The brand is written into each title, and must appear exactly once.
 - It **forces `robots: { index: true, follow: true }`** on every page, overriding the source
   WordPress `noindex` per the owner's decision (`lib/content.ts:99`). Per-page robots values in the
-  snapshot are inert.
+  snapshot are inert. The catch-all then overrides the four `/step/` calculator fragments to
+  `noindex, follow` (`isFunnelStep()`, since 2026-09-29).
 
 ## The pipeline
 

@@ -524,7 +524,13 @@ function makePage({ id, title, segments, seo, body, jsonLd = [] }) {
 
 // -- link groups for the /services/ index and the /sitemap/ page --
 // Titles are decoded by scripts/enrich.mjs, which runs later — decode here too (e.g. פיג&#8217;ו).
-const label = (p) => he.decode(p.title || "");
+// The WordPress title then reads "פיג’ו" (U+2019); a visible label takes גרש/גרשיים (CLAUDE.md §8,
+// the same normalisation as linkTo in scripts/enrich.mjs).
+const label = (p) =>
+  he
+    .decode(p.title || "")
+    .replace(/([א-ת])['’]/g, "$1׳")
+    .replace(/([א-ת])"(?=[א-ת])/g, "$1״");
 const href = (p) => "/" + p.segments.join("/") + "/";
 const byPrefix = (prefix) => site.pages.filter((p) => p.path.startsWith(prefix));
 
@@ -889,6 +895,70 @@ const corePages = CORE_PATHS.map((path) => {
   return p ? { label: label(p), href: path } : null;
 }).filter(Boolean);
 
+// The guide list lives here, not with the guide pages below, because the /sitemap/ page is built
+// first and lists every guide (a Temporal Dead Zone error otherwise).
+const GUIDES = [
+  {
+    id: 9201,
+    slug: "כמה-עולה-שכפול-מפתח-לרכב",
+    title: "כמה עולה שכפול מפתח לרכב",
+  },
+  {
+    id: 9202,
+    slug: "אבד-המפתח-היחיד-לרכב",
+    title: "אבד המפתח היחיד לרכב – מה עושים",
+  },
+  {
+    id: 9203,
+    slug: "מפתח-עם-שבב-או-מפתח-חכם",
+    title: "מפתח עם שבב או מפתח חכם – מה ההבדל",
+  },
+  // Added 2026-08-26. The competitor teardown found the category leader running ~30 editorial
+  // articles against our 3 — the largest remaining breadth gap after the service and location
+  // work. These are chosen to support the money pages rather than to chase volume: each one
+  // answers a question that precedes a purchase decision and links into the relevant service.
+  {
+    id: 9204,
+    slug: "איך-לבחור-מנעולן-אמין",
+    title: "איך לבחור מנעולן אמין – מה לבדוק לפני שמזמינים",
+  },
+  {
+    id: 9205,
+    slug: "ננעלתי-מחוץ-לבית",
+    title: "ננעלתי מחוץ לבית – מה עושים ומה לא לעשות",
+  },
+  {
+    id: 9206,
+    slug: "כמה-עולה-החלפת-צילינדר",
+    title: "כמה עולה החלפת צילינדר – מחירון והסבר",
+  },
+  {
+    id: 9207,
+    slug: "מפתח-מקורי-או-חליפי",
+    title: "מפתח מקורי או חליפי לרכב – מה עדיף",
+  },
+  {
+    id: 9208,
+    slug: "איך-עובד-אימובילייזר",
+    title: "איך עובד אימובילייזר ברכב – הסבר מלא",
+  },
+  {
+    id: 9209,
+    slug: "סוגי-צילינדרים-לדלת",
+    title: "סוגי צילינדרים לדלת – השוואה ובחירה",
+  },
+  {
+    id: 9210,
+    slug: "תחזוקת-מפתח-חכם",
+    title: "תחזוקת מפתח חכם – סוללה, טווח ותקלות",
+  },
+  {
+    id: 9211,
+    slug: "מה-עושים-אחרי-פריצה-לבית",
+    title: "מה עושים אחרי פריצה לבית – סדר פעולות",
+  },
+];
+
 const sitemapGroups = [
   {
     heading: "עמודים ראשיים",
@@ -904,6 +974,16 @@ const sitemapGroups = [
   {
     heading: "אזורי שירות",
     links: byPrefix("/locations/").map((p) => ({ label: label(p), href: href(p) })),
+  },
+  // Until 2026-09-29 /sitemap/ listed no guide in its content (only the sitewide footer did),
+  // so each guide's only in-content link was from /מדריכים/ — a page Google had not crawled.
+  // /sitemap/ is indexed.
+  {
+    heading: "מדריכים",
+    links: [
+      { label: "כל המדריכים", href: `/${GUIDES_SEGMENT}/` },
+      ...GUIDES.map((g) => ({ label: g.title, href: `/${GUIDES_SEGMENT}/${g.slug}/` })),
+    ],
   },
 ];
 
@@ -986,67 +1066,8 @@ site.pages.push(
 // Hebrew path is fine: these are rendered by the ASCII catch-all app/[...slug]/, with the
 // Hebrew living in the data. (Creating an actual app/מדריכים/ DIRECTORY would break the Next 16
 // exporter — see app/thank-you/page.tsx.)
-const GUIDES = [
-  {
-    id: 9201,
-    slug: "כמה-עולה-שכפול-מפתח-לרכב",
-    title: "כמה עולה שכפול מפתח לרכב",
-  },
-  {
-    id: 9202,
-    slug: "אבד-המפתח-היחיד-לרכב",
-    title: "אבד המפתח היחיד לרכב – מה עושים",
-  },
-  {
-    id: 9203,
-    slug: "מפתח-עם-שבב-או-מפתח-חכם",
-    title: "מפתח עם שבב או מפתח חכם – מה ההבדל",
-  },
-  // Added 2026-08-26. The competitor teardown found the category leader running ~30 editorial
-  // articles against our 3 — the largest remaining breadth gap after the service and location
-  // work. These are chosen to support the money pages rather than to chase volume: each one
-  // answers a question that precedes a purchase decision and links into the relevant service.
-  {
-    id: 9204,
-    slug: "איך-לבחור-מנעולן-אמין",
-    title: "איך לבחור מנעולן אמין – מה לבדוק לפני שמזמינים",
-  },
-  {
-    id: 9205,
-    slug: "ננעלתי-מחוץ-לבית",
-    title: "ננעלתי מחוץ לבית – מה עושים ומה לא לעשות",
-  },
-  {
-    id: 9206,
-    slug: "כמה-עולה-החלפת-צילינדר",
-    title: "כמה עולה החלפת צילינדר – מחירון והסבר",
-  },
-  {
-    id: 9207,
-    slug: "מפתח-מקורי-או-חליפי",
-    title: "מפתח מקורי או חליפי לרכב – מה עדיף",
-  },
-  {
-    id: 9208,
-    slug: "איך-עובד-אימובילייזר",
-    title: "איך עובד אימובילייזר ברכב – הסבר מלא",
-  },
-  {
-    id: 9209,
-    slug: "סוגי-צילינדרים-לדלת",
-    title: "סוגי צילינדרים לדלת – השוואה ובחירה",
-  },
-  {
-    id: 9210,
-    slug: "תחזוקת-מפתח-חכם",
-    title: "תחזוקת מפתח חכם – סוללה, טווח ותקלות",
-  },
-  {
-    id: 9211,
-    slug: "מה-עושים-אחרי-פריצה-לבית",
-    title: "מה עושים אחרי פריצה לבית – סדר פעולות",
-  },
-];
+//
+// GUIDES (the data) is declared above sitemapGroups, which lists every guide.
 
 for (const g of GUIDES) {
   site.pages.push(

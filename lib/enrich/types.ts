@@ -101,7 +101,10 @@ export interface EnrichedPage {
   pricing: PricingRow[];
   advantages?: { caption?: string; intro?: string; features?: FeatureCard[] };
   faq: { subtitle?: string; items: FaqItem[] };
-  related: { services: RelatedLink[]; locations: RelatedLink[] };
+  // Omit to derive it from content/enriched/_manifest.json (enrich.mjs withDerivedLinks): a
+  // rotating window of siblings plus default services. Author it when relevance or geographic
+  // adjacency matters (docs/content-standards.md §3.8).
+  related?: { services: RelatedLink[]; locations: RelatedLink[] };
   cta: { heading: string; body?: string };
 
   // Guide pages (kind: "guide") — editorial content under /מדריכים/. Drive Article schema.
