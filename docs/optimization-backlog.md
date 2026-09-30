@@ -555,8 +555,14 @@ win; quote it as a removed 84 px jump. What is left is the font swap: Rubik arri
 paint and moves the hero's image column 63 px. 🔶 open — candidates are a metric-matched fallback
 face (`size-adjust` / `ascent-override`) or preloading the two Rubik woff2 files the hero uses.
 
-**10.8 LCP is the hero band, and it is now preloaded — built and measured 2026-09-30, ⏳ awaiting
-the production deploy.** `scripts/assets.mjs` reads the band's image URLs and its media query back
+**10.8 ✅ LCP is the hero band, and it is now preloaded — deployed 2026-09-30 (`b957941`,
+deployment `7affb63f`).** Verified on the live site: the homepage is byte-identical to the build,
+both tags are in the live `<head>`, the band is fetched once with no warning, and `/thank-you/`
+makes no route-data or image request. Re-measured live against the previous deployment: homepage
+1,948 → 1,520 ms (apex 1,616); on the service page the band is the only LCP candidate and paints
+with first paint in every run. (That last batch ran with this workstation at 74% CPU from other
+work, which a 4×-throttled probe amplifies — the table below, taken on a quiet machine, is the
+reference.) `scripts/assets.mjs` reads the band's image URLs and its media query back
 out of the stylesheet it generates and records them as `site.assets.band`; `components/SiteFrame`
 emits two `media`-scoped `<link rel="preload" as="image" type="image/avif" fetchpriority="high">`
 through react-dom's `preload()`, which places them at byte 271 of `<head>`, ahead of the first
