@@ -71,6 +71,18 @@ powershell -File "c:/Users/robiu/antigravity/Projects/Israeli services sites/ops
 Other flags: `-BuildOnly` (build + output gate, no upload), `-DeployOnly` (ship the existing `out/`
 as-is), `-SkipDriftCheck` (**only** when the roster is knowingly ahead of DNS).
 
+**Since 2026-09-30 `npm run build` runs a `prebuild` gate first** — check-freshness, check-claims,
+check-typography, check-campaigns, check-live-regions and the schedule simulator
+(`docs/dynamic-presence-plan.md` §4.3) — so the script's build step now fails on a stale
+`content/site.json` or a ⛔ claim instead of shipping it. Two rules in `check-campaigns` fail by
+the passage of time alone (campaign runway, calendar horizon). If one of them is red while you are
+shipping an unrelated hotfix, set `$env:LIVE_GATES = 'lapsed-ok'` in the same PowerShell session
+before `-Confirm`: only those two become warnings, everything else still blocks. The nuclear
+bypass `$env:npm_config_ignore_scripts = 'true'` skips the whole chain — only when the gate
+itself is broken, and note it in `logs/deploys.csv`. Note that the script rotates `out/` into
+`out.prev/` **before** building, so a prebuild failure leaves no `out/` — fix the gate (or use
+the override) and run again; `-DeployOnly` cannot rescue it.
+
 ## What the script does, and why each step exists
 
 1. Resolves the Pages project name from the roster (`3locksmiths`).

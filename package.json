@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "prebuild": "node scripts/check-freshness.mjs && node scripts/check-claims.mjs && node scripts/check-typography.mjs && node scripts/check-campaigns.mjs && node scripts/check-live-regions.mjs && node scripts/check-schedule.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",

@@ -466,6 +466,68 @@
   }
 }
 
+/* ---- header height reserve — the pre-JS layout ------------------------------------
+   `.nav-main` is position:absolute inside `.template-header`, and the theme reserves NO space
+   for it: until nav.js runs setPadding() — after hydration and the script replay, ~8 s into a
+   throttled mobile load — the header covers the top of the hero (the LCP element), and then the
+   whole page jumps down by the header's height. Measured on the live homepage, 2026-09-30,
+   from the inline `padding-top` nav.js itself writes, at 22 viewport widths with headless
+   Chrome: 84px at ≤1199, 126px at 1200–1440, 146px from 1441. The breakpoints are the theme's
+   own, and the reserve uses their exact complements — fractional widths exist under browser
+   zoom, and a plain `min-width: 1200px` would give 1199 < w < 1200 the wrong tier:
+     · main.css `@media (max-width: 1199px)` hides `.nav-center`, leaving `.nav-bottom`'s
+       84px (nav.js:19 agrees: `clientWidth <= 1199`)                    → 84px
+     · media.css `@media (max-width: 1440px)` shrinks `.nav-center__row` 61→50 and
+       `.nav-bottom .menu` 84→75 (+1px border = 126)                      → 126px above 1199
+     · above 1440 the base values apply: 61 + 84 + 1 = 146                → 146px above 1440
+       (media.css `(min-width: 1441px)` only widens `.container` — no height effect)
+
+   nav.js still overwrites this with its measured value once it runs, so a font-metric
+   difference costs a few px of shift instead of the full header. No theme rule targets
+   `.template-header` at all, so this is a reserve, not an override; the `body` prefix is
+   for consistency with the other chrome rules in this file.
+
+   ⚠️ When the announcement topbar ships (docs/dynamic-presence-plan.md Phase 1) it sits INSIDE
+   `.nav-main`, so nav.js will measure it — and these three values must grow by its height in
+   the same change, or the topbar reintroduces the shift this rule removes. */
+body .template-header {
+  padding-top: 84px;
+}
+@media (min-width: 1199.02px) {
+  body .template-header {
+    padding-top: 126px;
+  }
+}
+@media (min-width: 1440.02px) {
+  body .template-header {
+    padding-top: 146px;
+  }
+}
+
+/* ---- motion preference (WCAG 2.3.3 / IS 5568) ---------------------------------------
+   Zero `prefers-reduced-motion` rules exist in the vendored theme or in this file before this
+   block. The theme's floating phone button pulses forever with no guard
+   (main.css `.floated-right .phone-btn:before`, `animation: grow 2s ease-in-out infinite`) —
+   the one always-on motion on the site today. The `.live-*` selectors are the surfaces the
+   dynamic-presence plan adds (topbar, seasonal card, updates strip); they are inert until those
+   classes exist, and every one of them must stay on this list. */
+@media (prefers-reduced-motion: reduce) {
+  body .floated-right .phone-btn::before,
+  body .floated-right .phone-btn::after {
+    animation: none;
+  }
+  .live-topbar,
+  .live-dialog,
+  .live-dialog::backdrop,
+  .live-updates {
+    animation: none;
+    transition: none;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+}
+
 /* ---- /תודה/ — the form-success page (native route, no scraped chrome) ---- */
 .thankyou {
   min-height: 70vh;
