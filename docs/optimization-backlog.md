@@ -539,7 +539,37 @@ use, which requires knowing per-page which are needed.
 **10.6 No font preload.** Google Fonts (Alexandria, Rubik, Poppins) load via the original `<link>`
 to Google's CDN, matching the source.
 
-**10.7 CLS.** The theme CSS reserves most boxes. Verify any new enriched block reserves its own.
+**10.7 CLS — measured on the live deployments, 2026-09-30.** The theme CSS reserves most boxes;
+verify any new enriched block reserves its own. Under Lighthouse-equivalent mobile throttling
+(412×823, 4× CPU, slow 4G), reading Chrome's own `layout-shift` entries over the DevTools protocol:
+
+| Shift                                              | before (`13a50031`)                                                                      | after (`584cb3da`) |
+| -------------------------------------------------- | ---------------------------------------------------------------------------------------- | ------------------ |
+| Header jump when `nav.js` runs (~6.7 s)            | **0.102** — `section.s-home-hero y: 0 → 84`, but flagged `hadRecentInput`, so not scored | none               |
+| Rubik font swap rewrapping the hero (~2.4 s)       | 0.056                                                                                    | 0.048              |
+| **CLS as scored** (Lighthouse agrees, 3 runs each) | **0.056**                                                                                | **0.048**          |
+
+The header height reserve in `app/enrich.css` removed a jump every slow-phone visitor saw — and it
+barely moves the number, because Chrome never counted that jump. Do not quote the reserve as a CLS
+win; quote it as a removed 84 px jump. What is left is the font swap: Rubik arrives after first
+paint and moves the hero's image column 63 px. 🔶 open — candidates are a metric-matched fallback
+face (`size-adjust` / `ascent-override`) or preloading the two Rubik woff2 files the hero uses.
+
+**10.8 🔶 LCP now counts the hero background image — the next perf task.** Before the reserve,
+`main.page-template-builder` covered the whole viewport at first paint (the header is absolutely
+positioned over it), and Chrome disqualifies a background image on a viewport-filling element as
+"page background" — so LCP was the `<h1>`, ~2.3 s throttled. With `main` starting below the header
+its background (`Group-1948753239-1-ezgif.com-crop.avif`) qualifies, and lab LCP reads **~3.1 s**:
+TTFB 0.03 s, **resource load delay 1.9 s**, load 1.1 s, render delay 0.06 s. No pixel arrives later
+than before — FCP is unchanged at 2.3 s — but the reported number is higher, and it is the honest
+one: that image is the largest thing on the screen.
+
+The 1.9 s is discovery: a CSS background is found only after `main.css` parses. The fix is a
+`<link rel="preload" as="image" fetchpriority="high">` for the hero background (with `media` for
+the mobile variant `scripts/assets.mjs` already emits), **measured on a preview deployment before
+it ships** — a localhost harness cannot measure this site's LCP, and a −1.6 s prediction made on
+one moved production not at all. There is no field data to worry about meanwhile: at this traffic
+the property has no CrUX sample.
 
 ---
 

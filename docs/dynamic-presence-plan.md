@@ -482,6 +482,16 @@ the first seasonal window is **Hanukkah (first candle 04/12/2026)**.
 | 0.7 | Fix stale doctrine that would misjudge this plan: `conversion-optimizer` (24/7 is ✅), `aeo-geo-strategist` + `/aeo-answer-content` + backlog §6.1 (the live robots.txt allows every AI bot), `local-presence-strategist` (posts live 6 months; Q&A discontinued 2025-11-03; the two payload shapes), `web-security-headers` (`_headers` exists), CLAUDE.md §1 (no contact popup) and §4 (`html-react-parser` is not a dependency)          | operator                | agents cite `business-facts` rows instead of restating facts    |
 | 0.8 | Enable Cloudflare Page Shield (free) so the report-only CSP finally reports                                                                                                                                                                                                                                                                                                                                                                 | owner (zone toggle)     | violations visible in the dashboard                             |
 
+> **Live result of 0.6 — deployed 2026-09-30, `584cb3da`.** Under throttled mobile emulation on
+> the live deployments the old build rendered the hero under the header and jumped it 84 px when
+> `nav.js` ran (~6.7 s — a 0.102 layout shift); the new build renders it in place from first paint
+> and nothing moves. Chrome had excluded that jump from the CLS score, so the scored number only
+> moves 0.056 → 0.048; the remainder is the Rubik font swap. A side effect worth knowing: LCP is
+> now attributed to the hero background image (~3.1 s) instead of the `<h1>` (~2.3 s) — the same
+> pixels at the same moments, a different element counted. Both are logged as backlog §10.7–10.8.
+> The background-image preload is the next perf task, and Phase 1 must re-run this same probe
+> when the topbar grows the reserve.
+
 ### Phase 1 — Calendar, topbar, gates (weeks 1–2)
 
 1. `scripts/calendar-sync.mjs` + `_calendar.overlay.json` → `content/enriched/_calendar.json`
