@@ -120,6 +120,33 @@ jobs:
             echo "::error::JS bundle over 1 MB in the export"; exit 1
           fi
 
+      # The hero band is the LCP element on every content page, and its preload is emitted by
+      # react-dom's preload() in components/SiteFrame.tsx (backlog §10.8). Today React writes it
+      # as a <link> ahead of the first stylesheet. If a future Next/React configuration ever gives
+      # the renderer `onHeaders`, React moves a high-priority image preload into an HTTP `Link`
+      # header instead — and a static export has no headers, so the preload would vanish with no
+      # error and LCP would quietly go back up. This asserts the tag is in the file a browser
+      # actually receives, with the media query the CSS uses, read from the same data.
+      - name: Assert the hero-band preload
+        run: |
+          set -euo pipefail
+          node -e '
+            const fs=require("fs");
+            const band=JSON.parse(fs.readFileSync("content/site.json","utf8")).assets.band;
+            const h=fs.readFileSync("out/index.html","utf8");
+            const head=h.slice(0,h.indexOf("</head>"));
+            const css=head.indexOf("rel=\"stylesheet\"");
+            let bad=0;
+            if(!band||band.preloads.length!==2){console.log("::error::site.assets.band is missing or malformed");process.exit(1);}
+            for(const p of band.preloads){
+              const i=head.indexOf("href=\""+p.href+"\"");
+              const tag=i<0?"":head.slice(head.lastIndexOf("<link",i),head.indexOf(">",i)+1);
+              const ok=tag.includes("rel=\"preload\"")&&tag.includes("as=\"image\"")&&tag.includes("media=\""+p.media+"\"")&&i<css;
+              if(!ok){bad++;console.log("::error::hero-band preload missing, late or wrong in out/index.html: "+p.href);}
+            }
+            console.log("hero-band preloads in <head> before the first stylesheet: "+(band.preloads.length-bad)+"/"+band.preloads.length);
+            process.exit(bad?1:0);'
+
       # §9.2 - every emitted route must have an inbound internal link. The footer was
       # rebuilt 2026-08-25 to reach both silos; this stops it silently regressing.
       - name: Assert no orphaned routes

@@ -44,9 +44,27 @@ export interface SitePage {
   bodyHtml: string;
 }
 
+/** One `<link rel="preload" as="image">` for the hero band's background. */
+export interface BandPreload {
+  href: string;
+  type: string;
+  media: string;
+}
+
+/**
+ * The hero band: a CSS background painted by the theme on a few classes, and the LCP element on
+ * every page that carries one of them. Derived by scripts/assets.mjs from the stylesheet it
+ * generates — never typed by hand, because a preload that does not match the CSS request
+ * exactly downloads the image twice.
+ */
+export interface BandAssets {
+  classes: string[];
+  preloads: BandPreload[];
+}
+
 export interface SiteData {
   wpUrl: string;
-  assets: { headLinks: HeadLink[]; headStyles: string[] };
+  assets: { headLinks: HeadLink[]; headStyles: string[]; band?: BandAssets };
   pages: SitePage[];
 }
 
@@ -54,6 +72,22 @@ const site = rawSite as unknown as SiteData;
 
 export function getSite(): SiteData {
   return site;
+}
+
+/**
+ * The band preloads for one page — empty when its body carries none of the band's classes.
+ *
+ * Today every snapshot page paints the band (105 through `.page-template-builder`, the four
+ * calculator steps through `.post-template-single`), so this returns the full list for all 109.
+ * The test is kept because that is a property of the scrape, not a guarantee: a page added
+ * without the band must not preload an image it will never use. The native routes (/thank-you/,
+ * the 404) never reach here — they do not render SiteFrame.
+ */
+export function getBandPreloads(page: SitePage): BandPreload[] {
+  const band = site.assets.band;
+  if (!band || band.classes.length === 0) return [];
+  const paintsBand = new RegExp(`class="[^"]*\\b(?:${band.classes.join("|")})\\b`);
+  return paintsBand.test(page.bodyHtml) ? band.preloads : [];
 }
 
 export function getFrontPage(): SitePage {

@@ -657,6 +657,104 @@ mainCss =
 mkdirSync(FA_OUT_DIR, { recursive: true });
 writeFileSync(MAIN_OUT, mainCss, "utf8");
 
+// 6b′. what the LCP element needs preloaded — recorded as DATA, read by components/SiteFrame.
+//
+// The hero band is a CSS background on `.page-template-builder`, and it is the LCP element on
+// every page that paints it (measured 2026-09-30 on the homepage, a service page, a location
+// page and the guides hub — docs/optimization-backlog.md §10.8). A background is discovered only
+// after THIS stylesheet downloads and parses: 1.9 s of "resource load delay" on a throttled
+// phone, for an 8.6 KB file, requested at Low priority. A <link rel="preload"> in the HTML moves
+// discovery to the first bytes of the document.
+//
+// A preload must name EXACTLY the URL the rule requests, under EXACTLY its media condition — a
+// mismatch downloads the image twice and logs "preloaded but not used". So the URLs, the media
+// query and the classes are read back out of the CSS written two lines above, never typed into a
+// component: if the theme's image or breakpoint ever changes, the preload follows, or this fails.
+//
+// AVIF only — and what that costs on browsers that do not take the image-set() branch:
+//   · no AVIF at all (Safari ≤ 15, Chrome < 85): `type="image/avif"` makes the browser skip the
+//     preload, and it finds the WebP through the plain `url()` declaration exactly as before.
+//   · AVIF yes, `type()` inside image-set() no (iOS/macOS Safari 16.x, Chromium 85–112 — about
+//     1.7% of global traffic on 2026-09-30, mostly Chrome 109 and iOS 16): the preload's type
+//     check passes, so the AVIF downloads (8.6 KB mobile / 28 KB desktop) and is never used; the
+//     WebP then loads as late as it always did. A wasted request and a "preloaded but not used"
+//     console warning, never a wrong image. No markup can close this — a <link> cannot test for
+//     image-set type() — and preloading WebP instead would make every current browser fetch
+//     both formats. So a warning from Safari 16 or Chrome 109 is this, not a URL mismatch.
+const BAND_SELECTOR = ".page-template-builder";
+
+/** Every rule whose selector list names the band and whose body carries an AVIF image-set(). */
+function bandRules(css) {
+  const found = [];
+  const scan = (text, media) => {
+    let i = 0;
+    while (i < text.length) {
+      const open = text.indexOf("{", i);
+      if (open === -1) break;
+      let depth = 1;
+      let j = open + 1;
+      while (j < text.length && depth) {
+        if (text[j] === "{") depth++;
+        else if (text[j] === "}") depth--;
+        j++;
+      }
+      const prelude = text.slice(i, open).trim();
+      const body = text.slice(open + 1, j - 1);
+      if (/^@media\b/i.test(prelude)) {
+        scan(body, prelude.replace(/^@media\s*/i, "").trim());
+      } else if (!prelude.startsWith("@")) {
+        const selectors = prelude.split(",").map((s) => s.trim());
+        const avif = /image-set\(\s*url\('([^']+\.avif)'\)\s*type\('image\/avif'\)/.exec(
+          body,
+        );
+        if (avif && selectors.includes(BAND_SELECTOR)) {
+          found.push({ media, avif: avif[1], selectors });
+        }
+      }
+      i = j;
+    }
+  };
+  scan(css.replace(/\/\*[\s\S]*?\*\//g, ""), null);
+  return found;
+}
+
+const band = bandRules(mainCss);
+const bandBase = band.filter((b) => b.media === null);
+const bandAlt = band.filter((b) => b.media !== null);
+const bandClasses = bandBase[0]?.selectors ?? [];
+const bandFiles = band.map((b) => join(ROOT, "public", b.avif));
+if (
+  bandBase.length !== 1 ||
+  bandAlt.length !== 1 ||
+  !bandClasses.every((s) => /^\.[\w-]+$/.test(s)) ||
+  !bandFiles.every((f) => existsSync(f))
+) {
+  console.error(
+    "assets: cannot derive the hero-band preload. Expected exactly one base rule and one\n" +
+      `  @media rule for ${BAND_SELECTOR}, each with an AVIF image-set() whose file exists, and a\n` +
+      "  selector list of plain classes. Found: " +
+      JSON.stringify(
+        band.map((b) => ({ media: b.media, avif: b.avif, selectors: b.selectors })),
+      ) +
+      "\n  A second breakpoint needs the base rule's media negation rewritten — see 6b′.",
+  );
+  process.exit(1);
+}
+// The variant under the media query first, then the base under its exact negation, so exactly
+// one of the two ever applies — `not all and (…)` is the standard complement of a media query,
+// with no fractional-pixel gap the way `min-width: 769px` would leave one.
+site.assets.band = {
+  classes: bandClasses.map((s) => s.slice(1)),
+  preloads: [
+    { href: bandAlt[0].avif, type: "image/avif", media: bandAlt[0].media },
+    {
+      href: bandBase[0].avif,
+      type: "image/avif",
+      media: `not all and ${bandAlt[0].media}`,
+    },
+  ],
+};
+
 // content/site.json is stateful — nothing regenerates the scraped head between runs — so this
 // has to converge, not fire once. Matching the vendored path ALONE made the second `npm run
 // enrich` a hard failure: run 1 rewrote the href, run 2 found nothing left to rewrite and could
@@ -715,6 +813,10 @@ console.log(
   `assets: main.css → ${MAIN_HREF} (${hadImport ? "Google Fonts @import removed" : "no @import found"}, ` +
     `${bgRules} background rule(s) re-encoded, ${(bgSaved / 1024).toFixed(0)} KB smaller)` +
     (droppedFonts.length ? `; dropped the Alexandria/Poppins stylesheet` : ``),
+);
+console.log(
+  `assets: hero band → preload recorded for .${site.assets.band.classes.join(" / .")}: ` +
+    site.assets.band.preloads.map((p) => `${basename(p.href)} [${p.media}]`).join(", "),
 );
 console.log(
   `assets: icons → favicon.ico (${ICO_SIZES.join("/")}) + apple-touch ${APPLE_PX}px, ` +

@@ -64,7 +64,14 @@ export default function ThankYouPage() {
           </a>
         </div>
         <p className="thankyou__back">
-          <Link href="/">חזרה לעמוד הבית</Link>
+          {/* prefetch={false} is load-bearing. This is the one next/link on the site, and by
+              default it prefetches the homepage's route data as soon as it is in view: ~400 KB
+              on the conversion page, for a link few visitors follow. Since the hero band is
+              preloaded (components/SiteFrame.tsx) that data also carries the preload hints, so
+              the browser would fetch the band image here — a page that never paints it. */}
+          <Link href="/" prefetch={false}>
+            חזרה לעמוד הבית
+          </Link>
         </p>
       </div>
     </main>

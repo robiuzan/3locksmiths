@@ -555,7 +555,49 @@ win; quote it as a removed 84 px jump. What is left is the font swap: Rubik arri
 paint and moves the hero's image column 63 px. 🔶 open — candidates are a metric-matched fallback
 face (`size-adjust` / `ascent-override`) or preloading the two Rubik woff2 files the hero uses.
 
-**10.8 🔶 LCP now counts the hero background image — the next perf task.** Before the reserve,
+**10.8 LCP is the hero band, and it is now preloaded — built and measured 2026-09-30, ⏳ awaiting
+the production deploy.** `scripts/assets.mjs` reads the band's image URLs and its media query back
+out of the stylesheet it generates and records them as `site.assets.band`; `components/SiteFrame`
+emits two `media`-scoped `<link rel="preload" as="image" type="image/avif" fetchpriority="high">`
+through react-dom's `preload()`, which places them at byte 271 of `<head>`, ahead of the first
+stylesheet, on all 109 snapshot pages. Production (`584cb3da`) against a preview of this build
+(`a6046e99`), alternating runs, Chrome's own LCP entries:
+
+| Page                                  | LCP before | LCP after      | Band request starts | Priority   |
+| ------------------------------------- | ---------- | -------------- | ------------------- | ---------- |
+| Homepage — throttled phone (5 + 5)    | 1,848 ms   | **1,468 ms**   | 1,142 → 210 ms      | Low → High |
+| Service — throttled phone (5 + 5)     | 1,860 ms   | **1,284 ms**   | 957 → 211 ms        | Low → High |
+| Location — throttled phone (5)        | 1,820 ms   | **1,432 ms**   | 966 → 201 ms        | Low → High |
+| Guides hub — throttled phone (3)      | 1,760 ms   | **1,364 ms**   | 977 → 232 ms        | Low → High |
+| Calculator step — throttled phone (3) | 1,540 ms   | **1,276 ms**   | 889 → 210 ms        | Low → High |
+| Homepage — desktop (6)                | 632 ms     | **480 ms**     | 303 → 68 ms         | Low → High |
+| Service — desktop (6–8)               | 560–608 ms | **456–484 ms** | 264 → 60 ms         | Low → High |
+| Location — desktop (8)                | 564 ms     | **496 ms**     | 259 → 60 ms         | Low → High |
+
+One request per load and zero "preloaded but not used" warnings in every run. LCP now coincides
+with first paint: the band is already there when the page first renders, where before the white
+headline was painted on a white page until the band arrived. What it costs and what it does not do:
+
+- **First paint is 20–65 ms later** on a throttled phone (the image shares the connection with the
+  render-blocking CSS). A preload _without_ `fetchpriority="high"` was built and measured as a
+  third arm precisely to avoid that — it starts just as early, is starved by the CSS, finishes no
+  sooner than today, and gains nothing (homepage 1,808 ms vs 1,848). The priority is the fix.
+- **~1.7% of browsers waste it** — those that decode AVIF but reject `type()` inside
+  `image-set()` (iOS/macOS Safari 16.x, Chromium 85–112): they download the AVIF (8.6 KB mobile /
+  28 KB desktop), never use it, and paint the WebP as late as before. No markup can detect that. A
+  "preloaded but not used" warning from those versions is this, not a URL mismatch.
+- **`/thank-you/` needed a fix first.** Its `<Link href="/">` prefetched the homepage's route data
+  — ~78 KB on every lead conversion, a waste that predates this change — and that data now
+  carries the preload hints, so the conversion page would have fetched the band image it never
+  paints. `prefetch={false}` removes both; verified by listing the page's requests.
+- CI asserts the two tags are in the exported HTML ahead of the first stylesheet: React moves a
+  high-priority image preload into an HTTP `Link` header when the renderer is given `onHeaders`,
+  and a static export would lose that silently.
+
+LCP is now bounded by first paint, so the next LCP gain has to come from the render-blocking CSS
+(nine stylesheets) — and the remaining CLS from the Rubik font swap (§10.7).
+
+_How LCP came to be the band, recorded when the header reserve shipped:_ before the reserve,
 `main.page-template-builder` covered the whole viewport at first paint (the header is absolutely
 positioned over it), and Chrome disqualifies a background image on a viewport-filling element as
 "page background" — so LCP was the `<h1>`, ~2.3 s throttled. With `main` starting below the header
