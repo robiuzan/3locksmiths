@@ -41,7 +41,9 @@
       "Skill(site-navigation)",
       "Skill(guides-hub)",
       "Skill(engagement-ux)",
-      "Skill(reporting-cadence)"
+      "Skill(reporting-cadence)",
+      "Skill(dynamic-presence)",
+      "Skill(israeli-calendar)"
     ],
     "deny": [
       "Edit(content/site.json)",
@@ -55,6 +57,18 @@
     ]
   },
   "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard-live-surfaces.ps1\"",
+            "statusMessage": "Guarding functions/ and secrets"
+          }
+        ]
+      }
+    ],
     "Stop": [
       {
         "hooks": [

@@ -60,12 +60,12 @@ const BLOCKING = [
   {
     id: "customer-count",
     re: /אלפי לקוחות|מאות לקוחות|אלפי מפתחות/,
-    why: "the Business Profile holds 0 reviews (owner, 2026-09-05) — the count has no source.",
+    why: "no genuine, ledgered review exists (docs/business-facts.md §B.5) — the count has no source.",
   },
   {
     id: "ratings",
     re: /aggregateRating|reviewCount/,
-    why: "zero collected reviews; a fabricated rating is a Google policy violation.",
+    why: "no genuine, ledgered review (docs/business-facts.md §B.5); a fabricated rating is a Google policy violation.",
   },
 ];
 
@@ -82,7 +82,7 @@ const BLOCKING_RAW = [
   {
     id: "fabricated-rating-badge",
     re: /GoogleRating|aggregateRating|reviewCount/,
-    why: "asserts a star rating we cannot source — docs/business-facts.md §B has zero reviews.",
+    why: "asserts a star rating we cannot source — docs/business-facts.md §B.5: no genuine review is ledgered.",
   },
   {
     // 2026-08-30: this guard matched on the token `GoogleRating`, so it caught the theme's badge
@@ -112,7 +112,7 @@ const BLOCKING_RAW = [
     // testimonials with invented customer names on the live homepage until 2026-08-26.
     id: "review-widget-markup",
     re: /saswp-r2-strs|saswp-rc-cnt|s-feedback/,
-    why: "review-widget markup on a site with zero collected reviews — it renders fabricated testimonials.",
+    why: "review-widget markup with no genuine, ledgered review (docs/business-facts.md §B.5) — it renders fabricated testimonials.",
   },
 ];
 

@@ -33,7 +33,9 @@ Consequences you must internalise:
   the utilities layer is. Importing preflight or theme clobbers the gogo theme's cascade — this was
   verified by computed-style comparison against the live site.
 - **jQuery is load-bearing.** `components/ThemeScripts.tsx` replays the original script sequence in
-  document order. Removing it breaks the nav, the carousels, the contact popup and the calculator.
+  document order. Removing it breaks the nav, the carousels and the calculator. (The magnific
+  "contact popup" this line once listed no longer exists — 0 `.modal-handler` elements sitewide
+  since the 2026-08-26 pruning; a new popup must be a native `<dialog>`, see `/dynamic-presence`.)
 - Editing a page means editing its **authored module** and re-running the pipeline, never editing
   `content/site.json` by hand.
 
@@ -102,7 +104,7 @@ Consequences you must internalise:
 ## 4. Stack
 
 Next.js **16.2.9** App Router · React **19.2.4** · TypeScript strict · Tailwind **v4, utilities layer
-only** · `@ishub/site-kit` (vendored tarball) · `he` · `html-react-parser` · `node-html-parser` (build
+only** · `@ishub/site-kit` (vendored tarball) · `he` · `node-html-parser` (build
 scripts). Flat layout, path alias `@/* -> ./*`.
 
 > ⚠️ **This is not the Next.js you know.** 16.2.9 has breaking changes against older majors — `params`
@@ -386,3 +388,8 @@ sitemap parity, unique titles, one H1, **JSON-LD parseability**, no `aggregateRa
 - Don't put PII in `dataLayer`.
 - Cloudflare zone settings (AI crawler policy, Scrape Shield, cache rules) are **the owner's to
   change**. Document the exact toggle; never assume it was done.
+- Any topbar, popup, banner, feed, seasonal or reviews surface follows
+  [docs/dynamic-presence-plan.md](docs/dynamic-presence-plan.md) and `/dynamic-presence`: every
+  word ships through `content/site.json`, the browser only _selects_ a pre-guarded variant, the
+  edge only _hides_. Never a runtime text source, never a `functions/` folder, never a second
+  client component for it.

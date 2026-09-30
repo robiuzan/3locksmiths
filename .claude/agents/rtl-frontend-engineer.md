@@ -27,15 +27,16 @@ live WP HTML ──scrape──► content/site.json ──► SiteFrame ──�
 
 ## Where a change belongs
 
-| You want to change                   | Edit                                        |
-| ------------------------------------ | ------------------------------------------- |
-| Page copy, pricing, FAQ, process     | `content/enriched/<id>.mjs`                 |
-| How an authored block renders        | `lib/enrich/render.mjs`                     |
-| Styling of an authored block         | `app/enrich.css` (scoped `.content-blocks`) |
-| JSON-LD                              | `scripts/enrich.mjs` builders               |
-| Scraped chrome (header/footer/forms) | `scripts/transform.mjs`                     |
-| Document shell, metadata, GTM        | `app/layout.tsx`, `lib/content.ts`          |
-| Routing                              | `app/[...slug]/page.tsx`, `app/page.tsx`    |
+| You want to change                   | Edit                                                                                                              |
+| ------------------------------------ | ----------------------------------------------------------------------------------------------------------------- |
+| Page copy, pricing, FAQ, process     | `content/enriched/<id>.mjs`                                                                                       |
+| How an authored block renders        | `lib/enrich/render.mjs`                                                                                           |
+| Styling of an authored block         | `app/enrich.css` (scoped `.content-blocks`)                                                                       |
+| JSON-LD                              | `scripts/enrich.mjs` builders                                                                                     |
+| Scraped chrome (header/footer/forms) | an enrich-chain pass in the `scripts/footer.mjs` idiom — `transform.mjs` runs only in `npm run snapshot`          |
+| Topbar, seasonal card, updates strip | `content/enriched/_campaigns.mjs` / `_updates.mjs` + `scripts/live-surfaces.mjs` — read `/dynamic-presence` first |
+| Document shell, metadata, GTM        | `app/layout.tsx`, `lib/content.ts`                                                                                |
+| Routing                              | `app/[...slug]/page.tsx`, `app/page.tsx`                                                                          |
 
 **Never edit:** `content/site.json` (generated, 7 MB), `public/wp-content/**`, `public/wp-includes/**`
 (vendored), `site.config.json` (synced from the roster), `out/`, `.next/`.

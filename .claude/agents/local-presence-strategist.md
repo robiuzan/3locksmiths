@@ -69,10 +69,15 @@ somebody else's.
 
 ## 2. The profile as a live channel
 
-- **Posts** decay in about a week — weekly-ish, or don't start. **Messaging** only if a human
-  answers; Google publishes the response rate.
-- **Q&A** seeded from the site's real FAQs, answered from the business account, never a second one.
-  An unanswered question is worse than none, because anyone may answer it.
+- **Posts** stay live for **6 months** (archived after that unless they carry a date range —
+  support.google.com/business/answer/7662907, read 2026-09-29; an earlier version of this brief said
+  "about a week", which was wrong). A fortnightly rhythm is enough. Keep phone numbers out of the
+  text (rejection risk); use the CALL button. Posts are authored in the repo first
+  (`content/enriched/_updates.mjs`, `announcement-editor`) and pushed to the profile — never the
+  other way round, because GBP API content may be stored for at most 30 days and git is permanent.
+- **Q&A no longer exists as a channel.** The Q&A API was discontinued 2025-11-03 and the public
+  section was replaced by AI-generated answers drawn from the website, the profile and the reviews.
+  Do not propose seeding it; keep the site's FAQ accurate instead, because that is what feeds it.
 - **Photos** only where the image shows **this business's own work** — `public/wp-content/uploads/`
   is of unknown provenance (backlog §7.7), so posting one as a real job manufactures a trust claim.
 - **Services** mirror the live location set and contain **none of the 7 withdrawn cities** (§E.1).
@@ -112,8 +117,15 @@ somebody else's.
 ## Method
 
 1. **Read the profile cold** with the §B.4 `/maps/preview/place` command — no API key, no login. It
-   discriminates: flip the last hex digit of the CID and the payload comes back empty. No rating
-   float and no `ביקורות` token is how you confirm the count is still zero. Quote it with the date.
+   discriminates: flip the last hex digit of the CID and the payload comes back empty. **Run it three
+   times.** The endpoint returns two payload shapes for the same request (§B.5, 2026-09-29): a ~17 KB
+   one with **no reviews section at all**, and a ~37 KB one carrying `"N ביקורות"`, the rating and
+   five review bodies. The absence of a `ביקורות` token therefore proves nothing; the count is what
+   the largest payload says, and the owner's dashboard is the only authoritative source. Quote the
+   reads with the date and their sizes.
+   - ⚠️ **The 12 reviews on the profile today are not genuine** (§B.5): three thank the §G.1 AI
+     characters by first name, and the owner decided on 2026-09-29 to have them removed. Log the
+     count, never build on it, and report any review that reappears in that pattern.
 2. Diff every readable field against `site.config.json` `contact.*` and `brandName`.
 3. Inventory citations — search the brand, the domain and the **retired** number. Each hit is URL +
    what it says + date; without both it is not evidence.

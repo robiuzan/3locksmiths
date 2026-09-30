@@ -77,16 +77,35 @@ the ceiling: imagery and copy must never imply more than three people. It does *
 Still open: no individual is **named** anywhere on the site, so `authorName` stays absent on all 12
 guides (`scripts/enrich.mjs:132-137`). A fabricated byline is worse than an absent one.
 
+### A.3 Who does the work, and who runs the site — ✅ OWNER, 2026-09-29
+
+**Leads are routed to a fixed set of three partner locksmiths** — the same three people every time
+(consistent with §A.2). The website and the lead line are operated by the marketing company
+(Steady Improvement — `Israeli services sites/CLAUDE.md`); the **Business Profile is verified on
+one of the locksmiths' own Google accounts**, not the operator's.
+
+What follows from it:
+
+- "שלושה מנעולנים", "אנחנו" and "הצוות שלנו" remain honest — there are three, and they are fixed.
+- No page, update card or Business Profile post may imply that the **operator** performed a job, or
+  that "we" is anyone other than those three.
+- Google's eligibility rule against lead-generation agents holding a profile is satisfied only
+  because a locksmith's own account owns it. **Never move the profile to an operator account.**
+- 🔶 **The legal entity behind the site is still unrecorded** (`legalName: null` in the roster). It is
+  the data controller the privacy notice must name, and the party any priced offer would have to
+  identify (Consumer Protection Law §14ג). Nothing in `docs/dynamic-presence-plan.md` collects data,
+  so it blocks nothing there — but it blocks any lead form beyond the existing one.
+
 ## B. Reputation & social proof
 
-| Fact                    | Value                           | Status | Source                                      |
-| ----------------------- | ------------------------------- | ------ | ------------------------------------------- |
-| Google Business Profile | live, claimed and verified      | ✅     | owner, 2026-09-05 — §B.4                    |
-| Reviews on the profile  | **0**                           | ✅     | owner, 2026-09-05 — §B.4                    |
-| Review count / rating   | "Google rating 5.0 ★★★★★"       | ⛔     | see §B.1                                    |
-| Testimonials            | 3 named reviews on the homepage | ⛔     | see §B.2                                    |
-| Social profiles         | —                               | 🔶     | `sameAs` holds the profile and nothing else |
-| Case studies            | —                               | 🔶     | none                                        |
+| Fact                    | Value                               | Status | Source                                      |
+| ----------------------- | ----------------------------------- | ------ | ------------------------------------------- |
+| Google Business Profile | live, claimed and verified          | ✅     | owner, 2026-09-05 — §B.4                    |
+| Reviews on the profile  | **12 — not genuine, being removed** | ⛔     | read + owner, 2026-09-29 — §B.5             |
+| Review count / rating   | "Google rating 5.0 ★★★★★"           | ⛔     | see §B.1                                    |
+| Testimonials            | 3 named reviews on the homepage     | ⛔     | see §B.2                                    |
+| Social profiles         | —                                   | 🔶     | `sameAs` holds the profile and nothing else |
+| Case studies            | —                                   | 🔶     | none                                        |
 
 **As of 2026-09-05 one thing off this site corroborates the entity.** The owner supplied a Google
 Business Profile and `schema.sameAs` now points at it. For a single-trade local business that is the
@@ -248,6 +267,49 @@ a real count with a verifiable public source. The move is to earn reviews on the
 mirror a number onto the site.
 
 ---
+
+### B.5 Twelve reviews appeared — and they are not genuine — 2026-09-29
+
+**What was read.** The §B.4 command, run three times in a row on 2026-09-29, returned **two
+different payload shapes** for the same request: 17,928 B and 17,203 B with no reviews section at
+all, and 37,059 B carrying `"12 ביקורות"`, a rating of `5`, and five visible reviews dated
+2026-09-22 → 2026-09-28. So:
+
+> ⚠️ **"No `ביקורות` token" never meant "0 reviews".** The 17 KB shape simply omits the reviews
+> section, and the `דירוג והוספת ביקורת` prompt appears in _both_ shapes, so it is not an empty-state
+> marker either. The 2026-09-05 read happened to be right (the owner confirmed 0 that day), but the
+> inference was unsound. **Read three times, look for `"\d+ ביקורות"`, and treat the owner's
+> dashboard as the only authoritative count.** `docs/local-presence.md` §1 now records both shapes.
+
+**What the reviews say.** All five visible ones are 5 stars. Three thank a technician by first name
+— `תודה רבה לשרון`, `הגיע אביעד משלושה מנעולנים`, `תודה רבה אבי`. Those are the first names of the
+three **AI-generated brand characters** filed in §G.1 (אבי יחזקל, אביעד בן שושן, שרון אליקים).
+
+**The owner confirmed 2026-09-29 that these are NOT the real technicians' names.** The reviews
+therefore thank people who do not exist. Two of the five come from accounts with a single review;
+none has an owner reply; twelve arrived in seven days on a profile that had none for three weeks.
+That is the pattern Google's Maps content policy names ("unusual volumes or patterns"), the pattern
+the site's own guide 9204 tells readers to distrust, and — with a rating asserted on the strength of
+them — the same class of defect as §B.1–B.3.
+
+**Decision (owner, 2026-09-29): have them removed, and start a genuine ask-flow.** Whoever posted
+each review deletes it from their own Google account; the owner replies to none; the site publishes
+**no** review, count, rating, badge or "see our reviews" link until a genuine, dated, ledgered
+baseline exists (`docs/dynamic-presence-plan.md` §3.4, §4.6). `Review` and `AggregateRating` stay
+forbidden exactly as before.
+
+**Also on the profile, read the same day:** four owner-uploaded photos, two of which are the
+catalog's AI-generated images (`home-cta-1.jpg` and the `hero-car` character) — against Google's
+"the image should represent reality" guideline and §G.1's own rule; and an owner-written description
+claiming plural vans (`הניידות שלנו`), a price quoted in advance, and regular service to garages,
+dealerships and fleets — 🔶 none of which is confirmed here. Replace the two photos with real
+key/lock photos and re-read the description against this file.
+
+**Identifiers, recorded here because Google lets them be stored indefinitely:** Place ID
+`ChIJpcB6V12ivggRi8lyDvLJiNs`; the Google-issued reviews page
+`https://search.google.com/local/reviews?placeid=ChIJpcB6V12ivggRi8lyDvLJiNs`. The official
+"Get more reviews" link and QR must be copied from the dashboard on a desktop browser, never
+rebuilt from the place ID.
 
 ## C. Contact & NAP
 
@@ -697,6 +759,21 @@ seven published key-type plates each card should point at. A wrong plate is what
 about, and a glyph makes no claim at all.
 
 ---
+
+### D.10 There are no seasonal offers — ✅ OWNER, 2026-09-29
+
+**No discount, special price or promotion exists.** Every `מבצע` in the authored copy is the verb
+("לבצע"), and the only near-offer wording, `ללא עלות נוספת`, is a warranty-type promise that is
+itself 🔶 (§D.2).
+
+So any `%`, `הנחה`, `מבצע` (as a noun), `מחיר מיוחד` or countdown on a topbar, card, popup or
+Business Profile post is ⛔ until the owner supplies, in writing, the service, the regular price it
+is measured against, the discount, VAT status, the validity period and the conditions — and the
+regular price itself is confirmed (§D.1, growth-roadmap critical path #8). Consumer Protection Law
+§2(a)(13) treats a claim about "the regular price" as a material misleading statement.
+
+The seasonal layer in `docs/dynamic-presence-plan.md` is therefore **advice, availability and safety
+only**, by design and by the owner's decision.
 
 ## E. Coverage
 

@@ -43,20 +43,28 @@ mostly done; the trust, measurement and reachability work has barely started.
 These gate the highest-value work and **only the owner can unblock them**. Everything else can proceed
 in parallel, but these determine the ceiling. Chase them first and chase them hard.
 
-| #   | Decision needed                                                         | Unblocks                                     |
-| --- | ----------------------------------------------------------------------- | -------------------------------------------- |
-| 1   | ✅ ~~Business Profile~~ — claimed, verified, areas corrected 2026-09-05 | map pack, reviews, `sameAs`, entity identity |
-| 2   | **A review-collection process**                                         | §7.2, `Review` schema, conversion rate       |
-| 3   | Founding year — or approval to drop "25+ שנים"                          | §7.1, `foundingDate`, every trust card       |
-| 4   | Real opening hours — is it 24/7 or 08:00–18:00?                         | §4.4, emergency positioning, schema          |
-| 5   | Address: real premises, or service-area business?                       | §5.1, `LocalBusiness` completeness, GBP type |
-| 6   | Licence / insurance / ח.פ. — any verifiable credential                  | §7.4, the whole authority dimension          |
-| 7   | A named human + photo (owner or lead technician)                        | §7.3, article authorship, AEO                |
-| 8   | Sign-off on the price ranges already published                          | §7.6, `Offer` schema, pricing page           |
-| 9   | Cloudflare AI-crawler policy decision                                   | **the entire AEO/GEO dimension** (§6.1)      |
-| 10  | ~~Correct business email~~ ✅ confirmed 2026-08-24                      | §4.2 — done, see business-facts §C.3         |
+| #   | Decision needed                                                                            | Unblocks                                                                          |
+| --- | ------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------- |
+| 1   | ✅ ~~Business Profile~~ — claimed, verified, areas corrected 2026-09-05                    | map pack, reviews, `sameAs`, entity identity                                      |
+| 2   | **A review-collection process**                                                            | §7.2, `Review` schema, conversion rate                                            |
+| 3   | Founding year — or approval to drop "25+ שנים"                                             | §7.1, `foundingDate`, every trust card                                            |
+| 4   | Real opening hours — is it 24/7 or 08:00–18:00?                                            | §4.4, emergency positioning, schema                                               |
+| 5   | Address: real premises, or service-area business?                                          | §5.1, `LocalBusiness` completeness, GBP type                                      |
+| 6   | Licence / insurance / ח.פ. — any verifiable credential                                     | §7.4, the whole authority dimension                                               |
+| 7   | A named human + photo (owner or lead technician)                                           | §7.3, article authorship, AEO                                                     |
+| 8   | Sign-off on the price ranges already published                                             | §7.6, `Offer` schema, pricing page                                                |
+| 9   | Cloudflare AI-crawler policy decision                                                      | **the entire AEO/GEO dimension** (§6.1)                                           |
+| 10  | ~~Correct business email~~ ✅ confirmed 2026-08-24                                         | §4.2 — done, see business-facts §C.3                                              |
+| 11  | **Remove the 12 non-genuine reviews** (business-facts §B.5) and start the genuine ask-flow | every reviews state in `docs/dynamic-presence-plan.md` §3.4; the profile's safety |
+| 12  | Push `main` (29 commits behind production) and enable secret scanning                      | any scheduled routine, any CI gate that guards a deploy                           |
 
 Record every answer in `docs/business-facts.md`. **Nothing here gets invented in the meantime.**
+
+> **2026-09-29 — the dynamic-presence plan.** Topbar, seasonal card, updates strip, reviews states
+> and the automation that keeps them fresh without a deploy are planned, decided and phased in
+> [docs/dynamic-presence-plan.md](dynamic-presence-plan.md). It sits _after_ Phase 2's trust work in
+> priority: its reviews track is gated on row 11, and it deliberately ships no offer, no live stat
+> and no recent-activity feed.
 
 ---
 

@@ -19,9 +19,17 @@ the command that reads it.
 The read is cookieless and needs no API key — the full command is in `docs/business-facts.md` §B.4.
 It discriminates: flip the last hex digit of the CID and the payload comes back empty.
 
-| Date       | Reviews | Rating | Name | Phone | Website | Category | Hours | How                             |
-| ---------- | ------- | ------ | ---- | ----- | ------- | -------- | ----- | ------------------------------- |
-| 2026-09-05 | 0       | none   | ✅   | ✅    | ✅      | ✅       | ✅    | `/maps/preview/place`, 17,754 B |
+| Date       | Reviews | Rating | Name | Phone | Website | Category | Hours | How                                                                |
+| ---------- | ------- | ------ | ---- | ----- | ------- | -------- | ----- | ------------------------------------------------------------------ |
+| 2026-09-05 | 0       | none   | ✅   | ✅    | ✅      | ✅       | ✅    | `/maps/preview/place`, 17,754 B                                    |
+| 2026-09-29 | 12      | 5      | ✅   | ✅    | ✅      | ✅       | ✅    | `/maps/preview/place`, 3 reads: 17,928 B / **37,059 B** / 17,203 B |
+
+> ⚠️ **The endpoint returns two payload shapes for the same request** (observed 2026-09-29, three
+> consecutive reads a few seconds apart). The ~17 KB shape has **no reviews section at all**; the
+> ~37 KB shape carries `"12 ביקורות"`, the rating float and five review bodies. The
+> `דירוג והוספת ביקורת` prompt is present in **both**, so it is not an empty-state marker. From now
+> on a profile read is three requests, and the review count is whatever the largest payload says —
+> or, better, what the owner's dashboard says. `docs/business-facts.md` §B.5.
 
 What the 2026-09-05 payload carried: `שלושה מנעולנים` · `076-599-1266` / `+972 76-599-1266` ·
 `https://3locksmiths.co.il/` · `מנעולן` (secondary `Service establishment`) · `פתוח 24 שעות`. No
@@ -33,22 +41,28 @@ strings are the timezone name.
 Facts the payload cannot carry, answered by the owner directly. These are ✅ sources in their own
 right; see `docs/business-facts.md` §B.4.
 
-| Date       | Question                                                      | Answer             |
-| ---------- | ------------------------------------------------------------- | ------------------ |
-| 2026-09-05 | Is the listing claimed + ownership-verified                   | **Yes**            |
-| 2026-09-05 | Do the service areas still list the 7 withdrawn cities (§E.1) | **No — corrected** |
-| 2026-09-05 | Review count                                                  | **0**              |
+| Date       | Question                                                                          | Answer                                                                                     |
+| ---------- | --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| 2026-09-05 | Is the listing claimed + ownership-verified                                       | **Yes**                                                                                    |
+| 2026-09-05 | Do the service areas still list the 7 withdrawn cities (§E.1)                     | **No — corrected**                                                                         |
+| 2026-09-05 | Review count                                                                      | **0**                                                                                      |
+| 2026-09-29 | Are אבי / אביעד / שרון (thanked in 3 of the visible reviews) the real technicians | **No** — they are the §G.1 AI character names                                              |
+| 2026-09-29 | Who does the jobs; who owns the profile's Google account                          | **A fixed three partner locksmiths; the profile is on one locksmith's own account** (§A.3) |
+| 2026-09-29 | What to do with the 12 reviews                                                    | **Have them removed; start a genuine ask-flow** (§B.5)                                     |
 
 ## 3. Review log
 
 One row per check. `Δ` is against the previous row, so the first row has none.
 
-| Date       | Count | Δ   | Rating | Notes                                                                   |
-| ---------- | ----- | --- | ------ | ----------------------------------------------------------------------- |
-| 2026-09-05 | 0     | —   | none   | Profile claimed, verified, complete and empty. No ask flow running yet. |
+| Date       | Count | Δ   | Rating | Notes                                                                                                                                                                                                                                        |
+| ---------- | ----- | --- | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-09-05 | 0     | —   | none   | Profile claimed, verified, complete and empty. No ask flow running yet.                                                                                                                                                                      |
+| 2026-09-29 | 12    | +12 | 5      | 5 of 12 visible, all 5★, dated 22–28/09; 2 reviewers have one-review accounts; 3 thank אבי/אביעד/שרון — **not real people** (owner); no owner replies; 4 owner photos, 2 AI-generated; description added. **Not genuine — removal decided.** |
 
-> ⚠️ **0 is the number that matters on this site.** The profile is otherwise finished, so the map
-> pack is gated on this row moving and on nothing else. It cannot be moved by code.
+> ⚠️ **The number that matters is the _genuine_ count, and today it is 0.** The 12 above are being
+> removed (§B.5). Until the genuine count has a dated row here **and** matches the owner's dashboard,
+> nothing on the site may cite a review, a rating or a count — the widget states in
+> `docs/dynamic-presence-plan.md` §3.4 are gated on this table.
 
 ## 4. Citation ledger
 
