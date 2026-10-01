@@ -243,25 +243,26 @@ homepage tiles **in the same change**, or the deploy is blocked. See `/image-pip
 ## 7. The build pipeline
 
 ```bash
-npm run snapshot   # scrape → transform → pages → build-manifest → enrich → footer → live-surfaces → form → hero-gallery → fix-links
+npm run snapshot   # scrape → transform → then the enrich chain (see package.json "snapshot")
                    #                                                    ↑ re-scrapes live WP — rare
-npm run enrich     # pages → build-manifest → enrich → footer → live-surfaces → form → hero-gallery → fix-links (no network)
+npm run enrich     # pages → … → advantage-icons → footer → live-surfaces → … → fix-links → phone → lastmod (package.json "enrich"; no network)
 npm run build      # next build → out/
 ```
 
-| Step                 | Does                                                                               |
-| -------------------- | ---------------------------------------------------------------------------------- |
-| `scrape.mjs`         | fetches the live WordPress HTML (**snapshot only**)                                |
-| `transform.mjs`      | CF7 → Web3Forms rewrite (**snapshot only** — see the warning below)                |
-| `pages.mjs`          | **creates routes that never existed** — utility pages, service shells, guides      |
-| `build-manifest.mjs` | classifies every page and computes related-link candidates                         |
-| `enrich.mjs`         | fills `<main>` from `content/enriched/<id>.mjs`, emits all JSON-LD                 |
-| `footer.mjs`         | rebuilds the global footer from the manifest                                       |
-| `live-surfaces.mjs`  | fills the header's announcement bar with every line; compiles the schedule         |
-| `form.mjs`           | normalises the lead form (validation, phone field, RTL, consent)                   |
-| `hero-gallery.mjs`   | rebuilds the 4 homepage hero tiles from the image catalog (no-ops until published) |
-| `fix-links.mjs`      | repairs/validates every internal link, `tel:`, `data-cta`, form redirect           |
-| `phone.mjs`          | rewrites every retired phone spelling in `site.json` **and** `public/`             |
+| Step                  | Does                                                                               |
+| --------------------- | ---------------------------------------------------------------------------------- |
+| `scrape.mjs`          | fetches the live WordPress HTML (**snapshot only**)                                |
+| `transform.mjs`       | CF7 → Web3Forms rewrite (**snapshot only** — see the warning below)                |
+| `pages.mjs`           | **creates routes that never existed** — utility pages, service shells, guides      |
+| `build-manifest.mjs`  | classifies every page and computes related-link candidates                         |
+| `enrich.mjs`          | fills `<main>` from `content/enriched/<id>.mjs`, emits all JSON-LD                 |
+| `footer.mjs`          | rebuilds the global footer from the manifest                                       |
+| `advantage-icons.mjs` | swaps the homepage's six heavy inline drawings for icon-font glyphs                |
+| `live-surfaces.mjs`   | the announcement bar (every line), the seasonal cards, the updates strip; schedule |
+| `form.mjs`            | normalises the lead form (validation, phone field, RTL, consent)                   |
+| `hero-gallery.mjs`    | rebuilds the 4 homepage hero tiles from the image catalog (no-ops until published) |
+| `fix-links.mjs`       | repairs/validates every internal link, `tel:`, `data-cta`, form redirect           |
+| `phone.mjs`           | rewrites every retired phone spelling in `site.json` **and** `public/`             |
 
 > ⚠️ **`transform.mjs` runs ONLY in `npm run snapshot`.** A chrome change made there will not appear
 > from `npm run enrich`. Anything that must apply on every ordinary rebuild belongs in the enrich
@@ -386,6 +387,7 @@ npm run format                     # FIRST — prettier rewrites modules, which 
 npm run enrich                     # if you touched content/enriched, lib/enrich or scripts
 node scripts/check-freshness.mjs   # content/site.json must be newer than its sources
 node scripts/check-claims.mjs      # no claim our own data refutes may reach the browser
+node scripts/check-dates.mjs       # a guide's visible date moves with its content, and only then
 npm run lint && npm run typecheck && npm run format:check && npm run build
 node scripts/check-orphans.mjs     # decode-aware; the shell version lies here
 node scripts/check-css-cascade.mjs     # no enrich.css override may tie with the vendored theme

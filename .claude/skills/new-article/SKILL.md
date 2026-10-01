@@ -30,3 +30,13 @@ by the ASCII catch-all `app/[...slug]/`) is completely fine — which is why `/�
 **Never invent a byline.** `docs/business-facts.md` §A records that nobody is named anywhere on this
 site. The three live guides deliberately omit `author` rather than fabricate one — a fabricated
 author is a worse trust signal than an absent one. Supply a real name or leave the field out.
+
+## Dates (since 2026-10-01)
+
+Guides show `פורסם: dd/mm/yyyy` (and `· עודכן` when it differs) from `datePublished` /
+`dateModified`, and `scripts/check-dates.mjs` (npm prebuild) holds them to the content:
+
+- a **new** guide: set both dates to the publish day, then `node scripts/check-dates.mjs --accept`;
+- a **significant** edit: move `dateModified` to today, then `--accept`;
+- a typo or a link: leave the date, run `--accept --minor <id>`;
+- never move `datePublished`. Commit `content/guide-dates.json` with the module.

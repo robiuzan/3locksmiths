@@ -40,6 +40,7 @@ Asserts `content/site.json` is newer than every authored module, pipeline script
 
 ```bash
 node scripts/check-claims.mjs
+node scripts/check-dates.mjs        # guides' visible dates match their content
 ```
 
 Fails on any claim the site's own data refutes: a years-in-business number against

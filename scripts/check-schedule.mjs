@@ -32,6 +32,7 @@ import { HARD_QUIET_KINDS, QUIET_KINDS, resolve, toMs } from "../lib/live/resolv
 import { compile, expand, winners } from "../lib/live/compile.mjs";
 import { withoutLiveRegions } from "../lib/live/regions.mjs";
 import { findClaim } from "../lib/live/claims.mjs";
+import { allowsDialog, hasEmergencyNumbers } from "../lib/live/pages.mjs";
 import {
   liveHeadScript,
   packSchedule,
@@ -693,6 +694,162 @@ test("the claim patterns catch the wordings that once slipped through", () => {
   }
   // Calendar labels see the base list only: an overlay day may be named after an operation.
   assert.equal(findClaim("מבצע חרבות ברזל"), null);
+});
+
+// ---------------------------------------------------------------------------------------
+// public/assets/live.js — the card's visit rules and the strip's 45-day decay
+// ---------------------------------------------------------------------------------------
+
+/** The shipped file, run in a VM with its test hook, so the rules tested are the rules served. */
+function liveJsRules() {
+  const hook = {};
+  const window = { __liveTest: hook };
+  vm.runInNewContext(readFileSync(join(ROOT, "public", "assets", "live.js"), "utf8"), {
+    window,
+    document: {},
+    Date,
+    isNaN,
+    parseInt,
+  });
+  return hook;
+}
+
+test("live.js: when the card may open — and every case where it must not", () => {
+  const { rules } = liveJsRules();
+  const DAY = 86_400_000;
+  const base = {
+    hasDialog: true,
+    storageOk: true,
+    lastShown: 0,
+    capDays: 14,
+    now: 1_800_000_000_000,
+    pageviews: 1,
+    fromSearch: false,
+  };
+  assert.equal(rules(base), "engaged", "first page, not from search: 20 s and a scroll");
+  assert.equal(rules({ ...base, pageviews: 2 }), "soon", "second page of a visit");
+  assert.equal(
+    rules({ ...base, fromSearch: true }),
+    "none",
+    "never the first page from a search engine",
+  );
+  assert.equal(
+    rules({ ...base, fromSearch: true, pageviews: 2 }),
+    "none",
+    "a search landing at ANY page view — back to the results and in again, or a reload",
+  );
+  assert.equal(
+    rules({ ...base, storageOk: false, pageviews: 3 }),
+    "none",
+    "no storage, no card — the cap could not hold",
+  );
+  assert.equal(rules({ ...base, hasDialog: false, pageviews: 3 }), "none");
+  assert.equal(
+    rules({ ...base, pageviews: 3, lastShown: base.now - 13 * DAY }),
+    "none",
+    "inside the 14-day cap",
+  );
+  assert.equal(
+    rules({ ...base, pageviews: 3, lastShown: base.now - 15 * DAY }),
+    "soon",
+    "after the cap",
+  );
+  assert.equal(
+    rules({ ...base, pageviews: 3, capDays: 30, lastShown: base.now - 15 * DAY }),
+    "none",
+    "data-cap-days is honoured",
+  );
+});
+
+test("live.js: the updates strip hides when its newest item is 45 days old (Israel date)", () => {
+  const { stale } = liveJsRules();
+  const at = (iso) => Date.parse(iso);
+  assert.equal(
+    stale("2026-09-02", at("2026-10-17T00:00:00+03:00")),
+    false,
+    "45 days exactly: still shown",
+  );
+  assert.equal(
+    stale("2026-09-02", at("2026-10-17T00:00:01+03:00")),
+    true,
+    "past 45 days: hidden",
+  );
+  assert.equal(
+    stale("not-a-date", at("2026-10-01T00:00:00+03:00")),
+    true,
+    "a broken date hides, never shows forever",
+  );
+});
+
+test("live.js: which referrers count as a search engine", () => {
+  const { fromSearch } = liveJsRules();
+  for (const ref of [
+    "https://www.google.com/",
+    "https://www.google.co.il/",
+    "http://www.google.com/",
+    "https://www.bing.com/search?q=x",
+    "https://duckduckgo.com/",
+    "android-app://com.google.android.googlequicksearchbox/",
+    "android-app://com.google.android.gm/",
+  ]) {
+    assert.equal(fromSearch(ref), true, `not treated as search: ${ref}`);
+  }
+  for (const ref of [
+    "",
+    "https://3locksmiths.co.il/services/",
+    "https://www.facebook.com/",
+    "https://googleblog.example/",
+  ]) {
+    assert.equal(fromSearch(ref), false, `treated as search: ${ref}`);
+  }
+});
+
+test("pages that tell the reader to call 100/101 never carry a card — detected from the text", () => {
+  const page = (t) => ({ id: 1, path: "/x/", bodyHtml: `<p>${t}</p>` });
+  for (const t of [
+    "חייגו ל-100 או ל-101 מיד",
+    "100 / 101",
+    "100/101",
+    "התקשרו קודם כול ל-100 או ל-101",
+    "למשטרה במספר 100",
+    "100 או לכבאות והצלה 102",
+  ]) {
+    assert.equal(hasEmergencyNumbers(page(t)), true, `missed: ${t}`);
+    assert.equal(allowsDialog(page(t)), false);
+  }
+  for (const t of [
+    "מחיר: 100 ₪ עד 101 ₪",
+    "100 ש״ח או 101 ש״ח",
+    "שנת 2010 ו-2011",
+    "דגם 1001",
+  ]) {
+    assert.equal(hasEmergencyNumbers(page(t)), false, `false positive: ${t}`);
+  }
+  assert.equal(
+    allowsDialog({ id: 9301, path: "/services/x/", bodyHtml: "" }),
+    false,
+    "calm",
+  );
+  assert.equal(
+    allowsDialog({ id: 9003, path: "/accessibility-statement/", bodyHtml: "" }),
+    false,
+    "legal",
+  );
+  assert.equal(allowsDialog({ id: 1, path: "/x/", bodyHtml: "<p>שלום</p>" }), true);
+});
+
+test("live.js carries no copy and no network access", () => {
+  const src = readFileSync(join(ROOT, "public", "assets", "live.js"), "utf8");
+  assert.doesNotMatch(
+    src,
+    /[֐-׿]|\\u05[89a-f]/i,
+    "a Hebrew letter (or its escape) in live.js — copy belongs in the page HTML",
+  );
+  assert.doesNotMatch(
+    src,
+    /fetch\(|XMLHttpRequest|sendBeacon|innerHTML|outerHTML|insertAdjacentHTML|document\.write|new Image|\.src\s*=|import\(|\beval\b|Function\(/,
+    "live.js may only select and open what the page already holds",
+  );
 });
 
 // ---------------------------------------------------------------------------------------

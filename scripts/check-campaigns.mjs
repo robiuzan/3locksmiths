@@ -3,7 +3,7 @@
  * (docs/dynamic-presence-plan.md §4.3; /dynamic-presence; /israeli-calendar).
  *
  *   content/enriched/_campaigns.mjs   the announcement bar's lines and windows
- *   content/enriched/_updates.mjs     the weekly updates strip (Phase 2)
+ *   content/enriched/_updates.mjs     the homepage updates strip: { heading, items: [...] }
  *   content/enriched/_calendar.json   generated Israeli calendar (quiet days etc.)
  *   content/enriched/_calendar.overlay.json   the calendar's hand-kept input
  *
@@ -41,6 +41,11 @@
  *   - typography: ASCII quotes next to Hebrew (CLAUDE.md §8); check-typography scans only the
  *     numeric page modules, so the registers need their own pass.
  *   - AI character names: docs/business-facts.md §G.1 / §B.5 — never on the site.
+ *   - the seasonal card (`dialog`): only on a fixed-date SEASONAL window. A safety window can be
+ *     live on Shabbat (decision 11) and live.js knows only the line, not the day — a card on it
+ *     could open on Shabbat; the weekly slot would nag every Thursday. Same claim, phone, quote
+ *     and length rules as the bar; the call label must print the number through {phone}; the
+ *     link must be the page the source quote is from.
  *
  * TWO RULES FAIL BY THE PASSAGE OF TIME ALONE — the runway and the calendar horizon. They must
  * never block an unrelated hotfix (a phone-number change, a security header), so
@@ -82,6 +87,7 @@ const CALENDAR_WARN_DAYS = 180; // warn below this …
 const CALENDAR_FAIL_DAYS = 60; // … fail below this
 const EXPIRED_DAYS = 30; // a window that ended this long ago should be removed
 const UPDATE_MAX_CHARS = 140;
+const DIALOG_MAX = { title: 28, body: 140, call: 24, whatsapp: 16, linkLabel: 18 };
 const TOPBAR_MAX_CHARS = 46; // one row at 360 px — see app/enrich.css
 const EVERGREEN_MAX_CHARS = 70; // desktop only
 const CALENDAR_KINDS = ["quiet", "shabbat", "chag", "pre-shabbat"];
@@ -436,7 +442,9 @@ async function checkSource(where, w) {
     );
     return;
   }
-  if (!w.topbar?.link) return;
+  // The page the tip points at: the line's link, or — when the line has none — the card's.
+  const target = w.topbar?.link?.href ?? w.dialog?.link?.href;
+  if (!target) return;
   const m = /content\/enriched\/(\d+)\.mjs\s*[—–-]\s*״([^״]+)״/.exec(w.source);
   if (!m) {
     fail(
@@ -451,8 +459,10 @@ async function checkSource(where, w) {
     fail(where, `source cites content/enriched/${id}.mjs, which does not exist`);
     return;
   }
-  for (const piece of m[2]
-    .split("…")
+  // Every ״…״ quote in the source is checked — the card's body may rest on a second sentence.
+  const quotes = [...w.source.matchAll(/״([^״]+)״/g)].map((q) => q[1]);
+  for (const piece of quotes
+    .flatMap((q) => q.split("…"))
     .map((p) => p.trim())
     .filter(Boolean)) {
     if (!texts.some((s) => s.includes(piece)))
@@ -463,12 +473,110 @@ async function checkSource(where, w) {
   }
   const path =
     manifest?.lookup?.[id]?.path ?? manifest?.pages?.find((p) => p.id === id)?.path;
-  if (path && safeDecode(path) !== safeDecode(w.topbar.link.href)) {
+  if (path && safeDecode(path) !== safeDecode(target)) {
     fail(
       where,
-      `source cites page ${id} (${safeDecode(path)}) but the line links to ${w.topbar.link.href}`,
+      `source cites page ${id} (${safeDecode(path)}) but the tip links to ${target}`,
     );
   }
+}
+
+/** "2026-02-30" is not a date — V8 would roll it into March. */
+const realDate = (d) => {
+  const t = new Date(`${d}T12:00:00Z`);
+  return !Number.isNaN(t.getTime()) && t.toISOString().slice(0, 10) === d;
+};
+/** The rules every short visitor-facing string follows: no promo word, no typed number, no quotes. */
+function lineRules(where, v) {
+  if (typeof v !== "string") return;
+  const hit = findClaim(v, true);
+  if (hit) fail(where, `⛔ ${hit}: "${v}"`);
+  if (LITERAL_PHONE_RE.test(v)) fail(where, "a typed phone number");
+  if (ANY_QUOTE_RE.test(v)) fail(where, `a quote character: "${v}"`);
+  if (/[{}]/.test(v)) fail(where, "a token outside the bar's text");
+}
+
+/** The seasonal card's own rules (Phase 2, plan §3.2). */
+function checkDialog(where, w) {
+  const dl = w.dialog;
+  if (w.kind !== "seasonal" || w.during !== undefined) {
+    fail(
+      where,
+      "a `dialog` belongs on a fixed-date seasonal window only — never on a safety window (it can be live on Shabbat) or a `during` slot (it would nag every week)",
+    );
+  }
+  if (!dl || typeof dl !== "object") {
+    fail(where, "dialog must be an object");
+    return;
+  }
+  const read = {
+    title: dl.title,
+    body: dl.body,
+    call:
+      typeof dl.call === "string" ? dl.call.replace(/\{phone\}/g, phoneDisplay) : dl.call,
+    whatsapp: dl.whatsapp,
+    linkLabel: dl.link?.label,
+  };
+  for (const [k, max] of Object.entries(DIALOG_MAX)) {
+    const v = read[k];
+    if (typeof v !== "string" || !v.trim()) {
+      fail(where, `dialog.${k === "linkLabel" ? "link.label" : k} is required`);
+      continue;
+    }
+    if (/[\r\n]/.test(v)) fail(where, `dialog.${k} contains a line break`);
+    if ([...v].length > max)
+      fail(
+        where,
+        `dialog.${k} is ${[...v].length} characters as read — max ${max}: "${v}"`,
+      );
+    if (ANY_QUOTE_RE.test(v)) fail(where, `a quote character in dialog.${k}: "${v}"`);
+    const hit = findClaim(v, true);
+    if (hit) fail(where, `⛔ ${hit} in dialog.${k}: "${v}"`);
+  }
+  if (typeof dl.call === "string" && !/\{phone\}/.test(dl.call)) {
+    fail(where, "dialog.call must print the number through {phone}");
+  }
+  for (const k of ["title", "body", "whatsapp"]) {
+    if (typeof dl[k] === "string" && /[{}]/.test(dl[k]))
+      fail(where, `dialog.${k} may not contain a token`);
+  }
+  const typed = [
+    dl.title,
+    dl.body,
+    typeof dl.call === "string" ? dl.call.replace(/\{phone\}/g, "") : "",
+    dl.whatsapp,
+    dl.link?.label,
+  ].join(" ");
+  if (LITERAL_PHONE_RE.test(typed))
+    fail(where, "a typed phone number in the card — {phone} only, in dialog.call");
+  if (/\d/.test(String(dl.whatsapp ?? "")))
+    fail(where, "dialog.whatsapp is a word, never a number");
+  if (!dl.link || !dl.link.href)
+    fail(
+      where,
+      "dialog.link { label, href } is required — the card points at the advice it summarises",
+    );
+  else {
+    if (!routeExists(dl.link.href))
+      fail(where, `dialog.link.href "${dl.link.href}" is not a live route`);
+    if (w.topbar?.link && safeDecode(dl.link.href) !== safeDecode(w.topbar.link.href)) {
+      fail(
+        where,
+        "dialog.link.href must be the page the line links to — the source quote is checked against that page",
+      );
+    }
+  }
+  const cap = dl.capDays;
+  if (cap !== undefined && !(Number.isInteger(cap) && cap >= 7 && cap <= 60)) {
+    fail(
+      where,
+      `dialog.capDays must be a whole number of days, 7–60 (default 14), got ${JSON.stringify(cap)}`,
+    );
+  }
+  const extra = Object.keys(dl).filter(
+    (k) => !["title", "body", "call", "whatsapp", "link", "capDays"].includes(k),
+  );
+  if (extra.length) fail(where, `unknown dialog field(s): ${extra.join(", ")}`);
 }
 
 const campaigns = await loadModule(CAMPAIGNS);
@@ -496,6 +604,15 @@ if (campaigns) {
   }
 
   const windows = Array.isArray(campaigns.windows) ? campaigns.windows : [];
+  if (windows.some((w) => w.dialog)) {
+    const close = campaigns.ui?.close;
+    if (typeof close !== "string" || !close.trim() || [...close].length > 12) {
+      fail(
+        "_campaigns.mjs.ui.close",
+        "required (the card's ✕ button needs an accessible name, ≤ 12 characters)",
+      );
+    } else checkCopy("_campaigns.mjs.ui", campaigns.ui);
+  }
   const calendarKinds = new Set(calendarWindows.map((c) => c.kind));
   const ids = new Set();
   const lineOf = new Map(); // variant → the topbar it renders, as JSON
@@ -515,11 +632,12 @@ if (campaigns) {
         where,
         "the `reduced` line is Phase 2 — it needs the status.json switch that reveals it",
       );
-    if (w.pages !== undefined || w.dialog !== undefined)
+    if (w.pages !== undefined)
       fail(
         where,
-        "`pages` and `dialog` are Phase 2 and are not read by the compiler yet — remove them",
+        "`pages` is not read by anything — the pipeline decides the pages (lib/live/pages.mjs)",
       );
+    if (w.dialog !== undefined) checkDialog(where, w);
     checkCopy(where, w);
     checkTopbar(where, w.topbar, TOPBAR_MAX_CHARS);
     await checkSource(where, w);
@@ -539,11 +657,11 @@ if (campaigns) {
         `a safety window's variant must start with "safety-", and no other kind's may — got kind ${w.kind}, variant "${variant}"`,
       );
     }
-    const line = JSON.stringify(w.topbar ?? null);
+    const line = JSON.stringify([w.topbar ?? null, w.dialog ?? null]);
     if (lineOf.has(variant) && lineOf.get(variant) !== line)
       fail(
         where,
-        `variant "${variant}" is used by another window with a different topbar`,
+        `variant "${variant}" is used by another window with a different topbar or card`,
       );
     lineOf.set(variant, line);
 
@@ -669,15 +787,33 @@ if (existsSync(UPDATES) && !updates)
   fail("_updates.mjs", "the file exists but has no default export");
 let updateCount = 0;
 if (updates) {
-  if (!Array.isArray(updates)) fail("_updates.mjs", "default export must be an array");
-  else {
-    updateCount = updates.length;
+  if (Array.isArray(updates) || !Array.isArray(updates.items)) {
+    fail("_updates.mjs", "default export must be { heading, items: [...] }");
+  } else if (
+    updates.items.length &&
+    (typeof updates.heading !== "string" || !updates.heading.trim())
+  ) {
+    fail("_updates.mjs", "heading is required when there are items");
+  } else {
+    if (updates.heading) {
+      checkCopy("_updates.mjs", { heading: updates.heading });
+      lineRules("_updates.mjs.heading", updates.heading);
+    }
+    const items = updates.items;
+    updateCount = items.length;
+    const seenDates = new Set();
     // Israel's civil date, not UTC: between 00:00 and 03:00 Israel time the UTC date is still
     // yesterday, and the owner's weekly paste tends to happen late. +3 h is Israel's summer
     // offset; in winter it is one hour generous, which can only ever ACCEPT a real same-day item.
     const today = new Date(now + 3 * 3_600_000).toISOString().slice(0, 10);
-    for (const [i, u] of updates.entries()) {
-      const where = `_updates.mjs[${i}]`;
+    for (const [i, u] of items.entries()) {
+      const where = `_updates.mjs.items[${i}]`;
+      if (seenDates.has(u.date))
+        fail(where, `two items on ${u.date} — one a day keeps the strip readable`);
+      seenDates.add(u.date);
+      if (DATE_RE.test(u.date ?? "") && !realDate(u.date))
+        fail(where, `date ${u.date} is not a real date`);
+      if (u.linkLabel !== undefined) lineRules(`${where}.linkLabel`, u.linkLabel);
       if (!DATE_RE.test(u.date ?? ""))
         fail(where, `date must be YYYY-MM-DD, got ${JSON.stringify(u.date)}`);
       else if (u.date > today) fail(where, `date ${u.date} is in the future`);
@@ -694,8 +830,26 @@ if (updates) {
           );
       }
       if (!u.source) fail(where, "missing source");
-      if (u.href !== undefined && !routeExists(u.href))
-        fail(where, `href "${u.href}" is not a live route`);
+      if (u.href !== undefined) {
+        // Cards link only to pages of this site — never off-site (the Business Profile still
+        // carries the 12 non-genuine reviews: plan §3.4 State A).
+        if (/^https?:\/\//.test(u.href))
+          fail(where, "href must be a page of this site, not an external URL");
+        else if (!routeExists(u.href))
+          fail(where, `href "${u.href}" is not a live route`);
+        if (
+          typeof u.linkLabel !== "string" ||
+          !u.linkLabel.trim() ||
+          [...u.linkLabel].length > 18
+        )
+          fail(where, "linkLabel (≤ 18 characters) is required with href");
+      }
+      if (u.image !== undefined && u.image !== null)
+        fail(
+          where,
+          "image is not supported yet — owner photos come through Media Studio (plan §3.3)",
+        );
+      if (ANY_QUOTE_RE.test(u.text ?? "")) fail(where, "a quote character in the text");
       checkCopy(where, u);
     }
   }

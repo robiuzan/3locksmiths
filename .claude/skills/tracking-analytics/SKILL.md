@@ -80,6 +80,16 @@ Convention: `{location}-{action}`.
 | `pricing-call`                    | `lib/enrich/render.mjs` pricing block    |
 | `form-submit`                     | the Web3Forms form                       |
 
+**The seasonal card (built 2026-10-01, `public/assets/live.js`)** adds `popup-call` and
+`popup-whatsapp` (both counted as `contact_click` by the suffix rule) and `popup-link` (not a
+conversion), plus two `dataLayer` events — the first custom events on the site:
+`{ event: "surface_view", surface: "dialog", variant }` when the card opens and
+`{ event: "surface_dismiss", surface: "dialog", variant, method: "esc" | "button" | "backdrop" | "action" }`
+when it closes. No personal data. **The container has no trigger for them yet** — add a Custom
+Event trigger per name and a GA4 event tag, hostname-scoped to 3locksmiths.co.il (the container
+is shared by the fleet), and test in Preview with `?at=2026-12-06T10:00:00%2B02:00` on a
+second page view.
+
 **The announcement bar (shipped 2026-09-30, `scripts/live-surfaces.mjs`)** adds three values on
 every page: `topbar-whatsapp` (the evergreen line — from 992 px the only WhatsApp link on the page,
 the sticky bar being phone-only; it is absent while a seasonal line is showing),

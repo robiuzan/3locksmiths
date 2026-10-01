@@ -45,9 +45,12 @@ may rest on a fact that `docs/business-facts.md` does not carry as ✅.
    route, or the owner's message itself (quote it with the date). If it needs a fact that is 🔶 or
    absent, write around it or add the row and hand the question back — never state it.
 2. **Draft the entry** against the contract in `docs/dynamic-presence-plan.md` Appendix A:
-   - `_updates.mjs`: `{ date: "YYYY-MM-DD", text, href, source, image }` — one sentence, ≤ 140
-     characters, a link to an **existing** page (never a new URL), absolute date only. Never a
-     future date.
+   - `_updates.mjs`: `export default { heading, items: [...] }`; each item
+     `{ date: "YYYY-MM-DD", text, href, linkLabel, source }` — one sentence, ≤ 140 characters,
+     no typed phone number, a link to an **existing page of this site** (never a new URL, never
+     off-site — the Business Profile still carries the 12 non-genuine reviews), `linkLabel` ≤ 18,
+     absolute date only, never a future date, one item per date. The homepage shows the newest
+     three; the strip hides itself 45 days after the newest item.
    - `_campaigns.mjs` window — **read the header comment of that file first; it is the authoring
      guide and it is current.** In short: `id` (unique, e.g. `purim-2027`), `variant` (the line's
      id on the page, `[a-z0-9-]`; windows that share a line share a variant; a safety line's
@@ -67,7 +70,11 @@ may rest on a fact that `docs/business-facts.md` does not carry as ✅.
        every seasonal line inside them, and every line on a memorial day or fast (a `safety` line
        stays on through Shabbat and chag — owner, 2026-10-01). You do check `public/assets/live-schedule.json` after
        `npm run enrich` to see when the line will really show.
-     - Not available yet (Phase 2): `dialog`, the `reduced` line, the ✕ dismissal.
+     - A fixed-date **seasonal** window may carry a `dialog` (the small card): title ≤ 28,
+       body ≤ 140, call (must contain {phone}) ≤ 24, whatsapp (a word) ≤ 16, link { label ≤ 18,
+       href = the line's own link }, capDays 7–60. If the card's body rests on a different
+       sentence from the line, add it to `source` as a second ״…״ quote — every quote is checked.
+       Never on a safety window or a `during` slot. Not available yet: the `reduced` line.
 3. **Hebrew discipline** (`/hebrew-rtl`): גרש `׳` and גרשיים `״`, never ASCII quotes; ₪ after the
    number (you should not be writing amounts anyway); phone in an LTR island; no mid-sentence
    language mixing.

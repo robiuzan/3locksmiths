@@ -86,6 +86,17 @@ const REWRITES = [
     from: "שכפול מפתח פיג'ו",
     to: "שכפול מפתח פיג׳ו",
   },
+
+  // --- §a11y English accessible names in the scraped chrome (all 109 pages) ---
+  // A screen reader announced the menu buttons and the floating call button in English on a
+  // Hebrew site (found by the Phase 2 review, 2026-10-01; the accessibility statement no longer
+  // lists it as a limitation because of these rules). The pass runs over the raw JSON text, so
+  // an attribute's quotes appear escaped: `\"` in the file, `\\"` in this source.
+  { id: "a11y-menu-open", from: "Open Mobile Navigation", to: "פתיחת התפריט" },
+  { id: "a11y-menu-close", from: "Close Side Navigation", to: "סגירת התפריט" },
+  { id: "a11y-float-call", from: "Call by phone", to: "חיוג אלינו" },
+  { id: "a11y-title-phone", from: 'title=\\"Phone\\"', to: 'title=\\"טלפון\\"' },
+  { id: "a11y-title-email", from: 'title=\\"Email\\"', to: 'title=\\"דוא״ל\\"' },
 ];
 
 /**
@@ -102,6 +113,10 @@ const FORBIDDEN = [
   ["demo-sliding-door-cta", /שירותי תיקון והתקנה של דלתות הזזה/],
   ["demo-sliding-door-headline", /דלת ההזזה שלך תקועה/],
   ["demo-sliding-door-vendor", /תיקון דלתות הזזה של/],
+  [
+    "english-accessible-name",
+    /Open Mobile Navigation|Close Side Navigation|Call by phone|title=\\"(?:Phone|Email)\\"/,
+  ],
 ];
 
 const raw = readFileSync(PATH, "utf8");

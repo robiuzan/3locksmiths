@@ -374,6 +374,21 @@ payload; count `href="tel:` to get the real number). Confirmed
 
 ---
 
+### C.6 Accessibility statement — open owner questions, 2026-10-01
+
+The statement was rewritten 2026-10-01 to claim only what is true (docs/dynamic-presence-plan.md
+Phase 2 step 6). What only the owner can answer, each 🔶 until then:
+
+| Question                                                                                   | Why it matters                                                                                                                                                 | Status |
+| ------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ |
+| Head count of the legal entity behind the site                                             | an accessibility coordinator is required from 25 employees (חוק שוויון זכויות לאנשים עם מוגבלות §19מב — threshold from secondary sources); none is named today | 🔶     |
+| Legal entity, VAT status (עוסק פטור?) and average annual turnover                          | the תקנה 35ו exemptions (₪100,000 / ₪1,000,000 tiers)                                                                                                          | 🔶     |
+| When the site first went live (before 26/10/2017?) and whether it ever met IS 5568 level A | the תקנה 35א existing-site provision                                                                                                                           | 🔶     |
+| Can 076-599-1266 receive SMS?                                                              | the old statement offered "הודעת טקסט"; removed until confirmed                                                                                                | 🔶     |
+| Who answers accessibility requests on the phone, WhatsApp and info@                        | the statement promises no response time; add one only if real                                                                                                  | 🔶     |
+| On-site accommodations during a job                                                        | a sentence offering them was removed until confirmed                                                                                                           | 🔶     |
+| A formal check by a מורשה נגישות                                                           | the statement says no external check was done; keep it true                                                                                                    | 🔶     |
+
 ### C.3 The business email is live — CONFIRMED 2026-08-24
 
 > Queried the Cloudflare Email Routing rules for the zone: **`info@3locksmiths.co.il` is an enabled

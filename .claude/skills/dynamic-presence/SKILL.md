@@ -95,11 +95,19 @@ they are rendered into `content/site.json`.
   text-only crawlers ignore `hidden`, and "reduced availability right now" on 109 pages is a
   sentence we do not want quoted.
 
-## The seasonal card
+## The seasonal card — shipped 2026-10-01 (not yet deployed)
+
+As built: `public/assets/live.js` opens a closed `<dialog class="live-dialog" data-dialog="<variant>">`
+from a `.live-dialogs` region (data-lm-ignore + data-nosnippet, end of body) when
+`html[data-live]` names that variant. Pages: `lib/live/pages.mjs` `allowsDialog` — not calm, no
+100/101 sentence in the page's own text, not the card's own link target. Register: `dialog` on a
+fixed-date seasonal window only; `ui.close` names the ✕. live.js carries no copy and no network
+call (the simulator fails on either), and is loaded `defer` with a `?v=<hash>` from
+`site.assets.liveJs`. The rules below are what it implements.
 
 - Native `<dialog>` + `showModal()`: top layer beats the z-index war (`.menu-toggle` 99,999,999,
   `.sticky-cta` 9,990, magnific 1,042) and gives focus containment, Esc and focus-return.
-- Rules: never on first pageview from search; 2nd pageview or 20 s + scroll; never on the 93xx
+- Rules: never on a page reached from search (any page view; the Google Android app counts); 2nd pageview (after 4 s) or 20 s + a scroll of a quarter of the page or 600 px; never on the 93xx
   emergency pages, `/thank-you/`, `/step/*`, or any page with the 100/101 line; once per campaign per
   14 days; never on a quiet day or under `quiet`/`reduced`/`off`; **if `localStorage` throws, do
   not show**. Primary action is `tel:` (`popup-call`); never a form field.

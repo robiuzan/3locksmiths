@@ -374,8 +374,10 @@ status.json override (off | quiet | reduced)      ← runtime, fail-closed
   is called `emergency` — they are `kind: "service"`) and of the calculator steps (`/step/*`). A
   calm page carries only the evergreen line and the safety lines, so a seasonal tip can never
   show there, and on a phone its bar opens only for a safety line. The Phase 2 dialog must treat
-  `data-live-calm` as "never open here"; `check-campaigns` still demands
-  `pages.exclude: ["emergency"]` on any window with a `dialog`, as a second lock.
+  `data-live-calm` as "never open here". _As built (Phase 2):_ the second lock is not a `pages`
+  field (check-campaigns rejects one) but `lib/live/pages.mjs` `allowsDialog` — calm pages, legal
+  pages and any page whose own text tells the reader to call 100/101 never carry a card — checked
+  again by check-live-regions.
 
 ### 4.3 Build gates — run on every human deploy, not only in CI
 
@@ -654,6 +656,74 @@ should settle it once and the modules follow. Phase 0.3 (the September baseline 
 
 ### Phase 2 — Updates strip, seasonal card, visual tokens (weeks 2–4)
 
+> **Built 2026-10-01; not committed or deployed yet.** Status per step — the plan as written
+> follows the block.
+>
+> - **4 ✅ The seasonal card.** `public/assets/live.js` (ES5, no copy — the gate fails on a Hebrew
+>   letter or any fetch/innerHTML in it; versioned `?v=<hash>` because `_headers` sets no caching)
+>   opens a closed `<dialog class="live-dialog">` that `live-surfaces.mjs` renders in a second
+>   `data-lm-ignore` region at the end of the body. One card in 2026: **Hanukkah** (03/12–11/12),
+>   copy by `hebrew-copywriter`, reviewed for claims and Hebrew. Rules as approved: never the first
+>   page from a search engine; 2nd page → after 4 s; a first page from elsewhere → 20 s **and** a
+>   quarter-page scroll; once per 14 days; never with a form field focused; no storage → no card.
+>   Never rendered on the 8 calm pages, on the 6 other pages whose text tells the reader to call
+>   100/101 (`lib/live/pages.mjs` detects it from the text), or on the card's own guide → 95
+>   pages — 92 after the review widened the 100/101 detection to "ל-100 או ל-101" and added the
+>   two legal pages. A card may sit only on a fixed-date **seasonal** window — never a safety window (it can
+>   be live on Shabbat) or the weekly slot. Phone: a bottom sheet 16 px above the sticky bar;
+>   desktop: centred, 360 px. Keyboard verified: focus starts on the call button, Tab stays
+>   inside, Esc closes; `surface_view` / `surface_dismiss {method}` reach `dataLayer`.
+>   **Still owed:** the GTM trigger + tag for those two events (an operator task in the container,
+>   hostname-scoped), and the live-URL check after deploy.
+> - **3 ✅ Dated guides.** `פורסם: dd/mm/yyyy` (and `· עודכן` only when it differs) under each
+>   guide's `<h1>`, from the same module fields as the Article JSON-LD. `scripts/check-dates.mjs`
+>   (prebuild) fingerprints each guide's advice — every string except the dates, the link lists
+>   and phone numbers — against `content/guide-dates.json`: content changed but the date did
+>   not, or the date moved but the content did not, fails. Baseline checked against git: since
+>   25–26/08 the guides changed only by the 02/09 number swap, re-pointed links and one word
+>   (פריסה ארצית → רחבה), so no guide shows "עודכן".
+> - **5 ◐ Visual polish.** Done: the six homepage drawings (195,833 B, sent twice per load) are
+>   now inline Font Awesome outlines read from the vendored SVG font (`scripts/advantage-icons.mjs`)
+>   — about 4 KB together, and no font download (a first version used the icon font, which
+>   would have made the homepage fetch its 123 KB for six glyphs). Homepage body 394 KB → 204 KB.
+>   The footer copyright is year-free, built from the roster brand name; it re-dated every sitemap
+>   URL once (accepted — a visible change on every page). **Waiting on the
+>   owner:** the palette (`brand.*` is null in the roster; the AA accent override #00802f
+>   already ships).
+> - **6 ✅ Accessibility statement** rewritten (`scripts/pages.mjs`): researched against תקנות
+>   35א/35ה/35ו, it now lists only what is true, names each limitation with an alternative (mobile
+>   menu, logo alt text, form labels, unchecked motion), drops the unsupported SMS / full-keyboard /
+>   labelled-form claims, adds WhatsApp as a link, the card and reduced-motion, and carries its
+>   own dd/mm/yyyy "updated" and "last checked (internal)" dates. No coordinator is named — owner
+>   questions in docs/business-facts.md §C.6. The contact page's WhatsApp link, which was
+>   labelled with the CALL number, now says ״וואטסאפ״.
+> - **1 ◐ Updates strip — built, empty.** `live-surfaces.mjs` renders `.live-updates` after
+>   `.section-advantages` from `_updates.mjs` (`{ heading, items }`, newest 3, dd/mm/yyyy, own
+>   classes — the theme's `.posts-list` would become a carousel); `live.js` hides it at 45 days.
+>   Not seeded: the sourced corpus is two items dated 02/09 (one cannot print its number) and
+>   would hide itself by 17/10. **Waits for the owner's first sentence.**
+> - **2 ◐ `announcement-editor`** updated for both registers; live once the owner sends an item.
+> - **7 ⏳** Gate green locally; commit and deploy on the owner's word.
+>
+> **Reviewed adversarially 2026-10-01** (four lenses, 43 findings, each reproduced by a second
+> agent). Fixed before shipping: the **closed card was visible under the footer of every page**
+> (the vendored bootstrap-grid sets `dialog { display: block }`; now `.live-dialog:not([open])`
+> hides it and check-live-regions fails if that rule goes); a search referrer now wins at every
+> page view, the Google Android app counts as search; a tap on the card's own padding no longer
+> dismisses it; it never opens over the open mobile menu, retries once a hidden tab returns,
+> closes itself when the line changes under it, gets focus on its title (not the call link), a
+> scroll lock, a phone max-height and forced-colours edges; the scroll rule is "a quarter of
+> the page or 600 px, whichever comes first". The statement's contrast, image, motion and
+> label sentences were corrected — the logo strip now has Hebrew brand alts, the menu and call
+> buttons Hebrew accessible names, and the homepage contact band's blue call button (3.49:1)
+> the AA green. Gates widened: a card's source quote is checked against the card's own link,
+> the strip's heading and labels against the claim rules, price words without ₪, real update
+> dates, exact tel/wa.me hrefs, a card on its own target, `check-dates --accept` refusing a
+> date-only move (`--minor <id>` records an insignificant edit).
+> **Known and accepted:** the sticky call bar is inert while the card is open (a tap there
+> closes the card, which has its own call and WhatsApp buttons); **no kill switch before
+> Phase 3** — the fallback is to delete the Hanukkah window's `dialog`, run enrich and redeploy.
+
 1. `content/enriched/_updates.mjs` seeded from the sourced corpus (§3.3); `live-surfaces.mjs`
    restores `.s-latest-posts` on the homepage; the 45-day decay rule in `live.js`.
 2. `announcement-editor` workflow live (§4.5); the first weekly item from the owner.
@@ -699,6 +769,13 @@ their owners change them.
 ---
 
 ## 6. Owner actions and open decisions
+
+**From Phase 2 (2026-10-01):** look at the Hanukkah card on a real phone
+(`/?at=2026-12-06T10:00:00%2B02:00`, on a second page view); answer the accessibility questions in
+docs/business-facts.md §C.6 (head count, legal entity and turnover, SMS on the 076 line, who answers
+accessibility requests) and have the statement read by whoever signs for the business; add the
+GTM trigger + tag for `surface_view` / `surface_dismiss`; send the first weekly update sentence;
+brand colours or the AA-safe defaults (item 5).
 
 1. **Delete the 12 reviews** (each poster, from their own account) and replace the two AI photos on
    the profile. Confirm the dashboard count afterwards — the public endpoint cannot.
@@ -780,7 +857,10 @@ export default {
       topbar: { text: "…", link: { label: "למדריך", href: "/מדריכים/…/" } },
       source: "…",
     },
-    // Phase 2 adds `dialog: { title, body, href, capDays }` + `pages: { exclude: ["emergency"] }`.
+    // Phase 2 (as built): a fixed-date seasonal window may add
+    //   dialog: { title, body, call: "חייגו {phone}", whatsapp, link: { label, href }, capDays }
+    // and the register gains ui: { close: "סגירה" }. No `pages` field — lib/live/pages.mjs decides.
+    // content/enriched/_updates.mjs: export default { heading, items: [{ date, text, href, linkLabel, source }] }
   ],
 };
 

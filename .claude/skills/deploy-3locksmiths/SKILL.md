@@ -72,7 +72,8 @@ Other flags: `-BuildOnly` (build + output gate, no upload), `-DeployOnly` (ship 
 as-is), `-SkipDriftCheck` (**only** when the roster is knowingly ahead of DNS).
 
 **Since 2026-09-30 `npm run build` runs a `prebuild` gate first** — check-freshness, check-claims,
-check-typography, check-campaigns, check-live-regions and the schedule simulator
+check-typography, check-campaigns, check-live-regions, the schedule simulator and (since
+2026-10-01) check-dates
 (`docs/dynamic-presence-plan.md` §4.3) — so the script's build step now fails on a stale
 `content/site.json` or a ⛔ claim instead of shipping it. Two rules in `check-campaigns` fail by
 the passage of time alone (campaign runway, calendar horizon). If one of them is red while you are

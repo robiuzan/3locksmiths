@@ -42,7 +42,8 @@
 }
 
 /* ---- Font Awesome icons inside the round icon box (scenarios / stats) ---- */
-.content-blocks .section-advantages .grid-wrap .grid-item .icon {
+.content-blocks .section-advantages .grid-wrap .grid-item .icon,
+body .section-advantages .grid-item-top .icon:has(> svg.ls-icon) {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -51,6 +52,14 @@
   font-size: 30px;
   color: #fff;
   line-height: 1;
+}
+/* The homepage band's six inline icons (scripts/advantage-icons.mjs): glyph outlines, drawn at
+   the same 30 px the font icons above use, white on the theme's icon box. */
+body .section-advantages .grid-item-top .icon > svg.ls-icon {
+  width: auto;
+  height: 30px;
+  max-width: 36px;
+  fill: #fff;
 }
 
 /* ---- Stats: large accent number (beat gogo's deep .grid-item-top h3 rule) ---- */
@@ -659,6 +668,199 @@ body .live-topbar__more {
   to {
     transform: translateY(calc(-1 * var(--live-bar, 0px)));
   }
+}
+
+/* ---- guide dates: פורסם / עודכן under the guide's <h1> (lib/enrich/render.mjs guideDates) ----
+   On the navy hero band; #d5e2ef on #011532 is about 14:1. */
+body .header-banner-left .enrich-dates {
+  margin: -8px 0 16px;
+  color: #d5e2ef;
+  font-size: 15px;
+}
+
+/* ---- the homepage contact band's call button: AA ----------------------------------------
+   The theme paints `.serv-contact-pw .btn-link` in --acsent-color3 #0089FF behind white text —
+   3.49:1, below AA. The owned call-button green instead (6.26:1). `body` + the extra
+   `.btn-link` class outrank the vendored rule; hover keeps the theme's inverted state. */
+body .serv-contact-pw a.btn-link {
+  background-color: #00702b;
+  border-color: #00702b;
+}
+body .serv-contact-pw a.btn-link:hover {
+  background-color: transparent;
+  color: #00702b;
+}
+
+/* ---- the seasonal card (docs/dynamic-presence-plan.md §3.2) ------------------------------
+   A native <dialog>, closed in the HTML, opened by public/assets/live.js with showModal(): the
+   browser puts it in the top layer — above the theme's z-index war (.menu-toggle 99,999,999,
+   the sticky bar 9,990) without a z-index of ours — and gives focus containment, Esc and focus
+   return. A small card, never a takeover (owner, 2026-09-29): 360px wide at most, centred on a
+   desktop; on a phone a bottom sheet that stops 72px above the bottom edge so the sticky
+   call/WhatsApp bar (56px) stays visible under it — inert while the card is open, like the rest
+   of the page; a tap there dismisses the card, which carries its own call and WhatsApp buttons. The title is a <p> named by
+   aria-labelledby — one <h1> per page is a CI rule, and a heading on 100 pages is outline noise.
+   The ✕ is last in the DOM (first focus lands on the call button) and drawn in the top corner.
+   Colours are the sticky bar's: white on #00702b 6.26:1, on #075e54 7.67:1, navy text on white. */
+/* The vendored bootstrap-grid.css ships normalize's `dialog { display: block }`, which outranks
+   the browser's own `dialog:not([open]) { display: none }` — without this rule every CLOSED card
+   sat visible under the footer of 95 pages (caught by the Phase 2 review, 2026-10-01).
+   scripts/check-live-regions.mjs fails the build if this rule goes missing. */
+.live-dialog:not([open]) {
+  display: none;
+}
+/* While the card is open the page underneath does not scroll (iOS scrolls it otherwise). */
+html:has(.live-dialog[open]) {
+  overflow: hidden;
+}
+.live-dialog {
+  box-sizing: border-box;
+  width: calc(100% - 32px);
+  max-width: 360px;
+  margin: auto;
+  padding: 24px 20px 20px;
+  border: 1px solid transparent; /* painted in forced-colors mode, where the card would lose its edge */
+  border-radius: 16px;
+  background: #fff;
+  color: #011532;
+  box-shadow: 0 12px 40px rgba(1, 21, 50, 0.28);
+  text-align: start;
+}
+.live-dialog::backdrop {
+  background: rgba(1, 21, 50, 0.4);
+}
+.live-dialog__title {
+  margin: 0 0 8px;
+  padding-inline-end: 32px; /* clear of the ✕ */
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+.live-dialog__body {
+  margin: 0 0 16px;
+  font-size: 16px;
+  line-height: 1.55;
+}
+.live-dialog__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+body .live-dialog__btn {
+  flex: 1 1 auto;
+  min-height: 48px;
+  padding: 0 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent; /* a button shape in forced-colors mode */
+  border-radius: 10px;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  text-decoration: none;
+}
+body .live-dialog__btn--call {
+  background: #00702b;
+}
+body .live-dialog__btn--wa {
+  background: #075e54;
+}
+body .live-dialog__btn:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+body .live-dialog__more {
+  display: inline-block;
+  margin-top: 14px;
+  color: #00702b;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+body .live-dialog__more:hover {
+  color: #00702b;
+  text-decoration-line: underline;
+}
+.live-dialog__close {
+  position: absolute;
+  inset-block-start: 10px;
+  inset-inline-end: 10px;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #34445b;
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+}
+.live-dialog__close:hover {
+  background: #f0f8ff;
+}
+.live-dialog :focus-visible {
+  outline: 3px solid #011532;
+  outline-offset: 2px;
+}
+@media (max-width: 991.98px) {
+  .live-dialog {
+    margin: auto auto calc(72px + env(safe-area-inset-bottom));
+    /* never taller than the space above the sticky bar: at 200% zoom or on a short screen the
+       card scrolls inside itself instead of pushing its title and ✕ off the top */
+    max-height: calc(100% - 72px - env(safe-area-inset-bottom) - 16px);
+  }
+}
+
+/* ---- the homepage updates strip (docs/dynamic-presence-plan.md §3.3) ----------------------
+   Rendered by scripts/live-surfaces.mjs after .section-advantages only when
+   content/enriched/_updates.mjs has items; hidden by live.js when the newest is 45 days old.
+   Own classes, not the theme's .s-latest-posts .posts-list — the vendored scripts.js turns that
+   into a looping carousel below 1025px. Up to three cards, newest first; one column on a phone. */
+.live-updates {
+  padding: 56px 0;
+  background: #f0f8ff;
+}
+.live-updates[hidden] {
+  display: none;
+}
+.live-updates__title {
+  margin: 0 0 24px;
+  text-align: center;
+}
+.live-updates__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.live-updates__item {
+  padding: 20px;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 4px 16px rgba(1, 21, 50, 0.08);
+}
+.live-updates__date {
+  display: block;
+  margin-bottom: 8px;
+  color: #34445b;
+  font-size: 14px;
+  font-weight: 700;
+}
+.live-updates__text {
+  margin: 0 0 10px;
+  color: #011532;
+}
+body .live-updates__link {
+  color: #00702b;
+  font-weight: 700;
+  text-decoration: underline;
 }
 
 /* ---- motion preference (WCAG 2.3.3 / IS 5568) ---------------------------------------

@@ -31,6 +31,10 @@ const MANIFEST = join(ROOT, "content", "enriched", "_manifest.json");
 
 const site = JSON.parse(readFileSync(FILE, "utf8"));
 const manifest = JSON.parse(readFileSync(MANIFEST, "utf8"));
+// The brand from the roster-synced manifest, never typed here (CLAUDE.md §6).
+const BRAND_NAME = JSON.parse(
+  readFileSync(join(ROOT, "site.config.json"), "utf8"),
+).brandName;
 
 /** Minimal HTML-escape for text we inject as element content. */
 const esc = (s) =>
@@ -186,6 +190,15 @@ for (const page of site.pages) {
       .map((l) => `<li><a href="${l.href}">${esc(l.label)}</a></li>`)
       .join("");
     if (prepend) legalMenu.set_content(prepend + legalMenu.innerHTML);
+  }
+
+  // The scraped "© 2025" reads as an abandoned site every January, and a year computed at
+  // build time would break the byte-reproducible enrich (and freeze on the day of the last
+  // deploy anyway). A year-free notice is what the plan chose (docs/dynamic-presence-plan.md
+  // §3.5). Idempotent: the text is set, not appended.
+  const copyright = root.querySelector("footer .footer-bot .copyright");
+  if (copyright) {
+    copyright.set_content(`© כל הזכויות שמורות ל${esc(BRAND_NAME)}`);
   }
 
   page.bodyHtml = root.toString();

@@ -70,6 +70,8 @@ export interface SiteData {
     band?: BandAssets;
     /** The inline <head> script that picks the live topbar line — see getLiveHeadScript(). */
     liveHead?: string;
+    /** The versioned URL of public/assets/live.js — see getLiveScriptSrc(). */
+    liveJs?: string;
   };
   pages: SitePage[];
 }
@@ -107,6 +109,16 @@ export function getBandPreloads(page: SitePage): BandPreload[] {
  */
 export function getLiveHeadScript(): string | null {
   return site.assets.liveHead ?? null;
+}
+
+/**
+ * The URL of public/assets/live.js with a content-hash query (`?v=…`), or null while no campaign
+ * register exists. The file opens the seasonal card and hides a stale updates strip; it carries
+ * no copy. Versioned by scripts/live-surfaces.mjs because public/_headers sets no caching for
+ * /assets/, and a returning visitor must never run last season's logic against this season's HTML.
+ */
+export function getLiveScriptSrc(): string | null {
+  return site.assets.liveJs ?? null;
 }
 
 export function getFrontPage(): SitePage {

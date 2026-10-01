@@ -4,7 +4,7 @@ import "./globals.css";
 import "./enrich.css";
 import SiteAssets from "@/components/SiteAssets";
 import StickyCta from "@/components/StickyCta";
-import { getLiveHeadScript, getSite } from "@/lib/content";
+import { getLiveHeadScript, getLiveScriptSrc, getSite } from "@/lib/content";
 import { type SiteManifest } from "@ishub/site-kit";
 import { gtmHeadSnippet, gtmNoScriptSrc } from "@ishub/site-kit/analytics";
 import siteManifest from "@/site.config.json";
@@ -38,6 +38,15 @@ const gtmNoScript = gtmNoScriptSrc(manifest.analytics?.gtmId);
  * null until content/enriched/_campaigns.mjs exists — then nothing is emitted.
  */
 const liveHead = getLiveHeadScript();
+
+/**
+ * The seasonal card's behaviour (public/assets/live.js), loaded `defer` at the end of <body>.
+ * A plain <script src defer> — not `async`, which React 19 would hoist and dedupe as a resource,
+ * and not next/script, whose handlers need a client component. The site has one soft navigation
+ * (/thank-you/ → /), and the script is idempotent on a page without a card, so loading once per
+ * document is right.
+ */
+const liveJs = getLiveScriptSrc();
 
 /** CDN host for manifest-managed media (the OG card today). Drives the <head> preconnect. */
 const mediaHost = manifest.images?.mediaHost;
@@ -166,6 +175,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           phoneE164={manifest.contact.phoneE164}
           whatsappE164={manifest.contact.whatsappE164 ?? manifest.contact.phoneE164}
         />
+        {liveJs && <script src={liveJs} defer />}
       </body>
     </html>
   );

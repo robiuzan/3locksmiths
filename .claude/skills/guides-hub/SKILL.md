@@ -156,3 +156,13 @@ From `docs/content-calendar.md` Batch 2, which is ordered by what each guide unl
 - `paras()` escapes HTML, so in-copy `<a>` in a Path B guide renders as literal markup
   (`docs/information-architecture.md` §4).
 - Never invent dates, authors or data to look authoritative.
+
+## Dates (since 2026-10-01)
+
+Guides show `פורסם: dd/mm/yyyy` (and `· עודכן` when it differs) from `datePublished` /
+`dateModified`, and `scripts/check-dates.mjs` (npm prebuild) holds them to the content:
+
+- a **new** guide: set both dates to the publish day, then `node scripts/check-dates.mjs --accept`;
+- a **significant** edit: move `dateModified` to today, then `--accept`;
+- a typo or a link: leave the date, run `--accept --minor <id>`;
+- never move `datePublished`. Commit `content/guide-dates.json` with the module.

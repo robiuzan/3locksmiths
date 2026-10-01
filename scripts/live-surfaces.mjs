@@ -43,6 +43,19 @@
  *   · public/assets/live-schedule.json — the same intervals, readable. The reminder routine
  *     fetches it from production to warn before the schedule runs out, and a human can diff it.
  *
+ * THE SEASONAL CARD (Phase 2, plan §3.2). A window with a `dialog` gets a closed
+ * <dialog data-dialog="<variant>"> in a second region — `.live-dialogs`, data-lm-ignore +
+ * data-nosnippet, at the end of the body — on every page that allows one
+ * (lib/live/pages.mjs allowsDialog: not calm, no 100/101 sentence, not the card's own link
+ * target). public/assets/live.js opens it when <html data-live> names that variant and the visit
+ * rules allow; that file carries no copy. Its URL is versioned with a content hash
+ * (site.assets.liveJs) because nothing in public/_headers sets caching for /assets/.
+ *
+ * THE UPDATES STRIP (Phase 2, plan §3.3). When content/enriched/_updates.mjs has items, the
+ * homepage gets a `.live-updates` section after `.section-advantages` — deliberately NOT a live
+ * region: a new item is a real content change and should move the homepage <lastmod>.
+ * `data-newest` lets live.js hide it once the newest item is 45 days old.
+ *
  * PIPELINE POSITION:  … footer → **live-surfaces** → form → … → fix-links → phone → lastmod
  *   before fix-links, so a broken href fails the build; before lastmod, which must see the
  *   region to exclude it.
@@ -56,6 +69,7 @@
  *
  *   node scripts/live-surfaces.mjs      (chained into `npm run enrich`)
  */
+import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -63,7 +77,7 @@ import { parse } from "node-html-parser";
 import { compile } from "../lib/live/compile.mjs";
 import { liveHeadScript } from "../lib/live/head-script.mjs";
 import { pieces } from "../lib/live/topbar.mjs";
-import { isCalm } from "../lib/live/pages.mjs";
+import { allowsDialog, isCalm } from "../lib/live/pages.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const FILE = join(ROOT, "content", "site.json");
@@ -71,6 +85,8 @@ const CAMPAIGNS = join(ROOT, "content", "enriched", "_campaigns.mjs");
 const CALENDAR = join(ROOT, "content", "enriched", "_calendar.json");
 const CONFIG = join(ROOT, "site.config.json");
 const SCHEDULE_OUT = join(ROOT, "public", "assets", "live-schedule.json");
+const UPDATES = join(ROOT, "content", "enriched", "_updates.mjs");
+const LIVE_JS = join(ROOT, "public", "assets", "live.js");
 
 const fail = (msg) => {
   console.error(`\nLIVE-SURFACES PROBLEM: ${msg}`);
@@ -184,8 +200,104 @@ const itemsFor = (page, calm) =>
     .map(([id, v]) => item(id, v.topbar, page.path))
     .join("") + item("evergreen", campaigns.evergreen.topbar, page.path);
 
+/** Text with the {phone} token: the number as an LTR island inside the label. */
+const withPhone = (text) =>
+  pieces(text)
+    .map((p) =>
+      p.text !== undefined
+        ? esc(p.text)
+        : p.token === "phone"
+          ? `<span dir="ltr">${esc(PHONE)}</span>`
+          : esc(p.label),
+    )
+    .join("");
+
+/** The cards: one closed <dialog> per variant whose window carries a `dialog`. */
+const cards = new Map();
+for (const w of campaigns.windows ?? []) {
+  if (!w.dialog) continue;
+  const v = w.variant || w.id;
+  if (!cards.has(v)) cards.set(v, w.dialog);
+}
+const CLOSE_LABEL = campaigns.ui?.close;
+if (cards.size && !CLOSE_LABEL)
+  fail("_campaigns.mjs needs ui.close (the ✕ button's accessible name).");
+
+function card(v, dialog, selfPath) {
+  const where = `_campaigns.mjs dialog "${v}"`;
+  for (const k of ["title", "body", "call", "whatsapp"]) {
+    if (!dialog[k]) fail(`${where}: missing ${k}.`);
+  }
+  const id = `live-dialog-${v}`;
+  let html =
+    `<dialog class="live-dialog" data-dialog="${v}" data-cap-days="${Number(dialog.capDays) || 14}" aria-labelledby="${id}-title" aria-describedby="${id}-body">` +
+    // Focus lands on the title (tabindex=-1 + autofocus), not on the call link — a stray Enter on
+    // open must not start a phone call. Tab reaches the call button next.
+    `<p class="live-dialog__title" id="${id}-title" tabindex="-1" autofocus>${esc(dialog.title)}</p>` +
+    `<p class="live-dialog__body" id="${id}-body">${esc(dialog.body)}</p>` +
+    `<div class="live-dialog__actions">` +
+    `<a class="live-dialog__btn live-dialog__btn--call" href="tel:${TEL}" data-cta="popup-call"><span>${withPhone(dialog.call)}</span></a>` +
+    ` <a class="live-dialog__btn live-dialog__btn--wa" href="https://wa.me/${WA}" target="_blank" rel="noopener" data-cta="popup-whatsapp">${esc(dialog.whatsapp)}</a>` +
+    `</div>`;
+  if (dialog.link) {
+    const target = href(dialog.link.href, where);
+    if (target !== selfPath) {
+      html += `<a class="live-dialog__more" href="${target}" data-cta="popup-link">${esc(dialog.link.label)}</a>`;
+    }
+  }
+  // Last in the DOM so the first focus lands on the call button, drawn top-corner by the CSS.
+  html += `<button type="button" class="live-dialog__close" aria-label="${esc(CLOSE_LABEL)}"><span aria-hidden="true">×</span></button></dialog>`;
+  return html;
+}
+
+/** The cards one page may carry: none on calm / 100-101 pages, none on a card's own target. */
+function cardsFor(page) {
+  if (!cards.size || !allowsDialog(page)) return "";
+  const html = [...cards]
+    .filter(
+      ([, dialog]) =>
+        !dialog.link || storedPath.get(safeDecode(dialog.link.href)) !== page.path,
+    )
+    .map(([v, dialog]) => card(v, dialog, page.path))
+    .join("");
+  return html
+    ? `<div class="live-dialogs" data-lm-ignore data-nosnippet>${html}</div>`
+    : "";
+}
+
+// --- the updates strip --------------------------------------------------------------------
+const updates = existsSync(UPDATES)
+  ? (await import(pathToFileURL(UPDATES).href)).default
+  : null;
+const updateItems = Array.isArray(updates?.items) ? updates.items : [];
+/** "2026-09-02" → "02/09/2026" — pre-rendered, never Intl (CLAUDE.md §8). */
+const ddmmyyyy = (iso) => `${iso.slice(8, 10)}/${iso.slice(5, 7)}/${iso.slice(0, 4)}`;
+function strip() {
+  if (!updateItems.length) return "";
+  if (!updates.heading) fail("_updates.mjs needs a heading.");
+  const newest = [...updateItems].sort((a, b) => b.date.localeCompare(a.date));
+  const shown = newest.slice(0, 3);
+  const cardsHtml = shown
+    .map((u) => {
+      const where = `_updates.mjs item ${u.date}`;
+      const link = u.href
+        ? ` <a class="live-updates__link" href="${href(u.href, where)}" data-cta="update-link">${esc(u.linkLabel)}</a>`
+        : "";
+      return `<li class="live-updates__item"><time class="live-updates__date" datetime="${u.date}">${ddmmyyyy(u.date)}</time><p class="live-updates__text">${esc(u.text)}</p>${link}</li>`;
+    })
+    .join("");
+  return (
+    `<section class="live-updates" data-newest="${newest[0].date}" aria-labelledby="live-updates-title">` +
+    `<div class="container"><h2 class="live-updates__title" id="live-updates-title">${esc(updates.heading)}</h2>` +
+    `<ul class="live-updates__list">${cardsHtml}</ul></div></section>`
+  );
+}
+const stripHtml = strip();
+
 let filled = 0;
 let calm = 0;
+let carded = 0;
+let stripped = 0;
 for (const page of site.pages) {
   const root = parse(page.bodyHtml, {
     blockTextElements: { script: true, style: true, noscript: true, pre: true },
@@ -210,7 +322,18 @@ for (const page of site.pages) {
   bar.set_content(
     `<div class="container live-topbar" data-lm-ignore data-nosnippet>${itemsFor(page, quietPage)}</div>`,
   );
-  page.bodyHtml = root.toString();
+  // Idempotent: whatever a previous run added is removed and rebuilt.
+  for (const old of root.querySelectorAll(".live-dialogs, .live-updates")) old.remove();
+  if (page.isFront && stripHtml) {
+    const after = root.querySelector("section.section-advantages");
+    if (!after)
+      fail("the homepage has no .section-advantages to put the updates strip after.");
+    after.insertAdjacentHTML("afterend", stripHtml);
+    stripped++;
+  }
+  const cardsHtml = cardsFor(page);
+  page.bodyHtml = root.toString() + cardsHtml;
+  if (cardsHtml) carded++;
   filled++;
 }
 
@@ -233,6 +356,13 @@ const schedule = {
   })),
 };
 site.assets.liveHead = liveHeadScript(intervals);
+// The behaviour file, versioned by content so a returning visitor never runs a stale copy.
+if (!existsSync(LIVE_JS)) fail("public/assets/live.js is missing.");
+const liveJsHash = createHash("sha256")
+  .update(readFileSync(LIVE_JS))
+  .digest("hex")
+  .slice(0, 12);
+site.assets.liveJs = `/assets/live.js?v=${liveJsHash}`;
 mkdirSync(dirname(SCHEDULE_OUT), { recursive: true });
 writeFileSync(SCHEDULE_OUT, JSON.stringify(schedule, null, 2) + "\n", "utf8");
 writeFileSync(FILE, JSON.stringify(site, null, 2), "utf8");
@@ -241,6 +371,10 @@ const last = intervals[intervals.length - 1];
 console.log(
   `live-surfaces: top bar filled on ${filled} page(s), ${calm} of them calm — ` +
     `${variants.size + 1} variant(s): ${[...variants.keys(), "evergreen"].join(", ")}`,
+);
+console.log(
+  `live-surfaces: ${cards.size} card(s) [${[...cards.keys()].join(", ")}] on ${carded} page(s); ` +
+    `updates strip: ${stripped ? `${Math.min(updateItems.length, 3)} item(s) on the homepage` : "none (no _updates.mjs items)"}`,
 );
 console.log(
   `live-surfaces: schedule → ${intervals.length} interval(s)` +

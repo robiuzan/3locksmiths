@@ -50,9 +50,17 @@
  *
  * Emergency pages (93xx) and the calculator steps never show a seasonal line — only the evergreen
  * line and a safety line. That is decided by the pipeline (lib/live/pages.mjs), not per window.
- * `pages` and `dialog` fields are Phase 2 and are rejected until then.
+ * A fixed-date SEASONAL window may carry a `dialog` — the small card (plan §3.2): title, body,
+ * call (must contain {phone}), whatsapp (a word), link { label, href } (the same page as the
+ * line's link), capDays (7–60, default 14). Never on a safety window or a `during` slot. The
+ * pipeline never renders a card on the calm pages, on a page that tells the reader to call
+ * 100/101, or on the card's own link target; live.js opens it on the 2nd page of a visit, or
+ * after 20 s and a scroll — never on the first page from a search engine.
  */
 export default {
+  // Interface words the cards need. The ✕ button's accessible name.
+  ui: { close: "סגירה" },
+
   // Shown from 992 px whenever nothing seasonal is live, and the JavaScript-off state. It is
   // about WhatsApp only, on purpose: the header row directly under the bar already prints the
   // hours and the phone number, and a visitor above 991 px has no other WhatsApp link (the
@@ -117,8 +125,18 @@ export default {
         text: "נוסעים בחנוכה? השאירו מפתח אצל אדם אמין",
         link: { label: "למדריך", href: "/מדריכים/ננעלתי-מחוץ-לבית/" },
       },
+      // The seasonal card (plan §3.2) — the one card of 2026. Copy drafted by hebrew-copywriter,
+      // reviewed for claims and Hebrew, 2026-10-01. Opens at most once in 14 days per visitor.
+      dialog: {
+        title: "יוצאים לחופשת חנוכה?",
+        body: "השאירו מפתח רזרבי אצל אדם שאתם סומכים עליו, ולא מתחת לשטיח או בעציץ – שם מחפשים ראשון. אין לכם מפתח נוסף? שכפלו אחד לפני שאתם יוצאים.",
+        call: "חייגו {phone}",
+        whatsapp: "וואטסאפ",
+        link: { label: "ננעלתם מחוץ לבית?", href: "/מדריכים/ננעלתי-מחוץ-לבית/" },
+        capDays: 14,
+      },
       source:
-        "content/enriched/9205.mjs — ״שכפלו מפתח נוסף והשאירו אותו אצל אדם שאתם סומכים עליו, לא מתחת לשטיח ולא בעציץ.״ · docs/business-facts.md §D.10 (advice only)",
+        "content/enriched/9205.mjs — ״שכפלו מפתח נוסף והשאירו אותו אצל אדם שאתם סומכים עליו, לא מתחת לשטיח ולא בעציץ.״ · card: ״השאירו עותק אצל אדם שאתם סומכים עליו, ולא מתחת לשטיח או בעציץ – שם מחפשים ראשון.״ · docs/business-facts.md §D.10 (advice only)",
     },
 
     // The cleaning weeks before Pesach 5787 (seder night Wednesday 21/04/2027). Ends at noon on

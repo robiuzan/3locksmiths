@@ -56,6 +56,8 @@ if (existsSync(liveDir)) {
   }
 }
 sources.push(join(ROOT, "site.config.json"));
+// The card behaviour file: its content hash is written into site.json (assets.liveJs).
+sources.push(join(ROOT, "public", "assets", "live.js"));
 
 /**
  * Modification times are only meaningful in a working tree someone has actually been editing.
