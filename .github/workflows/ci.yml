@@ -65,9 +65,12 @@ jobs:
           fi
           # `git diff` cannot see an untracked file: a register or a generated asset that was
           # never committed would "reproduce" here and be impossible to regenerate elsewhere.
-          untracked="$(git status --porcelain --untracked-files=all -- content public/assets lib scripts)"
+          # Untracked only — NOT modified: sharp re-encodes the theme AVIFs and the touch icon
+          # on every enrich, and its bytes differ between this runner and the workstation
+          # (first seen 2026-10-01, run 36795723478). Those files are not what this step guards.
+          untracked="$(git ls-files --others --exclude-standard -- content public/assets lib scripts)"
           if [ -n "$untracked" ]; then
-            echo "::error::uncommitted or untracked files under content/, public/assets/, lib/ or scripts/ after enrich:"
+            echo "::error::untracked files under content/, public/assets/, lib/ or scripts/ after enrich — commit them:"
             echo "$untracked"
             exit 1
           fi

@@ -569,6 +569,15 @@ through react-dom's `preload()`, which places them at byte 271 of `<head>`, ahea
 stylesheet, on all 109 snapshot pages. Production (`584cb3da`) against a preview of this build
 (`a6046e99`), alternating runs, Chrome's own LCP entries:
 
+**10.10 🔶 Pre-existing: sharp output is not byte-stable across platforms.** CI run
+36795723478 (2026-10-01, Linux, Node 20) re-encoded `public/assets/img/theme/*.avif` and
+`public/assets/icons/apple-touch-icon.png` to different bytes from the workstation (Windows,
+Node 24) while every text artifact reproduced exactly. Harmless today — CI diffs only the text
+artifacts and checks for UNTRACKED files — but it means those three files are regenerated with
+platform-dependent bytes on every `npm run enrich`. The clean fix is for `scripts/assets.mjs` to
+skip re-encoding when the source image and the sharp version are unchanged (a content hash in a
+sidecar), so the committed bytes are the only bytes.
+
 **10.9 🔶 Pre-existing: 20 px of horizontal overflow before the theme scripts run, only at
 1441–1479 px wide (noted 2026-09-30 while probing the announcement bar).** In the pre-JS state
 `.col-right__bot` in the header row sits at left −19 px and the off-canvas `.nav-side` at
