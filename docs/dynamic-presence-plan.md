@@ -514,7 +514,7 @@ the first seasonal window is **Hanukkah (first candle 04/12/2026)**.
 ### Phase 1 — Calendar, topbar, gates (weeks 1–2)
 
 > **Built 2026-09-30, reviewed adversarially the same day (five lenses, 59 findings, 58 acted
-> on or recorded below); not deployed** — a deploy is the owner's call (step 7). What shipped,
+> on or recorded below); committed `c546009`/`813bb93`, deployed 2026-10-01 as `08f204f8`.** What shipped,
 > against the steps as planned:
 
 1. ✅ `scripts/calendar-sync.mjs` + `_calendar.overlay.json` → `content/enriched/_calendar.json`
@@ -618,7 +618,16 @@ the first seasonal window is **Hanukkah (first candle 04/12/2026)**.
    `check-claims` sees every line again once it is rendered into `site.json`. Topbar `data-cta`
    values are in the tracking skill. `pages` and `dialog` on a window are rejected until Phase 2
    implements them.
-7. ⏳ Gate, deploy, **verify on the live URL** with `?at=` for Hanukkah
+7. ✅ **Deployed 2026-10-01 (`08f204f8`) and verified on the live URL:** the homepage is
+   byte-identical to the build; the schedule asset is served (79 intervals, Hebcal credit); with
+   `?at=` at 360 and 1366 px on the homepage and the locked-car page — today, Hanukkah, a
+   Hanukkah Shabbat, the DST night 26/03/2027, a summer Shabbat and Tisha B'Av — every line,
+   the calm-page rule and the reserve (= nav.js's value) came out as designed; the phone
+   scroll-away translates −34 px. A throttled-mobile LCP comparison on 2026-10-01 was too noisy to
+   read (1.7–7.1 s on one unchanged build — the machine was loaded); the LCP element is still the
+   hero band and median CLS is unchanged (0.0004). Still owed: a quiet-machine LCP re-run and
+   GTM Preview for `topbar-whatsapp`. As planned:
+   Gate, deploy, **verify on the live URL** with `?at=` for Hanukkah
    (`/?at=2026-12-06T10:00:00%2B02:00`), a quiet day (`…12-05T10:00…`) and the DST night; GTM
    Preview for `topbar-whatsapp` → `contact_click`. Lighthouse on the live URL, 3 runs (the local
    harness under-reads by ~1.8 s — memory `match-production-compression`). Local evidence so
