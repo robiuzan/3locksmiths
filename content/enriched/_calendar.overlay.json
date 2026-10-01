@@ -1,0 +1,41 @@
+{
+  "about": "Hand-kept Israeli days that Hebcal does not carry. Merged into _calendar.json by scripts/calendar-sync.mjs — an edit here changes nothing until that script is run (the gate fails otherwise). Every entry needs a source a human checked. The quiet days are the owner’s list of 2026-09-29: memorial days, Yom Kippur and Tisha B’Av (NOT the minor fasts), election day and Rabin day, Shabbat and every chag. verifiedThrough is the date a human has checked this file to; the calendar is truncated there. See /israeli-calendar.",
+  "verifiedThrough": "2027-12-31",
+  "days": [
+    {
+      "id": "iron-swords-memorial-5787",
+      "date": "2026-10-05",
+      "shape": "memorial",
+      "label": "יום הזיכרון הלאומי לאסון השבעה באוקטובר ולמלחמת חרבות ברזל",
+      "source": "Government decision 1525 (17/03/2024): 24 Tishrei, moved to Sunday 25 Tishrei when it falls on Shabbat. 24 Tishrei 5787 = Monday 05/10/2026."
+    },
+    {
+      "id": "october-7-2026",
+      "date": "2026-10-07",
+      "shape": "memorial",
+      "label": "7 באוקטובר",
+      "source": "Civil-date anniversary of 07/10/2023. Owner decision 2026-09-29: quiet day."
+    },
+    {
+      "id": "knesset-election-2026",
+      "date": "2026-10-27",
+      "shape": "day",
+      "label": "יום הבחירות לכנסת",
+      "source": "Election for the 26th Knesset, Tuesday 27/10/2026 — a public day off. Owner decision 2026-09-29: quiet day."
+    },
+    {
+      "id": "october-7-2027",
+      "date": "2027-10-07",
+      "shape": "memorial",
+      "label": "7 באוקטובר",
+      "source": "Civil-date anniversary of 07/10/2023. Owner decision 2026-09-29: quiet day."
+    },
+    {
+      "id": "iron-swords-memorial-5788",
+      "date": "2027-10-25",
+      "shape": "memorial",
+      "label": "יום הזיכרון הלאומי לאסון השבעה באוקטובר ולמלחמת חרבות ברזל",
+      "source": "Government decision 1525: 24 Tishrei 5788 = Monday 25/10/2027."
+    }
+  ]
+}

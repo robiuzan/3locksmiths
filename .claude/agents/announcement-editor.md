@@ -48,10 +48,26 @@ may rest on a fact that `docs/business-facts.md` does not carry as ✅.
    - `_updates.mjs`: `{ date: "YYYY-MM-DD", text, href, source, image }` — one sentence, ≤ 140
      characters, a link to an **existing** page (never a new URL), absolute date only. Never a
      future date.
-   - `_campaigns.mjs` window: `id`, `kind` (`seasonal` | `safety` | `reduced`), `from`/`until` with
-     **explicit offsets**, `priority` (no ties), `pages.exclude` (always `emergency` for a dialog),
-     `topbar` and optional `dialog` copy, `source`, and `cta` values ending `-call` / `-whatsapp` /
-     `-link`.
+   - `_campaigns.mjs` window — **read the header comment of that file first; it is the authoring
+     guide and it is current.** In short: `id` (unique, e.g. `purim-2027`), `variant` (the line's
+     id on the page, `[a-z0-9-]`; windows that share a line share a variant; a safety line's
+     variant starts `safety-` and no other may), `kind` (`seasonal` | `safety`), either
+     `from`/`until` with **explicit offsets** (+02:00 winter, +03:00 summer) or
+     `during: "<calendar kind>"` to repeat in every calendar window of that kind, `priority` (no
+     ties between windows that overlap), `topbar: { text, link: { label, href } }`, and `source`.
+     - **One row:** text + space + link label ≤ **46 characters** (the evergreen line ≤ 70 — it
+       shows on desktop only). `check-campaigns` counts it for you and fails on 47.
+     - **Never type a phone number.** `{phone}` prints and dials the call line;
+       `{whatsapp:וואטסאפ}` links that word to the WhatsApp line. 100/101 stay plain text.
+     - **Do not repeat the header** — hours and the phone number are already printed under the bar.
+     - `href` is written in readable Hebrew (`/מדריכים/…/`) and must be a live route.
+     - `source` quotes the sentence on the target page that says what the line says. A tip the
+       linked page does not contain is not shippable — find another page or another tip.
+     - You do **not** cut a window around Shabbat, a chag or a memorial day: the compiler silences
+       every seasonal line inside them, and every line on a memorial day or fast (a `safety` line
+       stays on through Shabbat and chag — owner, 2026-10-01). You do check `public/assets/live-schedule.json` after
+       `npm run enrich` to see when the line will really show.
+     - Not available yet (Phase 2): `dialog`, the `reduced` line, the ✕ dismissal.
 3. **Hebrew discipline** (`/hebrew-rtl`): גרש `׳` and גרשיים `״`, never ASCII quotes; ₪ after the
    number (you should not be writing amounts anyway); phone in an LTR island; no mid-sentence
    language mixing.
@@ -59,8 +75,11 @@ may rest on a fact that `docs/business-facts.md` does not carry as ✅.
    `node scripts/check-typography.mjs`, then `npm run enrich` and `node scripts/check-claims.mjs`.
    Red means you stop and fix; you never silence a rule.
 5. **Verify the rendered artifact**, not your file: grep `content/site.json` for the new text and
-   confirm it sits inside `.nav-main__top-bar` / `.s-latest-posts` / the dialog, inside
-   `<!--lm:ignore-->` where the plan says so, with `data-nosnippet`. Then hand back.
+   confirm it sits inside `.nav-main__top-bar` / `.s-latest-posts` / the dialog — for the bar,
+   inside the `data-lm-ignore data-nosnippet` container — and run
+   `node scripts/check-live-regions.mjs` and `node scripts/check-schedule.mjs`. To see it, serve
+   the build and open any page with `?at=<an instant inside the window>`, e.g.
+   `/?at=2027-03-22T10:00:00%2B02:00`. Then hand back.
 
 ## Output
 
@@ -76,7 +95,8 @@ live until a human runs `ops/deploy-site.ps1`.
 - Never touch `content/site.json`, `site.config.json`, the roster, `scripts/`, `lib/`, `app/` or
   another agent's brief. Never create a route.
 - Never write a number you cannot point at: years, prices, counts, minutes, ratings.
-- Never schedule festive copy into a quiet window — `check-campaigns` will fail it, and you should
-  have seen it first in `/israeli-calendar`.
+- Never write festive copy FOR a quiet day (a memorial day, a fast). The compiler keeps every line
+  off those days automatically, but a line whose whole point is such a day is an editorial
+  mistake no gate can see — read `/israeli-calendar` first.
 - Never store copy as JSON inside a `<script>`; never propose a runtime text source.
 - Don't restate business facts in your own words — cite the row. Rows change; agents drift.

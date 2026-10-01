@@ -38,11 +38,14 @@
   #   wa.me                    WhatsApp deep links (navigation, so form-action/frame not needed)
   #
   # 'unsafe-inline' in script-src is UNAVOIDABLE here, and that is worth stating plainly rather
-  # than pretending this policy is strong. There are three separate inline-script paths:
+  # than pretending this policy is strong. There are four separate inline-script paths:
   #   1. the GTM snippet injected via dangerouslySetInnerHTML in app/layout.tsx
   #   2. components/ThemeScripts.tsx, which CREATES <script> elements at runtime to replay the
   #      original theme scripts in document order
   #   3. the scraped WordPress HTML, which carries its own inline scripts, varying per page
+  #   4. the announcement bar's resolver, an inline <head> script from content/site.json
+  #      (lib/live/head-script.mjs) which also appends one <style> at runtime — so style-src
+  #      needs 'unsafe-inline' for it as well
   # A static export cannot emit a per-request nonce, and hashing (3) is impractical because the
   # blocks differ on every page. So this CSP buys defence-in-depth against injected EXTERNAL
   # resources, not against inline script. Enforcing it may never be fully reachable without

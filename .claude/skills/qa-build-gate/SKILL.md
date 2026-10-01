@@ -11,7 +11,7 @@ the start of this gate, not the end of it.
 ## 0. Rebuild content first if you touched it
 
 ```bash
-npm run enrich          # pages → build-manifest → enrich → fix-links   (no network)
+npm run enrich          # pages → build-manifest → enrich → footer → live-surfaces → … → fix-links → lastmod   (no network)
 ```
 
 **Required** if you edited `content/enriched/`, `lib/enrich/render.mjs` or `scripts/`. Skipping it
@@ -128,7 +128,8 @@ grep -rho 'tel:%5Bphone%5D\|tel:\[phone\]' out --include=index.html | wc -l
 # the business node must not publish a personal address. Must show the manifest email.
 grep -o '"email":"[^"]*"' out/index.html
 
-# GTM click tracking. Expect MANY distinct values (15 as of 2026-09-01) and the homepage
+# GTM click tracking. Expect MANY distinct values (17 as of 2026-09-30: topbar-whatsapp and
+# topbar-link joined the 15 of 2026-09-01) and the homepage
 # must carry at least one — it had a single sitewide value until then. See backlog §13.3.
 grep -rho 'data-cta="[^"]*"' out --include=index.html | sort | uniq -c
 grep -rL 'data-cta=' out --include=index.html      # must not list out/index.html

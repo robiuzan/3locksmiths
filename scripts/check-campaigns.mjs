@@ -2,29 +2,44 @@
  * Validates the live-surface registers before anything is built from them
  * (docs/dynamic-presence-plan.md §4.3; /dynamic-presence; /israeli-calendar).
  *
- *   content/enriched/_campaigns.mjs   topbar / seasonal-card windows + the evergreen line
- *   content/enriched/_updates.mjs     the weekly updates strip
+ *   content/enriched/_campaigns.mjs   the announcement bar's lines and windows
+ *   content/enriched/_updates.mjs     the weekly updates strip (Phase 2)
  *   content/enriched/_calendar.json   generated Israeli calendar (quiet days etc.)
+ *   content/enriched/_calendar.overlay.json   the calendar's hand-kept input
  *
  * Runs in npm `prebuild`, so every human deploy runs it (ops/deploy-site.ps1 runs only
  * `npm run build` — a gate that lives only in ci.yml never guards production). It PASSES when
- * no register exists yet: Phase 0 of the plan ships the gate before the data.
+ * no register exists yet.
  *
- * WHY THESE RULES (each one is a way the site has already been wrong, or a way it would be):
- *   - explicit ISO offsets: a date-only string is UTC midnight = 03:00 in Israel. A memorial
- *     day that starts three hours late is not a rounding error.
- *   - seasonal must not overlap a hard-quiet window: the runtime resolver would suppress it
- *     anyway, but authoring a promo across Yom HaZikaron is an editorial mistake, and belt +
- *     braces is the point. Shabbat/chag overlaps are expected (every 9-day window has a
- *     Shabbat) and are left to precedence.
+ * WHY THESE RULES (each one is a way the site has already been wrong, or a way it would be —
+ * most of them were found by mutation-testing this gate on 2026-09-30):
+ *   - explicit ISO offsets, of the RIGHT SEASON: a date-only string is UTC midnight = 03:00 in
+ *     Israel, and `+03:00` on a March date is a valid instant one hour away from the one meant.
+ *   - nothing shows on a quiet day: checked on the COMPILED schedule (lib/live/compile.mjs),
+ *     which is what ships — no interval may touch a memorial day, fast or civic day, and no
+ *     seasonal interval may touch a Shabbat or chag (a safety line may: owner, 2026-10-01).
+ *   - nothing is scheduled past the calendar: beyond its last quiet window no Shabbat is known,
+ *     so a line there would run straight through every Saturday. Timed windows without a
+ *     calendar at all are refused for the same reason.
+ *   - the calendar matches its hand-kept input: an overlay day that never went through the
+ *     networked sync protects nothing; every Saturday inside the range must be quiet.
  *   - priority ties: two seasonal windows live at once with equal priority means the page
  *     shows whichever sorts first. Say which one you meant.
- *   - runway: pre-authored schedules run out silently — the site just goes evergreen forever.
+ *   - shadowed windows: a line that is outranked or silenced for its whole life never shows.
+ *   - runway: pre-authored schedules run out silently — measured on the FIXED-date windows,
+ *     because the weekly `during` slot reaches the end of the calendar by construction.
  *   - claims: the registers are the one place copy can enter site.json without passing through
  *     an authored page module, so the ⛔ patterns from check-claims are applied here too, plus
- *     the ones a promo bar invites (arrival minutes, discounts, scarcity, live counts).
- *   - typography: ASCII quotes next to Hebrew letters (CLAUDE.md §8). check-typography scans
- *     only the numeric page modules (/^\d+\.mjs$/), so the registers need their own pass.
+ *     the ones a promo bar invites (lib/live/claims.mjs). There are no offers (§D.10).
+ *   - length: the bar is one row. A line that wraps on a 360 px phone pushes the page down by
+ *     a second row the header reserve (app/enrich.css) does not hold.
+ *   - no typed phone number, anywhere a visitor reads: {phone} prints the call line from
+ *     site.config.json; a literal one is missed by the next NAP change, and a number typed as
+ *     the WhatsApp label would print the CALL number on a link that opens WhatsApp.
+ *   - sources: a tip must be something the page it links to actually says. The quote in
+ *     `source` is checked against that page's module, so a rewrite there fails here.
+ *   - typography: ASCII quotes next to Hebrew (CLAUDE.md §8); check-typography scans only the
+ *     numeric page modules, so the registers need their own pass.
  *   - AI character names: docs/business-facts.md §G.1 / §B.5 — never on the site.
  *
  * TWO RULES FAIL BY THE PASSAGE OF TIME ALONE — the runway and the calendar horizon. They must
@@ -39,64 +54,46 @@ import { existsSync, readFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import {
+  HARD_QUIET_KINDS,
   ISO_WITH_OFFSET,
   QUIET_KINDS,
   WINDOW_KINDS,
+  boundMs,
   toMs,
 } from "../lib/live/resolve.mjs";
+import { compile, expand, winners } from "../lib/live/compile.mjs";
+import { TOKEN_SOURCE, visibleText } from "../lib/live/topbar.mjs";
+import { findClaim } from "../lib/live/claims.mjs";
+import { israelOffset } from "../lib/live/israel-time.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const ENRICHED = join(ROOT, "content", "enriched");
 const CAMPAIGNS = join(ENRICHED, "_campaigns.mjs");
 const UPDATES = join(ENRICHED, "_updates.mjs");
 const CALENDAR = join(ENRICHED, "_calendar.json");
+const OVERLAY = join(ENRICHED, "_calendar.overlay.json");
+const MANIFEST = join(ENRICHED, "_manifest.json");
 const SITE = join(ROOT, "content", "site.json");
+const CONFIG = join(ROOT, "site.config.json");
 
 const DAY = 86_400_000;
 const RUNWAY_DAYS = 30;
-const CALENDAR_MIN_MONTHS = 12; // warn below this …
+const CALENDAR_WARN_DAYS = 180; // warn below this …
 const CALENDAR_FAIL_DAYS = 60; // … fail below this
+const EXPIRED_DAYS = 30; // a window that ended this long ago should be removed
 const UPDATE_MAX_CHARS = 140;
-const CTA_RE = /^(topbar|popup|update|review)-(call|whatsapp|link|ask)$/;
+const TOPBAR_MAX_CHARS = 46; // one row at 360 px — see app/enrich.css
+const EVERGREEN_MAX_CHARS = 70; // desktop only
+const CALENDAR_KINDS = ["quiet", "shabbat", "chag", "pre-shabbat"];
+const VARIANT_RE = /^[a-z0-9-]+$/;
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
-const LAPSED_OK = process.env.LIVE_GATES === "lapsed-ok";
-
-/**
- * ⛔ — mirrors scripts/check-claims.mjs BLOCKING, plus what a promo surface invites.
- *
- * No `\b`: JavaScript's word boundary is ASCII-only, so between two Hebrew letters it matches
- * everywhere. Note the final-letter trap: `זמין` ends in a final nun (ן) while `זמינים` has a
- * regular one (נ) — `[נן]` covers both, `זמינים?` covers neither singular.
- */
-const CLAIMS = [
-  {
-    id: "years-in-business",
-    re: /\d{1,2}\s*\+?\s*שנות ניסיון|ניסיון של\s*\d{1,2}\s*שנ|מעל\s*\d{1,2}\s*שנ|עשרות שנים|\d{1,2}\s*שנ(?:ה|ים)\s+של\s+ניסיון/,
-  },
-  { id: "average-response-time", re: /זמן מענה ממוצע|זמן הגעה ממוצע/ },
-  { id: "arrival-minutes", re: /תוך\s*\d+\s*דק|ב-?\d+\s*דקות|\d+\s*דקות הגעה/ },
-  { id: "customer-count", re: /אלפי לקוחות|מאות לקוחות|אלפי מפתחות|לקוחות מרוצים/ },
-  {
-    id: "live-availability",
-    re: /טכנא(?:י|ים|ית|יות)\s+זמי[נן]|נציג(?:ים|ה)?\s+זמי[נן]|זמי[נן](?:ים|ה|ות)?\s+באזורך|באזורך עכשיו|\d+\s*צופים|צופים\s+(?:כעת|עכשיו)/,
-  },
-  {
-    id: "rating",
-    re: /aggregateRating|reviewCount|\d(\.\d)?\s*★|★{2,}|דירוג\s*\d|\d\s*כוכבים|חמישה כוכבים|כוכבים בגוגל/,
-  },
-  {
-    id: "discount-or-price",
-    re: /\d+\s*%|הנחה|במבצע|מבצע\s*(חג|קיץ|חורף|מיוחד)|מחיר מיוחד|במקום\s*\d+|\d{2,4}\s*(?:₪|ש[״"']ח|שקל(?:ים)?)|(?:^|[\s,.!?(])ב?חינם|ללא עלות|במתנה|(?:^|[\s,.!?(])מתנה/,
-  },
-  {
-    id: "scarcity-or-countdown",
-    re: /רק היום|היום בלבד|רק השבוע|נותרו\s*\d|ספירה לאחור|מהרו|לזמן מוגבל|עד חצות|הזדמנות אחרונה|נגמר בקרוב|מקומות מוגבל|מלאי מוגבל|עד גמר המלאי/,
-  },
-  { id: "ai-character-name", re: /אבי יחזקל|אביעד בן שושן|שרון אליקים/ },
-];
-
+/** A typed Israeli phone number (any separator) or an international prefix. */
+const LITERAL_PHONE_RE = /\+972|0\d{1,2}[-.\s]?\d{3}[-.\s]?\d{4}/;
 /** ASCII / typographic quotes touching a Hebrew letter — must be גרש ׳ / גרשיים ״. */
 const TYPO_RE = /[֐-׿]['"’“”]|['"’“”][֐-׿]/;
+/** Any quote character at all — in a one-line bar there is no use for one. */
+const ANY_QUOTE_RE = /['"’“”]/;
+const LAPSED_OK = process.env.LIVE_GATES === "lapsed-ok";
 
 const problems = [];
 const warnings = [];
@@ -127,13 +124,17 @@ function strings(value, path, out) {
   return out;
 }
 
+/** The ⛔ patterns and the quote rule, on every string of a register entry. */
 function checkCopy(where, value) {
   for (const [path, s] of strings(value, "", [])) {
-    if (/^(source|id|kind|from|until|cta|image|date)$/.test(path.split(".").pop() || ""))
+    if (
+      /^(source|id|kind|variant|during|from|until|cta|href|image|date)$/.test(
+        path.split(".").pop() || "",
+      )
+    )
       continue;
-    for (const rule of CLAIMS) {
-      if (rule.re.test(s)) fail(`${where}.${path}`, `⛔ ${rule.id}: "${s.slice(0, 80)}"`);
-    }
+    const hit = findClaim(s);
+    if (hit) fail(`${where}.${path}`, `⛔ ${hit}: "${s.slice(0, 80)}"`);
     if (TYPO_RE.test(s))
       fail(
         `${where}.${path}`,
@@ -142,31 +143,27 @@ function checkCopy(where, value) {
   }
 }
 
+const safeDecode = (s) => {
+  try {
+    return decodeURI(s);
+  } catch {
+    return s;
+  }
+};
 let livePaths = null;
 function routeExists(href) {
   if (!livePaths) {
     livePaths = new Set();
     if (existsSync(SITE)) {
-      const site = JSON.parse(readFileSync(SITE, "utf8"));
-      for (const p of site.pages ?? []) {
+      for (const p of JSON.parse(readFileSync(SITE, "utf8")).pages ?? []) {
         livePaths.add(p.path);
-        try {
-          livePaths.add(decodeURI(p.path));
-        } catch {
-          /* leave the encoded form only */
-        }
+        livePaths.add(safeDecode(p.path));
       }
     }
   }
   if (/^https?:\/\//.test(href)) return true; // external links are fix-links' business
   const clean = href.split("#")[0];
-  let decoded = clean;
-  try {
-    decoded = decodeURI(clean);
-  } catch {
-    /* keep as-is */
-  }
-  return livePaths.has(clean) || livePaths.has(decoded);
+  return livePaths.has(clean) || livePaths.has(safeDecode(clean));
 }
 
 /**
@@ -196,40 +193,67 @@ function impossibleDate(v) {
     : `is not a real date — it rolls over to ${wall.toISOString().slice(0, 16)} in its own offset`;
 }
 
-function checkBounds(where, w, requireWindow) {
-  const hasBounds = w.from !== undefined || w.until !== undefined;
-  if (!hasBounds) {
-    if (requireWindow) fail(where, "missing from/until");
+/** An authored bound must carry Israel's offset for THAT date and hour, not just some offset. */
+function wrongSeason(v) {
+  const m = /^(\d{4}-\d{2}-\d{2})T(\d{2}):\d{2}(?::\d{2})?(Z|[+-]\d{2}:\d{2})$/.exec(v);
+  if (!m) return null;
+  const want = israelOffset(m[1], Number(m[2]));
+  return m[3] === want
+    ? null
+    : `carries ${m[3]} but Israel is on ${want} at that instant (DST switches 25/10/2026, 26/03/2027, 31/10/2027)`;
+}
+
+/** Validates one bound string; returns its epoch ms or null. `authored` adds the season rule. */
+function checkBound(where, k, v, authored) {
+  if (typeof v !== "string" || !ISO_WITH_OFFSET.test(v)) {
+    fail(
+      where,
+      `${k} must be ISO 8601 with an explicit offset (e.g. 2026-12-03T12:00:00+02:00), got ${JSON.stringify(v)}`,
+    );
     return null;
   }
-  for (const k of ["from", "until"]) {
-    if (typeof w[k] !== "string" || !ISO_WITH_OFFSET.test(w[k])) {
-      fail(
-        where,
-        `${k} must be ISO 8601 with an explicit offset (e.g. 2026-12-03T12:00:00+02:00), got ${JSON.stringify(w[k])}`,
-      );
-      return null;
-    }
-    const bad = impossibleDate(w[k]);
-    if (bad) {
-      fail(where, `${k} ${w[k]} ${bad}`);
-      return null;
-    }
-  }
-  let from;
-  let until;
-  try {
-    from = toMs(w.from);
-    until = toMs(w.until);
-  } catch (e) {
-    fail(where, e instanceof Error ? e.message : String(e));
+  const bad = impossibleDate(v);
+  if (bad) {
+    fail(where, `${k} ${v} ${bad}`);
     return null;
   }
-  if (until <= from) fail(where, `until (${w.until}) is not after from (${w.from})`);
+  if (authored) {
+    const season = wrongSeason(v);
+    if (season) {
+      fail(where, `${k} ${v} ${season}`);
+      return null;
+    }
+  }
+  return toMs(v);
+}
+
+function checkBounds(where, w, authored) {
+  if (w.from === undefined && w.until === undefined) {
+    fail(where, "missing from/until");
+    return null;
+  }
+  const from = checkBound(where, "from", w.from, authored);
+  const until = checkBound(where, "until", w.until, authored);
+  if (from === null || until === null) return null;
+  if (until <= from) {
+    fail(where, `until (${w.until}) is not after from (${w.from})`);
+    return null;
+  }
   return { from, until };
 }
 
 const overlaps = (a, b) => a.from < b.until && b.from < a.until;
+/** The Israel civil date of an instant — what a human means by "ends 2027-09-15". */
+const iso10 = (ms) => {
+  const utc = new Date(ms);
+  const off =
+    israelOffset(utc.toISOString().slice(0, 10), utc.getUTCHours()) === "+03:00" ? 3 : 2;
+  return new Date(ms + off * 3_600_000).toISOString().slice(0, 10);
+};
+const addDays = (date, n) => {
+  const [y, m, d] = date.split("-").map(Number);
+  return new Date(Date.UTC(y, m - 1, d + n)).toISOString().slice(0, 10);
+};
 
 // ---------------------------------------------------------------------------------------
 // calendar
@@ -238,55 +262,221 @@ const overlaps = (a, b) => a.from < b.until && b.from < a.until;
 const now = Date.now();
 let calendar = [];
 let calendarWindows = [];
+let calendarEnd = 0; // the last instant a quiet-kind window covers — real protection ends here
 if (existsSync(CALENDAR)) {
   const cal = JSON.parse(readFileSync(CALENDAR, "utf8"));
-  if (!cal.credit || !/hebcal/i.test(cal.credit)) {
+  if (!cal.credit || !/hebcal/i.test(cal.credit))
     fail("_calendar.json", "missing the Hebcal CC BY 4.0 credit line (`credit`)");
-  }
   calendar = Array.isArray(cal.windows) ? cal.windows : [];
   const ids = new Set();
-  let last = 0;
   for (const [i, c] of calendar.entries()) {
     const where = `_calendar.json.windows[${i}]`;
     if (!c.id) fail(where, "missing id");
     else if (ids.has(c.id)) fail(where, `duplicate id ${c.id}`);
     ids.add(c.id);
-    if (!c.kind) fail(where, "missing kind");
-    const b = checkBounds(where, c, true);
+    if (!CALENDAR_KINDS.includes(c.kind))
+      fail(
+        where,
+        `kind must be one of ${CALENDAR_KINDS.join(" | ")}, got ${JSON.stringify(c.kind)}`,
+      );
+    const b = checkBounds(where, c, false);
     if (b) {
       calendarWindows.push({ ...c, ...b });
-      last = Math.max(last, b.until);
-    }
-    if (c.labelDate && !/^\d{2}\/\d{2}\/\d{4}$/.test(c.labelDate)) {
-      fail(where, `labelDate must be pre-rendered dd/mm/yyyy, got ${c.labelDate}`);
+      if (QUIET_KINDS.includes(c.kind)) calendarEnd = Math.max(calendarEnd, b.until);
     }
     checkCopy(where, { label: c.label });
   }
-  if (calendar.length) {
-    const daysLeft = Math.floor((last - now) / DAY);
-    const ends = new Date(last).toISOString().slice(0, 10);
+
+  // The calendar must match its hand-kept input and cover every Saturday it claims to cover.
+  if (existsSync(OVERLAY)) {
+    const overlay = JSON.parse(readFileSync(OVERLAY, "utf8"));
+    if (overlay.verifiedThrough !== cal.coversThrough) {
+      fail(
+        "_calendar.json",
+        `coversThrough ${cal.coversThrough} ≠ the overlay's verifiedThrough ${overlay.verifiedThrough} — run \`node scripts/calendar-sync.mjs\``,
+      );
+    }
+    for (const d of overlay.days ?? []) {
+      if (
+        !DATE_RE.test(d.date ?? "") ||
+        d.date < cal.coversFrom ||
+        d.date > cal.coversThrough
+      )
+        continue;
+      const w = calendarWindows.find((x) => x.id === d.id && x.kind === "quiet");
+      if (
+        !w ||
+        !(
+          w.from <= toMs(`${d.date}T12:00:00${israelOffset(d.date, 12)}`) &&
+          toMs(`${d.date}T12:00:00${israelOffset(d.date, 12)}`) < w.until
+        )
+      ) {
+        fail(
+          "_calendar.json",
+          `overlay day ${d.id} (${d.date}) has no quiet window — the overlay was edited without \`node scripts/calendar-sync.mjs\``,
+        );
+      }
+    }
+  }
+  if (calendarWindows.length && DATE_RE.test(cal.coversFrom ?? "")) {
+    const quietNow = calendarWindows.filter((c) => QUIET_KINDS.includes(c.kind));
+    for (
+      let d = cal.coversFrom;
+      toMs(`${d}T12:00:00${israelOffset(d, 12)}`) < calendarEnd;
+      d = addDays(d, 1)
+    ) {
+      if (new Date(d + "T12:00:00Z").getUTCDay() !== 6) continue;
+      const noon = toMs(`${d}T12:00:00${israelOffset(d, 12)}`);
+      if (!quietNow.some((c) => c.from <= noon && noon < c.until))
+        fail(
+          "_calendar.json",
+          `Saturday ${d} 12:00 is inside no quiet window — a Shabbat is missing`,
+        );
+    }
+  }
+
+  if (calendarWindows.length) {
+    const daysLeft = Math.floor((calendarEnd - now) / DAY);
+    const ends = iso10(calendarEnd);
     if (daysLeft < CALENDAR_FAIL_DAYS) {
       clockFail(
         "_calendar.json",
         `calendar ends ${ends} — only ${daysLeft} days left; run scripts/calendar-sync.mjs`,
       );
-    } else if (daysLeft < CALENDAR_MIN_MONTHS * 30) {
+    } else if (daysLeft < CALENDAR_WARN_DAYS) {
       warnings.push(
         `_calendar.json: calendar ends ${ends} (${daysLeft} days) — regenerate before it drops under ${CALENDAR_FAIL_DAYS} days and blocks the build`,
       );
     }
   }
 }
+const quietWindows = calendarWindows.filter((c) => QUIET_KINDS.includes(c.kind));
 const hardQuiet = calendarWindows.filter((c) => c.kind === "quiet");
 
 // ---------------------------------------------------------------------------------------
 // campaigns
 // ---------------------------------------------------------------------------------------
 
+const phoneDisplay = existsSync(CONFIG)
+  ? (JSON.parse(readFileSync(CONFIG, "utf8")).contact?.phoneDisplay ?? "")
+  : "";
+const manifest = existsSync(MANIFEST) ? JSON.parse(readFileSync(MANIFEST, "utf8")) : null;
+const modules = new Map(); // id → every string in content/enriched/<id>.mjs
+
+async function moduleStrings(id) {
+  if (!modules.has(id)) {
+    const file = join(ENRICHED, `${id}.mjs`);
+    const data = existsSync(file)
+      ? (await import(pathToFileURL(file).href)).default
+      : null;
+    modules.set(id, data ? strings(data, "", []).map(([, s]) => s) : null);
+  }
+  return modules.get(id);
+}
+
+/** The bar's own rules: tokens, no typed number, one row, no quotes, no promo words. */
+function checkTopbar(where, topbar, max) {
+  if (!topbar || typeof topbar.text !== "string" || !topbar.text.trim()) {
+    fail(where, "missing topbar.text");
+    return;
+  }
+  if (/[\r\n]/.test(topbar.text)) fail(where, "topbar.text contains a line break");
+  const literal = topbar.text.replace(new RegExp(TOKEN_SOURCE, "g"), "");
+  if (/[{}]/.test(literal))
+    fail(
+      where,
+      `topbar.text has an unknown token — only {phone} and {whatsapp:<label>} exist: "${topbar.text}"`,
+    );
+  if (/\{phone:/.test(topbar.text))
+    fail(where, "{phone} takes no label — it prints the number itself");
+  if (/\{whatsapp\}/.test(topbar.text))
+    fail(where, "{whatsapp} needs a label — write {whatsapp:וואטסאפ}");
+  if (topbar.href !== undefined || topbar.cta !== undefined)
+    fail(where, "topbar.href / topbar.cta were replaced by topbar.link: { label, href }");
+  if (topbar.link !== undefined) {
+    if (
+      !topbar.link ||
+      typeof topbar.link.label !== "string" ||
+      !topbar.link.label.trim() ||
+      !topbar.link.href
+    )
+      fail(where, "topbar.link needs both label and href");
+    else {
+      if (/[{}]/.test(topbar.link.label))
+        fail(where, "topbar.link.label may not contain a token");
+      if (!routeExists(topbar.link.href))
+        fail(where, `topbar.link.href "${topbar.link.href}" is not a live route`);
+    }
+  }
+  // Everything a visitor reads, with the call line blanked: text, token labels, link label.
+  const read = visibleText(topbar, "");
+  if (LITERAL_PHONE_RE.test(read))
+    fail(
+      where,
+      "a typed phone number — write {phone} (the call line) or {whatsapp:<label>}; never the number",
+    );
+  if (ANY_QUOTE_RE.test(read)) fail(where, `a quote character in a bar line: "${read}"`);
+  const promo = findClaim(read, true);
+  if (promo) fail(where, `⛔ ${promo}: "${read}"`);
+  const seen = visibleText(topbar, phoneDisplay);
+  const chars = [...seen].length;
+  if (chars > max)
+    fail(where, `the line is ${chars} characters as read — max ${max}: "${seen}"`);
+}
+
+/**
+ * `source` must quote the sentence, on the page the line links to, that says what the line
+ * says: `content/enriched/<id>.mjs — ״…״`. Pieces around an ellipsis are checked separately.
+ */
+async function checkSource(where, w) {
+  if (!w.source) {
+    fail(
+      where,
+      "missing source — cite the page module and quote the sentence the tip rests on",
+    );
+    return;
+  }
+  if (!w.topbar?.link) return;
+  const m = /content\/enriched\/(\d+)\.mjs\s*[—–-]\s*״([^״]+)״/.exec(w.source);
+  if (!m) {
+    fail(
+      where,
+      "a line with a link must cite its page: source must start `content/enriched/<id>.mjs — ״<the sentence>״`",
+    );
+    return;
+  }
+  const id = Number(m[1]);
+  const texts = await moduleStrings(id);
+  if (!texts) {
+    fail(where, `source cites content/enriched/${id}.mjs, which does not exist`);
+    return;
+  }
+  for (const piece of m[2]
+    .split("…")
+    .map((p) => p.trim())
+    .filter(Boolean)) {
+    if (!texts.some((s) => s.includes(piece)))
+      fail(
+        where,
+        `the quoted sentence is not in content/enriched/${id}.mjs any more: ״${piece}״`,
+      );
+  }
+  const path =
+    manifest?.lookup?.[id]?.path ?? manifest?.pages?.find((p) => p.id === id)?.path;
+  if (path && safeDecode(path) !== safeDecode(w.topbar.link.href)) {
+    fail(
+      where,
+      `source cites page ${id} (${safeDecode(path)}) but the line links to ${w.topbar.link.href}`,
+    );
+  }
+}
+
 const campaigns = await loadModule(CAMPAIGNS);
 if (existsSync(CAMPAIGNS) && !campaigns)
   fail("_campaigns.mjs", "the file exists but has no default export");
 let windowCount = 0;
+let intervalCount = 0;
+let nextLine = null;
 if (campaigns) {
   if (
     !campaigns.evergreen ||
@@ -296,15 +486,20 @@ if (campaigns) {
     fail("_campaigns.mjs", "missing evergreen.topbar.text — the JS-off state must exist");
   } else {
     checkCopy("_campaigns.mjs.evergreen", campaigns.evergreen);
+    checkTopbar(
+      "_campaigns.mjs.evergreen",
+      campaigns.evergreen.topbar,
+      EVERGREEN_MAX_CHARS,
+    );
     if (!campaigns.evergreen.source)
       fail("_campaigns.mjs.evergreen", "missing source (business-facts row)");
   }
 
   const windows = Array.isArray(campaigns.windows) ? campaigns.windows : [];
+  const calendarKinds = new Set(calendarWindows.map((c) => c.kind));
   const ids = new Set();
-  const timed = [];
-  let reducedCount = 0;
-  let lastUntil = 0;
+  const lineOf = new Map(); // variant → the topbar it renders, as JSON
+  const sound = []; // windows whose bounds parsed — safe to expand and compile
 
   for (const [i, w] of windows.entries()) {
     const where = `_campaigns.mjs.windows[${i}]`;
@@ -313,93 +508,156 @@ if (campaigns) {
     ids.add(w.id);
     if (w.id === "evergreen")
       fail(where, "`evergreen` is reserved for the default variant");
-
     if (!WINDOW_KINDS.includes(w.kind))
       fail(where, `kind must be one of ${WINDOW_KINDS.join(" | ")}, got ${w.kind}`);
-    if (!w.source)
+    if (w.kind === "reduced")
       fail(
         where,
-        "missing source — cite the docs/business-facts.md row or the owner's dated message",
+        "the `reduced` line is Phase 2 — it needs the status.json switch that reveals it",
       );
-    if (!w.topbar || !w.topbar.text) fail(where, "missing topbar.text");
+    if (w.pages !== undefined || w.dialog !== undefined)
+      fail(
+        where,
+        "`pages` and `dialog` are Phase 2 and are not read by the compiler yet — remove them",
+      );
     checkCopy(where, w);
+    checkTopbar(where, w.topbar, TOPBAR_MAX_CHARS);
+    await checkSource(where, w);
 
-    for (const [k, v] of Object.entries({
-      "topbar.cta": w.topbar?.cta,
-      "dialog.cta": w.dialog?.cta,
-    })) {
-      if (v !== undefined && !CTA_RE.test(v))
-        fail(where, `${k} "${v}" must match ${CTA_RE}`);
+    const variant = w.variant || w.id;
+    if (!VARIANT_RE.test(String(variant)))
+      fail(
+        where,
+        `variant "${variant}" must match ${VARIANT_RE} — it becomes a CSS selector`,
+      );
+    if (variant === "evergreen")
+      fail(where, "`evergreen` is reserved for the default variant");
+    // app/enrich.css opens the bar on the calm pages for `[data-live^="safety-"]` only.
+    if ((w.kind === "safety") !== /^safety-/.test(String(variant))) {
+      fail(
+        where,
+        `a safety window's variant must start with "safety-", and no other kind's may — got kind ${w.kind}, variant "${variant}"`,
+      );
     }
-    for (const [k, href] of Object.entries({
-      "topbar.href": w.topbar?.href,
-      "dialog.href": w.dialog?.href,
-    })) {
-      if (href !== undefined && !routeExists(href))
-        fail(where, `${k} "${href}" is not a live route`);
-    }
-    if (w.dialog) {
-      if (!w.dialog.title || !w.dialog.body) fail(where, "dialog needs title and body");
-      if (!(w.dialog.capDays >= 1))
-        fail(where, "dialog.capDays must be ≥ 1 (frequency cap per campaign)");
-      const excl = w.pages?.exclude ?? [];
-      if (!excl.includes("emergency"))
-        fail(
-          where,
-          'a dialog window must exclude the emergency pages: pages.exclude must contain "emergency"',
-        );
-    }
+    const line = JSON.stringify(w.topbar ?? null);
+    if (lineOf.has(variant) && lineOf.get(variant) !== line)
+      fail(
+        where,
+        `variant "${variant}" is used by another window with a different topbar`,
+      );
+    lineOf.set(variant, line);
 
-    if (w.kind === "reduced") {
-      reducedCount += 1;
-      if (w.id !== "reduced")
-        fail(where, 'the reduced-availability variant must have id "reduced"');
-      if (w.from !== undefined || w.until !== undefined)
-        fail(
-          where,
-          "reduced is revealed by status.json, never by time — drop from/until",
-        );
-      continue;
-    }
-
-    const b = checkBounds(where, w, true);
-    if (!b) continue;
     if (typeof w.priority !== "number") fail(where, "missing numeric priority");
-    timed.push({ ...w, ...b, where });
-    lastUntil = Math.max(lastUntil, b.until);
 
-    if (w.kind === "seasonal") {
-      for (const q of hardQuiet) {
-        if (overlaps(b, q))
-          fail(
-            where,
-            `seasonal window overlaps hard-quiet calendar window ${q.id} (${q.from} → ${q.until}) — split the window around it`,
+    if (w.during !== undefined) {
+      // Repeats inside every calendar window of that kind; from/until only bound the repetition.
+      if (QUIET_KINDS.includes(w.during))
+        fail(where, `during "${w.during}" is a quiet kind — nothing may show inside it`);
+      else if (!calendarKinds.has(w.during))
+        fail(where, `during "${w.during}" matches no window kind in _calendar.json`);
+      let ok = true;
+      for (const k of ["from", "until"]) {
+        if (w[k] !== undefined && checkBound(where, k, w[k], true) === null) ok = false;
+      }
+      if (ok) sound.push(w);
+    } else {
+      const b = checkBounds(where, w, true);
+      if (b) {
+        sound.push(w);
+        if (b.until < now - EXPIRED_DAYS * DAY) {
+          warnings.push(
+            `${where}: window ${w.id} ended ${iso10(b.until)} — remove it (its hidden line still ships on every page), or replace it with next year's window using the same variant`,
           );
-      }
-    }
-  }
-  if (reducedCount > 1) fail("_campaigns.mjs", "more than one reduced variant");
-
-  for (let i = 0; i < timed.length; i += 1) {
-    for (let j = i + 1; j < timed.length; j += 1) {
-      const a = timed[i];
-      const b = timed[j];
-      if (a.kind === b.kind && a.priority === b.priority && overlaps(a, b)) {
-        fail(
-          a.where,
-          `overlaps ${b.id} with the same priority (${a.priority}) — ties are ambiguous`,
-        );
+        }
       }
     }
   }
 
-  windowCount = timed.length;
-  if (windowCount && lastUntil < now + RUNWAY_DAYS * DAY) {
-    clockFail(
+  if (sound.length && !quietWindows.length) {
+    fail(
       "_campaigns.mjs",
-      `runway: the last authored window ends ${new Date(lastUntil).toISOString().slice(0, 10)} — fewer than ${RUNWAY_DAYS} days ahead; author the next one`,
+      "timed windows but no calendar with quiet windows — every line would run through every Shabbat. Run `node scripts/calendar-sync.mjs`",
     );
   }
+
+  // From here on the rules read the schedule the way the browser will: expanded and compiled.
+  const authored = (id) => id.split("@")[0];
+  const concrete = expand(sound, calendarWindows);
+  const tied = new Set();
+  for (let i = 0; i < concrete.length; i += 1) {
+    for (let j = i + 1; j < concrete.length; j += 1) {
+      const a = concrete[i];
+      const b = concrete[j];
+      if (authored(a.id) === authored(b.id)) continue; // one window's own repetitions
+      if (a.kind !== b.kind || a.priority !== b.priority || !overlaps(a, b)) continue;
+      const pair = `${authored(a.id)}|${authored(b.id)}`;
+      if (tied.has(pair)) continue; // a weekly window ties 60 times; say it once
+      tied.add(pair);
+      fail(
+        `_campaigns.mjs window ${authored(a.id)}`,
+        `overlaps ${authored(b.id)} with the same priority (${a.priority}) — ties are ambiguous`,
+      );
+    }
+  }
+
+  const intervals = compile(sound, calendarWindows);
+  const safetyVariants = new Set(
+    sound.filter((w) => w.kind === "safety").map((w) => w.variant || w.id),
+  );
+  for (const iv of intervals) {
+    const q = quietWindows.find(
+      (c) =>
+        overlaps(iv, c) &&
+        (HARD_QUIET_KINDS.includes(c.kind) || !safetyVariants.has(iv.variant)),
+    );
+    if (q)
+      fail(
+        "_campaigns.mjs",
+        `compiled schedule shows "${iv.variant}" inside quiet window ${q.id} (${new Date(q.from).toISOString()} → ${new Date(q.until).toISOString()}) — a compiler bug, do not ship`,
+      );
+    if (calendarEnd && iv.until > calendarEnd) {
+      fail(
+        "_campaigns.mjs",
+        `"${iv.variant}" is scheduled until ${iso10(iv.until)}, past the calendar's last quiet window (${iso10(calendarEnd)}) — no Shabbat is known there. Extend the overlay's verifiedThrough and run \`node scripts/calendar-sync.mjs\``,
+      );
+    }
+  }
+
+  const shown = winners(sound, calendarWindows);
+  for (const w of sound) {
+    if (!shown.has(w.id))
+      fail(
+        `_campaigns.mjs window ${w.id}`,
+        "never shows — it is outranked or silenced for its whole life. Remove it or fix its dates/priority",
+      );
+  }
+
+  windowCount = sound.length;
+  intervalCount = intervals.length;
+  // Runway on the fixed-date windows: the weekly `during` slot reaches the calendar's end by
+  // construction and would hide a register where next season's line was never written.
+  const fixed = sound.filter((w) => w.during === undefined);
+  const fixedEnd = fixed.reduce((m, w) => Math.max(m, boundMs(w.until)), 0);
+  if (fixed.length && fixedEnd < now + RUNWAY_DAYS * DAY) {
+    clockFail(
+      "_campaigns.mjs",
+      `runway: the last fixed-date line ends ${iso10(fixedEnd)} — fewer than ${RUNWAY_DAYS} days ahead; author the next one`,
+    );
+  }
+  if (!windowCount)
+    warnings.push(
+      "_campaigns.mjs: no timed windows — the bar shows the evergreen line only",
+    );
+  const fixedVariants = new Set(fixed.map((w) => w.variant || w.id));
+  const upcoming = intervals.find((iv) => iv.from > now && fixedVariants.has(iv.variant));
+  const current = intervals.find((iv) => iv.from <= now && now < iv.until);
+  nextLine = {
+    current: current ? current.variant : "evergreen",
+    upcoming: upcoming
+      ? `${upcoming.variant} from ${iso10(upcoming.from)}`
+      : "none authored",
+    fixedEnd: fixed.length ? iso10(fixedEnd) : "—",
+  };
 }
 
 // ---------------------------------------------------------------------------------------
@@ -424,8 +682,17 @@ if (updates) {
         fail(where, `date must be YYYY-MM-DD, got ${JSON.stringify(u.date)}`);
       else if (u.date > today) fail(where, `date ${u.date} is in the future`);
       if (!u.text) fail(where, "missing text");
-      else if (u.text.length > UPDATE_MAX_CHARS)
-        fail(where, `text is ${u.text.length} chars — max ${UPDATE_MAX_CHARS}`);
+      else {
+        if (u.text.length > UPDATE_MAX_CHARS)
+          fail(where, `text is ${u.text.length} chars — max ${UPDATE_MAX_CHARS}`);
+        const promo = findClaim(u.text, true);
+        if (promo) fail(where, `⛔ ${promo}: "${u.text.slice(0, 80)}"`);
+        if (LITERAL_PHONE_RE.test(u.text))
+          fail(
+            where,
+            "a typed phone number in an update — link the page that carries it instead",
+          );
+      }
       if (!u.source) fail(where, "missing source");
       if (u.href !== undefined && !routeExists(u.href))
         fail(where, `href "${u.href}" is not a live route`);
@@ -439,10 +706,15 @@ if (updates) {
 // ---------------------------------------------------------------------------------------
 
 console.log(
-  `campaigns: ${campaigns ? `${windowCount} timed window(s)` : "no _campaigns.mjs yet"} · ` +
+  `campaigns: ${campaigns ? `${windowCount} timed window(s) → ${intervalCount} interval(s)` : "no _campaigns.mjs yet"} · ` +
     `${updates ? `${updateCount} update(s)` : "no _updates.mjs yet"} · ` +
-    `${calendar.length ? `${calendar.length} calendar window(s), ${hardQuiet.length} hard-quiet` : "no _calendar.json yet"}`,
+    `${calendar.length ? `${calendar.length} calendar window(s), ${hardQuiet.length} hard-quiet, quiet through ${iso10(calendarEnd)}` : "no _calendar.json yet"}`,
 );
+if (nextLine) {
+  console.log(
+    `campaigns: showing now: ${nextLine.current} · next fixed-date line: ${nextLine.upcoming} · last fixed-date line ends ${nextLine.fixedEnd}`,
+  );
+}
 if (LAPSED_OK) {
   console.warn(
     "campaigns: ⚠ LIVE_GATES=lapsed-ok — the runway and calendar-horizon rules are warnings for this run; every correctness rule still blocks",
@@ -456,8 +728,8 @@ if (problems.length) {
   for (const p of problems) console.error(`  ! ${p}`);
   process.exit(1);
 }
-if (!existsSync(CAMPAIGNS) && !existsSync(UPDATES) && !existsSync(CALENDAR)) {
-  console.log("campaigns: nothing to validate — the registers do not exist yet ✅");
+if (!campaigns && !updates && !calendar.length) {
+  console.log("campaigns: nothing to validate yet ✅");
   process.exit(0);
 }
 console.log(`campaigns: registers valid ✅ (quiet kinds: ${QUIET_KINDS.join(", ")})`);

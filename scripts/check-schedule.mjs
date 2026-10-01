@@ -3,16 +3,22 @@
  * over fixed scenarios, so precedence bugs surface in `prebuild` rather than on Yom HaZikaron
  * eve (docs/dynamic-presence-plan.md §4.3; /israeli-calendar "Gates").
  *
- * Two layers:
- *   1. FIXTURES — hand-written windows that pin the contract: quiet beats seasonal, safety
- *      beats seasonal, priority ordering and its deterministic tie-break, status modes, page
+ * Three layers:
+ *   1. FIXTURES — hand-written windows that pin the contract: a hard quiet day beats everything,
+ *      Shabbat/chag beat seasonal but not safety, safety beats seasonal, priority ordering and its deterministic tie-break, status modes, page
  *      exclusion, dismissal, the DST nights (2026-10-25 and 2027-03-26) and the 5787 Adar I/II
  *      pair, and the rejection of date-only strings.
- *   2. THE REAL REGISTERS, when they exist — every hour for 400 days must resolve without
- *      throwing, and no seasonal variant may ever win during a calendar quiet window.
+ *   2. THREE ANSWERS TO ONE QUESTION. "What shows at instant t" is computed by the resolver
+ *      (lib/live/resolve.mjs, from the raw windows), by the compiler (lib/live/compile.mjs, by
+ *      cutting the timeline) and by the inline <head> script itself, executed in a VM from the
+ *      exact text that ships. They share no selection code, and must agree on every hour and on
+ *      both sides of every boundary.
+ *   3. THE REAL REGISTERS, when they exist — the same three-way agreement for 400 days, no
+ *      line on a hard quiet day and no seasonal line on Shabbat/chag, and content/site.json
+ *      carrying the current script.
  *
  * Pure node:test + node:assert (CLAUDE.md §13: no dependency the platform already provides).
- * Reads the clock only to choose the 400-day span; it never touches content/site.json.
+ * Reads the clock only to choose the 400-day span; it only ever READS content/site.json.
  *
  *   node scripts/check-schedule.mjs        (non-zero exit on any failing test)
  */
@@ -21,7 +27,16 @@ import { join, dirname } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { QUIET_KINDS, resolve, toMs } from "../lib/live/resolve.mjs";
+import vm from "node:vm";
+import { HARD_QUIET_KINDS, QUIET_KINDS, resolve, toMs } from "../lib/live/resolve.mjs";
+import { compile, expand, winners } from "../lib/live/compile.mjs";
+import { withoutLiveRegions } from "../lib/live/regions.mjs";
+import { findClaim } from "../lib/live/claims.mjs";
+import {
+  liveHeadScript,
+  packSchedule,
+  unpackSchedule,
+} from "../lib/live/head-script.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const ENRICHED = join(ROOT, "content", "enriched");
@@ -89,6 +104,19 @@ const F = {
       from: "2026-10-21T12:00:00+03:00",
       until: "2026-10-22T20:30:00+03:00",
     },
+    // A summer Shabbat inside the safety window, and Tisha B'Av inside it too.
+    {
+      id: "shabbat-2027-07-17",
+      kind: "shabbat",
+      from: "2027-07-16T18:20:00+03:00",
+      until: "2027-07-17T21:00:00+03:00",
+    },
+    {
+      id: "tisha-bav-2027",
+      kind: "quiet",
+      from: "2027-08-11T12:00:00+03:00",
+      until: "2027-08-12T20:27:00+03:00",
+    },
     // Purim Katan / Purim in the 5787 leap year: two distinct Adar windows.
     {
       id: "purim-katan-5787",
@@ -127,6 +155,60 @@ test("higher priority wins on overlap; safety beats seasonal regardless of prior
   assert.equal(at("2026-12-06T10:00:00+02:00").variant, "hanukkah-travel-2026"); // 20 > 10
   assert.equal(at("2027-07-15T10:00:00+03:00").variant, "safety-summer-2027"); // safety 50 vs seasonal 30
   assert.equal(at("2027-07-15T10:00:00+03:00").reason, "safety");
+  // Owner, 2026-10-01: the safety line stays on through Shabbat and chag …
+  const shabbat = at("2027-07-17T10:00:00+03:00");
+  assert.equal(shabbat.variant, "safety-summer-2027");
+  assert.equal(shabbat.quiet, true, "it is still a quiet window for everything else");
+  assert.equal(shabbat.dialog, null, "no card on Shabbat");
+  // … but not through a memorial day or a fast.
+  assert.equal(at("2027-08-12T10:00:00+03:00").variant, "evergreen");
+  assert.equal(at("2027-08-12T10:00:00+03:00").reason, "calendar:tisha-bav-2027");
+  // A hard quiet day overlapping a Shabbat silences the safety line whichever window the
+  // calendar lists first (a postponed Tisha B'Av starts on the Saturday).
+  const overlapCal = [
+    {
+      id: "shabbat-x",
+      kind: "shabbat",
+      from: "2029-07-20T18:25:00+03:00",
+      until: "2029-07-21T20:58:00+03:00",
+    },
+    {
+      id: "tisha-bav-x",
+      kind: "quiet",
+      from: "2029-07-21T12:00:00+03:00",
+      until: "2029-07-22T20:25:00+03:00",
+    },
+  ];
+  const safetyWin = [
+    {
+      id: "safety-x",
+      kind: "safety",
+      priority: 50,
+      from: "2029-07-01T00:00:00+03:00",
+      until: "2029-08-01T00:00:00+03:00",
+      topbar: { text: "x" },
+    },
+  ];
+  for (const cal of [overlapCal, [...overlapCal].reverse()]) {
+    const t = "2029-07-21T13:00:00+03:00";
+    assert.equal(
+      resolve({ windows: safetyWin, calendar: cal }, t).reason,
+      "calendar:tisha-bav-x",
+    );
+    assert.equal(lookup(compile(safetyWin, cal), toMs(t)), "evergreen");
+    assert.equal(
+      resolve({ windows: safetyWin, calendar: cal }, "2029-07-21T10:00:00+03:00").variant,
+      "safety-x",
+    );
+  }
+  // A seasonal line alone on that Shabbat would have been silenced.
+  assert.equal(
+    resolve(
+      { windows: F.windows.filter((w) => w.kind !== "safety"), calendar: F.calendar },
+      "2027-07-17T10:00:00+03:00",
+    ).variant,
+    "evergreen",
+  );
   const tie = resolve(
     {
       windows: [
@@ -241,7 +323,9 @@ test("date-only, offset-less or out-of-range bounds are rejected, never guessed"
     "2026-12-00T12:00:00+02:00", // day 0
     "",
     undefined,
-    1700000000000,
+    // (An epoch-ms NUMBER is accepted: that is what lib/live/compile.mjs hands the resolver
+    // after expanding a `during` window. An authored number never gets this far —
+    // check-campaigns requires every authored bound to be an ISO string.)
   ]) {
     assert.throws(() =>
       resolve(
@@ -264,6 +348,354 @@ test("date-only, offset-less or out-of-range bounds are rejected, never guessed"
 });
 
 // ---------------------------------------------------------------------------------------
+// the compiled schedule and the script that ships
+// ---------------------------------------------------------------------------------------
+
+/** Which variant the compiled interval list shows at `ms` — the lookup the head script does. */
+function lookup(intervals, ms) {
+  for (const iv of intervals) if (iv.from <= ms && ms < iv.until) return iv.variant;
+  return "evergreen";
+}
+
+/**
+ * The inline <head> script, run for real: the exact text app/layout.tsx prints, inside a VM with
+ * just enough of a browser for it. `at(ms)` moves its clock and re-runs it the way a `pageshow`
+ * does, returning what it wrote on <html>; `state.css` is what it wrote into its <style>.
+ */
+function bootHeadScript(intervals, search = "") {
+  const state = { now: 0, attr: null, css: null, listeners: {}, resizes: 0, timer: null };
+  const style = {
+    set textContent(v) {
+      state.css = v;
+    },
+  };
+  const sandbox = {
+    document: {
+      documentElement: {
+        setAttribute: (k, v) => {
+          if (k === "data-live") state.attr = v;
+        },
+      },
+      head: { appendChild() {} },
+      createElement: () => style,
+      addEventListener() {},
+      hidden: false,
+    },
+    location: { search },
+    addEventListener: (type, fn) => {
+      state.listeners[type] = fn;
+    },
+    Date: { now: () => state.now, parse: Date.parse },
+    dispatchEvent: (e) => {
+      if (e.type === "resize") state.resizes += 1;
+    },
+    Event: class {
+      constructor(type) {
+        this.type = type;
+      }
+    },
+    Math,
+    setTimeout: (fn, ms) => {
+      state.timer = { fn, ms };
+      return 1;
+    },
+    clearTimeout: () => {
+      state.timer = null;
+    },
+    parseInt,
+    isNaN,
+    decodeURIComponent,
+  };
+  vm.runInNewContext(liveHeadScript(intervals), sandbox);
+  return {
+    at(ms) {
+      state.now = ms;
+      state.listeners.pageshow();
+      return state.attr;
+    },
+    /** Let the armed timer fire, as the browser would at that moment. */
+    tick() {
+      const t = state.timer;
+      if (!t) return null;
+      state.now += t.ms;
+      state.timer = null;
+      t.fn();
+      return state.attr;
+    },
+    state,
+  };
+}
+
+/** Every hour of [start, end) plus one minute either side of every boundary. */
+function* probes(intervals, start, end, extra = []) {
+  for (let ms = start; ms < end; ms += HOUR) yield ms;
+  for (const iv of intervals) {
+    for (const edge of [iv.from, iv.until]) yield* [edge - 60_000, edge, edge + 60_000];
+  }
+  for (const ms of extra) yield* [ms - 60_000, ms, ms + 60_000];
+}
+
+test("`during` fans one authored window out over the calendar, inside its bounds only", () => {
+  const calendar = [
+    {
+      id: "pre-1",
+      kind: "pre-shabbat",
+      from: "2026-10-01T17:00:00+03:00",
+      until: "2026-10-02T14:00:00+03:00",
+    },
+    {
+      id: "pre-2",
+      kind: "pre-shabbat",
+      from: "2026-10-08T17:00:00+03:00",
+      until: "2026-10-09T14:00:00+03:00",
+    },
+    {
+      id: "pre-3",
+      kind: "pre-shabbat",
+      from: "2026-10-15T17:00:00+03:00",
+      until: "2026-10-16T14:00:00+03:00",
+    },
+    {
+      id: "shabbat-3",
+      kind: "shabbat",
+      from: "2026-10-16T13:00:00+03:00",
+      until: "2026-10-17T19:00:00+03:00",
+    },
+  ];
+  const windows = [
+    {
+      id: "weekly",
+      kind: "seasonal",
+      during: "pre-shabbat",
+      from: "2026-10-08T00:00:00+03:00",
+      priority: 5,
+      topbar: { text: "x" },
+    },
+  ];
+  const concrete = expand(windows, calendar);
+  assert.deepEqual(
+    concrete.map((w) => w.id),
+    ["weekly@pre-2", "weekly@pre-3"],
+    "the window before `from` is not expanded",
+  );
+  assert.ok(concrete.every((w) => w.variant === "weekly"));
+  const intervals = compile(windows, calendar);
+  assert.equal(intervals.length, 2);
+  assert.equal(
+    intervals[1].until,
+    toMs("2026-10-16T13:00:00+03:00"),
+    "a quiet window that starts inside a repetition cuts it short",
+  );
+  assert.deepEqual([...winners(windows, calendar)], ["weekly"]);
+});
+
+test("the compiled schedule agrees with the resolver — fixtures, every hour and every boundary", () => {
+  const intervals = compile(F.windows, F.calendar);
+  const concrete = { windows: expand(F.windows, F.calendar), calendar: F.calendar };
+  const start = toMs("2026-10-01T00:00:00+03:00");
+  const end = toMs("2027-10-01T00:00:00+03:00");
+  const quietEdges = F.calendar.flatMap((c) => [toMs(c.from), toMs(c.until)]);
+  let n = 0;
+  for (const ms of probes(intervals, start, end, quietEdges)) {
+    assert.equal(
+      lookup(intervals, ms),
+      resolve(concrete, ms).variant,
+      `compiled ≠ resolved at ${new Date(ms).toISOString()}`,
+    );
+    n += 1;
+  }
+  assert.ok(n > 8000);
+  // Disjoint, sorted, merged — the shape the packer relies on.
+  for (let i = 1; i < intervals.length; i += 1) {
+    const prev = intervals[i - 1];
+    const next = intervals[i];
+    assert.ok(prev.until <= next.from, "intervals overlap or are unsorted");
+    assert.ok(
+      prev.until < next.from || prev.variant !== next.variant,
+      "adjacent intervals of one variant were not merged",
+    );
+  }
+});
+
+test("pack → unpack returns the same schedule", () => {
+  const intervals = compile(F.windows, F.calendar);
+  assert.deepEqual(unpackSchedule(packSchedule(intervals)), intervals);
+  assert.deepEqual(packSchedule([]), { variants: [], base: 0, packed: "" });
+  assert.throws(
+    () => packSchedule([{ variant: "x", from: 30_000, until: 90_000 }]),
+    /minute-aligned/,
+    "a bound that is not on a whole minute cannot be packed losslessly",
+  );
+  assert.throws(
+    () => packSchedule([{ variant: 'x"]{}', from: 0, until: 60_000 }]),
+    /variant id/,
+  );
+});
+
+test("the shipped <head> script picks the resolver's variant — run in a VM, fixtures", () => {
+  const intervals = compile(F.windows, F.calendar);
+  const concrete = { windows: expand(F.windows, F.calendar), calendar: F.calendar };
+  const page = bootHeadScript(intervals);
+  const start = toMs("2026-10-01T00:00:00+03:00");
+  const end = toMs("2027-10-01T00:00:00+03:00");
+  for (const ms of probes(intervals, start, end)) {
+    assert.equal(
+      page.at(ms),
+      resolve(concrete, ms).variant,
+      `head script ≠ resolver at ${new Date(ms).toISOString()}`,
+    );
+  }
+  // The rule it writes: reveal the variant, hide the evergreen line that follows it.
+  page.at(toMs("2026-12-06T10:00:00+02:00"));
+  assert.equal(
+    page.state.css,
+    '.live-topbar__item[data-campaign="hanukkah-travel-2026"]{display:flex!important}' +
+      '.live-topbar__item[data-campaign="hanukkah-travel-2026"]~[data-campaign="evergreen"]{display:none}',
+  );
+  page.at(toMs("2026-10-01T10:00:00+03:00"));
+  assert.equal(page.state.css, "", "evergreen needs no rule — it is the static default");
+});
+
+test("?at= overrides the clock; garbage falls back to the clock; an empty schedule is evergreen", () => {
+  const intervals = compile(F.windows, F.calendar);
+  const hanukkah = bootHeadScript(intervals, "?at=2026-12-06T10:00:00%2B02:00");
+  assert.equal(hanukkah.at(toMs("2026-10-01T10:00:00+03:00")), "hanukkah-travel-2026");
+  const plain = bootHeadScript(intervals, "?utm_source=x&at=2026-12-06T10:00:00+02:00");
+  assert.equal(
+    plain.at(0),
+    "hanukkah-travel-2026",
+    "an unencoded + is a plus, not a space",
+  );
+  const shabbat = bootHeadScript(intervals, "?at=2026-12-05T10:00:00%2B02:00");
+  assert.equal(shabbat.at(toMs("2026-12-06T10:00:00+02:00")), "evergreen");
+  const garbage = bootHeadScript(intervals, "?at=%E0%A4%A");
+  assert.equal(garbage.at(toMs("2026-12-06T10:00:00+02:00")), "hanukkah-travel-2026");
+  const nonsense = bootHeadScript(intervals, "?at=tomorrow");
+  assert.equal(nonsense.at(toMs("2026-10-01T10:00:00+03:00")), "evergreen");
+  assert.equal(bootHeadScript([]).at(Date.now()), "evergreen");
+});
+
+test("a line that changes while the page is open asks the theme to re-measure the header", () => {
+  // nav.js writes the header's padding once, at load, and again only on `resize`. A bar that
+  // opens on a phone mid-visit would otherwise sit on top of the first 34px of the page.
+  const page = bootHeadScript(compile(F.windows, F.calendar));
+  page.at(toMs("2026-10-01T10:00:00+03:00")); // evergreen
+  page.at(toMs("2026-10-01T11:00:00+03:00")); // still evergreen
+  assert.equal(page.state.resizes, 0, "no change, no resize — including the first run");
+  page.at(toMs("2026-12-06T10:00:00+02:00")); // Hanukkah opens
+  assert.equal(page.state.resizes, 1);
+  page.at(toMs("2026-12-06T11:00:00+02:00")); // same line
+  assert.equal(page.state.resizes, 1);
+  page.at(toMs("2026-12-05T10:00:00+02:00")); // Shabbat — back to evergreen
+  assert.equal(page.state.resizes, 2);
+});
+
+test("a visible tab re-checks at the next boundary on its own — one timer, re-armed each run", () => {
+  const intervals = compile(F.windows, F.calendar);
+  const page = bootHeadScript(intervals);
+  // Shabbat inside Hanukkah: evergreen now, the Hanukkah line returns when havdalah ends.
+  const havdalah = toMs("2026-12-05T21:00:00+02:00");
+  page.at(havdalah - 2 * HOUR);
+  assert.equal(page.state.attr, "evergreen");
+  assert.ok(page.state.timer, "a timer is armed");
+  assert.equal(
+    page.state.now + page.state.timer.ms,
+    havdalah + 1000,
+    "it fires one second past the boundary",
+  );
+  assert.equal(page.tick(), "hanukkah-travel-2026");
+  assert.equal(page.state.resizes, 1, "and nudges nav.js");
+  assert.ok(page.state.timer, "the next boundary is armed in turn");
+  // No timer under ?at= (a preview is a frozen instant), none after the last interval.
+  const frozen = bootHeadScript(intervals, "?at=2026-12-06T10:00:00%2B02:00");
+  frozen.at(0);
+  assert.equal(frozen.state.timer, null);
+  const late = bootHeadScript(intervals);
+  late.at(toMs("2028-01-01T10:00:00+02:00"));
+  assert.equal(late.state.timer, null);
+  // Forty days before the first interval the delay is clamped to what setTimeout can hold.
+  const early = bootHeadScript(intervals);
+  early.at(toMs("2026-01-01T10:00:00+02:00"));
+  assert.equal(early.state.timer.ms, 2147483647);
+});
+
+test("live regions are cut from the raw body — nested once, siblings both; edits outside still count", () => {
+  const nested =
+    "<header><div data-lm-ignore data-nosnippet>OUT1<span data-lm-ignore>INNER</span>OUT2</div>AFTER-0123456789-AFTER</header><main>body</main>";
+  assert.equal(
+    withoutLiveRegions(nested),
+    "<header>AFTER-0123456789-AFTER</header><main>body</main>",
+    "a region inside a region is cut once, with its parent — never the bytes after it",
+  );
+  const siblings = "<p data-lm-ignore>a</p><p>keep</p><p data-lm-ignore>b</p>";
+  assert.equal(withoutLiveRegions(siblings), "<p>keep</p>");
+  assert.equal(withoutLiveRegions("<p>no regions</p>"), "<p>no regions</p>");
+  const SITE = join(ROOT, "content", "site.json");
+  if (!existsSync(SITE)) return;
+  const home = JSON.parse(readFileSync(SITE, "utf8")).pages.find((p) => p.isFront);
+  const before = withoutLiveRegions(home.bodyHtml);
+  assert.ok(!before.includes("data-campaign"), "no line survives the cut");
+  assert.ok(before.includes("nav-main__top-bar"), "the slot around the region survives");
+  const reworded = home.bodyHtml.replace(
+    /live-topbar__text">[^<]*/,
+    'live-topbar__text">REWORDED',
+  );
+  assert.notEqual(reworded, home.bodyHtml);
+  assert.equal(
+    withoutLiveRegions(reworded),
+    before,
+    "rewording a line leaves the fingerprint alone",
+  );
+  const edited = home.bodyHtml.replace("<main", "<main data-edited");
+  assert.notEqual(
+    withoutLiveRegions(edited),
+    before,
+    "an edit outside the region still moves it",
+  );
+});
+
+test("the claim patterns catch the wordings that once slipped through", () => {
+  // Found by mutation-testing the gate on 2026-09-30. Every one of these must stay ⛔.
+  for (const bad of [
+    "מבצע: שכפול מפתח שני",
+    "מבצע חנוכה על צילינדרים",
+    "מבצעי החורף כבר כאן",
+    "שכפול מפתח ₪250",
+    "סוללה לשלט ב-5 ₪",
+    "עד 30 דקות ואנחנו אצלכם",
+    "אצלכם תוך חצי שעה",
+    "הגעה ב-20 דק׳ לכל מקום",
+    "20 דקות וטכנאי בדרך",
+    "המחיר הזול בעיר, מובטח",
+    "1+1 על שכפול מפתחות",
+    "מפתח שני בחצי מחיר",
+    "רק מאה שקלים למפתח",
+    "עד סוף השבוע בלבד",
+    "אחריות לשנה על כל צילינדר",
+    "20% הנחה",
+    "תוך 20 דקות",
+    "250 ₪",
+    "טכנאי זמין באזורך",
+    "אלפי לקוחות מרוצים",
+  ]) {
+    assert.ok(findClaim(bad, true), `not caught: "${bad}"`);
+  }
+  // And the lines that ship must not be.
+  for (const good of [
+    "שני מפתחות הרכב בצרור אחד? זה לא גיבוי למדריך",
+    "השלט מגיב לאט בקור? סימן לסוללה חלשה למדריך",
+    "נוסעים בחנוכה? השאירו מפתח אצל אדם אמין למדריך",
+    "ניקיון לפסח? לצילינדר גרפיט, לא שמן מזון פרטים",
+    "ילד או בעל חיים ברכב נעול? חייגו 100/101 פרטים",
+    "מעדיפים לכתוב ולא להתקשר? שלחו לנו הודעת וואטסאפ",
+  ]) {
+    assert.equal(findClaim(good, true), null, `false positive: "${good}"`);
+  }
+  // Calendar labels see the base list only: an overlay day may be named after an operation.
+  assert.equal(findClaim("מבצע חרבות ברזל"), null);
+});
+
+// ---------------------------------------------------------------------------------------
 // the real registers, if they exist
 // ---------------------------------------------------------------------------------------
 
@@ -281,27 +713,78 @@ async function loadReal() {
 const real = await loadReal();
 const haveReal = real.windows.length > 0 || real.calendar.length > 0;
 
-test(`real registers: ${haveReal ? `${real.windows.length} window(s), ${real.calendar.length} calendar window(s)` : "none yet"} — every hour of the next ${DAYS} days`, () => {
+test(`real registers: ${haveReal ? `${real.windows.length} window(s), ${real.calendar.length} calendar window(s)` : "none yet"} — resolver, compiled schedule and head script agree on every hour of the next ${DAYS} days`, () => {
   if (!haveReal) return;
+  const intervals = compile(real.windows, real.calendar);
+  const concrete = {
+    windows: expand(real.windows, real.calendar),
+    calendar: real.calendar,
+  };
+  const page = bootHeadScript(intervals);
   const start = Date.now();
+  const quietEdges = real.calendar
+    .filter((c) => QUIET_KINDS.includes(c.kind))
+    .flatMap((c) => [toMs(c.from), toMs(c.until)]);
   let promos = 0;
-  for (let h = 0; h < DAYS * 24; h += 1) {
-    const ms = start + h * HOUR;
-    const d = resolve(real, ms);
+  let instants = 0;
+  for (const ms of probes(intervals, start, start + DAYS * 24 * HOUR, quietEdges)) {
+    const d = resolve(concrete, ms);
+    const when = new Date(ms).toISOString();
+    const inHard = real.calendar.some(
+      (c) =>
+        HARD_QUIET_KINDS.includes(c.kind) && toMs(c.from) <= ms && ms < toMs(c.until),
+    );
     const inQuiet = real.calendar.some(
       (c) => QUIET_KINDS.includes(c.kind) && toMs(c.from) <= ms && ms < toMs(c.until),
     );
+    if (inHard) {
+      assert.equal(d.variant, "evergreen", `"${d.variant}" on a quiet day at ${when}`);
+    }
     if (inQuiet) {
-      assert.equal(
-        d.variant,
-        "evergreen",
-        `promo "${d.variant}" during quiet window at ${new Date(ms).toISOString()}`,
+      assert.ok(
+        d.variant === "evergreen" || d.variant.startsWith("safety-"),
+        `seasonal "${d.variant}" during Shabbat/chag at ${when}`,
       );
       assert.equal(d.dialog, null);
     }
+    assert.equal(lookup(intervals, ms), d.variant, `compiled ≠ resolved at ${when}`);
+    assert.equal(page.at(ms), d.variant, `head script ≠ resolver at ${when}`);
+    instants += 1;
     if (d.variant !== "evergreen") promos += 1;
   }
   console.log(
-    `  schedule: ${promos} of ${DAYS * 24} simulated hours show a non-evergreen variant`,
+    `  schedule: ${intervals.length} interval(s); ${promos} of ${instants} probed instants show a non-evergreen line`,
+  );
+});
+
+test("what ships is what the registers compile to — the head script and the readable schedule", () => {
+  const SITE = join(ROOT, "content", "site.json");
+  const SCHEDULE = join(ROOT, "public", "assets", "live-schedule.json");
+  if (!existsSync(SITE) || !existsSync(join(ENRICHED, "_campaigns.mjs"))) return;
+  const intervals = compile(real.windows, real.calendar);
+  const shipped = JSON.parse(readFileSync(SITE, "utf8")).assets?.liveHead;
+  assert.equal(
+    shipped,
+    liveHeadScript(intervals),
+    "content/site.json carries a stale head script — run `npm run enrich`",
+  );
+  assert.ok(
+    existsSync(SCHEDULE),
+    "public/assets/live-schedule.json is missing — run `npm run enrich`",
+  );
+  const readable = JSON.parse(readFileSync(SCHEDULE, "utf8"));
+  assert.deepEqual(
+    readable.intervals,
+    intervals.map((iv) => ({
+      variant: iv.variant,
+      from: new Date(iv.from).toISOString(),
+      until: new Date(iv.until).toISOString(),
+    })),
+    "public/assets/live-schedule.json is stale — run `npm run enrich`",
+  );
+  assert.match(
+    readable.about,
+    /Hebcal/,
+    "the served schedule must carry the Hebcal credit",
   );
 });

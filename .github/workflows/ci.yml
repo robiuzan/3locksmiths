@@ -58,9 +58,17 @@ jobs:
         run: |
           set -euo pipefail
           npm run enrich
-          if ! git diff --quiet -- content/site.json content/enriched/_manifest.json; then
+          if ! git diff --quiet -- content/site.json content/enriched/_manifest.json content/lastmod.json public/assets/live-schedule.json; then
             echo "::error::content/site.json is stale — run \`npm run enrich\` and commit the result"
-            git diff --stat -- content/site.json content/enriched/_manifest.json
+            git diff --stat -- content/site.json content/enriched/_manifest.json content/lastmod.json public/assets/live-schedule.json
+            exit 1
+          fi
+          # `git diff` cannot see an untracked file: a register or a generated asset that was
+          # never committed would "reproduce" here and be impossible to regenerate elsewhere.
+          untracked="$(git status --porcelain --untracked-files=all -- content public/assets lib scripts)"
+          if [ -n "$untracked" ]; then
+            echo "::error::uncommitted or untracked files under content/, public/assets/, lib/ or scripts/ after enrich:"
+            echo "$untracked"
             exit 1
           fi
           echo "content/site.json reproduces exactly from its sources"

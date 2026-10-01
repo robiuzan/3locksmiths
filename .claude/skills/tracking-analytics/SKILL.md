@@ -47,7 +47,7 @@ the container competes with jQuery for parse time.
 Move the `gtm-init` script into `<head>`; keep the `<noscript>` iframe in `<body>`, which is where it
 belongs.
 
-Note this inline script is one of the three inline-script paths a future CSP must accommodate — see
+Note this inline script is one of the four inline-script paths a future CSP must accommodate — see
 `/web-security-headers`.
 
 ## The `data-cta` inventory — present, but single-valued
@@ -79,6 +79,16 @@ Convention: `{location}-{action}`.
 | `footer-call` / `footer-whatsapp` | scraped chrome                           |
 | `pricing-call`                    | `lib/enrich/render.mjs` pricing block    |
 | `form-submit`                     | the Web3Forms form                       |
+
+**The announcement bar (shipped 2026-09-30, `scripts/live-surfaces.mjs`)** adds three values on
+every page: `topbar-whatsapp` (the evergreen line — from 992 px the only WhatsApp link on the page,
+the sticky bar being phone-only; it is absent while a seasonal line is showing),
+`topbar-call` (only if a line uses the `{phone}` token; none does today) and `topbar-link` (a
+seasonal line's link to a guide or service page). The container's `contact_click` predicate is
+`-(call|whatsapp)$`, so `topbar-link` is **deliberately not a conversion** — it is a page view of
+an advice page. The summer safety line prints `100/101` as plain text: a tappable emergency number
+tagged `-call` would be counted as a lead for this business. Every line is in the HTML at once
+(hidden), so a raw `grep -c 'data-cta="topbar-link"'` counts five per page, not one.
 
 ```bash
 # the distribution — should stop being a single value

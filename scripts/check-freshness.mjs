@@ -43,7 +43,18 @@ for (const f of readdirSync(join(ROOT, "scripts"))) {
   if (/^check-/.test(f)) continue;
   if (f.endsWith(".mjs")) sources.push(join(ROOT, "scripts", f));
 }
-sources.push(join(ROOT, "lib", "enrich", "render.mjs"));
+// The renderer and the helpers it imports (catalog-image.mjs, esc.mjs, …).
+for (const f of readdirSync(join(ROOT, "lib", "enrich"))) {
+  if (f.endsWith(".mjs")) sources.push(join(ROOT, "lib", "enrich", f));
+}
+// The live surfaces: the schedule compiler, the <head> script and the topbar tokens all end up
+// inside site.json through scripts/live-surfaces.mjs.
+const liveDir = join(ROOT, "lib", "live");
+if (existsSync(liveDir)) {
+  for (const f of readdirSync(liveDir)) {
+    if (f.endsWith(".mjs")) sources.push(join(liveDir, f));
+  }
+}
 sources.push(join(ROOT, "site.config.json"));
 
 /**
@@ -85,5 +96,10 @@ for (const s of stale.slice(0, 12)) {
   console.error(`  ! ${s.f.replace(ROOT, "").replace(/\\/g, "/")}  (${ago}s newer)`);
 }
 if (stale.length > 12) console.error(`  … and ${stale.length - 12} more`);
-console.error("\nFix: npm run enrich\n");
+const overlay = stale.find((s) => s.f.endsWith("_calendar.overlay.json"));
+console.error(
+  overlay
+    ? "\nFix: node scripts/calendar-sync.mjs (the overlay feeds the calendar, which enrich reads), then npm run enrich\n"
+    : "\nFix: npm run enrich\n",
+);
 process.exit(1);

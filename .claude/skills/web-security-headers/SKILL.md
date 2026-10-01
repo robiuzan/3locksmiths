@@ -1,6 +1,6 @@
 ---
 name: web-security-headers
-description: Security posture for a snapshot-ported static export on Cloudflare Pages — public/_headers for HSTS, X-Frame-Options and Permissions-Policy, why a CSP here is harder than on any sibling site (three separate inline-script paths), public/_redirects, the stale second origin still live on GitHub Pages, PII and consent on the Web3Forms form, and secret hygiene. Use when adding headers, planning a CSP, or auditing security. Triggers "security headers", "CSP", "HSTS", "_headers", "is the form safe", "clickjacking".
+description: Security posture for a snapshot-ported static export on Cloudflare Pages — public/_headers for HSTS, X-Frame-Options and Permissions-Policy, why a CSP here is harder than on any sibling site (four separate inline-script paths), public/_redirects, the stale second origin still live on GitHub Pages, PII and consent on the Web3Forms form, and secret hygiene. Use when adding headers, planning a CSP, or auditing security. Triggers "security headers", "CSP", "HSTS", "_headers", "is the form safe", "clickjacking".
 ---
 
 # Security headers & posture
@@ -73,13 +73,16 @@ Notes before shipping it:
 
 ## CSP — harder here than on any sibling site
 
-There are **three separate inline-script paths**, and a static export cannot generate a per-request
+There are **four separate inline-script paths**, and a static export cannot generate a per-request
 nonce:
 
 1. **The GTM snippet** — injected via `dangerouslySetInnerHTML` in `app/layout.tsx`.
 2. **`components/ThemeScripts.tsx`** — creates `<script>` elements **at runtime** and appends them to
    the body, replaying the theme's libraries in document order.
-3. **The scraped WordPress HTML itself** — `page.bodyHtml` contains the source site's own inline
+3. **The announcement bar's resolver** — an inline `<head>` script printed from
+   `content/site.json` (`lib/live/head-script.mjs`), which also appends one `<style>` element at
+   runtime, so `style-src` needs `'unsafe-inline'` too. It carries no copy, only ids and minutes.
+4. **The scraped WordPress HTML itself** — `page.bodyHtml` contains the source site's own inline
    scripts, injected as opaque markup.
 
 Hashing is impractical across (3) because the inline blocks vary per page. So any workable CSP needs

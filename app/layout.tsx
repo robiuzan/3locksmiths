@@ -4,7 +4,7 @@ import "./globals.css";
 import "./enrich.css";
 import SiteAssets from "@/components/SiteAssets";
 import StickyCta from "@/components/StickyCta";
-import { getSite } from "@/lib/content";
+import { getLiveHeadScript, getSite } from "@/lib/content";
 import { type SiteManifest } from "@ishub/site-kit";
 import { gtmHeadSnippet, gtmNoScriptSrc } from "@ishub/site-kit/analytics";
 import siteManifest from "@/site.config.json";
@@ -17,6 +17,27 @@ const manifest = siteManifest as unknown as SiteManifest;
 /** Shared GTM loader — inert (renders nothing) until analytics.gtmId is set in the manifest. */
 const gtmHead = gtmHeadSnippet(manifest.analytics?.gtmId);
 const gtmNoScript = gtmNoScriptSrc(manifest.analytics?.gtmId);
+
+/**
+ * Picks the announcement-bar line from the visitor's clock, before first paint
+ * (docs/dynamic-presence-plan.md §3.1; lib/live/head-script.mjs explains the script itself).
+ *
+ * WHY AN INLINE SCRIPT IN <head> AND NOT A COMPONENT
+ *
+ *   Which line shows depends on the date, and a static export has no date: the HTML is built
+ *   once and served for weeks. Next 16's guide for exactly this case
+ *   (node_modules/next/dist/docs/01-app/02-guides/preventing-flash-before-hydration.md) is an
+ *   inline script that runs while the HTML parses. A client component would run only after
+ *   hydration — seconds late on a phone here, behind the theme-script replay — and would make a
+ *   second "use client" file (CLAUDE.md §9).
+ *
+ *   It sets `data-live` on <html>, which is why <html> carries suppressHydrationWarning: the
+ *   attribute is not in the server render, and React must keep the DOM's version. It changes
+ *   nothing else React owns. With JavaScript off it never runs and the evergreen line shows.
+ *
+ * null until content/enriched/_campaigns.mjs exists — then nothing is emitted.
+ */
+const liveHead = getLiveHeadScript();
 
 /** CDN host for manifest-managed media (the OG card today). Drives the <head> preconnect. */
 const mediaHost = manifest.images?.mediaHost;
@@ -99,8 +120,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   preconnectFonts();
   // Hebrew / RTL document root — matches the WordPress source exactly.
   return (
-    <html lang="he" dir="rtl">
+    <html lang="he" dir="rtl" suppressHydrationWarning>
       <head>
+        {/* Anywhere in <head> will do: an inline script here runs before <body> is parsed, so
+            before the header can paint. React hoists the stylesheets above it regardless. */}
+        {liveHead && (
+          <script id="live-resolver" dangerouslySetInnerHTML={{ __html: liveHead }} />
+        )}
         {/* Media host from the manifest (images.mediaHost) — serves the OG card today, and is
             the host the site-kit image pipeline would use if adopted (backlog §10.4). The
             fleet output gate in ops/deploy-site.ps1 requires this preconnect whenever

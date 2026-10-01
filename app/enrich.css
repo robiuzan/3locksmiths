@@ -487,20 +487,177 @@
    `.template-header` at all, so this is a reserve, not an override; the `body` prefix is
    for consistency with the other chrome rules in this file.
 
-   ⚠️ When the announcement topbar ships (docs/dynamic-presence-plan.md Phase 1) it sits INSIDE
-   `.nav-main`, so nav.js will measure it — and these three values must grow by its height in
-   the same change, or the topbar reintroduces the shift this rule removes. */
+   The announcement bar (next block) sits INSIDE `.nav-main`, so nav.js measures it too. Its
+   height is 34px and is part of every number here: the desktop tiers are 126 + 34 and
+   146 + 34 because the bar is always open there; from 992px to the desktop breakpoint the
+   mobile header carries it too (84 + 34, always open); below 992px `--live-bar` is 34px
+   exactly when the bar is open. Change the bar's height and these move in the same edit, or
+   the bar reintroduces the shift this rule removes. */
 body .template-header {
-  padding-top: 84px;
+  --live-bar: 0px;
+  padding-top: calc(84px + var(--live-bar));
+}
+@media (min-width: 992px) {
+  body .template-header {
+    --live-bar: 34px;
+  }
 }
 @media (min-width: 1199.02px) {
   body .template-header {
-    padding-top: 126px;
+    padding-top: 160px;
   }
 }
 @media (min-width: 1440.02px) {
   body .template-header {
-    padding-top: 146px;
+    padding-top: 180px;
+  }
+}
+
+/* ---- the announcement bar (docs/dynamic-presence-plan.md §3.1) ----------------------
+   The theme's own `.nav-main__top-bar` slot, which it ships `display: none` (main.css:1008).
+   scripts/live-surfaces.mjs fills it with one <p data-campaign="…"> per line — every seasonal
+   line, all hidden, and the evergreen line last — and adds the `nav-main__top-bar--live`
+   marker class. Every rule below keys on that marker, never on the bare slot: a slot the pass
+   did not fill stays hidden, and with it the scraped speed claim it holds. Which line shows is
+   decided before first paint by the inline script in <head> (lib/live/head-script.mjs): it sets
+   `html[data-live]` and writes the one rule that reveals the matching line and hides the
+   evergreen line after it. This file owns everything else: the look, when the bar is open, and
+   the header reserve above.
+
+   WHEN THE BAR IS OPEN
+     · from 992px (the sticky call/WhatsApp bar's cut-off, above): always. The evergreen line is
+       then the only WhatsApp link on the page — which is why that line is about WhatsApp and
+       not about hours or the phone number: the header row right under it already prints both.
+     · below 992px: only while a seasonal or safety line is live. The evergreen line would
+       repeat what the sticky bar already offers, and 34px of a phone is not free.
+     · calm pages (`data-live-calm` on the header — the emergency cluster and the calculator
+       steps): a seasonal line is never rendered there, so below 992px the bar opens only for a
+       safety line. `[data-live^="safety-"]` is that test; check-campaigns enforces the prefix.
+     · JavaScript off: `html[data-live]` is never set — from 992px the evergreen line shows,
+       below it there is no bar. Nothing is hidden behind a script.
+
+   ONE ROW, NORMALLY. check-campaigns caps a line at 46 characters (70 for the evergreen line,
+   which never shows below 992px), which is one row at this size down to 320px. The row is NOT
+   forced: with a text-spacing or zoom override (WCAG 1.4.12 / 1.4.4) the line wraps to a
+   second row and the bar grows, rather than cutting words off with an ellipsis. For those
+   users the pre-JS reserve is 34px short until nav.js measures the real height after load;
+   truncation would be a loss of content, a shift is not.
+
+   The phone rules use `not all and (min-width: 992px)` — the exact complement of the
+   always-open query — so no fractional width falls between the two.
+
+   Green #00702b with white text is 6.26:1 (AA) — the same pair as the sticky call button. Not
+   the header's navy: on desktop the row directly under the bar is navy too, and a navy bar
+   read as a caption of that row rather than as an announcement (judged on screenshots,
+   2026-09-30). Never the theme accent #009f3c — 3.49:1. The `body` prefix is what beats the
+   vendored `.nav-main .nav-main__top-bar` rule; check-css-cascade fails a tie. The transparent
+   border is for forced-colors mode, where the green is gone and the bar would otherwise merge
+   with the white row under it — Windows paints transparent borders there. */
+body .nav-main .nav-main__top-bar {
+  display: none;
+  box-sizing: border-box;
+  min-height: 34px;
+  padding: 7px 0 8px; /* 7 + 18 (line) + 8 + 1 (border) = the 34px the reserve holds */
+  border-bottom: 1px solid transparent;
+  background-color: #00702b;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 18px;
+}
+body .live-topbar__item {
+  display: none;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0 8px; /* 8, not 10: the widest line is 238 + 41px at 13px, and a 320px phone offers 288 */
+  margin: 0;
+  font: inherit;
+  color: inherit;
+}
+body .live-topbar__item[data-campaign="evergreen"] {
+  display: flex;
+}
+body .live-topbar__text {
+  min-width: 0;
+}
+body .live-topbar__link {
+  color: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+body .live-topbar__link:hover {
+  color: inherit;
+  /* the theme's `a:hover { text-decoration: none }` ties with the rule above; this outranks it */
+  text-decoration-line: underline;
+  text-decoration-thickness: 2px;
+}
+body .live-topbar__link:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: -2px;
+}
+body .live-topbar__more {
+  flex: none;
+}
+@media (max-width: 339.98px) {
+  /* Android "display size: large" turns a 360px phone into ~320px; give the widest line room. */
+  body .nav-main .nav-main__top-bar {
+    font-size: 12px;
+  }
+}
+@media (min-width: 992px) {
+  body .nav-main .nav-main__top-bar--live {
+    display: block;
+  }
+}
+@media (min-width: 1199.02px) {
+  body .nav-main .nav-main__top-bar--live {
+    font-size: 14px;
+  }
+}
+@media not all and (min-width: 992px) {
+  html[data-live]:not([data-live="evergreen"]) body .nav-main .nav-main__top-bar--live {
+    display: block;
+  }
+  html[data-live]:not([data-live="evergreen"]) body .template-header {
+    --live-bar: 34px;
+  }
+  html[data-live]:not([data-live^="safety-"])
+    body
+    .template-header[data-live-calm]
+    .nav-main__top-bar--live {
+    display: none;
+  }
+  html[data-live]:not([data-live^="safety-"]) body .template-header[data-live-calm] {
+    --live-bar: 0px;
+  }
+
+  /* On a phone the header is fixed for the whole page, and a tip that follows the reader down
+     an article for three winter months is a tax. Where the browser supports scroll-driven
+     animation the whole header slides up by the bar's height over the first 68px of scroll, so
+     the bar leaves and the logo row stays. Only `transform` moves — `.nav-main` keeps its
+     layout height, so nav.js's measurement and the reserve above are untouched — and
+     `--live-bar` is 0px whenever the bar is shut, which makes this a no-op then. Without
+     support the bar simply stays with the header. `.nav-main` holds no fixed-position
+     descendant (the slide-out menu, `.nav-side`, is its sibling), so the transform does not
+     re-anchor anything. While keyboard focus is inside the bar the header comes back: a
+     focused link that has slid off-screen is a focus stop nobody can see (WCAG 2.4.7); every
+     browser with scroll-driven animation has :has(). */
+  @supports (animation-timeline: scroll()) {
+    body .nav-main {
+      animation: live-bar-away linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 0px 68px;
+    }
+    body .nav-main:has(.live-topbar :focus-visible) {
+      animation: none;
+    }
+  }
+}
+@keyframes live-bar-away {
+  to {
+    transform: translateY(calc(-1 * var(--live-bar, 0px)));
   }
 }
 
@@ -514,6 +671,11 @@ body .template-header {
 @media (prefers-reduced-motion: reduce) {
   body .floated-right .phone-btn::before,
   body .floated-right .phone-btn::after {
+    animation: none;
+  }
+  /* The bar's scroll-away on phones is driven by the scroll position, not by time, but it is
+     still motion the visitor did not ask for: with this preference it simply stays put. */
+  body .nav-main {
     animation: none;
   }
   .live-topbar,

@@ -145,13 +145,19 @@ lib/
   wp.ts                WordPress REST types (page list / media only)
   enrich/types.ts      ⭐ EnrichedPage — the authored-page contract
   enrich/render.mjs    ⭐ renders authored blocks into gogo-classed HTML
-scripts/               scrape → transform → pages → build-manifest → enrich → footer → form → fix-links
+  live/                ⭐ the announcement bar's schedule — resolve / compile / head-script / topbar
+scripts/               scrape → transform → pages → build-manifest → enrich → footer → live-surfaces → form → fix-links
                        + check-freshness.mjs / check-orphans.mjs / check-catalog-images.mjs
                        + check-placeholders.mjs (release guards + the image approval queue)
+                       + check-campaigns.mjs / check-live-regions.mjs / check-schedule.mjs (prebuild)
                        + phone.mjs (carries a NAP phone change into the scraped chrome)
+                       + calendar-sync.mjs (NETWORKED, human-run, never in a chain — see /israeli-calendar)
 content/
   site.json            ⭐ 18.5 MB build artifact — NEVER hand-edit
   enriched/<id>.mjs    ⭐ 57 authored pages + _manifest.json (92xx guides, 93xx emergency)
+  enriched/_campaigns.mjs  ⭐ the announcement bar's lines and their windows — EDIT HERE
+  enriched/_calendar.json  generated Israeli calendar (Hebcal, CC BY 4.0) — never hand-edit;
+                           its hand-kept input is _calendar.overlay.json
 public/wp-content/     vendored theme + plugin assets — NEVER edit
 site.config.json       SiteManifest — synced from the roster, never edit here
 docs/                  the acceptance bars every agent cites
@@ -181,6 +187,27 @@ lib/content.ts  →  app/**  →  components/SiteFrame  →  out/
 
 **Identity and NAP go up to the roster. Page copy goes in `content/enriched/`. Presentation goes in
 `lib/enrich/render.mjs` + `app/enrich.css`.** A phone number or a price typed anywhere else is a bug.
+
+### The announcement bar — authored lines, chosen in the browser
+
+```
+content/enriched/_campaigns.mjs   ← EDIT HERE: the lines, their windows, their sources
+content/enriched/_calendar.json   ← generated once a year by scripts/calendar-sync.mjs (human-run)
+        │  (npm run enrich → scripts/live-surfaces.mjs)
+        ▼
+content/site.json   every line, hidden, in every page's header  (.nav-main__top-bar, data-lm-ignore)
+                    + assets.liveHead — the inline <head> script with the compiled schedule
+public/assets/live-schedule.json   the same schedule, readable
+        │
+        ▼
+app/layout.tsx prints the script → it sets html[data-live] before first paint → app/enrich.css
+```
+
+A static export has no date, and deploys are human-run — so the page carries **every** line and the
+visitor's clock picks one. Memorial days and fasts silence all of them at compile time; Shabbat
+and chag silence the seasonal ones (the hot-car safety line stays on — owner, 2026-10-01).
+The browser only ever _selects_; it never fetches or writes copy. The doctrine is `/dynamic-presence`,
+the calendar rules `/israeli-calendar`, the plan `docs/dynamic-presence-plan.md`.
 
 ### Images have their own source of truth — and it is not this repo
 
@@ -216,9 +243,9 @@ homepage tiles **in the same change**, or the deploy is blocked. See `/image-pip
 ## 7. The build pipeline
 
 ```bash
-npm run snapshot   # scrape → transform → pages → build-manifest → enrich → footer → form → hero-gallery → fix-links
+npm run snapshot   # scrape → transform → pages → build-manifest → enrich → footer → live-surfaces → form → hero-gallery → fix-links
                    #                                                    ↑ re-scrapes live WP — rare
-npm run enrich     # pages → build-manifest → enrich → footer → form → hero-gallery → fix-links (no network)
+npm run enrich     # pages → build-manifest → enrich → footer → live-surfaces → form → hero-gallery → fix-links (no network)
 npm run build      # next build → out/
 ```
 
@@ -230,6 +257,7 @@ npm run build      # next build → out/
 | `build-manifest.mjs` | classifies every page and computes related-link candidates                         |
 | `enrich.mjs`         | fills `<main>` from `content/enriched/<id>.mjs`, emits all JSON-LD                 |
 | `footer.mjs`         | rebuilds the global footer from the manifest                                       |
+| `live-surfaces.mjs`  | fills the header's announcement bar with every line; compiles the schedule         |
 | `form.mjs`           | normalises the lead form (validation, phone field, RTL, consent)                   |
 | `hero-gallery.mjs`   | rebuilds the 4 homepage hero tiles from the image catalog (no-ops until published) |
 | `fix-links.mjs`      | repairs/validates every internal link, `tel:`, `data-cta`, form redirect           |
@@ -259,6 +287,12 @@ literal Hebrew route **directory** (`app/מדריכים/`) breaks the Next 16 ex
   any authored module or other guard can reach. It exits non-zero if a retired spelling survives
   outside the WhatsApp URL. Its `RETIRED` array is what you append to on the next number change.
   See `docs/business-facts.md` §C.5.
+- `scripts/check-campaigns.mjs`, `check-live-regions.mjs`, `check-schedule.mjs` — the announcement
+  bar's gates, all in npm `prebuild`. The first validates the register (claims, length, tokens,
+  ties, runway); the second the rendered regions; the third runs the resolver, the compiled
+  schedule and the **actual inline script** against each other for every hour of the next 400 days.
+  Two rules fail by the passage of time alone — `LIVE_GATES=lapsed-ok` downgrades only those
+  (`/deploy-3locksmiths`).
 - `scripts/check-freshness.mjs` — run before shipping. `npm run build` does **not** regenerate
   `content/site.json`, so editing a module and building without `npm run enrich` silently ships the
   previous copy. That reached production once; don't repeat it.

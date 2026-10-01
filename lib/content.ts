@@ -64,7 +64,13 @@ export interface BandAssets {
 
 export interface SiteData {
   wpUrl: string;
-  assets: { headLinks: HeadLink[]; headStyles: string[]; band?: BandAssets };
+  assets: {
+    headLinks: HeadLink[];
+    headStyles: string[];
+    band?: BandAssets;
+    /** The inline <head> script that picks the live topbar line — see getLiveHeadScript(). */
+    liveHead?: string;
+  };
   pages: SitePage[];
 }
 
@@ -88,6 +94,19 @@ export function getBandPreloads(page: SitePage): BandPreload[] {
   if (!band || band.classes.length === 0) return [];
   const paintsBand = new RegExp(`class="[^"]*\\b(?:${band.classes.join("|")})\\b`);
   return paintsBand.test(page.bodyHtml) ? band.preloads : [];
+}
+
+/**
+ * The inline `<head>` script that reveals the right announcement-bar line before first paint,
+ * or null while no campaign register exists.
+ *
+ * Built by scripts/live-surfaces.mjs (from lib/live/head-script.mjs) and stored in the snapshot
+ * rather than assembled here, so the schedule that ships is the one the prebuild simulator
+ * tested and CI's byte-for-byte `content/site.json` check covers. It holds variant ids and
+ * minutes — never copy: every visible word is already in each page's `bodyHtml`.
+ */
+export function getLiveHeadScript(): string | null {
+  return site.assets.liveHead ?? null;
 }
 
 export function getFrontPage(): SitePage {

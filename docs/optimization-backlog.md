@@ -569,6 +569,15 @@ through react-dom's `preload()`, which places them at byte 271 of `<head>`, ahea
 stylesheet, on all 109 snapshot pages. Production (`584cb3da`) against a preview of this build
 (`a6046e99`), alternating runs, Chrome's own LCP entries:
 
+**10.9 🔶 Pre-existing: 20 px of horizontal overflow before the theme scripts run, only at
+1441–1479 px wide (noted 2026-09-30 while probing the announcement bar).** In the pre-JS state
+`.col-right__bot` in the header row sits at left −19 px and the off-canvas `.nav-side` at
++1470 px, so `scrollWidth` is 1461 on a 1441 px viewport; nav.js fixes it after load, and at 1500
+px and above nothing overflows. Present in the previous export too, so not caused by the bar.
+Cosmetic (a scrollbar that appears for the first seconds on a narrow band of desktop widths);
+the fix is a `body` override for `.col-right__bot` at exactly that band in `app/enrich.css`,
+verified with the pre-JS probe (memory `verify-pre-js-layout-headless`).
+
 | Page                                  | LCP before | LCP after      | Band request starts | Priority   |
 | ------------------------------------- | ---------- | -------------- | ------------------- | ---------- |
 | Homepage — throttled phone (5 + 5)    | 1,848 ms   | **1,468 ms**   | 1,142 → 210 ms      | Low → High |

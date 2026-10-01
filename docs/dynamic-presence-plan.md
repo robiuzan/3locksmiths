@@ -19,18 +19,19 @@ paid to remove three times (`docs/business-facts.md` §B.1–B.3, §D.4).
 
 ## 0. The decisions this plan rests on (owner, 2026-09-29)
 
-| #   | Decision                                                                                                                                                                                                     | Consequence in this plan                                                                                     |
-| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------ |
-| 1   | The 12 reviews that appeared 22–28/09 thank technicians (אבי, אביעד, שרון) who **do not exist** — they are the AI brand characters' names (§G.1). **Decision: have them removed; start a genuine ask-flow.** | The site references **no** review, count, rating or link until a genuine, ledgered baseline exists (§3.4).   |
-| 2   | Jobs are done by a **fixed set of three partner locksmiths**; leads are routed to them; the Business Profile is verified on **one locksmith's own Google account**.                                          | "שלושה" and "we" stay honest; §A.2 stands. "Recent activity" copy must never imply the operator did a job.   |
-| 3   | **No seasonal offers exist.** No discount, no special price.                                                                                                                                                 | Seasonal content = advice, availability, safety. No ₪ amount and no % may appear on any new surface.         |
-| 4   | Popup = **a small, delayed, dismissible card**, never on the emergency pages.                                                                                                                                | Native `<dialog>`, shown on the 2nd pageview or after ~20 s + scroll, frequency-capped, never collects data. |
-| 5   | Deploys stay **human-only**, plus phone reminders.                                                                                                                                                           | Nothing in this plan deploys by itself. Freshness without a deploy comes only from pre-authored schedules.   |
-| 6   | A fleet **`status.json` kill switch** on an existing Cloudflare origin is acceptable; the account is treated as **Workers Free**.                                                                            | The only runtime input, and it can only _hide_ or _select_ — never inject text (§4.4).                       |
-| 7   | Updates: **weekly**, supplied by the owner, pasted into a Claude session; the strip **auto-hides** when the newest item is older than 45 days.                                                               | `announcement-editor` agent + `content/enriched/_updates.mjs` (§3.3, §4.5).                                  |
-| 8   | **Pilot on 3locksmiths first**; fleet reuse later at the data/logic layer only.                                                                                                                              | No site-kit change in phases 0–4 (§5, Phase 5).                                                              |
-| 9   | Quiet days: **memorial days, fast days, election/Rabin day, and Shabbat + chag themselves** — all promotional/seasonal copy goes silent; only the evergreen line shows.                                      | Hand-kept overlay in the calendar; precedence rule in §4.2.                                                  |
-| 10  | Open, not decided: WhatsApp prefill text; brand colour source; legal entity for the privacy notice.                                                                                                          | Listed under §6 as owner actions; nothing here assumes an answer.                                            |
+| #   | Decision                                                                                                                                                                                                                                             | Consequence in this plan                                                                                      |
+| --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| 1   | The 12 reviews that appeared 22–28/09 thank technicians (אבי, אביעד, שרון) who **do not exist** — they are the AI brand characters' names (§G.1). **Decision: have them removed; start a genuine ask-flow.**                                         | The site references **no** review, count, rating or link until a genuine, ledgered baseline exists (§3.4).    |
+| 2   | Jobs are done by a **fixed set of three partner locksmiths**; leads are routed to them; the Business Profile is verified on **one locksmith's own Google account**.                                                                                  | "שלושה" and "we" stay honest; §A.2 stands. "Recent activity" copy must never imply the operator did a job.    |
+| 3   | **No seasonal offers exist.** No discount, no special price.                                                                                                                                                                                         | Seasonal content = advice, availability, safety. No ₪ amount and no % may appear on any new surface.          |
+| 4   | Popup = **a small, delayed, dismissible card**, never on the emergency pages.                                                                                                                                                                        | Native `<dialog>`, shown on the 2nd pageview or after ~20 s + scroll, frequency-capped, never collects data.  |
+| 5   | Deploys stay **human-only**, plus phone reminders.                                                                                                                                                                                                   | Nothing in this plan deploys by itself. Freshness without a deploy comes only from pre-authored schedules.    |
+| 6   | A fleet **`status.json` kill switch** on an existing Cloudflare origin is acceptable; the account is treated as **Workers Free**.                                                                                                                    | The only runtime input, and it can only _hide_ or _select_ — never inject text (§4.4).                        |
+| 7   | Updates: **weekly**, supplied by the owner, pasted into a Claude session; the strip **auto-hides** when the newest item is older than 45 days.                                                                                                       | `announcement-editor` agent + `content/enriched/_updates.mjs` (§3.3, §4.5).                                   |
+| 8   | **Pilot on 3locksmiths first**; fleet reuse later at the data/logic layer only.                                                                                                                                                                      | No site-kit change in phases 0–4 (§5, Phase 5).                                                               |
+| 9   | Quiet days: **memorial days, fast days, election/Rabin day, and Shabbat + chag themselves** — all promotional/seasonal copy goes silent; only the evergreen line shows. _(Amended by row 11: on Shabbat and chag the safety line stays on.)_         | Hand-kept overlay in the calendar; precedence rule in §4.2.                                                   |
+| 10  | Open, not decided: WhatsApp prefill text; brand colour source; legal entity for the privacy notice.                                                                                                                                                  | Listed under §6 as owner actions; nothing here assumes an answer.                                             |
+| 11  | **2026-10-01, after Phase 1:** the summer hot-car safety line stays on through Shabbat and chag (memorial days and fasts still silence it); it runs from **01/05**, not 15/06; the desktop WhatsApp line at the top of the emergency pages is right. | `lib/live/resolve.mjs` + `compile.mjs` (two grades of quiet); `_campaigns.mjs`; the calm-page rule unchanged. |
 
 ---
 
@@ -75,9 +76,13 @@ deploy, no third-party widget, no edge HTML rewriting, no second React client is
    fix-links and phone.mjs.
 2. **No clock and no network in the enrich chain.** Date selection happens in the browser in
    `Asia/Jerusalem`; copy changes happen through `npm run enrich` + a human deploy.
-3. **Volatile chrome is excluded from the `<lastmod>` fingerprint and from snippets.** Every live
-   region is wrapped in `<!--lm:ignore-->…<!--/lm:ignore-->` (stripped by `lastmod.mjs` before
-   hashing) and carries `data-nosnippet` in the static HTML (Google: never add it via JS).
+3. **Volatile chrome is excluded from the `<lastmod>` fingerprint and from snippets.** The root
+   element of every live region carries `data-lm-ignore` (cut out by `lastmod.mjs` before hashing)
+   and `data-nosnippet`, both in the static HTML (Google: never add it via JS). _As planned this
+   was an HTML comment pair, `<!--lm:ignore-->`; Phase 1 found that eight passes in the enrich
+   chain re-parse the body with node-html-parser's defaults, which drop comments, so the marker
+   became an attribute. Wherever this document still says "`lm:ignore` sentinels", read "a
+   `data-lm-ignore` region"._
 4. **Runtime input can only hide or select among pre-guarded variants — never inject text.** The one
    runtime input is `status.json` (§4.4); if it is unreachable, slow or malformed the site fails
    **closed**: promos hidden, the evergreen phone line always visible.
@@ -116,16 +121,16 @@ theme-script replay on mobile. `ThemeScripts` stays the only client component (C
 
 ### 2.4 Seams — where each surface attaches and what it costs
 
-| Seam                                                 | Reaches                     | Guarded? | lastmod-safe?                       | Verdict                                                                                                                             |
-| ---------------------------------------------------- | --------------------------- | -------- | ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| Pipeline pass into scraped chrome (footer.mjs idiom) | 109/109 pages               | **yes**  | only with the `lm:ignore` exclusion | **Chosen** for topbar, updates strip, dialog. Bytes ship twice, so variants stay short.                                             |
-| RSC component in `app/layout.tsx` (StickyCta idiom)  | all routes incl. /thank-you | **no**   | yes                                 | Only for the resolver script and CSS. Never for copy.                                                                               |
-| New authored block in `lib/enrich/render.mjs`        | 99 pages with a module      | yes      | per page                            | Later, for a per-page "updates" block on /אודותינו/. Not sitewide — sitewide defaults are how `DEFAULT_STATS` fabricated.           |
-| New route via `scripts/pages.mjs` (97xx)             | one URL                     | yes      | yes                                 | Only for a `/עדכונים/` hub, and only after the 2026-10-29 indexing checkpoint (§3.3).                                               |
-| Pages Function / HTMLRewriter (`functions/`)         | every request               | **no**   | n/a                                 | **Rejected** for content: bypasses all gates, bills every HTML hit, 10 ms CPU vs an 876 KB page, ships silently on the next deploy. |
-| GitHub Actions scheduled deploy (skyshade pattern)   | —                           | —        | —                                   | **Rejected**: contradicts CLAUDE.md §10 and `ci.yml:9-11`, needs an account-wide Pages token, and `main` is a month stale.          |
-| GTM Custom HTML in the shared container              | 11 domains                  | **no**   | n/a                                 | **Rejected** except as a last-resort emergency off-switch.                                                                          |
-| Third-party review widget (Elfsight etc.)            | —                           | **no**   | n/a                                 | **Rejected**: injects schema CI cannot see, sets marketing cookies, full DOM control under `'unsafe-inline'`.                       |
+| Seam                                                 | Reaches                     | Guarded? | lastmod-safe?                      | Verdict                                                                                                                             |
+| ---------------------------------------------------- | --------------------------- | -------- | ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| Pipeline pass into scraped chrome (footer.mjs idiom) | 109/109 pages               | **yes**  | only with the `data-lm-ignore` cut | **Chosen** for topbar, updates strip, dialog. Bytes ship twice, so variants stay short.                                             |
+| RSC component in `app/layout.tsx` (StickyCta idiom)  | all routes incl. /thank-you | **no**   | yes                                | Only for the resolver script and CSS. Never for copy.                                                                               |
+| New authored block in `lib/enrich/render.mjs`        | 99 pages with a module      | yes      | per page                           | Later, for a per-page "updates" block on /אודותינו/. Not sitewide — sitewide defaults are how `DEFAULT_STATS` fabricated.           |
+| New route via `scripts/pages.mjs` (97xx)             | one URL                     | yes      | yes                                | Only for a `/עדכונים/` hub, and only after the 2026-10-29 indexing checkpoint (§3.3).                                               |
+| Pages Function / HTMLRewriter (`functions/`)         | every request               | **no**   | n/a                                | **Rejected** for content: bypasses all gates, bills every HTML hit, 10 ms CPU vs an 876 KB page, ships silently on the next deploy. |
+| GitHub Actions scheduled deploy (skyshade pattern)   | —                           | —        | —                                  | **Rejected**: contradicts CLAUDE.md §10 and `ci.yml:9-11`, needs an account-wide Pages token, and `main` is a month stale.          |
+| GTM Custom HTML in the shared container              | 11 domains                  | **no**   | n/a                                | **Rejected** except as a last-resort emergency off-switch.                                                                          |
+| Third-party review widget (Elfsight etc.)            | —                           | **no**   | n/a                                | **Rejected**: injects schema CI cannot see, sets marketing cookies, full DOM control under `'unsafe-inline'`.                       |
 
 ### 2.5 Tech stack — what is added, and what is deliberately not
 
@@ -158,6 +163,12 @@ the theme's existing unguarded `.phone-btn:before` pulse (`main.css:6126-6147`).
 │                               existing .nav-center (logo · menu · 24/7 · CTA)                   │
 ```
 
+> **As built (2026-09-30):** green `#00702b`, 34 px, no ✕ yet, the evergreen line is
+> WhatsApp-only and no line prints a number (the draft below shows the retired WhatsApp spelling
+> `phone.mjs` forbids), open from 992 px always and below it only for a seasonal/safety line,
+> with a scroll-away on phones. The wireframe and bullets below are the plan as approved; the
+> Phase 1 block in §5 records what shipped and why it differs.
+
 - **Placement:** the existing `.nav-main__top-bar` node, un-hidden via
   `body .nav-main .nav-main__top-bar[data-live-slot]{display:flex}` in `enrich.css` (specificity
   beats the vendored rule; never edit `main.css`). Because it sits _inside_ `.nav-main`, `nav.js`
@@ -179,7 +190,8 @@ the theme's existing unguarded `.phone-btn:before` pulse (`main.css:6126-6147`).
   - `reduced` — `זמינות מופחתת כרגע — התקשרו ונעדכן` (shown only when `status.json` says so;
     strips the 24/7 wording from the bar; the schema cannot change at runtime, so a reserve-duty
     period longer than a week needs a deploy that changes `openingHoursSpecification` too).
-  - `quiet` days show `evergreen` only.
+  - `quiet` days show `evergreen` only (as built: memorial days and fasts; on Shabbat and chag the
+    safety line stays on — row 11).
 - **Links:** `data-cta="topbar-call"` and `data-cta="topbar-whatsapp"` — the `-call`/`-whatsapp`
   suffix is what the shared GTM container counts as `contact_click` (its predicate is
   `-(call|whatsapp)$`). The ✕ stores a per-campaign dismissal in `localStorage` inside `try/catch`.
@@ -314,7 +326,11 @@ same way the port was verified — not by reading CSS.
 ### 4.1 The calendar — generated once a year by a human, consumed offline forever
 
 `scripts/calendar-sync.mjs` (**networked, human-run, never in the enrich chain** — the same split as
-the image pipeline):
+the image pipeline). _As built: it fetches through the overlay's `verifiedThrough` plus one year,
+emits Shabbat/chag as candle-lighting − 60 min → havdalah + 30 min from Hebcal (not the padded
+fixed window in step 3), emits no `labelDate`, refuses to write a calendar that fails its own
+content assertions, and `--check` exits 1 on drift — see the Phase 1 block in §5 and
+`/israeli-calendar`._ The steps as planned:
 
 1. Fetch `https://www.hebcal.com/hebcal?v=1&cfg=json&maj=on&min=on&mod=on&year=<Y>&i=on&lg=he` for
    the current and next two Hebrew years. `i=on` is mandatory (the default is the diaspora
@@ -339,39 +355,42 @@ the image pipeline):
 
 ```
 status.json override (off | quiet | reduced)      ← runtime, fail-closed
-  > quiet-day window                              ← memorial, fast, election/Rabin, Shabbat + chag
-    > safety window (summer hot-car line)         ← non-commercial, always allowed to win
-      > seasonal advice window (highest priority number wins on overlap; check-campaigns forbids ties)
-        > evergreen                               ← also the JS-off state and the fallback for any error
+  > hard quiet day                                ← memorial, fast, election/Rabin: evergreen only
+    > safety window (summer hot-car line)         ← non-commercial; stays on through Shabbat + chag (decision 11)
+      > Shabbat + chag                            ← evergreen — no seasonal line
+        > seasonal advice window (highest priority number wins on overlap; check-campaigns forbids ties)
+          > evergreen                             ← also the JS-off state and the fallback for any error
 ```
 
 - Evaluated in `Asia/Jerusalem` from windows that already carry offsets — never the visitor's
   local date, never `new Date('YYYY-MM-DD')` (parsed as UTC midnight = 03:00 in Israel).
-- Re-evaluated on `pageshow` and `visibilitychange`, so a tab left open across a sundown flips.
+- Re-evaluated on `pageshow`, on `visibilitychange` and by a timer armed for the next boundary,
+  so a tab left open across a sundown flips — a visible desktop tab included (as built; the
+  first version had no timer and only flipped once the tab was hidden and shown again).
 - A **time-travel preview**: `?at=2026-12-04T18:30+02:00` is honoured client-only (never linked,
   so never indexed) for review; the schedule simulator (§4.3) is the automated version.
-- Page scoping: the body wrapper already carries the WordPress body class; `live-surfaces.mjs` adds
-  `data-live-kind="<manifest kind>"` and `data-live-noint` on excluded routes so the resolver can
-  refuse the dialog without a lookup table. ⚠️ **No manifest kind is called `emergency` today** —
-  the 93xx pages are `kind: "service"` — so `check-campaigns` demanding
-  `pages.exclude: ["emergency"]` is a no-op at runtime until Phase 1 step 3 makes
-  `live-surfaces.mjs` emit `data-live-kind="emergency"` for ids 9301–9304 (or the manifest gains
-  an `emergency: true` flag). Ship that mapping **before** the first dialog window.
+- Page scoping — **shipped in Phase 1 as "calm pages".** `live-surfaces.mjs` puts
+  `data-live-calm` on `.template-header` of the emergency cluster (ids 9301–9399; no manifest kind
+  is called `emergency` — they are `kind: "service"`) and of the calculator steps (`/step/*`). A
+  calm page carries only the evergreen line and the safety lines, so a seasonal tip can never
+  show there, and on a phone its bar opens only for a safety line. The Phase 2 dialog must treat
+  `data-live-calm` as "never open here"; `check-campaigns` still demands
+  `pages.exclude: ["emergency"]` on any window with a `dialog`, as a second lock.
 
 ### 4.3 Build gates — run on every human deploy, not only in CI
 
 `deploy-site.ps1` runs only `npm run build`; CI has not run since 2026-08-30. So the gates that must
 protect production go into an npm **`prebuild`** script (npm runs it before `build` automatically):
 
-| Gate                                         | Fails when                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| -------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `check-freshness` (exists)                   | `content/site.json` is older than its sources                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| `check-claims` (**extended**)                | ⛔ patterns in `site.json` **or** in `_campaigns.mjs`/`_updates.mjs` string values **or** in `out/**/index.html`; new BLOCKING rules: arrival time `תוך \d+ דקות`, `טכנאים זמינים`, `נותרו`, `רק היום`, `\d+% הנחה`, `במקום \d+ ₪`, countdowns, ★ + number                                                                                                                                                                                                                                                                                |
-| `check-typography` (**extended**)            | ASCII quotes in `_campaigns.mjs`, `_updates.mjs`, `_calendar.json` labels (add holiday tokens: `ל״ג`, `חוה״מ`, `ט״ו`)                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| `check-campaigns` (**new**)                  | a window lacks an offset or names an impossible instant (30 February, hour 24 — V8 would roll them over silently); a seasonal window overlaps a hard-quiet window; two windows tie on priority; runway < 30 days of authored windows; the calendar ends < 60 days out (a warning from 12 months); an entry cites no business-facts row; a link is not a live route; a `data-cta` lacks the `-call`/`-whatsapp` suffix; an update's date is in the future (Israel date, not UTC); ⛔ copy patterns and ASCII quotes in any register string |
-| schedule simulator (**new**, `node:test`)    | `resolve(schedule, instant)` over every hour of the next 400 days produces an overlap, a quiet-day promo, a wrong-side DST result on 2026-10-25/2027-03-26, or an Adar mis-match in 5787                                                                                                                                                                                                                                                                                                                                                  |
-| `check-live-regions` (**new**)               | a `lm:ignore` region appears inside `<main>`, or a live region lacks `data-nosnippet`, or a variant is stored as JSON in a `<script>`                                                                                                                                                                                                                                                                                                                                                                                                     |
-| rendered-DOM rating scan (**new**, Phase 4c) | any `Review`/`AggregateRating` JSON-LD or third-party review host after JS runs                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| Gate                                         | Fails when                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `check-freshness` (exists)                   | `content/site.json` is older than its sources                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `check-claims` (**extended**)                | ⛔ patterns in `site.json` **or** in `_campaigns.mjs`/`_updates.mjs` string values **or** in `out/**/index.html`; new BLOCKING rules: arrival time `תוך \d+ דקות`, `טכנאים זמינים`, `נותרו`, `רק היום`, `\d+% הנחה`, `במקום \d+ ₪`, countdowns, ★ + number                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `check-typography` (**extended**)            | ASCII quotes in `_campaigns.mjs`, `_updates.mjs`, `_calendar.json` labels (add holiday tokens: `ל״ג`, `חוה״מ`, `ט״ו`)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `check-campaigns` (**new**)                  | a window lacks an offset or names an impossible instant (30 February, hour 24 — V8 would roll them over silently); the **compiled** schedule shows any line inside a memorial day, fast or civic day, or a seasonal line inside a Shabbat or chag (a safety line may show there — decision 11) (Phase 1 replaced the authoring rule "a seasonal window overlaps a hard-quiet window": the compiler now subtracts them, so the output is what is tested); two windows tie on priority; a window never shows; a line is longer than one row (46 characters, evergreen 70), types a phone number or uses an unknown `{token}`; a safety variant lacks the `safety-` prefix; runway < 30 days of compiled schedule; the calendar ends < 60 days out (a warning from 12 months); an entry cites no business-facts row; a link is not a live route; a `data-cta` lacks the `-call`/`-whatsapp` suffix; an update's date is in the future (Israel date, not UTC); ⛔ copy patterns and ASCII quotes in any register string |
+| schedule simulator (**new**, `node:test`)    | the resolver, the compiled schedule and the **shipped inline script (run in a VM)** disagree at any hour of the next 400 days or on either side of any boundary; a quiet-day promo; a wrong-side DST result on 2026-10-25/2027-03-26; an Adar mis-match in 5787; `site.json` carries a stale script                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `check-live-regions` (**new**)               | a `data-lm-ignore` region appears inside `<main>`, lacks `data-nosnippet`, contains a `<script>`, lacks a visible evergreen item or has it anywhere but last, or a calm page carries a seasonal line                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| rendered-DOM rating scan (**new**, Phase 4c) | any `Review`/`AggregateRating` JSON-LD or third-party review host after JS runs                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 
 `.prettierignore` gains `content/enriched/_calendar.json` and `public/assets/live-schedule.json`,
 or the Stop hook's Prettier pass creates a format → enrich loop.
@@ -494,26 +513,135 @@ the first seasonal window is **Hanukkah (first candle 04/12/2026)**.
 
 ### Phase 1 — Calendar, topbar, gates (weeks 1–2)
 
-1. `scripts/calendar-sync.mjs` + `_calendar.overlay.json` → `content/enriched/_calendar.json`
-   (§4.1). Commit with the CC BY credit. `.prettierignore` updated.
-2. `content/enriched/_campaigns.mjs` with: `evergreen`, `quiet` (derived), `safety-summer`
-   (15/06–15/09), `hanukkah-travel` (03/12–12/12 → guide 9211), `winter-battery` (01/11–31/03 →
-   guide 9210), `pesach-cleaning-keys` (13/04–28/04/2027 → the relevant guide), `back-to-school`
-   (15/08–10/09/2027), `before-shabbat` (weekly Thu 17:00 → Fri 14:00, spare-key advice, the tested
-   Bnei Brak framing). Copy by `hebrew-copywriter`; every entry cites its row.
-3. `scripts/live-surfaces.mjs` in the enrich chain (after `footer.mjs`, before `fix-links.mjs` so
-   every link is validated and gets its `data-cta`): fills `.nav-main__top-bar` with all variants
-   inside `lm:ignore` sentinels + `data-nosnippet`; emits `public/assets/live-schedule.json`.
-4. `scripts/lastmod.mjs`: strip `lm:ignore` regions before hashing (assert on a fixture that the
-   homepage hash is unchanged when only a variant changes).
-5. `app/layout.tsx`: the constant inline resolver (`<html suppressHydrationWarning>`), reading the
-   window table imported from `_campaigns.mjs` at build time. `app/enrich.css`: slot styling,
-   `html[data-live="…"]` reveal rules, JS-off = evergreen.
-6. `check-campaigns`, `check-live-regions`, the simulator, and the check-claims/typography
-   extensions (§4.3). Add the topbar `data-cta` values to the tracking skill.
-7. Gate, deploy, **verify on the live URL** with `?at=` for Hanukkah, a quiet day, DST night.
-   Lighthouse on the live URL, 3 runs (the local harness under-reads by ~1.8 s — memory
-   `match-production-compression`).
+> **Built 2026-09-30, reviewed adversarially the same day (five lenses, 59 findings, 58 acted
+> on or recorded below); not deployed** — a deploy is the owner's call (step 7). What shipped,
+> against the steps as planned:
+
+1. ✅ `scripts/calendar-sync.mjs` + `_calendar.overlay.json` → `content/enriched/_calendar.json`
+   (§4.1): 153 windows, 01/09/2026 → 31/12/2027 — 63 Shabbat, 9 chag, 12 quiet days, 69
+   `pre-shabbat`. Shabbat and chag run from candle-lighting − 60 min to havdalah + 30 min (Tel
+   Aviv, from Hebcal), not the fixed Fri 15:00 → Sat 21:00 the plan sketched: the real times were
+   one request away and a fixed window is wrong by up to two hours in June. The generator fetches
+   one year past the overlay's `verifiedThrough` so the last Shabbat closes, and **refuses to
+   write** a calendar in which a Friday night is not quiet, a named day of any year is missing,
+   a diaspora-only day appears (proof `i=on` was honoured), a span is implausibly long, or any
+   kind has fewer windows than the committed file. Every date was re-verified against Hebcal's
+   own endpoints, the IANA tz database and the Ministry of Education's pages by the review.
+   Minor fasts are **not** quiet (owner decision 9 named Yom Kippur and Tisha B'Av). CC BY
+   credit inside and in the served schedule; in `.prettierignore`.
+2. ✅ `content/enriched/_campaigns.mjs` — copy drafted by `hebrew-copywriter`, each line checked
+   against the page it links to and by a typography pass, then revised on review:
+
+   | Line (variant)   | Shows                                                              | Reads                                            | Links to                       |
+   | ---------------- | ------------------------------------------------------------------ | ------------------------------------------------ | ------------------------------ |
+   | `evergreen`      | from 992 px, whenever nothing else is; JS off                      | מעדיפים לכתוב ולא להתקשר? שלחו לנו הודעת וואטסאפ | WhatsApp                       |
+   | `before-shabbat` | every Thu 17:00 → Fri 14:00, from 08/10/2026                       | שני מפתחות הרכב בצרור אחד? זה לא גיבוי           | guide 9202 (only car key)      |
+   | `winter-remote`  | 15/11/2026 → 01/03/2027                                            | השלט מגיב לאט בקור? סימן לסוללה חלשה             | guide 9210 (smart-key battery) |
+   | `hanukkah`       | Thu 03/12 → Fri 11/12/2026 afternoon                               | נוסעים בחנוכה? השאירו מפתח אצל אדם אמין          | guide 9205 (locked out)        |
+   | `pesach`         | 04/04 → 21/04/2027 12:00                                           | ניקיון לפסח? לצילינדר גרפיט, לא שמן מזון         | lander 78 (מנעולן לבית)        |
+   | `safety-summer`  | 01/05 → 15/09/2027 — beats every seasonal line, on through Shabbat | ילד או בעל חיים ברכב נעול? חייגו 100/101         | emergency 9301 (locked car)    |
+
+   Deviations from the plan, each deliberate: **the evergreen line is WhatsApp-only** — the
+   header row directly under the bar already prints "24/7" and the phone number, so the planned
+   line repeated both; **winter** is 15/11 → 01/03 rather than 01/11 → 31/03 (a line that opens
+   "slow in the cold?" on a 28 °C day reads as automation); **Pesach** runs the three cleaning
+   weeks _before_ the seder, and links to the home lander where the maintenance list is visible
+   (the same advice sits in a collapsed FAQ on the lock-replacement page); **Hanukkah** links to
+   9205, not 9211 — the spare-key advice is there, not in the burglary guide — and ends inside
+   the last Shabbat so it never shows after the holiday; **back-to-school** was dropped — the
+   summer safety line outranks it for its whole life, and `check-campaigns` now rejects a window
+   that never shows; **no `reduced` line** is rendered until the `status.json` switch that
+   reveals it exists (Phase 2) — text-only crawlers ignore `hidden`, and "reduced availability
+   right now" on 109 pages is a sentence we do not want quoted. The plan's evergreen draft also
+   printed the WhatsApp number in its retired spelling; no line prints a number now — `{phone}`
+   and `{whatsapp:<label>}` are the only ways to reach one.
+
+3. ✅ `scripts/live-surfaces.mjs` in the enrich and snapshot chains after `footer.mjs`. It fills
+   `.nav-main__top-bar` on 109/109 pages with every line as a `<p data-campaign hidden>` inside a
+   `data-lm-ignore data-nosnippet` container, the evergreen line last, and marks the slot
+   `nav-main__top-bar--live` (the CSS keys on the marker, so an unfilled slot can never show the
+   scraped speed claim); marks the 8 **calm pages** (emergency 93xx, `/step/*` — `lib/live/pages.mjs`)
+   with `data-live-calm` and gives them only the evergreen and safety lines; drops a line's link
+   on the page it points at; compiles the schedule (`lib/live/compile.mjs` — windows minus quiet
+   days, precedence applied → 79 intervals) into the inline head script (`site.assets.liveHead`,
+   ~1.7 KB) and into the readable `public/assets/live-schedule.json`. It **fails** rather than
+   skips a page it cannot fill, fails when the register vanishes while the bar is already in
+   `site.json` (the off switch is `windows: []`), and fails when timed windows exist without a
+   calendar.
+4. ✅ `scripts/lastmod.mjs` cuts `[data-lm-ignore]` elements out of the raw body by source offset
+   (`lib/live/regions.mjs`, nested regions cut once) before hashing; `check-orphans` ignores the
+   same regions, so a hidden bar link never keeps a route off the orphan list. Proved on the real
+   site and pinned as a test: rewording a line moves **0 of 109** hashes; an edit outside the
+   region still moves one. (Introducing the bar moved all 109 once — the old slot text had been
+   inside the fingerprint.) CI's byte-for-byte check now covers `content/lastmod.json` and
+   `public/assets/live-schedule.json`, and fails on an untracked file under `content/`, `lib/`,
+   `scripts/` or `public/assets/` — a register that was never committed would otherwise
+   "reproduce" in CI and be impossible to regenerate anywhere else.
+5. ✅ `app/layout.tsx` prints the script (`<html suppressHydrationWarning>`); `app/enrich.css`
+   holds the look and the rules for when the bar is open. **Green `#00702b`, white text (6.26:1),
+   34 px.** Open from 992 px always (the sticky call/WhatsApp bar's cut-off — the review found
+   that 992–1199 px, iPad landscape and zoomed laptops, had no WhatsApp link at all); below
+   992 px only for a seasonal or safety line. Where the browser supports scroll-driven animation
+   the phone header slides up by the bar's height in the first 68 px of scroll, so a tip does not
+   follow the reader down the page for three winter months — and slides back while keyboard
+   focus is inside the bar; without support, or with reduced-motion, it simply stays. One row
+   normally (the 46-character cap, 12 px from 340 px down), but a text-spacing or zoom override
+   wraps to a second row instead of truncating (WCAG 1.4.12). The header reserve from Phase 0.6
+   grew with it: 84 px (+34 when the bar is open), 118 px from 992, 160 px, 180 px.
+   The script is stored in `site.json` rather than assembled in `layout.tsx` from `_campaigns.mjs`
+   as planned, so the schedule that ships is the one the simulator tested and CI's byte-for-byte
+   check covers — and the app imports no pipeline module. It re-runs on `pageshow`,
+   `visibilitychange` **and at the next boundary** (one timer), so a visible desktop tab flips
+   at sundown too, and fires `resize` when the line changes so `nav.js` re-measures the header.
+   **No ✕ yet.** Dismissal needs `localStorage` handling that belongs with `live.js` (Phase 2);
+   the scroll-away is what makes a bar without one tolerable on a phone. Owner: look at the
+   winter line on a real phone (`/?at=2027-01-12T10:00:00%2B02:00`) before agreeing to a
+   3.5-month window.
+6. ✅ Gates, all in `prebuild`: `check-campaigns` (offsets of the right season; tokens; no typed
+   phone number anywhere a visitor reads, including labels; one-row length; the `safety-`
+   prefix; ties; windows that never show; **no compiled interval inside a hard quiet day, no
+   seasonal one inside a Shabbat or chag, and none past the calendar's last quiet window**; timed windows without a calendar; the
+   calendar's kinds, its overlay days and every Saturday noon inside it; the `source` quote
+   present in the module of the page the line links to; ⛔ claims from `lib/live/claims.mjs`,
+   widened after mutation testing — bare מבצע, any price spelling, any arrival time, warranty —
+   and pinned as a test; expired windows warned; runway measured on fixed-date windows only,
+   with the next authored line printed on every build), `check-live-regions` (attribute-based;
+   the calm pages exactly as `lib/live/pages.mjs` names them; one region per slot; **every
+   item's text and link equal the register** — `site.json` being newer than the register proves
+   nothing), and the simulator — 19 tests, in which the resolver, the compiled schedule and the
+   **actual inline script executed in a VM** must agree on every hour of the next 400 days and
+   both sides of every boundary; plus the timer, the region cutter and the claim fixtures.
+   `check-freshness` treats `lib/live/*.mjs` and all of `lib/enrich/` as sources and names the
+   calendar sync when the overlay is the newer file. `check-css-cascade` no longer mistakes a
+   keyframe step for a selector. `check-claims` and `check-typography` were **not** extended to
+   read the registers as planned: `check-campaigns` applies both rule sets to the registers, and
+   `check-claims` sees every line again once it is rendered into `site.json`. Topbar `data-cta`
+   values are in the tracking skill. `pages` and `dialog` on a window are rejected until Phase 2
+   implements them.
+7. ⏳ Gate, deploy, **verify on the live URL** with `?at=` for Hanukkah
+   (`/?at=2026-12-06T10:00:00%2B02:00`), a quiet day (`…12-05T10:00…`) and the DST night; GTM
+   Preview for `topbar-whatsapp` → `contact_click`. Lighthouse on the live URL, 3 runs (the local
+   harness under-reads by ~1.8 s — memory `match-production-compression`). Local evidence so
+   far: a headless-Chrome probe over 180 cases (320, 360, 991, 992, 1024, 1199, 1200, 1366 and
+   1920 px; the homepage and an emergency page; five instants; with and without the theme
+   scripts) — the pre-JS padding equalled what `nav.js` later measured in every case, exactly
+   one line showed, none was clipped, and the WhatsApp link was present at every width; plus
+   keyboard focus, hover, forced-colours, text-spacing and 320 px probes. The LCP element is
+   unchanged by the taller header (the review checked 27 cases against the previous export).
+   A pre-existing 20 px horizontal overflow in the pre-JS state at exactly 1441–1479 px
+   (`.col-right__bot`, present in the previous export too) was noted, not fixed.
+
+**Decided 2026-10-01 (decision 11):** the safety line stays on through Shabbat and chag
+(`resolve.mjs` and `compile.mjs` now know two grades of quiet: a memorial day or fast silences
+everything, Shabbat/chag silence the seasonal lines only; no card opens on Shabbat even for a
+safety line); it runs from 01/05/2027; the desktop WhatsApp line on the emergency pages stays.
+Compiled: 79 intervals; the safety line is on every summer Saturday and Shavuot, off on Yom
+HaShoah, Yom HaZikaron and Tisha B'Av.
+
+**Still open (not blockers):** the site's own pages disagree on lock lubrication —
+`/מנעולן-לבית/` allows "שמן מנעולים ייעודי", four others say graphite/dry only — the locksmiths
+should settle it once and the modules follow. Phase 0.3 (the September baseline in
+`docs/reporting/`) is still not done.
 
 ### Phase 2 — Updates strip, seasonal card, visual tokens (weeks 2–4)
 
@@ -617,31 +745,45 @@ their owners change them.
 ## Appendix A — data contracts
 
 ```js
-// content/enriched/_campaigns.mjs  (authored; read by live-surfaces.mjs AND app/layout.tsx)
+// content/enriched/_campaigns.mjs  (authored; read by scripts/live-surfaces.mjs — as shipped in Phase 1)
 export default {
   evergreen: {
-    topbar: { text: "…", call: true, whatsapp: true }, // copy via hebrew-copywriter
-    source: "business-facts §C.5, §D.3",
+    topbar: { text: "… {whatsapp:וואטסאפ}" }, // {phone} and {whatsapp:<label>} are the only tokens
+    source: "docs/business-facts.md §C.5",
   },
   windows: [
     {
-      id: "hanukkah-travel-2026",
+      id: "hanukkah-2026",
+      variant: "hanukkah", // the line's id on the page; defaults to id; safety lines start "safety-"
       kind: "seasonal", // seasonal | safety | reduced
-      from: "2026-12-03T12:00:00+02:00",
-      until: "2026-12-12T23:59:00+02:00",
-      priority: 20, // higher wins; ties fail check-campaigns
-      pages: { exclude: ["emergency"] }, // manifest kinds / ids; dialog also obeys data-live-noint
-      topbar: { text: "…", href: "/%d7%9e%d7%93%d7%a8%d7%99%d7%9b%d7%99%d7%9d/…/", cta: "topbar-link" },
-      dialog: { title: "…", body: "…", href: "…", capDays: 14 },
-      source: "guide 9211; owner 2026-09-29 (no offers)",
+      from: "2026-12-03T06:00:00+02:00", // explicit offset, [from, until)
+      until: "2026-12-13T00:00:00+02:00",
+      priority: 30, // higher wins among seasonal; ties fail check-campaigns
+      topbar: { text: "…", link: { label: "למדריך", href: "/מדריכים/…/" } }, // ≤ 46 chars as read
+      source: "content/enriched/9205.mjs — the quoted sentence · business-facts §D.10",
     },
+    {
+      id: "before-shabbat",
+      kind: "seasonal",
+      during: "pre-shabbat", // repeat in every calendar window of this kind; from/until only bound it
+      from: "2026-10-08T00:00:00+03:00",
+      priority: 20,
+      topbar: { text: "…", link: { label: "למדריך", href: "/מדריכים/…/" } },
+      source: "…",
+    },
+    // Phase 2 adds `dialog: { title, body, href, capDays }` + `pages: { exclude: ["emergency"] }`.
   ],
 };
 
-// content/enriched/_calendar.json  (generated; CC BY 4.0 Hebcal.com; do not hand-edit)
-{ "generated": "2026-10-02", "credit": "Hebcal.com (CC BY 4.0) + overlay",
-  "windows": [ { "id": "yom-kippur-5788", "kind": "quiet", "from": "2027-10-10T12:00:00+03:00",
-                 "until": "2027-10-11T20:30:00+03:00", "label": "יום כיפור", "labelDate": "11/10/2027" } ] }
+// content/enriched/_calendar.json  (generated by scripts/calendar-sync.mjs; CC BY 4.0 Hebcal.com; do not hand-edit)
+{ "credit": "…Hebcal.com (CC BY 4.0)…", "source": "…", "coversFrom": "2026-09-01", "coversThrough": "2027-12-31",
+  "windows": [ { "id": "yom-kippur-5788", "kind": "quiet",  // quiet | shabbat | chag | pre-shabbat
+                 "from": "2027-10-10T12:00:00+03:00", "until": "2027-10-11T…+03:00",
+                 "label": "יום כיפור", "source": "hebcal" } ] }
+
+// public/assets/live-schedule.json  (generated by live-surfaces.mjs; the compiled schedule, readable)
+{ "about": "…", "variants": ["before-shabbat", "…", "evergreen"],
+  "intervals": [ { "variant": "before-shabbat", "from": "2026-10-08T14:00:00.000Z", "until": "2026-10-09T11:00:00.000Z" } ] }
 
 // content/enriched/_updates.mjs
 export default [

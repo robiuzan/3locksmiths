@@ -40,6 +40,7 @@
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { join } from "node:path";
+import { withoutLiveRegions } from "../lib/live/regions.mjs";
 
 const ROOT = process.cwd();
 const SITE = join(ROOT, "content", "site.json");
@@ -64,10 +65,16 @@ if (!pages.length) {
  */
 const fingerprint = (p) =>
   createHash("sha256")
-    .update(JSON.stringify([p.bodyHtml ?? "", p.seo ?? {}, p.jsonLd ?? []]))
+    .update(
+      JSON.stringify([withoutLiveRegions(p.bodyHtml ?? ""), p.seo ?? {}, p.jsonLd ?? []]),
+    )
     .digest("hex")
     .slice(0, 16);
 
+// The body with every live region (`data-lm-ignore`) cut out — lib/live/regions.mjs explains
+// why an attribute, why the raw string, and why a nested region is cut once. The announcement
+// bar holds EVERY seasonal line on every page (scripts/live-surfaces.mjs); without the cut,
+// rewording one line would re-stamp all ~109 URLs at once — the failure described at the top.
 const previous = existsSync(LEDGER) ? JSON.parse(readFileSync(LEDGER, "utf8")) : {};
 const today = new Date().toISOString().slice(0, 10);
 

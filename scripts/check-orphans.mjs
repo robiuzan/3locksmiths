@@ -14,6 +14,7 @@
  */
 import { readdirSync, readFileSync } from "node:fs";
 import { join, relative, sep } from "node:path";
+import { withoutLiveRegions } from "../lib/live/regions.mjs";
 
 const OUT = "out";
 
@@ -58,7 +59,9 @@ const linked = new Set();
     const p = join(dir, e.name);
     if (e.isDirectory()) walk(p);
     else if (e.name === "index.html") {
-      const html = readFileSync(p, "utf8");
+      // The announcement bar's links sit on every page, inside `hidden` items in a
+      // data-lm-ignore region; they must not be what keeps a route out of this list.
+      const html = withoutLiveRegions(readFileSync(p, "utf8"));
       for (const m of html.matchAll(/href="(\/[^"]*)"/g)) linked.add(norm(m[1]));
     }
   }

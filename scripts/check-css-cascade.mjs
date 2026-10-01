@@ -42,6 +42,9 @@ function rules(css) {
     for (const sel of m[1].split(",")) {
       const s = sel.trim().replace(/\s+/g, " ");
       if (!s || s.startsWith("@") || s.startsWith("%")) continue;
+      // `from` / `to` / `40%` inside @keyframes are steps, not selectors: the theme's own
+      // keyframes would otherwise "tie" with ours on `transform`.
+      if (/^(?:from|to|\d+(?:\.\d+)?%)$/.test(s)) continue;
       if (!map.has(s)) map.set(s, new Set());
       for (const p of props) map.get(s).add(p);
     }
