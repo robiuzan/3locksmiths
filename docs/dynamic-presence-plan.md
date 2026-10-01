@@ -656,7 +656,11 @@ should settle it once and the modules follow. Phase 0.3 (the September baseline 
 
 ### Phase 2 — Updates strip, seasonal card, visual tokens (weeks 2–4)
 
-> **Built 2026-10-01; not committed or deployed yet.** Status per step — the plan as written
+> **Built 2026-10-01; committed `dfc2332`, deployed 2026-10-01 as `87535dbf` and verified on the live
+> URL** — homepage byte-identical to the build and 501 KB (was 885 KB); the closed card hidden at
+> 390 and 1366 px; the card opening on a 2nd page view with focus on its title; no card from a real
+> HTTPS Google referrer, on /מנעולן-רכב/ or on the statement; Hebrew labels and logo alts; the
+> contact-band button green. Status per step — the plan as written
 > follows the block.
 >
 > - **4 ✅ The seasonal card.** `public/assets/live.js` (ES5, no copy — the gate fails on a Hebrew
