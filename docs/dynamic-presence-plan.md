@@ -750,7 +750,9 @@ should settle it once and the modules follow. Phase 0.3 (the September baseline 
 3. Optional: Playwright screenshot matrix for the key dates (only if it survives §13).
 4. Phase 3b (optional, owner decision): the Access-OTP phone form for `status.json`.
 
-> **Status 2026-10-04 — built, reviewed, gated; production steps wait for the owner.**
+> **Status 2026-10-04 — built, reviewed, gated, committed (`bf5b51e`, CI green), the switch set
+> up, deployed (`37ada1c5`) and drilled on the live site. Only the reminder's ntfy secret is
+> left.**
 >
 > - **1 ✅ built.** `public/assets/live.js` reads `https://imgquarry.com/status/fleet.json` after
 >   first paint (1.5 s, `credentials: omit`, `cache: no-cache` so a flip reaches the next page
@@ -765,8 +767,15 @@ should settle it once and the modules follow. Phase 0.3 (the September baseline 
 >   still-valid cached mode instead of throwing it away. `?mode=…` previews. CSP connect-src
 >   gains imgquarry.com. Write path: `../Sys Admin/scripts/fleet/status-switch.mjs`
 >   (show / set / cors, -DryRun → -Confirm, the Sys Admin guard hook demands `# APPROVED:`) and
->   `../Sys Admin/runbooks/fleet-status-switch.md`. **Not yet done:** the bucket CORS rule, the
->   file itself, the deploy and the drill — in that order (owner approval).
+>   `../Sys Admin/runbooks/fleet-status-switch.md`. **Done 2026-10-04, in this order, on the
+>   owner's approval:** bucket `media` CORS (GET/HEAD for the apex, www and `.pages.dev` — the
+>   bucket had none; images for every fleet site answer exactly as before, and the switch URL is
+>   `DYNAMIC` with `Vary: Origin`, so no origin's header is served to another); the file at
+>   `normal`; the deploy; the drill. **Drill, live, fresh headless Chrome each time:** the switch
+>   read answered 200 in 163–515 ms; `quiet` reached the live site in < 15 s (the Hanukkah preview
+>   showed the evergreen line, the card stayed shut on page 3, `quiet` cached for the next page);
+>   back to `normal` → the Hanukkah line and the card returned, and a returning visitor still
+>   carrying the drill's cached `quiet` was corrected on the next page and the cache cleared.
 > - **2 ✅ built.** `scripts/check-reminders.mjs` + `.github/workflows/remind.yml` (Sunday 08:00):
 >   reads production — the switch, deploy drift (live.js, schedule, head script, strip), the
 >   strip's age (21 days), the runway (30 days / a line ending in 14 with nothing after), quiet
@@ -808,10 +817,12 @@ their owners change them.
 
 ## 6. Owner actions and open decisions
 
-**From Phase 3 (2026-10-04):** approve the three switch steps (bucket CORS for the three
-3locksmiths origins, the file at `normal`, then the deploy and the drill); add the `NTFY_TOPIC`
-secret to the GitHub repository (or approve the operator copying it from Sys Admin); confirm the
-wartime wording `פועלים בכפוף להנחיות פיקוד העורף`.
+**From Phase 3 (2026-10-04):** add the `NTFY_TOPIC` secret to the GitHub repository (or approve
+the operator copying it from Sys Admin) — until then the weekly reminder only prints; confirm the
+wartime wording `פועלים בכפוף להנחיות פיקוד העורף` (shipped hidden 2026-10-04). Noticed during
+the drill, not part of this plan: the homepage button `השירות שלנו מתחיל תוך דקות קבל מענה מהיר`
+(scraped from WordPress, 11 times on 8 pages) is an unquantified speed promise of the kind
+CLAUDE.md §3 rule 1 lists — confirm it or let it be rewritten through scripts/claims.mjs.
 
 **From Phase 2 (2026-10-01):** look at the Hanukkah card on a real phone
 (`/?at=2026-12-06T10:00:00%2B02:00`, on a second page view); answer the accessibility questions in
