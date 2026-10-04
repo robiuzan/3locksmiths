@@ -790,6 +790,36 @@ regular price itself is confirmed (§D.1, growth-roadmap critical path #8). Cons
 The seasonal layer in `docs/dynamic-presence-plan.md` is therefore **advice, availability and safety
 only**, by design and by the owner's decision.
 
+### D.11 "השירות שלנו מתחיל תוך דקות" — ✅ OWNER, 2026-10-04
+
+> ✅ **The owner confirmed it on 2026-10-04**, in session, answering the question this register's
+> plan raised (`docs/dynamic-presence-plan.md` §6). The copy stays.
+
+**What it covers** — a call gets answered and the service gets going within minutes:
+
+- the homepage button `השירות שלנו מתחיל תוך דקות קבל מענה מהיר` (scraped WordPress markup, a
+  `tel:` link, `data-cta="content-call"`) — the only place the button exists;
+- the Audi page (`content/enriched/9502.mjs`): `תוך דקות ספורות נאמר לכם אם העבודה מתבצעת אצלכם…`
+  and `…תשובה מדויקת בטלפון תוך דקות ספורות` — the same promise about the phone answer.
+
+**What it does NOT cover:** an arrival time on site; a measured average (the ⛔
+`30–60 ד׳ זמן מענה ממוצע` stays refuted, §D.4); the per-city `30–45 דקות` windows (still 🔶, §D.3).
+The other `תוך דקות` sentences on the site are job durations (`מפתח מכני פשוט נחתך תוך דקות`) or the
+hot-car safety warning — different statements, not settled by this row.
+
+If the business ever cannot answer and start within minutes (overnight included — §D.3 says 24/7),
+reword the button through `scripts/claims.mjs` and the two lines in `9502.mjs`, the same day.
+
+### D.12 The wartime line — wording ✅ OWNER, 2026-10-04
+
+`פועלים בכפוף להנחיות פיקוד העורף` — the announcement bar's `reduced` line
+(`content/enriched/_campaigns.mjs` → `reduced`). The owner confirmed the wording on 2026-10-04.
+
+It shows only while the fleet status switch says `reduced` (`docs/dynamic-presence-plan.md` §4.4;
+`../Sys Admin/runbooks/fleet-status-switch.md`); otherwise it ships hidden on every page, inside a
+`data-nosnippet` region. It promises no hours and no arrival time, and the site never repeats Home
+Front Command alerts. Change the words only on the owner's say-so.
+
 ## E. Coverage
 
 | Fact                 | Value                                                            | Status            |

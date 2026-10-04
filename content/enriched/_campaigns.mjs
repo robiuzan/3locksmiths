@@ -83,7 +83,7 @@ export default {
   reduced: {
     topbar: { text: "פועלים בכפוף להנחיות פיקוד העורף" },
     source:
-      "docs/dynamic-presence-plan.md §4.4 (the pre-approved wartime state; owner decision 6, 2026-09-29) · docs/business-facts.md §D.10 (no offer)",
+      "docs/dynamic-presence-plan.md §4.4 (the pre-approved wartime state; owner decision 6, 2026-09-29) · docs/business-facts.md §D.12 (wording confirmed by the owner 2026-10-04) · §D.10 (no offer)",
   },
 
   windows: [

@@ -817,12 +817,11 @@ their owners change them.
 
 ## 6. Owner actions and open decisions
 
-**From Phase 3 (2026-10-04):** add the `NTFY_TOPIC` secret to the GitHub repository (or approve
-the operator copying it from Sys Admin) — until then the weekly reminder only prints; confirm the
-wartime wording `פועלים בכפוף להנחיות פיקוד העורף` (shipped hidden 2026-10-04). Noticed during
-the drill, not part of this plan: the homepage button `השירות שלנו מתחיל תוך דקות קבל מענה מהיר`
-(scraped from WordPress, 11 times on 8 pages) is an unquantified speed promise of the kind
-CLAUDE.md §3 rule 1 lists — confirm it or let it be rewritten through scripts/claims.mjs.
+**From Phase 3 (2026-10-04) — all three closed the same day:** the `NTFY_TOPIC` repository secret
+was copied from Sys Admin on the owner's word, and a manual run of `remind.yml` pushed the first
+message; the owner confirmed the wartime wording (business-facts §D.12) and the homepage button
+`השירות שלנו מתחיל תוך דקות` (§D.11 — the button exists only on the homepage; the earlier "11 times
+on 8 pages" counted every `תוך דקות`, most of them job durations and the hot-car warning).
 
 **From Phase 2 (2026-10-01):** look at the Hanukkah card on a real phone
 (`/?at=2026-12-06T10:00:00%2B02:00`, on a second page view); answer the accessibility questions in
