@@ -1,0 +1,35 @@
+name: Weekly reminder
+
+# Reads PRODUCTION once a week and pushes one message to the owner's phone (ntfy):
+# the status switch, deploy drift, the updates strip's age, the pre-written runway, quiet days
+# in the coming week, the calendar's horizon. scripts/check-reminders.mjs says what each means.
+#
+# It never builds, never deploys and never writes — owner decision 5 (deploys stay human-only),
+# docs/dynamic-presence-plan.md §4.5. The one secret is the ntfy topic (NTFY_TOPIC; optional
+# NTFY_SERVER). Without it the run prints the message and pushes nothing.
+#
+# GitHub pauses scheduled workflows in a repository with no commits for 60 days; it emails the
+# owner first. Any push re-arms it — or run it by hand from the Actions tab.
+
+on:
+  schedule:
+    - cron: "0 5 * * 0" # Sunday 08:00 Israel summer time / 07:00 winter
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  remind:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Read production and push the weekly message
+        run: node scripts/check-reminders.mjs
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+          NTFY_SERVER: ${{ secrets.NTFY_SERVER }}

@@ -8,7 +8,9 @@
  *   After editing: `npm run format`, `npm run enrich`, then `npm run build` (its prebuild gate
  *   runs scripts/check-campaigns.mjs, which enforces everything below). Look at
  *   public/assets/live-schedule.json to see when a line will really show. A deploy is what
- *   makes it live; the only off switch before Phase 2 is `windows: []` + enrich + deploy.
+ *   makes it live. The off switch needs no deploy: https://imgquarry.com/status/fleet.json
+ *   (`quiet` = the evergreen line only, `reduced` = the wartime line below, `off` = no bar, and
+ *   no card in any of them) — runbook: ../Sys Admin/runbooks/fleet-status-switch.md.
  *
  * THE RULES
  *   - No offers exist (docs/business-facts.md §D.10, owner 2026-09-29): a line is advice,
@@ -71,6 +73,17 @@ export default {
     },
     source:
       "docs/business-facts.md §C.5 (WhatsApp is live on its own number, which is never printed — the 076 call line cannot receive it)",
+  },
+
+  // The wartime line. Never shown by date: only while the fleet switch
+  // (https://imgquarry.com/status/fleet.json) says `"mode": "reduced"` — written in advance so
+  // nobody drafts copy under sirens (plan §4.4). Rendered on every page, the emergency pages
+  // included. No link, no promise of hours or arrival; the site never repeats Home Front
+  // Command alerts. Under `quiet` the evergreen line shows instead, under `off` no bar at all.
+  reduced: {
+    topbar: { text: "פועלים בכפוף להנחיות פיקוד העורף" },
+    source:
+      "docs/dynamic-presence-plan.md §4.4 (the pre-approved wartime state; owner decision 6, 2026-09-29) · docs/business-facts.md §D.10 (no offer)",
   },
 
   windows: [

@@ -580,6 +580,13 @@ function checkDialog(where, w) {
 }
 
 const campaigns = await loadModule(CAMPAIGNS);
+if (campaigns) {
+  const extra = Object.keys(campaigns).filter(
+    (k) => !["ui", "evergreen", "reduced", "windows"].includes(k),
+  );
+  if (extra.length)
+    fail("_campaigns.mjs", `unknown top-level key(s): ${extra.join(", ")}`);
+}
 if (existsSync(CAMPAIGNS) && !campaigns)
   fail("_campaigns.mjs", "the file exists but has no default export");
 let windowCount = 0;
@@ -601,6 +608,32 @@ if (campaigns) {
     );
     if (!campaigns.evergreen.source)
       fail("_campaigns.mjs.evergreen", "missing source (business-facts row)");
+  }
+
+  // The wartime line (plan §4.4): revealed only by the status switch's `reduced` mode, on every
+  // page, the emergency pages included. One row like any line, no link (it sends nobody away),
+  // the same claim/phone/quote rules, and a source. Optional — without it `reduced` just shows
+  // the evergreen line, which is not what an owner flipping it expects, so it warns.
+  if (campaigns.reduced !== undefined) {
+    const r = campaigns.reduced;
+    if (!r?.topbar?.text) fail("_campaigns.mjs.reduced", "missing topbar.text");
+    else {
+      checkCopy("_campaigns.mjs.reduced", r);
+      checkTopbar("_campaigns.mjs.reduced", r.topbar, TOPBAR_MAX_CHARS);
+      if (r.topbar.link)
+        fail("_campaigns.mjs.reduced", "the wartime line carries no link");
+    }
+    if (!r?.source) fail("_campaigns.mjs.reduced", "missing source");
+    const extra = Object.keys(r ?? {}).filter((k) => !["topbar", "source"].includes(k));
+    if (extra.length)
+      fail(
+        "_campaigns.mjs.reduced",
+        `unknown field(s): ${extra.join(", ")} — it has no window`,
+      );
+  } else {
+    console.warn(
+      "campaigns: ⚠ no `reduced` line — the status switch's reduced mode would show the evergreen line",
+    );
   }
 
   const windows = Array.isArray(campaigns.windows) ? campaigns.windows : [];
@@ -630,7 +663,7 @@ if (campaigns) {
     if (w.kind === "reduced")
       fail(
         where,
-        "the `reduced` line is Phase 2 — it needs the status.json switch that reveals it",
+        "the wartime line is the top-level `reduced` entry, not a window — the status switch reveals it, never a date",
       );
     if (w.pages !== undefined)
       fail(
@@ -648,8 +681,11 @@ if (campaigns) {
         where,
         `variant "${variant}" must match ${VARIANT_RE} — it becomes a CSS selector`,
       );
-    if (variant === "evergreen")
-      fail(where, "`evergreen` is reserved for the default variant");
+    if (["evergreen", "reduced", "off"].includes(String(variant)))
+      fail(
+        where,
+        `"${variant}" is reserved (evergreen = the default line; reduced / off = the status switch)`,
+      );
     // app/enrich.css opens the bar on the calm pages for `[data-live^="safety-"]` only.
     if ((w.kind === "safety") !== /^safety-/.test(String(variant))) {
       fail(

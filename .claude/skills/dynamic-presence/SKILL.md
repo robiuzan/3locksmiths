@@ -32,7 +32,11 @@ is the part you must hold in your head while touching any of it. Business facts 
 4. **Runtime input can only hide or select — never inject text.** The one runtime input is
    `status.json` (`{ mode: normal|quiet|reduced|off }`). If it is unreachable, slow (> 1.5 s) or
    malformed, fail **closed**: promos hidden, the evergreen line (and the header's own phone
-   number, which no line replaces) always visible.
+   number, which no line replaces) always visible. _As built (Phase 3, 2026-10-04):_ live.js
+   writes one of five ids to `html[data-live-mode]`, caches a non-normal mode for the next page's
+   first paint, and keeps a still-valid cached mode when a read fails; a safety line survives
+   "fail". Runbook: `../Sys Admin/runbooks/fleet-status-switch.md` — the bucket CORS rule and the
+   file must exist **before** a deploy that ships the reader, or every seasonal line goes dark.
 5. **No review, rating, count, badge, testimonial or "live stat" without a dated, sourced row** in
    `docs/local-presence.md` §3 — and no `Review`/`AggregateRating` markup ever (CI fails on it;
    Google gives no stars for self-serving reviews, widgets included).
@@ -90,10 +94,10 @@ they are rendered into `content/site.json`.
   desktop and in the sticky bar on a phone. The evergreen line is WhatsApp-only for that reason.
 - The scraped text `שירות מהיר ומיידי` was an unquantified speed claim: replaced, never revealed.
 - Every variant is short. Bytes in `bodyHtml` ship twice (HTML + RSC payload).
-- Not built yet (Phase 2, with `live.js`): the ✕ dismissal, the `reduced` line and the
-  `status.json` read. Do not render a `reduced` line before the switch that reveals it exists —
-  text-only crawlers ignore `hidden`, and "reduced availability right now" on 109 pages is a
-  sentence we do not want quoted.
+- The `reduced` line (Phase 3): `_campaigns.mjs` top-level `reduced`, rendered hidden on
+  every page (the calm ones too) and revealed only by the switch's `reduced` mode. Text-only
+  crawlers ignore `hidden`; the region's `data-nosnippet` keeps it out of Google's snippets,
+  and the wording is a statement about guidelines, not about reduced availability.
 
 ## The seasonal card — shipped 2026-10-01 (not yet deployed)
 

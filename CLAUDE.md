@@ -206,7 +206,10 @@ app/layout.tsx prints the script → it sets html[data-live] before first paint 
 A static export has no date, and deploys are human-run — so the page carries **every** line and the
 visitor's clock picks one. Memorial days and fasts silence all of them at compile time; Shabbat
 and chag silence the seasonal ones (the hot-car safety line stays on — owner, 2026-10-01).
-The browser only ever _selects_; it never fetches or writes copy. The doctrine is `/dynamic-presence`,
+The browser only ever _selects_; it never fetches or writes copy. Its one runtime input is the
+fleet status switch, `https://imgquarry.com/status/fleet.json` (quiet / reduced / off override
+the calendar; unreadable = fail closed) — flipped from `../Sys Admin/runbooks/fleet-status-switch.md`,
+never by a deploy. The doctrine is `/dynamic-presence`,
 the calendar rules `/israeli-calendar`, the plan `docs/dynamic-presence-plan.md`.
 
 ### Images have their own source of truth — and it is not this repo

@@ -750,6 +750,40 @@ should settle it once and the modules follow. Phase 0.3 (the September baseline 
 3. Optional: Playwright screenshot matrix for the key dates (only if it survives §13).
 4. Phase 3b (optional, owner decision): the Access-OTP phone form for `status.json`.
 
+> **Status 2026-10-04 — built, reviewed, gated; production steps wait for the owner.**
+>
+> - **1 ✅ built.** `public/assets/live.js` reads `https://imgquarry.com/status/fleet.json` after
+>   first paint (1.5 s, `credentials: omit`, `cache: no-cache` so a flip reaches the next page
+>   view even after a hand upload); `parseStatus` lets through exactly normal / quiet / reduced /
+>   off — anything else, and any network failure, is "fail". The mode goes to
+>   `html[data-live-mode]`; the head script re-picks: off → no bar (and its 34 px given back),
+>   reduced → the pre-written wartime line (`_campaigns.mjs` top-level `reduced`, on every page,
+>   the emergency ones included), quiet → evergreen, fail → evergreen unless a safety line is live.
+>   The card opens only after the switch said `normal` on that page view. A non-normal mode is
+>   cached ("<mode>,<expires>", 30 min or the switch's own `until`) and applied before first paint
+>   on the next page — and on a page restored from the back/forward cache; a failed read keeps a
+>   still-valid cached mode instead of throwing it away. `?mode=…` previews. CSP connect-src
+>   gains imgquarry.com. Write path: `../Sys Admin/scripts/fleet/status-switch.mjs`
+>   (show / set / cors, -DryRun → -Confirm, the Sys Admin guard hook demands `# APPROVED:`) and
+>   `../Sys Admin/runbooks/fleet-status-switch.md`. **Not yet done:** the bucket CORS rule, the
+>   file itself, the deploy and the drill — in that order (owner approval).
+> - **2 ✅ built.** `scripts/check-reminders.mjs` + `.github/workflows/remind.yml` (Sunday 08:00):
+>   reads production — the switch, deploy drift (live.js, schedule, head script, strip), the
+>   strip's age (21 days), the runway (30 days / a line ending in 14 with nothing after), quiet
+>   days and chag in the next 7 days, the calendar horizon (90 days) — and pushes one ntfy
+>   message. GitHub Actions instead of `/schedule`: it needs no session and no machine left on.
+>   **Not yet done:** the `NTFY_TOPIC` repository secret (owner approval).
+> - **3, 4 —** not started (optional).
+>
+> **Reviewed adversarially 2026-10-04** (four lenses, 17 findings, 14 reproduced by a second
+> agent, all fixed): a slow or failed read threw away a still-valid cached off/reduced (the
+> wartime line would vanish on slow phones); a late answer was discarded; a bfcache-restored page
+> kept its old mode; the fail-closed wiring and the off/reduced CSS had no gate (now 4 live.js
+> wiring tests, a card-lock test, a bfcache test and check-live-regions rule 13, each
+> mutation-checked); `set` did not verify CORS per origin; the guard hook let `set -Confirm`
+> through without approval; the runbook never created the file or said it must precede the
+> deploy; the reminder named quiet days by their eve and printed the calendar end a day late.
+
 ### Phase 4 — Reviews, gated on genuineness and on Google (from ≈ 2026-11-04)
 
 - **4a (now, continuous):** the ask-flow (§4.6); weekly ledger reads; nothing on the site.
@@ -773,6 +807,11 @@ their owners change them.
 ---
 
 ## 6. Owner actions and open decisions
+
+**From Phase 3 (2026-10-04):** approve the three switch steps (bucket CORS for the three
+3locksmiths origins, the file at `normal`, then the deploy and the drill); add the `NTFY_TOPIC`
+secret to the GitHub repository (or approve the operator copying it from Sys Admin); confirm the
+wartime wording `פועלים בכפוף להנחיות פיקוד העורף`.
 
 **From Phase 2 (2026-10-01):** look at the Hanukkah card on a real phone
 (`/?at=2026-12-06T10:00:00%2B02:00`, on a second page view); answer the accessibility questions in

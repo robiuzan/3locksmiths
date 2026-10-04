@@ -33,7 +33,8 @@
   #   www.googletagmanager.com GTM container + the <noscript> iframe
   #   fonts.googleapis.com     the theme's Google Fonts stylesheet (Alexandria/Rubik/Poppins)
   #   fonts.gstatic.com        the font files that stylesheet then requests
-  #   imgquarry.com            manifest media host (OG card, preconnected in <head>)
+  #   imgquarry.com            manifest media host (OG card, preconnected in <head>) — and
+  #                            connect-src for the status switch, /status/fleet.json (live.js)
   #   api.web3forms.com        the lead form POST — needs connect-src AND form-action
   #   wa.me                    WhatsApp deep links (navigation, so form-action/frame not needed)
   #
@@ -51,4 +52,4 @@
   # resources, not against inline script. Enforcing it may never be fully reachable without
   # changing the port itself — see docs/optimization-backlog.md §12.5.
   # ---------------------------------------------------------------------------------------
-  Content-Security-Policy-Report-Only: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https://www.googletagmanager.com https://imgquarry.com; connect-src 'self' https://api.web3forms.com https://www.googletagmanager.com; frame-src https://www.googletagmanager.com; form-action 'self' https://api.web3forms.com
+  Content-Security-Policy-Report-Only: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https://www.googletagmanager.com https://imgquarry.com; connect-src 'self' https://api.web3forms.com https://www.googletagmanager.com https://imgquarry.com; frame-src https://www.googletagmanager.com; form-action 'self' https://api.web3forms.com

@@ -186,17 +186,27 @@ function item(id, topbar, selfPath) {
 }
 
 // One element per VARIANT, not per window: the weekly slot is ~60 windows and one sentence.
+// `reduced` and `off` are the status switch's states (lib/live/head-script.mjs), never a window's.
+const RESERVED = ["evergreen", "reduced", "off"];
 const variants = new Map();
 for (const w of campaigns.windows ?? []) {
   const v = w.variant || w.id;
-  if (v === "evergreen")
-    fail(`window "${w.id}" may not use the reserved variant "evergreen".`);
+  if (RESERVED.includes(v))
+    fail(`window "${w.id}" may not use the reserved variant "${v}".`);
   if (!variants.has(v)) variants.set(v, { topbar: w.topbar, kind: w.kind });
 }
-/** The region's items for one page: every line, or only the safety lines on a calm page. */
+// The wartime line: no window, never in the schedule — only the status switch reveals it
+// (live.js → html[data-live-mode="reduced"] → the head script picks it). Every page carries it,
+// the calm ones included: it is about whether we work, not a tip.
+if (campaigns.reduced) {
+  if (campaigns.reduced.topbar?.link)
+    fail("_campaigns.mjs reduced: the wartime line carries no link.");
+  variants.set("reduced", { topbar: campaigns.reduced.topbar, kind: "reduced" });
+}
+/** The region's items for one page: every line, or only the safety + wartime lines on a calm page. */
 const itemsFor = (page, calm) =>
   [...variants]
-    .filter(([, v]) => !calm || v.kind === "safety")
+    .filter(([, v]) => !calm || v.kind === "safety" || v.kind === "reduced")
     .map(([id, v]) => item(id, v.topbar, page.path))
     .join("") + item("evergreen", campaigns.evergreen.topbar, page.path);
 
@@ -349,6 +359,8 @@ const schedule = {
     "Each interval is a stretch where a line OTHER than the evergreen one shows; quiet days are already subtracted. " +
     "Shabbat and holiday times: Hebcal.com (CC BY 4.0).",
   variants: [...variants.keys(), "evergreen"],
+  status:
+    "https://imgquarry.com/status/fleet.json overrides all of this in the browser: quiet → evergreen, reduced → the wartime line, off → no bar; unreadable → seasonal lines off, safety lines stay.",
   intervals: intervals.map((iv) => ({
     variant: iv.variant,
     from: new Date(iv.from).toISOString(),

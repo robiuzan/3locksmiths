@@ -27,6 +27,16 @@
  *   - if storage is unavailable (private mode, some in-app browsers) — never: without it the
  *     frequency cap cannot hold, and a card that returns on every page is worse than none.
  *
+ * THE STATUS SWITCH (plan §4.4; ../Sys Admin/runbooks/fleet-status-switch.md). Its ONE network
+ * read: https://imgquarry.com/status/fleet.json, after first paint, 1.5 s at most. The answer
+ * can only pick one of five fixed ids — normal | quiet | reduced | off, or "fail" when it cannot
+ * be read, parsed or trusted — which go to <html data-live-mode>; the inline head script then
+ * re-picks the line (lib/live/head-script.mjs). Nothing from the response reaches the page as
+ * text. A non-normal mode is cached in localStorage ("<mode>,<expires ms>", 30 min, or until the
+ * switch's own `until`; 5 min for a failed read) so the next page applies it BEFORE first paint.
+ * The card opens only once the switch has said "normal" on this page view — fail closed.
+ * `?mode=…` previews a mode without reading the switch.
+ *
  * Deliberately ES5 and wrapped in try/catch: an error here costs the visitor the card, nothing
  * else. Events go to dataLayer as surface_view / surface_dismiss with the line's id only — no
  * personal data (CLAUDE.md §13).
@@ -39,6 +49,39 @@
   var SEARCH =
     /^(https?:\/\/([^\/]*\.)?(google|bing|yahoo|duckduckgo|yandex|baidu|ecosia|startpage)\.|android-app:\/\/com\.google\.android\.(googlequicksearchbox|gm))/i;
   var STALE_DAYS = 45;
+  var STATUS_URL = "https://imgquarry.com/status/fleet.json";
+  var STATUS_TIMEOUT = 1500;
+  var HOLD = 30 * 6e4; // how long a non-normal mode is applied before first paint on later pages
+  var FAIL_HOLD = 5 * 6e4;
+  var MODES = { normal: 1, quiet: 1, reduced: 1, off: 1 };
+  var ISO = /^\d{4}-\d\d-\d\dT\d\d:\d\d(:\d\d(\.\d+)?)?([+-]\d\d:\d\d|Z)$/;
+
+  /**
+   * Pure: the switch's answer → { mode, hold }. mode is ONLY ever one of normal / quiet /
+   * reduced / off / fail; hold is how long to cache it (0 = do not). Anything unexpected —
+   * not JSON, an unknown mode, an `until` without a timezone — is "fail": the conservative
+   * state, never a guess. An `until` in the past means the override has lapsed: normal.
+   */
+  function parseStatus(text, now) {
+    var o;
+    var failed = { mode: "fail", hold: FAIL_HOLD };
+    try {
+      o = JSON.parse(text);
+    } catch (e) {
+      return failed;
+    }
+    if (!o || typeof o !== "object" || typeof o.mode !== "string") return failed;
+    if (!Object.prototype.hasOwnProperty.call(MODES, o.mode)) return failed;
+    var hold = HOLD;
+    if (o.until !== undefined && o.until !== null && o.until !== "") {
+      if (typeof o.until !== "string" || !ISO.test(o.until)) return failed;
+      var t = Date.parse(o.until);
+      if (isNaN(t)) return failed;
+      if (now >= t) return { mode: "normal", hold: 0 };
+      hold = Math.min(hold, t - now);
+    }
+    return { mode: o.mode, hold: o.mode === "normal" ? 0 : hold };
+  }
 
   /** Pure: did this page view arrive from a search engine? */
   function fromSearch(referrer) {
@@ -68,6 +111,7 @@
     w.__liveTest.rules = rules;
     w.__liveTest.stale = stale;
     w.__liveTest.fromSearch = fromSearch;
+    w.__liveTest.parseStatus = parseStatus;
     return;
   }
 
@@ -75,6 +119,75 @@
     try {
       (w.dataLayer = w.dataLayer || []).push(o);
     } catch (e) {}
+  }
+
+  var h = d.documentElement;
+
+  /** Apply a mode: the attribute, the cache for the next page, and a re-pick by the head script. */
+  function setMode(mode, hold) {
+    h.setAttribute("data-live-mode", mode);
+    try {
+      if (hold > 0) w.localStorage.setItem("ls-status", mode + "," + (Date.now() + hold));
+      else w.localStorage.removeItem("ls-status");
+    } catch (e) {}
+    try {
+      d.dispatchEvent(new Event("live-mode"));
+    } catch (e) {}
+  }
+
+  /**
+   * No answer from the switch (slow, offline, blocked): a still-valid quiet / reduced / off that an
+   * earlier page cached is a better guess than "fail" — it is what the switch said minutes ago, and
+   * throwing it away would bring the bar (or a seasonal line) back for exactly the visitors on a
+   * slow phone. Only with nothing valid cached does the page fail closed.
+   */
+  function noAnswer(hold) {
+    var c;
+    try {
+      c = (w.localStorage.getItem("ls-status") || "").split(",");
+    } catch (e) {
+      c = [];
+    }
+    var left = Number(c[1]) - Date.now();
+    if (/^(quiet|reduced|off)$/.test(c[0]) && left > 0) setMode(c[0], left);
+    else setMode("fail", hold);
+  }
+
+  // --- the status switch -----------------------------------------------------------------------
+  try {
+    if (!/[?&]mode=/.test(location.search)) {
+      if (!w.fetch) {
+        noAnswer(0);
+      } else {
+        var answered = false; // a response (good or bad) arrived — a late one still counts
+        var timer = setTimeout(function () {
+          if (!answered) noAnswer(0); // slow, not broken: do not carry "fail" to the next page
+        }, STATUS_TIMEOUT);
+        // no-cache = revalidate every time (a 304 when unchanged): a flip reaches the next page
+        // view, even if the file was uploaded by hand without its Cache-Control header.
+        w.fetch(STATUS_URL, { credentials: "omit", mode: "cors", cache: "no-cache" })
+          .then(function (r) {
+            if (!r.ok) throw new Error("status " + r.status);
+            return r.text();
+          })
+          .then(function (text) {
+            answered = true;
+            clearTimeout(timer);
+            var s = parseStatus(text, Date.now());
+            setMode(s.mode, s.hold);
+          })
+          ["catch"](function () {
+            if (answered) return;
+            answered = true;
+            clearTimeout(timer);
+            noAnswer(FAIL_HOLD);
+          });
+      }
+    }
+  } catch (e) {
+    try {
+      noAnswer(0);
+    } catch (e2) {}
   }
 
   try {
@@ -135,6 +248,7 @@
         return;
       }
       if (
+        h.getAttribute("data-live-mode") !== "normal" || // the switch said otherwise, or nothing yet
         d.documentElement.getAttribute("data-live") !== variant ||
         d.querySelector("dialog[open]") ||
         d.querySelector(".nav-side.active") || // the mobile menu is open

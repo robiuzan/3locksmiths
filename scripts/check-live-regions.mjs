@@ -30,6 +30,8 @@
  *      (no `open`), names its title and body by id, and says exactly what the register says;
  *  12. app/enrich.css keeps a closed card hidden (`.live-dialog:not([open]) { display: none }`) —
  *      the vendored theme's `dialog { display: block }` otherwise shows it on every page;
+ *  13. app/enrich.css carries the status switch's states: "off" hides the bar and its reserve at
+ *      every width, "reduced" opens it on the calm pages' phone layout;
  *  11. public/assets/live.js carries no copy (not one Hebrew letter), and the URL the layout
  *      loads it from carries the hash of the file that is actually there;
  *   9. what each region SAYS is what the register says: every item's text as read and its link
@@ -89,6 +91,9 @@ if (campaigns?.evergreen?.topbar) {
     const v = w.variant || w.id;
     if (!expected.has(v)) expected.set(v, { topbar: w.topbar, kind: w.kind });
   }
+  // The wartime line: on every page, the calm ones included — the status switch reveals it.
+  if (campaigns.reduced?.topbar)
+    expected.set("reduced", { topbar: campaigns.reduced.topbar, kind: "reduced" });
   expected.set("evergreen", { topbar: campaigns.evergreen.topbar, kind: "evergreen" });
 }
 
@@ -189,9 +194,9 @@ for (const page of site.pages ?? []) {
           `${label}: variant "${id}" is not \`hidden\` — it would show without CSS`,
         );
       }
-      if (calm && id !== "evergreen" && !/^safety-/.test(id)) {
+      if (calm && id !== "evergreen" && id !== "reduced" && !/^safety-/.test(id)) {
         problems.push(
-          `${label}: seasonal variant "${id}" on a calm page — only evergreen and safety lines belong there`,
+          `${label}: seasonal variant "${id}" on a calm page — only evergreen, safety and the wartime line belong there`,
         );
       }
       // Rule 9 — the words and the link, against the register.
@@ -233,7 +238,11 @@ for (const page of site.pages ?? []) {
     }
     if (campaigns) {
       for (const [id, want] of expected) {
-        const belongs = !calm || want.kind === "safety" || id === "evergreen";
+        const belongs =
+          !calm ||
+          want.kind === "safety" ||
+          want.kind === "reduced" ||
+          id === "evergreen";
         if (belongs && !seen.has(id))
           problems.push(`${label}: variant "${id}" from the register is missing`);
       }
@@ -396,6 +405,53 @@ if (cardsWanted.size) {
     problems.push(
       "app/enrich.css has no `.live-dialog:not([open]) { display: none }` — the closed cards would show on every page",
     );
+}
+
+// Rule 13 — the status switch's states have their CSS (plan §4.4). The head script only sets
+// html[data-live="off" | "reduced"]; without these rules "off" would leave the bar up (and its
+// 34px reserve) and "reduced" would never open on an emergency page's phone layout.
+if (campaigns) {
+  // Comments out, whitespace squashed, then plain substring tests — exact rules, no regex.
+  const css = readFileSync(join(ROOT, "app", "enrich.css"), "utf8")
+    .replace(/\/\*[\s\S]*?\*\//g, "")
+    .replace(/\s+/g, " ");
+  const need = [
+    [
+      'html[data-live="off"] body .nav-main .nav-main__top-bar--live { display: none; }',
+      '"off" must hide the bar at every width',
+    ],
+    [
+      'html[data-live="off"] body .template-header { --live-bar: 0px; }',
+      '"off" must give back the bar\'s 34px reserve',
+    ],
+    [
+      'html[data-live]:not([data-live="evergreen"]):not([data-live="off"]) body .nav-main .nav-main__top-bar--live { display: block; }',
+      'the phone rule that opens the bar must exclude data-live="off"',
+    ],
+    [
+      'html[data-live]:not([data-live="evergreen"]):not([data-live="off"]) body .template-header { --live-bar: 34px; }',
+      'the phone reserve must exclude data-live="off"',
+    ],
+    [
+      'html[data-live]:not([data-live^="safety-"]):not([data-live="reduced"]) body .template-header[data-live-calm] .nav-main__top-bar--live { display: none; }',
+      'the calm-page rule must let data-live="reduced" open the bar',
+    ],
+    [
+      'html[data-live]:not([data-live^="safety-"]):not([data-live="reduced"]) body .template-header[data-live-calm] { --live-bar: 0px; }',
+      'the calm-page reserve must let data-live="reduced" keep the bar',
+    ],
+    [
+      "padding-top: calc(126px + var(--live-bar));",
+      "the 1200px+ header reserve must follow --live-bar (126px + bar)",
+    ],
+    [
+      "padding-top: calc(146px + var(--live-bar));",
+      "the 1441px+ header reserve must follow --live-bar (146px + bar)",
+    ],
+  ];
+  for (const [rule, why] of need)
+    if (!css.includes(rule))
+      problems.push(`app/enrich.css: ${why} — expected \`${rule}\``);
 }
 
 // Rule 11 — the behaviour file carries no copy, and the page loads the file that is there.

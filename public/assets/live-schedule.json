@@ -6,8 +6,10 @@
     "hanukkah",
     "pesach",
     "safety-summer",
+    "reduced",
     "evergreen"
   ],
+  "status": "https://imgquarry.com/status/fleet.json overrides all of this in the browser: quiet → evergreen, reduced → the wartime line, off → no bar; unreadable → seasonal lines off, safety lines stay.",
   "intervals": [
     {
       "variant": "before-shabbat",

@@ -513,13 +513,22 @@ body .template-header {
 }
 @media (min-width: 1199.02px) {
   body .template-header {
-    padding-top: 160px;
+    padding-top: calc(126px + var(--live-bar)); /* 160 with the bar */
   }
 }
 @media (min-width: 1440.02px) {
   body .template-header {
-    padding-top: 180px;
+    padding-top: calc(146px + var(--live-bar)); /* 180 with the bar */
   }
+}
+/* The status switch's `off` (plan §4.4): no bar at any width, and its 34px given back. The head
+   script sets data-live="off" before first paint when the mode is cached, so the reserve and the
+   bar agree from the start; the header phone and the sticky call bar are untouched. */
+html[data-live="off"] body .template-header {
+  --live-bar: 0px;
+}
+html[data-live="off"] body .nav-main .nav-main__top-bar--live {
+  display: none;
 }
 
 /* ---- the announcement bar (docs/dynamic-presence-plan.md §3.1) ----------------------
@@ -626,19 +635,27 @@ body .live-topbar__more {
   }
 }
 @media not all and (min-width: 992px) {
-  html[data-live]:not([data-live="evergreen"]) body .nav-main .nav-main__top-bar--live {
+  html[data-live]:not([data-live="evergreen"]):not([data-live="off"])
+    body
+    .nav-main
+    .nav-main__top-bar--live {
     display: block;
   }
-  html[data-live]:not([data-live="evergreen"]) body .template-header {
+  html[data-live]:not([data-live="evergreen"]):not([data-live="off"])
+    body
+    .template-header {
     --live-bar: 34px;
   }
-  html[data-live]:not([data-live^="safety-"])
+  /* calm pages: only a safety line or the status switch's wartime line opens the bar */
+  html[data-live]:not([data-live^="safety-"]):not([data-live="reduced"])
     body
     .template-header[data-live-calm]
     .nav-main__top-bar--live {
     display: none;
   }
-  html[data-live]:not([data-live^="safety-"]) body .template-header[data-live-calm] {
+  html[data-live]:not([data-live^="safety-"]):not([data-live="reduced"])
+    body
+    .template-header[data-live-calm] {
     --live-bar: 0px;
   }
 

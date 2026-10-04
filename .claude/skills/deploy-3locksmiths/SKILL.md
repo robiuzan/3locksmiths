@@ -135,6 +135,11 @@ unreviewed full-site change.
 
 ## Before you deploy
 
+**Since Phase 3 (2026-10-04) every page reads the status switch** — check it answers before you
+ship: `node scripts/fleet/status-switch.mjs show` from `../Sys Admin` must print HTTP 200 and an
+`access-control-allow-origin`. A missing file or CORS rule does not break the build; it silently
+turns every seasonal line and the card off on the live site (`../Sys Admin/runbooks/fleet-status-switch.md`).
+
 Run `/qa-build-gate` end to end. Its stop-ship list applies — in particular do not ship an
 unparseable JSON-LD block, a `tel:[phone]` placeholder, a personal email in the business node, or any
 `Review`/`AggregateRating` without a source.

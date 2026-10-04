@@ -279,6 +279,14 @@ test("status.json overrides everything and can only hide or select", () => {
     "evergreen",
     "the reduced variant is never chosen by time",
   );
+  // An unreadable switch fails CLOSED: seasonal lines go, a safety line stays, never a card.
+  assert.equal(at(iso, { status: { mode: "fail" } }).variant, "evergreen");
+  assert.equal(at(iso, { status: { mode: "fail" } }).dialog, null);
+  assert.equal(
+    at("2027-06-20T10:00:00+03:00", { status: { mode: "fail" } }).variant,
+    "safety-summer-2027",
+    "a safety line is not a promotion — it survives a failed read",
+  );
 });
 
 test("page exclusion, no-interstitial pages and dismissal", () => {
@@ -363,8 +371,17 @@ function lookup(intervals, ms) {
  * just enough of a browser for it. `at(ms)` moves its clock and re-runs it the way a `pageshow`
  * does, returning what it wrote on <html>; `state.css` is what it wrote into its <style>.
  */
-function bootHeadScript(intervals, search = "") {
-  const state = { now: 0, attr: null, css: null, listeners: {}, resizes: 0, timer: null };
+function bootHeadScript(intervals, search = "", { storage = null, now = 0 } = {}) {
+  const state = {
+    now,
+    attr: null,
+    css: null,
+    listeners: {},
+    docListeners: {},
+    attrs: {},
+    resizes: 0,
+    timer: null,
+  };
   const style = {
     set textContent(v) {
       state.css = v;
@@ -374,12 +391,16 @@ function bootHeadScript(intervals, search = "") {
     document: {
       documentElement: {
         setAttribute: (k, v) => {
+          state.attrs[k] = String(v);
           if (k === "data-live") state.attr = v;
         },
+        getAttribute: (k) => (k in state.attrs ? state.attrs[k] : null),
       },
       head: { appendChild() {} },
       createElement: () => style,
-      addEventListener() {},
+      addEventListener: (type, fn) => {
+        state.docListeners[type] = fn;
+      },
       hidden: false,
     },
     location: { search },
@@ -407,11 +428,18 @@ function bootHeadScript(intervals, search = "") {
     isNaN,
     decodeURIComponent,
   };
+  if (storage) sandbox.localStorage = { getItem: (k) => storage[k] ?? null };
   vm.runInNewContext(liveHeadScript(intervals), sandbox);
   return {
     at(ms) {
       state.now = ms;
       state.listeners.pageshow();
+      return state.attr;
+    },
+    /** What live.js does with the switch's answer: set the mode, fire `live-mode`. */
+    mode(m) {
+      state.attrs["data-live-mode"] = m;
+      state.docListeners["live-mode"]();
       return state.attr;
     },
     /** Let the armed timer fire, as the browser would at that moment. */
@@ -555,6 +583,95 @@ test("the shipped <head> script picks the resolver's variant — run in a VM, fi
   );
   page.at(toMs("2026-10-01T10:00:00+03:00"));
   assert.equal(page.state.css, "", "evergreen needs no rule — it is the static default");
+});
+
+test("the status switch outranks the calendar in the shipped <head> script — every hour, every mode", () => {
+  const intervals = compile(F.windows, F.calendar);
+  const concrete = { windows: expand(F.windows, F.calendar), calendar: F.calendar };
+  const start = toMs("2026-10-01T00:00:00+03:00");
+  const end = toMs("2027-10-01T00:00:00+03:00");
+  for (const mode of ["normal", "quiet", "reduced", "off", "fail"]) {
+    const page = bootHeadScript(intervals);
+    page.mode(mode);
+    for (const ms of probes(intervals, start, end)) {
+      const want = resolve(concrete, ms, { status: { mode } }).variant;
+      assert.equal(
+        page.at(ms),
+        want === null ? "off" : want, // the resolver's "hide" is the attribute "off"
+        `mode ${mode}: head script ≠ resolver at ${new Date(ms).toISOString()}`,
+      );
+    }
+  }
+});
+
+test("the switch's mode: applied before first paint from the cache or ?mode=, and live", () => {
+  const intervals = compile(F.windows, F.calendar);
+  const hanukkah = toMs("2026-12-06T10:00:00+02:00");
+  const boot = (search, storage) =>
+    bootHeadScript(intervals, search, { storage, now: hanukkah });
+  const future = String(hanukkah + 60_000);
+  const past = String(hanukkah - 1);
+  const H = "hanukkah-travel-2026";
+  assert.equal(boot("", {}).state.attr, H, "no cache: the calendar");
+  assert.equal(boot("", { "ls-status": `quiet,${future}` }).state.attr, "evergreen");
+  assert.equal(boot("", { "ls-status": `off,${future}` }).state.attr, "off");
+  assert.equal(
+    boot("", { "ls-status": `off,${future}` }).state.css,
+    "",
+    "off writes no rule",
+  );
+  assert.equal(boot("", { "ls-status": `reduced,${future}` }).state.attr, "reduced");
+  assert.match(
+    boot("", { "ls-status": `reduced,${future}` }).state.css,
+    /data-campaign="reduced"/,
+  );
+  assert.equal(boot("", { "ls-status": `fail,${future}` }).state.attr, "evergreen");
+  assert.equal(
+    boot("", { "ls-status": `quiet,${past}` }).state.attr,
+    H,
+    "an expired cache is ignored",
+  );
+  for (const junk of [
+    "normal,9e15",
+    "evil,9e15",
+    "quiet",
+    "quiet,abc",
+    "x><y,9e15",
+    "",
+  ]) {
+    assert.equal(
+      boot("", { "ls-status": junk }).state.attr,
+      H,
+      `cache "${junk}" must be ignored`,
+    );
+  }
+  assert.equal(
+    boot("?mode=reduced", { "ls-status": `quiet,${future}` }).state.attr,
+    "reduced",
+    "a preview beats the cache",
+  );
+  assert.equal(boot("?mode=garbage", {}).state.attr, H, "an unknown preview is ignored");
+  assert.equal(boot("?mode=offline", {}).state.attr, H, "a prefix is not a mode");
+  // Without localStorage at all (a locked-down WebView), the script still runs.
+  assert.equal(bootHeadScript(intervals, "", { now: hanukkah }).state.attr, H);
+  // Back/forward cache: a page restored after a later page cached "off" picks it up on pageshow.
+  const store = {};
+  const restored = boot("", store);
+  assert.equal(restored.state.attr, H);
+  store["ls-status"] = `off,${future}`;
+  assert.equal(
+    restored.at(hanukkah),
+    "off",
+    "a restored page applies the newer cached mode",
+  );
+  // Live: the switch's answer re-picks, and a changed line asks the theme to re-measure.
+  const page = boot("", {});
+  const before = page.state.resizes;
+  assert.equal(page.mode("off"), "off");
+  assert.equal(page.state.resizes, before + 1);
+  assert.equal(page.mode("normal"), H);
+  assert.equal(page.mode("normal"), H);
+  assert.equal(page.state.resizes, before + 2, "no re-measure when nothing changed");
 });
 
 test("?at= overrides the clock; garbage falls back to the clock; an empty schedule is evergreen", () => {
@@ -838,7 +955,263 @@ test("pages that tell the reader to call 100/101 never carry a card — detected
   assert.equal(allowsDialog({ id: 1, path: "/x/", bodyHtml: "<p>שלום</p>" }), true);
 });
 
-test("live.js carries no copy and no network access", () => {
+test("live.js: the status switch's answer can only pick one of five ids", () => {
+  const { parseStatus } = liveJsRules();
+  const now = Date.parse("2026-10-04T12:00:00+03:00");
+  const MIN = 60_000;
+  const p = (o) => ({
+    ...parseStatus(typeof o === "string" ? o : JSON.stringify(o), now),
+  });
+  assert.deepEqual(p({ mode: "normal" }), { mode: "normal", hold: 0 });
+  for (const mode of ["quiet", "reduced", "off"]) {
+    assert.deepEqual(p({ mode }), { mode, hold: 30 * MIN });
+    assert.deepEqual(p({ mode, until: null, note: "x" }), { mode, hold: 30 * MIN });
+  }
+  assert.deepEqual(
+    p({ mode: "quiet", until: "2026-10-04T12:10:00+03:00" }),
+    { mode: "quiet", hold: 10 * MIN },
+    "the cache never outlives the switch's own until",
+  );
+  assert.deepEqual(
+    p({ mode: "off", until: "2026-10-04T11:59:00+03:00" }),
+    { mode: "normal", hold: 0 },
+    "a lapsed override is normal again",
+  );
+  for (const bad of [
+    "",
+    "not json",
+    "null",
+    "[]",
+    '"quiet"',
+    { mode: "QUIET" },
+    { mode: "evergreen" },
+    { mode: "fail" },
+    { mode: "<b>x</b>" },
+    { mode: ["quiet"] },
+    { mode: "toString" },
+    { mode: "__proto__" },
+    { mode: "quiet", until: "2026-10-05" },
+    { mode: "quiet", until: "2026-10-05T10:00:00" },
+    { mode: "quiet", until: 1791000000000 },
+    { mode: "quiet", until: "2026-13-45T10:00:00+03:00" },
+  ]) {
+    assert.deepEqual(
+      p(bad),
+      { mode: "fail", hold: 5 * MIN },
+      `must fail closed: ${JSON.stringify(bad)}`,
+    );
+  }
+});
+
+/**
+ * The shipped live.js, run for real (no test hook) against a fake browser: a scripted fetch, a
+ * clock, storage, timers and — optionally — a card. Returns the page's state and a way to fire
+ * the timers it armed, so the fail-closed wiring is tested, not just parseStatus.
+ */
+function bootLiveJs({
+  fetch,
+  cache = null,
+  search = "",
+  dialog = null,
+  pv = 0,
+  now = 1_000_000,
+}) {
+  const attrs = { "data-live": dialog ? dialog.variant : "evergreen" };
+  const store = cache ? { "ls-status": cache } : {};
+  const session = { "ls-pv": String(pv) };
+  const timers = [];
+  const events = [];
+  let fetched = 0;
+  let shown = 0;
+  const dlg = dialog && {
+    open: false,
+    returnValue: "",
+    getAttribute: (k) => (k === "data-cap-days" ? "14" : null),
+    addEventListener() {},
+    showModal() {
+      shown += 1;
+      this.open = true;
+    },
+    close() {
+      this.open = false;
+    },
+  };
+  const document = {
+    documentElement: {
+      getAttribute: (k) => (k in attrs ? attrs[k] : null),
+      setAttribute: (k, v) => {
+        attrs[k] = String(v);
+      },
+    },
+    querySelector: (sel) => (dlg && sel.indexOf("dialog.live-dialog") === 0 ? dlg : null),
+    dispatchEvent: (e) => events.push(e.type),
+    addEventListener() {},
+    hidden: false,
+    activeElement: null,
+    referrer: "",
+  };
+  const mkStorage = (o) => ({
+    getItem: (k) => (k in o ? o[k] : null),
+    setItem: (k, v) => {
+      o[k] = String(v);
+    },
+    removeItem: (k) => {
+      delete o[k];
+    },
+  });
+  const window = {
+    localStorage: mkStorage(store),
+    sessionStorage: mkStorage(session),
+    fetch:
+      fetch &&
+      ((...a) => {
+        fetched += 1;
+        return fetch(...a);
+      }),
+    addEventListener() {},
+    innerHeight: 800,
+    pageYOffset: 0,
+  };
+  vm.runInNewContext(readFileSync(join(ROOT, "public", "assets", "live.js"), "utf8"), {
+    window,
+    document,
+    location: { search },
+    Date: { now: () => now, parse: Date.parse },
+    Event: class {
+      constructor(type) {
+        this.type = type;
+      }
+    },
+    setTimeout: (fn, ms) => timers.push({ fn, ms }) && timers.length,
+    clearTimeout: (i) => {
+      if (timers[i - 1]) timers[i - 1].fn = () => {};
+    },
+    JSON,
+    Object,
+    Number,
+    Math,
+    Error,
+    parseInt,
+    isNaN,
+  });
+  return {
+    attrs,
+    store,
+    events,
+    get fetched() {
+      return fetched;
+    },
+    get shown() {
+      return shown;
+    },
+    fire(ms) {
+      for (const t of timers.splice(0))
+        if (t.ms === ms) t.fn();
+        else timers.push(t);
+    },
+  };
+}
+const flush = () => new Promise((r) => setImmediate(r));
+const ok = (body) => () =>
+  Promise.resolve({ ok: true, status: 200, text: () => Promise.resolve(body) });
+
+test("live.js: the switch's wiring fails closed — slow, broken, missing — and keeps a valid cached mode", async () => {
+  const later = String(1_000_000 + 600_000);
+  // a good answer: applied, cached (or uncached for normal), and the head script told
+  for (const [body, mode, cached] of [
+    ['{"mode":"off"}', "off", true],
+    ['{"mode":"quiet","until":null}', "quiet", true],
+    ['{"mode":"normal"}', "normal", false],
+    ["<html>404 page</html>", "fail", true],
+  ]) {
+    const p = bootLiveJs({ fetch: ok(body), cache: `reduced,${later}` });
+    await flush();
+    await flush();
+    assert.equal(p.attrs["data-live-mode"], mode, body);
+    assert.equal("ls-status" in p.store, cached, `cache after ${body}`);
+    if (cached) assert.match(p.store["ls-status"], new RegExp(`^${mode},\\d+$`));
+    assert.ok(p.events.includes("live-mode"));
+  }
+  const never = () => new Promise(() => {});
+  const reject = () => Promise.reject(new TypeError("Failed to fetch"));
+  const notOk = () =>
+    Promise.resolve({ ok: false, status: 404, text: () => Promise.resolve("") });
+  // no answer, nothing cached: fail closed (a timeout is not carried to the next page)
+  let p = bootLiveJs({ fetch: never });
+  p.fire(1500);
+  assert.equal(p.attrs["data-live-mode"], "fail");
+  assert.equal("ls-status" in p.store, false, "a slow read is not remembered");
+  for (const bad of [reject, notOk]) {
+    p = bootLiveJs({ fetch: bad });
+    await flush();
+    await flush();
+    assert.equal(p.attrs["data-live-mode"], "fail");
+    assert.match(
+      p.store["ls-status"] ?? "",
+      /^fail,\d+$/,
+      "a broken read is remembered briefly",
+    );
+  }
+  p = bootLiveJs({ fetch: undefined });
+  assert.equal(p.attrs["data-live-mode"], "fail", "no fetch at all");
+  // no answer, but the switch said off / reduced / quiet a few minutes ago: keep it
+  for (const mode of ["off", "reduced", "quiet"]) {
+    for (const bad of [never, reject, notOk, undefined]) {
+      p = bootLiveJs({ fetch: bad, cache: `${mode},${later}` });
+      p.fire(1500);
+      await flush();
+      await flush();
+      assert.equal(
+        p.attrs["data-live-mode"],
+        mode,
+        `cached ${mode} must survive a failed read`,
+      );
+      assert.match(p.store["ls-status"] ?? "", new RegExp(`^${mode},`));
+    }
+  }
+  // …unless it has expired, or it is a cached "fail"
+  p = bootLiveJs({ fetch: never, cache: "off,999999" });
+  p.fire(1500);
+  assert.equal(p.attrs["data-live-mode"], "fail", "an expired cache is not a guess");
+  // a late answer still counts
+  let release;
+  p = bootLiveJs({
+    fetch: () =>
+      new Promise((r) => {
+        release = () =>
+          r({ ok: true, status: 200, text: () => Promise.resolve('{"mode":"normal"}') });
+      }),
+  });
+  p.fire(1500);
+  assert.equal(p.attrs["data-live-mode"], "fail");
+  release();
+  await flush();
+  await flush();
+  assert.equal(p.attrs["data-live-mode"], "normal", "the answer after the timeout wins");
+  // a preview never reads the switch
+  p = bootLiveJs({ fetch: ok('{"mode":"off"}'), search: "?mode=quiet" });
+  assert.equal(p.fetched, 0);
+});
+
+test("live.js: the card opens only after the switch said normal on this page view", async () => {
+  const dialog = { variant: "hanukkah" };
+  for (const [fetch, wantOpen] of [
+    [ok('{"mode":"normal"}'), 1],
+    [ok('{"mode":"quiet"}'), 0],
+    [ok("garbage"), 0],
+    [() => Promise.reject(new TypeError("x")), 0],
+    [() => new Promise(() => {}), 0],
+  ]) {
+    const p = bootLiveJs({ fetch, dialog, pv: 1 }); // this is the 2nd page view → "soon", 4 s
+    await flush();
+    await flush();
+    p.fire(1500);
+    p.fire(4000);
+    assert.equal(p.shown, wantOpen, `card with switch answer ${fetch}`);
+  }
+});
+
+test("live.js carries no copy, and its one network read is the status switch", () => {
   const src = readFileSync(join(ROOT, "public", "assets", "live.js"), "utf8");
   assert.doesNotMatch(
     src,
@@ -847,9 +1220,17 @@ test("live.js carries no copy and no network access", () => {
   );
   assert.doesNotMatch(
     src,
-    /fetch\(|XMLHttpRequest|sendBeacon|innerHTML|outerHTML|insertAdjacentHTML|document\.write|new Image|\.src\s*=|import\(|\beval\b|Function\(/,
+    /XMLHttpRequest|sendBeacon|innerHTML|outerHTML|insertAdjacentHTML|insertAdjacentText|textContent|innerText|createTextNode|document\.write|new Image|\.src\s*=|import\(|\beval\b|Function\(|postMessage|WebSocket|EventSource/,
     "live.js may only select and open what the page already holds",
   );
+  assert.equal((src.match(/fetch\(/g) || []).length, 1, "exactly one fetch");
+  assert.match(src, /w\.fetch\(STATUS_URL,/, "…and it reads the status switch");
+  assert.deepEqual(
+    [...src.matchAll(/"(https?:\/\/[^"]*)"/g)].map((m) => m[1]),
+    ["https://imgquarry.com/status/fleet.json"],
+    "the only URL in live.js is the switch",
+  );
+  assert.match(src, /credentials: "omit"/, "no cookies to the bucket");
 });
 
 // ---------------------------------------------------------------------------------------
