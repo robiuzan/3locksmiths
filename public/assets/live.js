@@ -34,7 +34,9 @@
  * re-picks the line (lib/live/head-script.mjs). Nothing from the response reaches the page as
  * text. A non-normal mode is cached in localStorage ("<mode>,<expires ms>", 30 min, or until the
  * switch's own `until`; 5 min for a failed read) so the next page applies it BEFORE first paint.
- * The card opens only once the switch has said "normal" on this page view — fail closed.
+ * The card opens only once the switch has said "normal" on this page view — fail closed. An
+ * answer after the 1.5 s limit can still apply an override (quiet / reduced / off), but never
+ * brings the normal lines back on that page view.
  * `?mode=…` previews a mode without reading the switch.
  *
  * Deliberately ES5 and wrapped in try/catch: an error here costs the visitor the card, nothing
@@ -160,8 +162,11 @@
         noAnswer(0);
       } else {
         var answered = false; // a response (good or bad) arrived — a late one still counts
+        var late = false; // the timeout already failed this page view closed
         var timer = setTimeout(function () {
-          if (!answered) noAnswer(0); // slow, not broken: do not carry "fail" to the next page
+          if (answered) return;
+          late = true;
+          noAnswer(0); // slow, not broken: do not carry "fail" to the next page
         }, STATUS_TIMEOUT);
         // no-cache = revalidate every time (a 304 when unchanged): a flip reaches the next page
         // view, even if the file was uploaded by hand without its Cache-Control header.
@@ -174,6 +179,11 @@
             answered = true;
             clearTimeout(timer);
             var s = parseStatus(text, Date.now());
+            // A LATE "normal" changes nothing: this page view already failed closed at 1.5 s, and
+            // re-opening the bar would move the layout a second time on a slow phone (measured
+            // 2 shifts, CLS ≈ 0.08 — review, 2026-10-12). A late quiet / reduced / off still
+            // applies: an override always wins. The next page view starts fresh.
+            if (late && s.mode === "normal") return;
             setMode(s.mode, s.hold);
           })
           ["catch"](function () {
@@ -190,92 +200,52 @@
     } catch (e2) {}
   }
 
-  try {
-    // --- the updates strip: hide it when the newest item is too old -------------------------
+  // --- the updates strip: hide it when the newest item is too old ---------------------------
+  // (Component sites also hide it from <html data-live-stale>, set before first paint by the fleet
+  // live-kit's calm script — that survives a React re-render of the homepage; this is the fallback.)
+  function hideStale() {
     var strip = d.querySelector(".live-updates[data-newest]");
     if (strip && stale(strip.getAttribute("data-newest"), Date.now())) {
       strip.setAttribute("hidden", "");
     }
+  }
+  try {
+    hideStale();
+  } catch (e) {}
 
-    // --- the card -----------------------------------------------------------------------------
-    // Storage first, and the page view counted on EVERY page — not only on pages that carry a
-    // card — so "the 2nd page of a visit" means what it says.
-    var ls, pv;
+  // --- the card -------------------------------------------------------------------------------
+  // Storage first, and the page view counted on EVERY page — not only on pages that carry a card
+  // — so "the 2nd page of a visit" means what it says.
+  var ls, ss, pv;
+  try {
+    ls = w.localStorage;
+    ls.setItem("ls-t", "1");
+    ls.removeItem("ls-t");
+    ss = w.sessionStorage;
+  } catch (e) {
+    return;
+  }
+  function countView() {
     try {
-      ls = w.localStorage;
-      ls.setItem("ls-t", "1");
-      ls.removeItem("ls-t");
-      var ss = w.sessionStorage;
       pv = (parseInt(ss.getItem("ls-pv"), 10) || 0) + 1;
       ss.setItem("ls-pv", String(pv));
+      return true;
     } catch (e) {
-      return;
+      return false;
     }
+  }
+  if (!countView()) return;
 
-    var variant = d.documentElement.getAttribute("data-live");
-    if (!variant || variant === "evergreen") return;
-    var dlg = d.querySelector('dialog.live-dialog[data-dialog="' + variant + '"]');
-    if (!dlg || typeof dlg.showModal !== "function") return;
+  /** The card for a variant, looked up NOW: a React site may have replaced the node since load. */
+  function findCard(variant) {
+    var c = d.querySelector('dialog.live-dialog[data-dialog="' + variant + '"]');
+    return c && c.isConnected !== false && typeof c.showModal === "function" ? c : null;
+  }
 
-    var key = "ls-dlg-" + variant;
-    var decision = rules({
-      hasDialog: true,
-      storageOk: true,
-      lastShown: parseInt(ls.getItem(key), 10) || 0,
-      capDays: parseInt(dlg.getAttribute("data-cap-days"), 10) || 14,
-      now: Date.now(),
-      pageviews: pv,
-      fromSearch: fromSearch(d.referrer),
-    });
-    if (decision === "none") return;
-
-    var opened = false;
-    var waitingForVisible = false;
-    function open() {
-      if (opened) return;
-      var a = d.activeElement;
-      if (d.hidden) {
-        // The visitor switched apps while we waited — try again when they come back.
-        if (!waitingForVisible) {
-          waitingForVisible = true;
-          d.addEventListener("visibilitychange", function retry() {
-            if (d.hidden) return;
-            d.removeEventListener("visibilitychange", retry);
-            waitingForVisible = false;
-            setTimeout(open, 1500);
-          });
-        }
-        return;
-      }
-      if (
-        h.getAttribute("data-live-mode") !== "normal" || // the switch said otherwise, or nothing yet
-        d.documentElement.getAttribute("data-live") !== variant ||
-        d.querySelector("dialog[open]") ||
-        d.querySelector(".nav-side.active") || // the mobile menu is open
-        (a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)) // typing in the lead form
-      ) {
-        return; // dropped for this page view — the conservative choice
-      }
-      opened = true;
-      dlg.returnValue = "";
-      dlg.showModal();
-      try {
-        ls.setItem(key, String(Date.now()));
-      } catch (e) {}
-      push({ event: "surface_view", surface: "dialog", variant: variant });
-      // The line changes under an open card (candle-lighting, a quiet day starting): close it.
-      if (w.MutationObserver) {
-        new MutationObserver(function () {
-          if (dlg.open && d.documentElement.getAttribute("data-live") !== variant) {
-            dlg.close("expired");
-          }
-        }).observe(d.documentElement, {
-          attributes: true,
-          attributeFilter: ["data-live"],
-        });
-      }
-    }
-
+  /** The card's own listeners, once per node (dismissal, and the event for the dataLayer). */
+  function bind(dlg, variant) {
+    if (dlg.__live) return;
+    dlg.__live = true;
     dlg.addEventListener("click", function (e) {
       var t = e.target;
       if (t === dlg) {
@@ -305,9 +275,95 @@
         method: dlg.returnValue || "esc",
       });
     });
+  }
 
+  var opened = false; // a card opened on this page view
+  var timers = [];
+  var unscroll = null;
+  function later(fn, ms) {
+    timers.push(
+      setTimeout(function () {
+        try {
+          fn();
+        } catch (e) {}
+      }, ms),
+    );
+  }
+
+  function open(variant) {
+    if (opened) return;
+    var dlg = findCard(variant);
+    if (!dlg) return;
+    var a = d.activeElement;
+    if (d.hidden) {
+      // The visitor switched apps while we waited — try again when they come back.
+      d.addEventListener("visibilitychange", function retry() {
+        if (d.hidden) return;
+        d.removeEventListener("visibilitychange", retry);
+        later(function () {
+          open(variant);
+        }, 1500);
+      });
+      return;
+    }
+    if (
+      h.getAttribute("data-live-mode") !== "normal" || // the switch said otherwise, or nothing yet
+      h.hasAttribute("data-live-nodialog") || // a component site marked this page "no card" (fleet live-kit)
+      d.querySelector("[data-live-calm-page]") || // a page that marks itself calm (a 404 page)
+      h.getAttribute("data-live") !== variant ||
+      d.querySelector("dialog[open]") ||
+      d.querySelector(".nav-side.active, [data-live-block]") || // a menu, consent banner or other overlay is open
+      (a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)) // typing in the lead form
+    ) {
+      return; // dropped for this page view — the conservative choice
+    }
+    opened = true;
+    bind(dlg, variant);
+    dlg.returnValue = "";
+    dlg.showModal();
+    try {
+      ls.setItem("ls-dlg-" + variant, String(Date.now()));
+    } catch (e) {}
+    push({ event: "surface_view", surface: "dialog", variant: variant });
+    // The line changes under an open card (candle-lighting, a quiet day starting): close it.
+    if (w.MutationObserver) {
+      new MutationObserver(function () {
+        if (dlg.open && h.getAttribute("data-live") !== variant) dlg.close("expired");
+      }).observe(h, { attributes: true, attributeFilter: ["data-live"] });
+    }
+  }
+
+  /**
+   * Decide this page view's card. `nav` = a page view reached without a document load (a React
+   * site's client-side navigation): its referrer is still the landing page's, but it is a page
+   * of this site, so it never counts as a search landing.
+   */
+  function consider(nav) {
+    for (var i = 0; i < timers.length; i++) clearTimeout(timers[i]);
+    timers = [];
+    if (unscroll) {
+      unscroll();
+      unscroll = null;
+    }
+    opened = false;
+    var variant = h.getAttribute("data-live");
+    if (!variant || variant === "evergreen") return;
+    var dlg = findCard(variant);
+    if (!dlg) return;
+    var decision = rules({
+      hasDialog: true,
+      storageOk: true,
+      lastShown: parseInt(ls.getItem("ls-dlg-" + variant), 10) || 0,
+      capDays: parseInt(dlg.getAttribute("data-cap-days"), 10) || 14,
+      now: Date.now(),
+      pageviews: pv,
+      fromSearch: nav ? false : fromSearch(d.referrer),
+    });
+    if (decision === "none") return;
     if (decision === "soon") {
-      setTimeout(open, 4000);
+      later(function () {
+        open(variant);
+      }, 4000);
       return;
     }
     // "engaged": 20 s on the page AND a scroll of a quarter of the page or 600 px, whichever
@@ -315,14 +371,14 @@
     var waited = false;
     var scrolled = false;
     function check() {
-      if (waited && scrolled) open();
+      if (waited && scrolled) open(variant);
     }
-    setTimeout(function () {
+    later(function () {
       waited = true;
       check();
     }, 20000);
     function onScroll() {
-      var max = (d.documentElement.scrollHeight || 0) - w.innerHeight;
+      var max = (h.scrollHeight || 0) - w.innerHeight;
       if (max <= 0 || w.pageYOffset >= Math.min(max * 0.25, 600)) {
         scrolled = true;
         w.removeEventListener("scroll", onScroll);
@@ -330,6 +386,37 @@
       }
     }
     w.addEventListener("scroll", onScroll, { passive: true });
+    unscroll = function () {
+      w.removeEventListener("scroll", onScroll);
+    };
     onScroll(); // already scrolled (a restored position), or a page too short to scroll
+  }
+
+  try {
+    consider(false);
   } catch (e) {}
+
+  // A React site's client-side navigation (fleet live-kit: its calm script fires `live-nav` after
+  // history.pushState / popstate, once the page's calm marks are updated). The pilot never fires
+  // it — every page there is a document load — so this is inert on 3locksmiths.
+  d.addEventListener("live-nav", function () {
+    try {
+      countView();
+      // after React commits the new page (not a `later` timer: consider() clears those)
+      setTimeout(function () {
+        try {
+          hideStale();
+          // Back / forward with the card open, onto a page that may not carry one: close it.
+          var o = d.querySelector("dialog.live-dialog[open]");
+          if (
+            o &&
+            (h.hasAttribute("data-live-nodialog") ||
+              d.querySelector("[data-live-calm-page]"))
+          )
+            o.close("nav");
+        } catch (e) {}
+      }, 0);
+      consider(true);
+    } catch (e) {}
+  });
 })(window, document);

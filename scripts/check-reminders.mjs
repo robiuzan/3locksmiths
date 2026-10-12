@@ -217,7 +217,8 @@ if (existsSync(calendarFile)) {
     const silent = `the site is silent from ${ddmmyyyy(from)} ${hhmm.format(new Date(from))} to ${ddmmyyyy(until)} ${hhmm.format(new Date(until))}`;
     if (c.kind === "quiet")
       todo.push(
-        `Quiet day ${day}: ${c.label ?? c.id} — ${silent}, by itself. If the business closes, set special hours on the Business Profile.`,
+        // The fleet sites share this calendar and print it only, so this is the one push for all.
+        `Quiet day ${day}: ${c.label ?? c.id} — ${silent}, by itself, and so is every fleet site with the live bar. If a business closes, set special hours on its Business Profile.`,
       );
     else if (c.kind === "chag")
       info.push(`Chag ${day}: ${c.label ?? c.id} (seasonal lines pause by themselves).`);
@@ -226,7 +227,7 @@ if (existsSync(calendarFile)) {
   const [cy, cm, cd] = String(cal.coversThrough).split("-");
   if (through - now < 90 * DAY)
     todo.push(
-      `The calendar ends ${cd}/${cm}/${cy}. Run node scripts/calendar-sync.mjs, then enrich and deploy.`,
+      `The calendar ends ${cd}/${cm}/${cy}. Run node scripts/calendar-sync.mjs, then enrich and deploy — then re-sync the fleet (node fleet/live-kit/sync.mjs ../<site>) and deploy each site.`,
     );
 }
 

@@ -795,8 +795,45 @@ test("the claim patterns catch the wordings that once slipped through", () => {
     "250 ₪",
     "טכנאי זמין באזורך",
     "אלפי לקוחות מרוצים",
+    // The fleet's trade-neutral rules (2026-10-11). A first version of them lost its regex
+    // backslashes on the way into the file and matched none of these — every one passed.
+    "מגיעים תוך 24 שעות",
+    "הצעה תוך 24 שעות",
+    "תוך שעתיים אצלכם",
+    "תוך יומיים",
+    "התקנה ללא תשלום",
+    "בדיקה בלי חיוב",
+    "אפשר בתשלומים",
+    "מספר 1 בגוש דן",
+    "מס׳ 1 בצפון",
+    "4.9 בגוגל",
+    "ציון 9",
+    "מאות פרויקטים בשנה",
+    "אלפי התקנות",
+    "קבלן רשום ומבוטח",
+    // Found by the 2026-10-12 fleet critic: the plural and the "leading" claim slipped through.
+    "בלי עלויות נוספות",
+    "המובילים בתחום",
+    "החברה המובילה באזור",
+    "מהמובילים בישראל",
+    "מתנה לכל לקוח",
+    // The 2026-10-12 port reviews: a final letter and a prefix the rules missed.
+    "הכי מומלצים באזור",
+    "אפשר לפרוס לתשלומים",
+    "ותשלומים נוחים",
+    "עלות ההתקנה כלולה",
   ]) {
     assert.ok(findClaim(bad, true), `not caught: "${bad}"`);
+  }
+  // Words that only CONTAIN a ⛔ stem are not claims (the 2026-10-12 reviews).
+  for (const fine of [
+    "איך עבודה מתנהלת אצלנו",
+    "הצל עצמו מתנהג אחרת בחורף",
+    "הצינור המוביל את המים לביוב",
+    "בחום של 35 מעלות המזגן עובד קשה",
+    "נקו את תעלות הניקוז לפני החורף",
+  ]) {
+    assert.equal(findClaim(fine, true), null, `false positive: "${fine}"`);
   }
   // And the lines that ship must not be.
   for (const good of [
@@ -1015,40 +1052,59 @@ function bootLiveJs({
   dialog = null,
   pv = 0,
   now = 1_000_000,
+  referrer = "",
 }) {
   const attrs = { "data-live": dialog ? dialog.variant : "evergreen" };
   const store = cache ? { "ls-status": cache } : {};
   const session = { "ls-pv": String(pv) };
   const timers = [];
+  let tid = 0;
   const events = [];
+  const docListeners = {};
   let fetched = 0;
   let shown = 0;
-  const dlg = dialog && {
+  const makeCard = () => ({
     open: false,
     returnValue: "",
+    isConnected: true,
     getAttribute: (k) => (k === "data-cap-days" ? "14" : null),
     addEventListener() {},
     showModal() {
+      if (!this.isConnected) throw new Error("InvalidStateError: not in a Document");
       shown += 1;
       this.open = true;
     },
     close() {
       this.open = false;
     },
-  };
+  });
+  let card = dialog ? makeCard() : null;
+  let calmPage = false;
   const document = {
     documentElement: {
       getAttribute: (k) => (k in attrs ? attrs[k] : null),
+      hasAttribute: (k) => k in attrs,
       setAttribute: (k, v) => {
         attrs[k] = String(v);
       },
+      removeAttribute: (k) => {
+        delete attrs[k];
+      },
     },
-    querySelector: (sel) => (dlg && sel.indexOf("dialog.live-dialog") === 0 ? dlg : null),
+    querySelector: (sel) => {
+      if (sel === "[data-live-calm-page]") return calmPage ? {} : null;
+      if (!card || sel.indexOf("dialog.live-dialog") !== 0) return null;
+      return sel.includes("[open]") && !card.open ? null : card;
+    },
     dispatchEvent: (e) => events.push(e.type),
-    addEventListener() {},
+    addEventListener: (type, fn) =>
+      (docListeners[type] = docListeners[type] || []).push(fn),
+    removeEventListener: (type, fn) => {
+      docListeners[type] = (docListeners[type] || []).filter((f) => f !== fn);
+    },
     hidden: false,
     activeElement: null,
-    referrer: "",
+    referrer,
   };
   const mkStorage = (o) => ({
     getItem: (k) => (k in o ? o[k] : null),
@@ -1069,6 +1125,7 @@ function bootLiveJs({
         return fetch(...a);
       }),
     addEventListener() {},
+    removeEventListener() {},
     innerHeight: 800,
     pageYOffset: 0,
   };
@@ -1082,9 +1139,14 @@ function bootLiveJs({
         this.type = type;
       }
     },
-    setTimeout: (fn, ms) => timers.push({ fn, ms }) && timers.length,
-    clearTimeout: (i) => {
-      if (timers[i - 1]) timers[i - 1].fn = () => {};
+    setTimeout: (fn, ms) => {
+      const t = { id: ++tid, fn, ms, dead: false };
+      timers.push(t);
+      return t.id;
+    },
+    clearTimeout: (id) => {
+      const t = timers.find((x) => x.id === id);
+      if (t) t.dead = true;
     },
     JSON,
     Object,
@@ -1097,6 +1159,7 @@ function bootLiveJs({
   return {
     attrs,
     store,
+    session,
     events,
     get fetched() {
       return fetched;
@@ -1104,10 +1167,29 @@ function bootLiveJs({
     get shown() {
       return shown;
     },
+    /** Let every live timer of `ms` fire, as the browser would at that moment. */
     fire(ms) {
-      for (const t of timers.splice(0))
+      for (const t of timers.splice(0)) {
+        if (t.dead) continue;
         if (t.ms === ms) t.fn();
         else timers.push(t);
+      }
+    },
+    /** A React site's client-side navigation, as the kit's calm script announces it. */
+    nav() {
+      for (const fn of docListeners["live-nav"] || []) fn();
+    },
+    /** The page now carries a [data-live-calm-page] element (a 404 page). */
+    markCalmPage(on = true) {
+      calmPage = on;
+    },
+    get cardOpen() {
+      return Boolean(card && card.open);
+    },
+    /** React re-rendered the cards region: the old node is detached, a new one takes its place. */
+    replaceCard() {
+      if (card) card.isConnected = false;
+      card = makeCard();
     },
   };
 }
@@ -1173,21 +1255,27 @@ test("live.js: the switch's wiring fails closed — slow, broken, missing — an
   p = bootLiveJs({ fetch: never, cache: "off,999999" });
   p.fire(1500);
   assert.equal(p.attrs["data-live-mode"], "fail", "an expired cache is not a guess");
-  // a late answer still counts
-  let release;
-  p = bootLiveJs({
-    fetch: () =>
-      new Promise((r) => {
-        release = () =>
-          r({ ok: true, status: 200, text: () => Promise.resolve('{"mode":"normal"}') });
-      }),
-  });
-  p.fire(1500);
-  assert.equal(p.attrs["data-live-mode"], "fail");
-  release();
-  await flush();
-  await flush();
-  assert.equal(p.attrs["data-live-mode"], "normal", "the answer after the timeout wins");
+  // a late answer can still apply an override, but a late "normal" never re-opens what the
+  // timeout closed: that was a second layout shift on a slow phone (review, 2026-10-12)
+  for (const [body, want] of [
+    ['{"mode":"normal"}', "fail"],
+    ['{"mode":"off"}', "off"],
+    ['{"mode":"reduced"}', "reduced"],
+  ]) {
+    let release;
+    p = bootLiveJs({
+      fetch: () =>
+        new Promise((r) => {
+          release = () => r({ ok: true, status: 200, text: () => Promise.resolve(body) });
+        }),
+    });
+    p.fire(1500);
+    assert.equal(p.attrs["data-live-mode"], "fail");
+    release();
+    await flush();
+    await flush();
+    assert.equal(p.attrs["data-live-mode"], want, `late ${body}`);
+  }
   // a preview never reads the switch
   p = bootLiveJs({ fetch: ok('{"mode":"off"}'), search: "?mode=quiet" });
   assert.equal(p.fetched, 0);
@@ -1209,6 +1297,79 @@ test("live.js: the card opens only after the switch said normal on this page vie
     p.fire(4000);
     assert.equal(p.shown, wantOpen, `card with switch answer ${fetch}`);
   }
+});
+
+test("live.js on a React site: a client-side navigation is a page view, and the card can open there", async () => {
+  const normal = ok('{"mode":"normal"}');
+  // Landing (1st view): the 20 s + scroll rule. Then a click to another page: the 2nd view, 4 s.
+  let p = bootLiveJs({ fetch: normal, dialog: { variant: "v" }, pv: 0 });
+  await flush();
+  await flush();
+  p.nav();
+  assert.equal(p.session["ls-pv"], "2", "the soft navigation was counted");
+  p.fire(20000); // the landing page's wait was cancelled by the navigation
+  assert.equal(p.shown, 0);
+  p.fire(4000);
+  assert.equal(p.shown, 1, "the 2nd page of the visit opens the card after 4 s");
+  // A search landing never shows the card on its own page view — a click-through is no longer one.
+  p = bootLiveJs({
+    fetch: normal,
+    dialog: { variant: "v" },
+    pv: 0,
+    referrer: "https://www.google.com/",
+  });
+  await flush();
+  await flush();
+  p.fire(4000);
+  p.fire(20000);
+  assert.equal(p.shown, 0, "never on the search landing itself");
+  p.nav();
+  p.fire(4000);
+  assert.equal(
+    p.shown,
+    1,
+    "the page clicked to from the landing is not a search landing",
+  );
+  // A page the kit marked "no card" before the card was due.
+  p = bootLiveJs({ fetch: normal, dialog: { variant: "v" }, pv: 1 });
+  await flush();
+  await flush();
+  p.attrs["data-live-nodialog"] = "";
+  p.fire(4000);
+  assert.equal(p.shown, 0, "data-live-nodialog keeps the card shut");
+});
+
+test("live.js: back/forward onto a no-card page closes an open card; a calm page keeps it shut", async () => {
+  const normal = ok('{"mode":"normal"}');
+  let p = bootLiveJs({ fetch: normal, dialog: { variant: "v" }, pv: 1 });
+  await flush();
+  await flush();
+  p.fire(4000);
+  assert.equal(p.cardOpen, true, "the card opened");
+  p.attrs["data-live-nodialog"] = ""; // the calm script re-marked the page on popstate
+  p.nav();
+  p.fire(0);
+  assert.equal(p.cardOpen, false, "the card closed on the no-card page");
+  // A page that marks itself calm (a 404 page) never gets a card.
+  p = bootLiveJs({ fetch: normal, dialog: { variant: "v" }, pv: 1 });
+  await flush();
+  await flush();
+  p.markCalmPage();
+  p.fire(4000);
+  assert.equal(p.shown, 0, "no card on a [data-live-calm-page] page");
+});
+
+test("live.js: the card is looked up when it opens — React may have replaced the node", async () => {
+  const p = bootLiveJs({
+    fetch: ok('{"mode":"normal"}'),
+    dialog: { variant: "v" },
+    pv: 1,
+  });
+  await flush();
+  await flush();
+  p.replaceCard(); // the old node is detached: showModal() on it would throw
+  assert.doesNotThrow(() => p.fire(4000));
+  assert.equal(p.shown, 1, "the card in the document opened");
 });
 
 test("live.js carries no copy, and its one network read is the status switch", () => {
