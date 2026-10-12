@@ -1,0 +1,289 @@
+/* FLEET LIVE-KIT — live-core.css. Canonical in 3locksmiths.co.il/fleet/live-kit/css/, hash-locked
+   into each fleet site by fleet/live-kit/sync.mjs; import it once from the root layout. Do not
+   edit a site copy: theme it through the custom properties below (set them in the site's own
+   globals.css), and check contrast there (white on the bar colour ≥ 4.5:1, AA).
+
+     --live-bar-bg     bar background            --live-bar-ink    bar text
+     --live-call-bg    card call button          --live-wa-bg      card WhatsApp button
+     --live-call-ink   its text (default #fff)   --live-wa-ink     its text (default #fff)
+     --live-ink        card / strip text         --live-accent     card / strip links
+     --live-soft-bg    strip background          --live-max        content width of the bar
+     --live-sticky-offset  phone: the sticky call bar's height + 16px (the card stops above it)
+
+   WHEN THE BAR IS OPEN (same rules as the 3locksmiths pilot)
+     · from 992px: always — the evergreen line at least.
+     · below 992px: only while a seasonal, safety or wartime line is live.
+     · html[data-live="off"] (the fleet status switch): never, at any width.
+     · calm pages (html[data-live-calm], set before first paint by the kit's calm script from the
+       page's own path): seasonal lines never show; a safety or wartime line still does.
+     · JavaScript off: html[data-live] is never set — from 992px the evergreen line shows, below
+       it there is no bar. Nothing hides behind a script.
+   The bar is NOT sticky: it scrolls away with the page, so the one-sticky-element budgets in the
+   fleet's mobile docs are not touched. */
+
+.live-topbar {
+  display: none;
+  background: var(--live-bar-bg, #0b3d5c);
+  color: var(--live-bar-ink, #fff);
+  border-bottom: 1px solid transparent; /* painted in forced-colors mode */
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 18px;
+}
+.live-topbar__inner {
+  box-sizing: border-box;
+  max-width: var(--live-max, 72rem);
+  min-height: 34px;
+  margin: 0 auto;
+  padding: 7px 16px 8px;
+}
+.live-topbar__item {
+  display: none;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0 8px;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+}
+.live-topbar__item[data-campaign="evergreen"] {
+  display: flex;
+}
+.live-topbar__text {
+  min-width: 0;
+}
+.live-topbar__link {
+  color: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.live-topbar__link:hover {
+  color: inherit;
+  text-decoration-thickness: 2px;
+}
+.live-topbar__link:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: -2px;
+}
+@media (min-width: 992px) {
+  .live-topbar {
+    display: block;
+  }
+}
+@media not all and (min-width: 992px) {
+  html[data-live]:not([data-live="evergreen"]):not([data-live="off"]) .live-topbar {
+    display: block;
+  }
+}
+html[data-live="off"] .live-topbar {
+  display: none;
+}
+/* Calm pages. The head script reveals the live line with `display:flex!important`; these
+   out-specify it for seasonal lines only, and bring the evergreen line back in their place. */
+html[data-live-calm] .live-topbar__item[data-kind="seasonal"] {
+  display: none !important;
+}
+html[data-live-calm]:not([data-live^="safety-"]):not([data-live="reduced"])
+  .live-topbar__item[data-campaign="evergreen"] {
+  display: flex;
+}
+@media not all and (min-width: 992px) {
+  html[data-live-calm]:not([data-live^="safety-"]):not([data-live="reduced"])
+    .live-topbar {
+    display: none;
+  }
+}
+/* A page can also mark ITSELF calm with an element `[data-live-calm-page]` anywhere in its
+   content — for the pages no path can name in advance: the 404 page (it answers every unknown
+   URL). Same three rules, keyed on :has(); live.js also keeps the card shut there. */
+html:has([data-live-calm-page]) .live-topbar__item[data-kind="seasonal"] {
+  display: none !important;
+}
+html:has([data-live-calm-page]):not([data-live^="safety-"]):not([data-live="reduced"])
+  .live-topbar__item[data-campaign="evergreen"] {
+  display: flex;
+}
+@media not all and (min-width: 992px) {
+  html:has([data-live-calm-page]):not([data-live^="safety-"]):not([data-live="reduced"])
+    .live-topbar {
+    display: none;
+  }
+}
+
+/* ---- the seasonal card ----------------------------------------------------------------
+   A native <dialog>, closed in the HTML, opened by /assets/live.js with showModal(): the top
+   layer, focus containment, Esc and focus return come from the browser. A small card, never a
+   takeover: 360px at most, centred on a desktop; on a phone a bottom sheet that stops above the
+   sticky call bar. Some resets ship `dialog { display: block }` — without the next rule a
+   CLOSED card shows on every page (the pilot shipped that once). check-live-out fails if it goes. */
+.live-dialog:not([open]) {
+  display: none;
+}
+html:has(.live-dialog[open]) {
+  overflow: hidden;
+}
+.live-dialog {
+  box-sizing: border-box;
+  width: calc(100% - 32px);
+  max-width: 360px;
+  margin: auto;
+  padding: 24px 20px 20px;
+  border: 1px solid transparent;
+  border-radius: 16px;
+  background: #fff;
+  color: var(--live-ink, #0f172a);
+  box-shadow: 0 12px 40px rgba(15, 23, 42, 0.28);
+  text-align: start;
+}
+.live-dialog::backdrop {
+  background: rgba(15, 23, 42, 0.45);
+}
+.live-dialog__title {
+  margin: 0 0 8px;
+  padding-inline-end: 40px; /* clear of the ✕ */
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+.live-dialog__body {
+  margin: 0 0 16px;
+  font-size: 16px;
+  line-height: 1.55;
+}
+.live-dialog__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.live-dialog__btn {
+  flex: 1 1 auto;
+  min-height: 48px;
+  padding: 0 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 700;
+  text-decoration: none;
+}
+/* Text colours are settings too: a site whose CTA colour is light (amber) needs dark text on it
+   to stay AA — --live-call-ink / --live-wa-ink (white by default). */
+.live-dialog__btn--call,
+.live-dialog__btn--call:hover {
+  background: var(--live-call-bg, #00702b);
+  color: var(--live-call-ink, #fff);
+}
+.live-dialog__btn--wa,
+.live-dialog__btn--wa:hover {
+  background: var(--live-wa-bg, #075e54);
+  color: var(--live-wa-ink, #fff);
+}
+.live-dialog__btn:hover {
+  text-decoration: underline;
+}
+.live-dialog__more {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px; /* a 44px tap target, the strictest rule in the fleet's docs */
+  margin-top: 8px; /* and 8px clear of the buttons above it (visionsecurity mobile-ux §4) */
+  color: var(--live-accent, #00702b);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.live-dialog__close {
+  position: absolute;
+  inset-block-start: 6px;
+  inset-inline-end: 6px;
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--live-ink, #0f172a);
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+}
+.live-dialog__close:hover {
+  background: rgba(15, 23, 42, 0.06);
+}
+.live-dialog :focus-visible {
+  outline: 3px solid var(--live-ink, #0f172a);
+  outline-offset: 2px;
+}
+@media (max-width: 991.98px) {
+  .live-dialog {
+    margin: auto auto calc(var(--live-sticky-offset, 72px) + env(safe-area-inset-bottom));
+    max-height: calc(
+      100% - var(--live-sticky-offset, 72px) - env(safe-area-inset-bottom) - 16px
+    );
+  }
+}
+
+/* ---- the homepage updates strip ------------------------------------------------------ */
+.live-updates {
+  padding: 48px 0;
+  background: var(--live-soft-bg, #f1f5f9);
+}
+.live-updates[hidden],
+html[data-live-stale] .live-updates {
+  display: none;
+}
+.live-updates__title {
+  margin: 0 0 24px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-align: center;
+}
+.live-updates__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.live-updates__item {
+  padding: 20px;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08);
+}
+.live-updates__date {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  opacity: 0.8;
+}
+.live-updates__text {
+  margin: 0 0 10px;
+  color: var(--live-ink, #0f172a);
+}
+.live-updates__link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px; /* the same 44px tap target as the card's link */
+  color: var(--live-accent, #00702b);
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .live-topbar,
+  .live-dialog,
+  .live-dialog::backdrop,
+  .live-updates {
+    animation: none;
+    transition: none;
+  }
+}

@@ -7,6 +7,8 @@ const eslintConfig = defineConfig([
   ...nextTs,
   // Override default ignores of eslint-config-next.
   globalIgnores([
+    // fleet/live-kit: copied into the other fleet sites and linted there (templates import their paths)
+    "fleet/**",
     // Default ignores of eslint-config-next:
     ".next/**",
     "out/**",
