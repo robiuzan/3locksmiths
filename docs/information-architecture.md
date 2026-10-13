@@ -33,7 +33,7 @@ almost nothing connects sideways.
 <footer>
   <div class="footer-col sidebar-1">   ← COMPLETELY EMPTY (renders as a blank gap)
   <div class="footer-col sidebar-3 footer-info">
-      hours · phone · email · "derech sara 25/2" · [הזמינו פגישה] button
+      hours · phone · email · "דרך שרה 25/2, זכרון יעקב" · [הזמינו פגישה] button
   <div class="footer-bot">
       © 2025 · מדיניות פרטיות · הצהרת נגישות · מפת אתר
 ```

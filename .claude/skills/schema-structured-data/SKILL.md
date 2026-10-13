@@ -171,7 +171,7 @@ manifest**, never in `site.config.json` directly.
 `hasMap` is now sourceable from the same profile if anyone wants it, but `geo` is not — the pin
 Google serves is a service-area centroid, not premises.
 
-Note the manifest's `schema` block has **no `address` field at all**, so adding one is a manifest-schema
+(Resolved 2026-10-13: the manifest's `schema.address` now carries street, city and country — business-facts §C.1.) Historically the manifest's `schema` block had **no `address` field at all**, so adding one is a manifest-schema
 change as well as a data question.
 
 ## Checklist

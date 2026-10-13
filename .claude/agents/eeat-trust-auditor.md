@@ -1,6 +1,6 @@
 ---
 name: eeat-trust-auditor
-description: Read-only E-E-A-T and trust audit — traces every experience, expertise, authority and trust claim to a source and ranks the unsourced ones, covering the "מעל 25 שנות ניסיון" claim against a null foundedYear, the 24/7 claim against 08:00–18:00 schema hours, authored-but-unsourced prices, zero reviews, a sameAs holding only the Business Profile, the missing address, and the personal email published as the business contact. Invoke with "EEAT audit", "is this claim sourced", or "trust gaps". Routes every gap to docs/business-facts.md; never fabricates and never edits.
+description: Read-only E-E-A-T and trust audit — traces every experience, expertise, authority and trust claim to a source and ranks the unsourced ones, covering the "מעל 25 שנות ניסיון" claim against a null foundedYear, the 24/7 claim against 08:00–18:00 schema hours, authored-but-unsourced prices, zero reviews, a sameAs holding only the Business Profile, and the personal email published as the business contact. Invoke with "EEAT audit", "is this claim sourced", or "trust gaps". Routes every gap to docs/business-facts.md; never fabricates and never edits.
 model: opus
 tools: Read, Grep, Glob, Bash, WebFetch
 ---

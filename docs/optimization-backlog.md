@@ -239,7 +239,7 @@ shipping unsourced is a **stop-ship**.
 
 ## §5 Local SEO — 🔴
 
-**5.1 🔴 There is no address.** Not in the roster manifest (`schema` has `type`, `priceRange`,
+**5.1 ✅ RESOLVED 2026-10-13 — דרך שרה 25/2, זכרון יעקב, footer + schema (business-facts §C.1).** History: Not in the roster manifest (`schema` has `type`, `priceRange`,
 `areaServed`, `sameAs` — no `address` field), not in the JSON-LD, not on any page, not in the footer.
 For a `Locksmith` node this is the largest structural local-SEO gap.
 
@@ -455,14 +455,14 @@ Two lessons worth keeping:
 **9.2 🔴 The footer is near-empty — the single biggest wasted internal-linking surface.**
 Measured on the export 2026-08-25:
 
-| Footer fact                    | Value                                                          |
-| ------------------------------ | -------------------------------------------------------------- |
-| Columns                        | 2 — and `footer-col sidebar-1` is **completely blank**         |
-| Total links                    | **6** (phone, email, contact CTA, privacy, a11y, sitemap)      |
-| Links to the 30 service pages  | **0**                                                          |
-| Links to the 25 location pages | **0**                                                          |
-| Unique words                   | 31                                                             |
-| Address                        | `derech sara 25/2` — Latin transliteration, no city, no markup |
+| Footer fact                    | Value                                                           |
+| ------------------------------ | --------------------------------------------------------------- |
+| Columns                        | 2 — and `footer-col sidebar-1` is **completely blank**          |
+| Total links                    | **6** (phone, email, contact CTA, privacy, a11y, sitemap)       |
+| Links to the 30 service pages  | **0**                                                           |
+| Links to the 25 location pages | **0**                                                           |
+| Unique words                   | 31                                                              |
+| Address                        | `דרך שרה 25/2, זכרון יעקב` — Hebrew, in the schema (2026-10-13) |
 
 Every page on the site carries this footer, so it is 67 opportunities to link into the silos, and it
 links into neither. An empty column also renders as a visible blank gap. Rebuilding it is the highest

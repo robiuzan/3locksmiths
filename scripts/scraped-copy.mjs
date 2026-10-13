@@ -99,9 +99,17 @@ const REWRITES = [
   { id: "a11y-title-email", from: 'title=\\"Email\\"', to: 'title=\\"דוא״ל\\"' },
 
   // --- §address: the footer printed the address in Latin letters on a Hebrew page (CLAUDE.md §8).
-  // Owner confirmed 2026-10-13 that it is right and should be in Hebrew (business-facts §C.1).
-  // Text only: no city was given, so it stays out of the LocalBusiness schema.
-  { id: "footer-address-hebrew", from: "derech sara 25/2", to: "דרך שרה 25/2" },
+  // Owner confirmed 2026-10-13 that it is right, in Hebrew, and in זכרון יעקב (business-facts
+  // §C.1); the same address is in the LocalBusiness schema via the roster's schema.address.
+  // A RegExp `from` (the only one): the lookahead keeps it idempotent — a plain string rule that
+  // appends the city would append it again on every run. The lookbehind pins it to the footer's
+  // `<div class="caption">` (this pass runs on the raw JSON text, where the markup's quotes and
+  // whitespace are escaped), so it never touches the JSON-LD streetAddress enrich.mjs writes.
+  {
+    id: "footer-address-hebrew",
+    from: /(?<=caption\\">(?:\\[nt])*)(?:derech sara|דרך שרה) 25\/2(?!, זכרון יעקב)/g,
+    to: "דרך שרה 25/2, זכרון יעקב",
+  },
 ];
 
 /**
@@ -130,6 +138,12 @@ let out = raw;
 const counts = new Map();
 
 for (const r of REWRITES) {
+  if (r.from instanceof RegExp) {
+    const n = (out.match(r.from) || []).length;
+    counts.set(r.id, n);
+    if (n) out = out.replace(r.from, r.to);
+    continue;
+  }
   const n = out.split(r.from).length - 1;
   counts.set(r.id, n);
   if (n) out = out.split(r.from).join(r.to);

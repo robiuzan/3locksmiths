@@ -42,7 +42,7 @@ in this skill is made.
   <div class="footer-top"><div class="footer-row">
     <div class="footer-col sidebar-1">        ← COMPLETELY EMPTY (visible blank gap)
     <div class="footer-col sidebar-3 footer-info">
-        hours · phone · email · "derech sara 25/2" · [הזמינו פגישה]
+        hours · phone · email · "דרך שרה 25/2, זכרון יעקב" · [הזמינו פגישה]
   <div class="footer-bot">
       © 2025 · מדיניות פרטיות · הצהרת נגישות · מפת אתר
 ```

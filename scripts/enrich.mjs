@@ -225,9 +225,9 @@ function faqSchema(data) {
  * fix is to repeat the node, keyed by a stable `@id` so consumers de-duplicate it into one
  * entity. It costs well under a kilobyte per page.
  *
- * `address` carries `addressCountry` only. docs/business-facts.md §C.1 records that no confirmed
- * street address exists and that inventing one is forbidden — but the country is a fact we can
- * source, and an address node with a country is better understood than no address node at all.
+ * `address` is read from the roster's `schema.address` — street and city confirmed by the owner
+ * 2026-10-13 (docs/business-facts.md §C.1). With no roster address it falls back to
+ * `addressCountry` only; a value is never invented.
  * `sameAs` is spread in only when the manifest's array is non-empty: an empty array is noise, not
  * a signal. Since 2026-09-05 it carries the Google Business Profile (docs/business-facts.md §B.4),
  * so the guard is what keeps the node clean if a future site has nothing to point at — not a
@@ -264,7 +264,13 @@ function localBusinessSchema() {
     // 106 routes. `schemaImage()` prefers the hero slot, then the OG card, and only falls back
     // to that upload while neither is published.
     image: schemaImage(),
-    address: { "@type": "PostalAddress", addressCountry: "IL" },
+    // The street address — confirmed by the owner 2026-10-13 (docs/business-facts.md §C.1), read
+    // from the roster's schema.address. Country-only until then: never an invented address.
+    address: {
+      "@type": "PostalAddress",
+      ...(manifest.schema?.address ?? {}),
+      addressCountry: manifest.schema?.address?.addressCountry ?? "IL",
+    },
     ...(sameAs.length ? { sameAs } : {}),
     priceRange: manifest.schema?.priceRange ?? "₪₪",
     // 24/7 — confirmed by the owner 2026-08-30 (docs/business-facts.md §D.3). Until then this
