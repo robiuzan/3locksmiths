@@ -175,6 +175,11 @@ for (const page of site.pages ?? []) {
         `${label}: a live region inside a live region — one marker per region`,
       );
     if ((el.getAttribute("class") ?? "").split(/\s+/).includes("live-dialogs")) continue; // rule 10, below
+    // The Google-reviews footer line and band (scripts/reputation.mjs) are single facts, not
+    // variant lists — no evergreen item. Their placement and wording are proven by
+    // scripts/check-reputation.mjs; rules 1–3 above still apply to them.
+    const cls = (el.getAttribute("class") ?? "").split(/\s+/);
+    if (cls.includes("live-reviews") || cls.includes("live-reviews-band")) continue;
 
     const items = el.querySelectorAll("[data-campaign]");
     const evergreen = items.filter(

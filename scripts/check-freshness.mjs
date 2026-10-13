@@ -55,6 +55,13 @@ if (existsSync(liveDir)) {
     if (f.endsWith(".mjs")) sources.push(join(liveDir, f));
   }
 }
+// The Google-reviews line: its markup comes from lib/reviews/ through scripts/reputation.mjs.
+const reviewsDir = join(ROOT, "lib", "reviews");
+if (existsSync(reviewsDir)) {
+  for (const f of readdirSync(reviewsDir)) {
+    if (f.endsWith(".mjs")) sources.push(join(reviewsDir, f));
+  }
+}
 sources.push(join(ROOT, "site.config.json"));
 // The card behaviour file: its content hash is written into site.json (assets.liveJs).
 sources.push(join(ROOT, "public", "assets", "live.js"));

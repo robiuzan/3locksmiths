@@ -880,6 +880,124 @@ body .live-updates__link {
   text-decoration: underline;
 }
 
+/* ---- the Google-reviews line (docs/dynamic-presence-plan.md §3.4, as built 2026-10-13) ------
+   Rendered by scripts/reputation.mjs from content/enriched/_reputation.mjs: footer (every page),
+   the homepage hero, /contact/, and a band before the footer on the 80 service + city pages.
+   Inline only — nothing fixed or floating (the phone's bottom edge belongs to the sticky bar).
+   Every rule is body-prefixed: app/enrich.css loads FIRST and the theme's footer/hero link rules
+   would otherwise win a specificity tie (scripts/check-css-cascade.mjs). Logical properties only.
+   The star is decoration (aria-hidden); the rating is spoken by .live-reviews__sr. */
+body .live-reviews {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 16px;
+  font-size: 15px;
+  line-height: 1.5;
+}
+body .live-reviews__line {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+}
+body .live-reviews__star {
+  flex: none;
+  inline-size: 18px;
+  block-size: 18px;
+  fill: #9a6b00;
+}
+body .live-reviews__rating {
+  font-weight: 700;
+}
+body .live-reviews__links {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0 16px;
+}
+body .live-reviews__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-block-size: 44px;
+  color: #00702b;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+body .live-reviews__ext {
+  flex: none;
+  fill: currentColor;
+  transform: scaleX(
+    -1
+  ); /* the arrow points up-and-away to the LEFT in a right-to-left line */
+}
+body .live-reviews__sr {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+body .live-reviews :focus-visible {
+  outline: 3px solid currentColor;
+  outline-offset: 2px;
+}
+/* footer (navy): the theme's own footer link grey, 11.7:1 */
+body .live-reviews--footer {
+  color: #ccd0d6;
+}
+body .live-reviews--footer .live-reviews__link {
+  color: #ccd0d6;
+}
+body .live-reviews--footer .live-reviews__link:hover,
+body .live-reviews--footer .live-reviews__link:focus-visible {
+  color: #fff;
+}
+body .live-reviews--footer .live-reviews__star,
+body .live-reviews--hero .live-reviews__star {
+  fill: #ffe102;
+}
+/* homepage hero: white on the photo band, directly under the call button (which does not move) */
+body .live-reviews--hero {
+  margin-block-start: 12px;
+  color: #fff;
+}
+body .live-reviews--hero .live-reviews__link {
+  color: #fff;
+}
+/* /contact/: a quiet card under the call button */
+body .live-reviews--contact {
+  inline-size: fit-content;
+  max-inline-size: 100%;
+  margin-block: 16px 0;
+  padding-inline: 16px;
+  border: 1px solid #d9dce0;
+  border-radius: 16px;
+  background: #fff;
+  color: #011532;
+}
+body .live-reviews--contact .live-reviews__asof {
+  color: #34445b;
+}
+/* the band on the service + city pages, between the content and the footer */
+body .live-reviews-band {
+  padding-block: 24px;
+  background: #f0f8ff;
+}
+body .live-reviews--band {
+  justify-content: center;
+  color: #011532;
+}
+body .live-reviews--band .live-reviews__asof {
+  color: #34445b;
+}
+html[data-live="off"] body .live-reviews,
+html[data-live="off"] body .live-reviews-band {
+  display: none;
+}
+
 /* ---- motion preference (WCAG 2.3.3 / IS 5568) ---------------------------------------
    Zero `prefers-reduced-motion` rules exist in the vendored theme or in this file before this
    block. The theme's floating phone button pulses forever with no guard
@@ -900,7 +1018,9 @@ body .live-updates__link {
   .live-topbar,
   .live-dialog,
   .live-dialog::backdrop,
-  .live-updates {
+  .live-updates,
+  .live-reviews,
+  .live-reviews-band {
     animation: none;
     transition: none;
   }

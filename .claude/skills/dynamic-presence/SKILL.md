@@ -130,6 +130,15 @@ call (the simulator fails on either), and is loaded `defer` with a `?v=<hash>` f
 
 ## Reviews — three states, in order, never skipped
 
+> **As built 2026-10-13 (owner decisions 12–13, plan §0 and §3.4): the line is LIVE.** It shows
+> Google's own rating + count from the owner's weekly dashboard read —
+> `content/enriched/_reputation.mjs` → `scripts/reputation.mjs` → `scripts/check-reputation.mjs`.
+> The owner reversed §B.5 ("do not consider them as fake", business-facts §B.6), so State A below is
+> history. To update: append the week's dashboard read to the register AND to
+> `docs/local-presence.md` §3, then format → enrich → check → build → deploy. A read older than 14
+> days fails the build. Code lives in `lib/reviews/`, NOT `lib/live/` (the fleet kit copies
+> `lib/live/*`). Never hide low ratings; never quote a review; never review schema.
+
 | State | Precondition                                                                               | What ships                                                                                    |
 | ----- | ------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------- |
 | A     | today: the 12 non-genuine reviews are being removed (§B.5)                                 | **nothing** review-related; the ask-flow runs off-site                                        |

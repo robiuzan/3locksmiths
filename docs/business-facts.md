@@ -98,14 +98,14 @@ What follows from it:
 
 ## B. Reputation & social proof
 
-| Fact                    | Value                               | Status | Source                                      |
-| ----------------------- | ----------------------------------- | ------ | ------------------------------------------- |
-| Google Business Profile | live, claimed and verified          | ✅     | owner, 2026-09-05 — §B.4                    |
-| Reviews on the profile  | **12 — not genuine, being removed** | ⛔     | read + owner, 2026-09-29 — §B.5             |
-| Review count / rating   | "Google rating 5.0 ★★★★★"           | ⛔     | see §B.1                                    |
-| Testimonials            | 3 named reviews on the homepage     | ⛔     | see §B.2                                    |
-| Social profiles         | —                                   | 🔶     | `sameAs` holds the profile and nothing else |
-| Case studies            | —                                   | 🔶     | none                                        |
+| Fact                    | Value                                        | Status   | Source                                               |
+| ----------------------- | -------------------------------------------- | -------- | ---------------------------------------------------- |
+| Google Business Profile | live, claimed and verified                   | ✅       | owner, 2026-09-05 — §B.4                             |
+| Reviews on the profile  | **13, average 5 — shown as Google's figure** | ✅ owner | owner's dashboard, 2026-10-13 — §B.6 (reverses §B.5) |
+| Review count / rating   | "Google rating 5.0 ★★★★★"                    | ⛔       | see §B.1                                             |
+| Testimonials            | 3 named reviews on the homepage              | ⛔       | see §B.2                                             |
+| Social profiles         | —                                            | 🔶       | `sameAs` holds the profile and nothing else          |
+| Case studies            | —                                            | 🔶       | none                                                 |
 
 **As of 2026-09-05 one thing off this site corroborates the entity.** The owner supplied a Google
 Business Profile and `schema.sameAs` now points at it. For a single-trade local business that is the
@@ -311,6 +311,30 @@ key/lock photos and re-read the description against this file.
 "Get more reviews" link and QR must be copied from the dashboard on a desktop browser, never
 rebuilt from the place ID.
 
+### B.6 The owner reverses §B.5 — Google's figure goes on the site — 2026-10-13
+
+**What changed.** Between 2026-09-29 and 2026-10-11 the profile went 12 → 20 → 11 on the public
+reads. New reviews kept thanking אבי / אביעד / שרון, and one described buying furniture and a parasol
+(`docs/local-presence.md` §3). Asked who was posting them, the owner said they did not know. Then,
+on 2026-10-13, the owner said: **"do not consider them as fake"**. The dashboard showed **13
+reviews, average 5**, and the owner chose to show **Google's own figure** on every page now.
+
+**What ships, and what it claims.** `★ 5.0 · 13 ביקורות בגוגל · נכון ל-13/10/2026` plus a link to
+Google's reviews page. The footer of every page, the homepage hero, `/contact/` and the 80
+service + city pages carry it (`content/enriched/_reputation.mjs` → `scripts/reputation.mjs`). It
+states what Google shows on the dated dashboard read. It quotes no review and calls no reviewer a
+verified customer. `Review` / `AggregateRating` markup stays forbidden (self-serving; CI blocks it).
+
+**What this register still records, so nobody launders it later.** On 2026-09-29 the owner said the
+three names are not the real technicians (§B.5); that statement has not been withdrawn, only the
+conclusion drawn from it. The furniture/parasol review is off-topic on its face. If the line is
+ever challenged, the answer is these two dated owner statements, not "the reviews were verified".
+
+**Also decided 2026-10-13.** Live review cards (State C) may come later, and they will show
+**every** review the source returns, low ratings included. The owner asked to hide genuine 1–2★
+reviews; that was declined, because it is star filtering (Google Places terms, review gating) and
+would make the site's "★ 5.0" disagree with the cards beneath it.
+
 ## C. Contact & NAP
 
 | Fact               | Value                                                      | Status | Source                                                                  |
@@ -335,6 +359,10 @@ rebuilt from the place ID.
 >
 > The manifest still has **no `address` field**, so adding one is a roster-schema change. Original
 > analysis below.
+>
+> ✅ **2026-10-13, owner:** the address is right, and it should be written in Hebrew. The footer now
+> reads **דרך שרה 25/2** (`scripts/scraped-copy.mjs`, rule `footer-address-hebrew`). Still open:
+> which city, and whether it goes into the `LocalBusiness` schema (not done — no city was given).
 
 ### C.1b The manifest has no address field
 

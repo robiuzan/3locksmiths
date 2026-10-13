@@ -252,20 +252,21 @@ npm run enrich     # pages → … → advantage-icons → footer → live-surfa
 npm run build      # next build → out/
 ```
 
-| Step                  | Does                                                                               |
-| --------------------- | ---------------------------------------------------------------------------------- |
-| `scrape.mjs`          | fetches the live WordPress HTML (**snapshot only**)                                |
-| `transform.mjs`       | CF7 → Web3Forms rewrite (**snapshot only** — see the warning below)                |
-| `pages.mjs`           | **creates routes that never existed** — utility pages, service shells, guides      |
-| `build-manifest.mjs`  | classifies every page and computes related-link candidates                         |
-| `enrich.mjs`          | fills `<main>` from `content/enriched/<id>.mjs`, emits all JSON-LD                 |
-| `footer.mjs`          | rebuilds the global footer from the manifest                                       |
-| `advantage-icons.mjs` | swaps the homepage's six heavy inline drawings for icon-font glyphs                |
-| `live-surfaces.mjs`   | the announcement bar (every line), the seasonal cards, the updates strip; schedule |
-| `form.mjs`            | normalises the lead form (validation, phone field, RTL, consent)                   |
-| `hero-gallery.mjs`    | rebuilds the 4 homepage hero tiles from the image catalog (no-ops until published) |
-| `fix-links.mjs`       | repairs/validates every internal link, `tel:`, `data-cta`, form redirect           |
-| `phone.mjs`           | rewrites every retired phone spelling in `site.json` **and** `public/`             |
+| Step                  | Does                                                                                                                                                                            |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `scrape.mjs`          | fetches the live WordPress HTML (**snapshot only**)                                                                                                                             |
+| `transform.mjs`       | CF7 → Web3Forms rewrite (**snapshot only** — see the warning below)                                                                                                             |
+| `pages.mjs`           | **creates routes that never existed** — utility pages, service shells, guides                                                                                                   |
+| `build-manifest.mjs`  | classifies every page and computes related-link candidates                                                                                                                      |
+| `enrich.mjs`          | fills `<main>` from `content/enriched/<id>.mjs`, emits all JSON-LD                                                                                                              |
+| `footer.mjs`          | rebuilds the global footer from the manifest                                                                                                                                    |
+| `advantage-icons.mjs` | swaps the homepage's six heavy inline drawings for icon-font glyphs                                                                                                             |
+| `live-surfaces.mjs`   | the announcement bar (every line), the seasonal cards, the updates strip; schedule                                                                                              |
+| `form.mjs`            | normalises the lead form (validation, phone field, RTL, consent)                                                                                                                |
+| `hero-gallery.mjs`    | rebuilds the 4 homepage hero tiles from the image catalog (no-ops until published)                                                                                              |
+| `fix-links.mjs`       | repairs/validates every internal link, `tel:`, `data-cta`, form redirect                                                                                                        |
+| `phone.mjs`           | rewrites every retired phone spelling in `site.json` **and** `public/`                                                                                                          |
+| `reputation.mjs`      | the Google-reviews line (after `live-surfaces`); register `content/enriched/_reputation.mjs`, gate `check-reputation.mjs` (prebuild) — update weekly from the owner's dashboard |
 
 > ⚠️ **`transform.mjs` runs ONLY in `npm run snapshot`.** A chrome change made there will not appear
 > from `npm run enrich`. Anything that must apply on every ordinary rebuild belongs in the enrich

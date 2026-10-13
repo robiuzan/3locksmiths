@@ -41,14 +41,19 @@ strings are the timezone name.
 Facts the payload cannot carry, answered by the owner directly. These are ✅ sources in their own
 right; see `docs/business-facts.md` §B.4.
 
-| Date       | Question                                                                          | Answer                                                                                     |
-| ---------- | --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| 2026-09-05 | Is the listing claimed + ownership-verified                                       | **Yes**                                                                                    |
-| 2026-09-05 | Do the service areas still list the 7 withdrawn cities (§E.1)                     | **No — corrected**                                                                         |
-| 2026-09-05 | Review count                                                                      | **0**                                                                                      |
-| 2026-09-29 | Are אבי / אביעד / שרון (thanked in 3 of the visible reviews) the real technicians | **No** — they are the §G.1 AI character names                                              |
-| 2026-09-29 | Who does the jobs; who owns the profile's Google account                          | **A fixed three partner locksmiths; the profile is on one locksmith's own account** (§A.3) |
-| 2026-09-29 | What to do with the 12 reviews                                                    | **Have them removed; start a genuine ask-flow** (§B.5)                                     |
+| Date       | Question                                                                          | Answer                                                                                                       |
+| ---------- | --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| 2026-09-05 | Is the listing claimed + ownership-verified                                       | **Yes**                                                                                                      |
+| 2026-09-05 | Do the service areas still list the 7 withdrawn cities (§E.1)                     | **No — corrected**                                                                                           |
+| 2026-09-05 | Review count                                                                      | **0**                                                                                                        |
+| 2026-09-29 | Are אבי / אביעד / שרון (thanked in 3 of the visible reviews) the real technicians | **No** — they are the §G.1 AI character names                                                                |
+| 2026-09-29 | Who does the jobs; who owns the profile's Google account                          | **A fixed three partner locksmiths; the profile is on one locksmith's own account** (§A.3)                   |
+| 2026-09-29 | What to do with the 12 reviews                                                    | **Have them removed; start a genuine ask-flow** (§B.5)                                                       |
+| 2026-10-13 | The dashboard count and average                                                   | **13 reviews, average 5**                                                                                    |
+| 2026-10-13 | Are the profile's reviews fake                                                    | **"Do not consider them as fake"** — reverses 2026-09-29 (§B.6)                                              |
+| 2026-10-13 | Show Google's figure on the site now                                              | **Yes — "★ 5.0 · 13"**, labelled as Google's, every page (§B.6)                                              |
+| 2026-10-13 | The official "Get more reviews" link                                              | `https://g.page/r/CYvJcg7yyYjbEAI/review` (roster `schema.reviewsWriteUri`)                                  |
+| 2026-10-13 | Live review cards: hide genuine 1–2★ reviews?                                     | Asked to hide them; **declined** (star filtering). Owner then chose cards showing every review, later (§B.6) |
 
 ## 3. Review log
 
@@ -58,11 +63,16 @@ One row per check. `Δ` is against the previous row, so the first row has none.
 | ---------- | ----- | --- | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 2026-09-05 | 0     | —   | none   | Profile claimed, verified, complete and empty. No ask flow running yet.                                                                                                                                                                      |
 | 2026-09-29 | 12    | +12 | 5      | 5 of 12 visible, all 5★, dated 22–28/09; 2 reviewers have one-review accounts; 3 thank אבי/אביעד/שרון — **not real people** (owner); no owner replies; 4 owner photos, 2 AI-generated; description added. **Not genuine — removal decided.** |
+| 2026-10-07 | 20    | +8  | 5      | `/maps/preview/place` ×3: 37,074 / 17,078 / 17,803 B. Of the 5 visible: one 5 h old thanks אביעד, one thanks שרון, one describes buying furniture and a parasol, one has no text.                                                            |
+| 2026-10-08 | 11    | —   | 5      | Google's keyless map embed, two reads (a different method — not compared with the rows above).                                                                                                                                               |
+| 2026-10-11 | 11    | −9  | 5      | `/maps/preview/place` ×3: 38,008 / 38,008 / 17,805 B. Two new 2-day-old reviews thank אביעד and אבי; the furniture review still visible.                                                                                                     |
+| 2026-10-13 | 13    | +2  | 5      | **The owner's dashboard** (owner, in session). The authoritative count. This row is what the site shows (`content/enriched/_reputation.mjs`).                                                                                                |
 
-> ⚠️ **The number that matters is the _genuine_ count, and today it is 0.** The 12 above are being
-> removed (§B.5). Until the genuine count has a dated row here **and** matches the owner's dashboard,
-> nothing on the site may cite a review, a rating or a count — the widget states in
-> `docs/dynamic-presence-plan.md` §3.4 are gated on this table.
+> ⚠️ **2026-10-13 — the owner reversed the 2026-09-29 position** (§2 below; business-facts §B.6):
+> the reviews on the profile are not to be treated as fake, and the site shows **Google's own
+> figure**, as read by the owner in the dashboard each week. The line it feeds is
+> `docs/dynamic-presence-plan.md` §3.4 (as built). Each weekly dashboard read gets a row here **and**
+> the same row in `content/enriched/_reputation.mjs`; a row older than 14 days fails the build.
 
 ## 4. Citation ledger
 

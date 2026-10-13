@@ -20,6 +20,7 @@
  *   node scripts/check-claims.mjs        (exit 1 if a ⛔ claim is rendered anywhere)
  */
 import { readFileSync } from "node:fs";
+import { parse } from "node-html-parser";
 
 const site = JSON.parse(readFileSync("content/site.json", "utf8"));
 const pages = Array.isArray(site) ? site : (site.pages ?? Object.values(site));
@@ -154,6 +155,118 @@ for (const page of pages) {
   for (const rule of INFO) {
     const n = (haystack.match(rule.re) || []).length;
     if (n) infoCounts.set(rule.id, (infoCounts.get(rule.id) || 0) + n);
+  }
+}
+
+/**
+ * THE GOOGLE-REVIEWS LINE (2026-10-13, docs/dynamic-presence-plan.md §3.4). A rating, a review
+ * count and links to Google's review pages are allowed ONLY inside the blocks that
+ * scripts/reputation.mjs renders from the owner's dashboard reads (content/enriched/_reputation.mjs,
+ * proven by scripts/check-reputation.mjs). Anywhere else they are unsourced, so the vocabulary is
+ * tested with those blocks cut out. Phrase-level on purpose: Hebrew "ביקורת" also means an
+ * inspection, and the site uses it that way (ביקורת נגישות, ביקורת כניסה).
+ */
+const OWN_BLOCKS = ".live-reviews, .live-reviews-band";
+const REVIEW_TEXT = [
+  {
+    id: "review-rating-outside-the-line",
+    re: /★\s*\d(?:[.,]\d)?|\d(?:[.,]\d)?\s*★|⭐/,
+  },
+  {
+    id: "review-count-outside-the-line",
+    re: /\d+\s*(?:ביקורות|חוות דעת)|ביקורות\s*[(:]\s*\d|(?:עשרות|מאות|אלפי)\s+(?:ביקורות|חוות דעת|המלצות)/,
+  },
+  {
+    id: "verified-reviewer-claim",
+    re: /(?:לקוח(?:ה|ות)?|ביקורת|רכישה)\s+מאומת(?:ת|ים|ות)?/,
+  },
+];
+const REVIEW_LINK = /search\.google\.com\/local|g\.page\/r\/|writereview|query_place_id/;
+/** Third-party review widgets inject schema and copy at runtime that no gate here can read. */
+const WIDGET_HOST =
+  /elfsight|elfsightcdn|trustindex|embedsocial|sociablekit|featurable|widget\.trustpilot|reviewsonmywebsite/i;
+const REVIEW_TYPES = new Set(["Review", "AggregateRating", "Product"]);
+
+/** Every @type in a parsed JSON-LD value, string or array, at any depth. */
+function* types(node) {
+  if (Array.isArray(node)) {
+    for (const n of node) yield* types(n);
+  } else if (node && typeof node === "object") {
+    const t = node["@type"];
+    if (typeof t === "string") yield t;
+    else if (Array.isArray(t)) yield* t.filter((x) => typeof x === "string");
+    for (const v of Object.values(node)) yield* types(v);
+  }
+}
+
+const report = (id, where, found, why) => {
+  failures++;
+  if (failures <= 25) {
+    console.error(`  ⛔ [${id}] ${where}`);
+    console.error(`       "${String(found).trim().slice(0, 80)}"  —  ${why}`);
+  }
+};
+
+const assetsRaw = JSON.stringify(site.assets ?? {});
+const assetHit = assetsRaw.match(WIDGET_HOST);
+if (assetHit)
+  report(
+    "third-party-review-widget",
+    "site.assets",
+    assetHit[0],
+    "a third-party review widget is loaded sitewide.",
+  );
+
+for (const page of pages) {
+  const where = page.path ?? page.slug ?? page.id ?? "?";
+  const root = parse(String(page.bodyHtml ?? ""), { comment: false });
+  for (const el of root.querySelectorAll(OWN_BLOCKS)) el.remove();
+  const outside = root.toString();
+  const text = visible(outside);
+  for (const rule of REVIEW_TEXT) {
+    const m = text.match(rule.re);
+    if (m)
+      report(
+        rule.id,
+        where,
+        m[0],
+        "a rating/count/verified claim outside the sourced reviews line (content/enriched/_reputation.mjs).",
+      );
+  }
+  const link = outside.match(REVIEW_LINK);
+  if (link)
+    report(
+      "google-review-link-outside-the-line",
+      where,
+      link[0],
+      "links to Google reviews belong only in the reviews line.",
+    );
+  const widget = `${page.bodyHtml ?? ""} ${JSON.stringify(page.scripts ?? "")}`.match(
+    WIDGET_HOST,
+  );
+  if (widget)
+    report(
+      "third-party-review-widget",
+      where,
+      widget[0],
+      "a third-party review widget (rejected, docs/dynamic-presence-plan.md §2.4).",
+    );
+  for (const block of Array.isArray(page.jsonLd) ? page.jsonLd : []) {
+    let parsed;
+    try {
+      parsed = typeof block === "string" ? JSON.parse(block) : block;
+    } catch {
+      continue; // unparseable blocks are enrich.mjs's to fail on
+    }
+    for (const t of types(parsed)) {
+      if (REVIEW_TYPES.has(t))
+        report(
+          "review-schema-type",
+          where,
+          `@type ${t}`,
+          "no Review/AggregateRating/Product markup, ever — Google gives no stars for self-serving reviews.",
+        );
+    }
   }
 }
 

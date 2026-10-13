@@ -97,6 +97,11 @@ const REWRITES = [
   { id: "a11y-float-call", from: "Call by phone", to: "חיוג אלינו" },
   { id: "a11y-title-phone", from: 'title=\\"Phone\\"', to: 'title=\\"טלפון\\"' },
   { id: "a11y-title-email", from: 'title=\\"Email\\"', to: 'title=\\"דוא״ל\\"' },
+
+  // --- §address: the footer printed the address in Latin letters on a Hebrew page (CLAUDE.md §8).
+  // Owner confirmed 2026-10-13 that it is right and should be in Hebrew (business-facts §C.1).
+  // Text only: no city was given, so it stays out of the LocalBusiness schema.
+  { id: "footer-address-hebrew", from: "derech sara 25/2", to: "דרך שרה 25/2" },
 ];
 
 /**
@@ -113,6 +118,7 @@ const FORBIDDEN = [
   ["demo-sliding-door-cta", /שירותי תיקון והתקנה של דלתות הזזה/],
   ["demo-sliding-door-headline", /דלת ההזזה שלך תקועה/],
   ["demo-sliding-door-vendor", /תיקון דלתות הזזה של/],
+  ["latin-footer-address", /derech sara/i],
   [
     "english-accessible-name",
     /Open Mobile Navigation|Close Side Navigation|Call by phone|title=\\"(?:Phone|Email)\\"/,
