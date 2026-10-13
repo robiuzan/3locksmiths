@@ -1,6 +1,6 @@
 ---
 name: local-seo-il
-description: Israeli local-SEO doctrine for שלושה מנעולנים — the address (confirmed 2026-10-13, in the footer + schema; the Business Profile hides it), the Google עסק שלי profile that arrived 2026-09-05 — claimed, verified, NAP-checked and holding 0 reviews, four spellings of one phone number including a dead placeholder, the region-typed-as-City fix for קריות, duplicate-city slugs, coverage honesty, and the expansion cap. Use when populating locations for local ranking or auditing local visibility. Triggers "local SEO", "NAP", "city pages", "Google עסק שלי", "doorway pages", "areaServed", "add a city".
+description: Israeli local-SEO doctrine for שלושה מנעולנים — the address (confirmed 2026-10-13, footer only by the owner's choice — the Business Profile hides it), the Google עסק שלי profile that arrived 2026-09-05 — claimed, verified, NAP-checked and holding 0 reviews, four spellings of one phone number including a dead placeholder, the region-typed-as-City fix for קריות, duplicate-city slugs, coverage honesty, and the expansion cap. Use when populating locations for local ranking or auditing local visibility. Triggers "local SEO", "NAP", "city pages", "Google עסק שלי", "doorway pages", "areaServed", "add a city".
 ---
 
 # Local SEO — Israel
@@ -43,7 +43,7 @@ occurrences in the served HTML). Tapping them does nothing. Fix in the pipeline
 
 ## 2. ✅ The address — resolved 2026-10-13 (history below)
 
-**Resolved 2026-10-13:** דרך שרה 25/2, זכרון יעקב (owner) — footer + `LocalBusiness` `PostalAddress` from the roster's `schema.address` (business-facts §C.1). Still open: postal code, geo, and whether זכרון יעקב is served.
+**Resolved 2026-10-13:** דרך שרה 25/2, זכרון יעקב 3092325 (owner) — in the footer only; the owner chose to keep it OUT of the `LocalBusiness` schema, as the Business Profile hides it (business-facts §C.1).
 
 The roster manifest's `schema` block carries `type`, `priceRange`, `areaServed` and `sameAs`. **There
 is no `address` field.** No page renders an address; the `LocalBusiness` node has none; the footer has

@@ -16,7 +16,7 @@ connects sideways.
 - Two columns, and `footer-col sidebar-1` is **completely blank** — a visible gap.
 - **6 links total**: phone, email, contact CTA, privacy, accessibility, sitemap.
 - **0 links to the 30 service pages. 0 to the 25 location pages.**
-- 31 words. Address: `דרך שרה 25/2, זכרון יעקב` (Hebrew since 2026-10-13; also in the LocalBusiness schema).
+- 31 words. Address: `דרך שרה 25/2, זכרון יעקב` (Hebrew since 2026-10-13; footer only, not in the schema — owner's choice).
 
 That is 67 wasted opportunities to link into both silos. Fixing it is the highest ratio of
 ranking-and-UX gain to effort available on this site.

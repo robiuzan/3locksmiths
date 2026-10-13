@@ -225,9 +225,11 @@ function faqSchema(data) {
  * fix is to repeat the node, keyed by a stable `@id` so consumers de-duplicate it into one
  * entity. It costs well under a kilobyte per page.
  *
- * `address` is read from the roster's `schema.address` — street and city confirmed by the owner
- * 2026-10-13 (docs/business-facts.md §C.1). With no roster address it falls back to
- * `addressCountry` only; a value is never invented.
+ * `address` is country-only ON PURPOSE. The street address (דרך שרה 25/2, זכרון יעקב 3092325) is
+ * confirmed, but the owner chose 2026-10-13 to show it in the footer only and keep it out of the
+ * structured data — the Business Profile hides it as a service-area listing (business-facts §C.1).
+ * The spread below still reads the roster's `schema.address` should that decision change; never
+ * invent one.
  * `sameAs` is spread in only when the manifest's array is non-empty: an empty array is noise, not
  * a signal. Since 2026-09-05 it carries the Google Business Profile (docs/business-facts.md §B.4),
  * so the guard is what keeps the node clean if a future site has nothing to point at — not a
@@ -264,8 +266,8 @@ function localBusinessSchema() {
     // 106 routes. `schemaImage()` prefers the hero slot, then the OG card, and only falls back
     // to that upload while neither is published.
     image: schemaImage(),
-    // The street address — confirmed by the owner 2026-10-13 (docs/business-facts.md §C.1), read
-    // from the roster's schema.address. Country-only until then: never an invented address.
+    // Country-only by the owner's choice (2026-10-13, business-facts §C.1); the roster has no
+    // schema.address. Adding one there is the only switch.
     address: {
       "@type": "PostalAddress",
       ...(manifest.schema?.address ?? {}),

@@ -48,7 +48,7 @@ time. **That asymmetry is the root cause of the most important finding on this s
    - `email` is **`robiuzan@gmail.com`** — a personal Gmail, live on the homepage, against the
      manifest's `info@3locksmiths.co.il`. This is **Critical** (§4.2).
    - `telephone` is `+972-55-6601006` against the manifest's `+972765991266` — two NAP spellings.
-   - The `address` is `PostalAddress` {street, city, IL} from the roster's `schema.address` (confirmed 2026-10-13); before that there was **no `address`**, because the manifest had no address field (§5.1 /
+   - The `address` is country-only ON PURPOSE: the street address is confirmed but the owner keeps it in the footer only (2026-10-13, business-facts §C.1); before that there was **no `address`**, because the manifest had no address field (§5.1 /
      `docs/business-facts.md` §C.1). Route it to business-facts; **never invent one.**
 3. **Opening hours vs the title.** The node claims Sun–Fri 08:00–18:00 and Sat 08:00–17:00 while the
    homepage title claims `מנעולן 24/7`. One is wrong and both are 🔶 (§4.4).

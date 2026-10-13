@@ -343,7 +343,7 @@ would make the site's "★ 5.0" disagree with the cards beneath it.
 | Phone (E.164)      | +972765991266                                              | ✅     | manifest `contact.phoneE164` — changed 2026-09-02, §C.5                 |
 | WhatsApp           | +972556601006                                              | ✅     | manifest `contact.whatsappE164` — **deliberately the old number**, §C.5 |
 | Email              | info@3locksmiths.co.il                                     | ✅     | **verified 2026-08-24** — live routing rule, see §C.3                   |
-| **Street address** | דרך שרה 25/2, זכרון יעקב                                   | ✅     | owner 2026-10-13 — roster `schema.address` (§C.1)                       |
+| **Street address** | דרך שרה 25/2, זכרון יעקב                                   | ✅     | owner 2026-10-13, מיקוד 3092325 — footer only, not in the schema (§C.1) |
 | Opening hours      | 2 `OpeningHoursSpecification` nodes in the scraped JSON-LD | 🔶     | scraped from WordPress, never verified against the business             |
 
 ### C.1 The address — CORRECTED 2026-08-25
@@ -363,15 +363,16 @@ would make the site's "★ 5.0" disagree with the cards beneath it.
 > ✅ **2026-10-13, owner:** the address is right, and it should be written in Hebrew. The footer now
 > reads **דרך שרה 25/2** (`scripts/scraped-copy.mjs`, rule `footer-address-hebrew`).
 >
-> ✅ **2026-10-13, owner: the city is זכרון יעקב.** Full address **דרך שרה 25/2, זכרון יעקב** —
-> in the footer of every page and in the `LocalBusiness` schema (`PostalAddress`
-> streetAddress/addressLocality/addressCountry), read from the roster's `schema.address`.
-> ⚠️ The Business Profile hides its address (service-area listing, §B.4). Showing it on the site
-> is the owner's choice; if the profile ever shows an address, it must be this one, spelled the same.
+> ✅ **2026-10-13, owner: the city is זכרון יעקב, postal code 3092325.** The footer of every page
+> reads **דרך שרה 25/2, זכרון יעקב**. It was published in the `LocalBusiness` schema the same day,
+> then withdrawn on the owner's answer: the Business Profile hides the address (a service-area
+> listing, §B.4), so the site keeps it in the footer only and the schema stays country-only. The
+> switch is the roster's `schema.address` (absent on purpose). Not in `areaServed`: the owner says
+> זכרון יעקב is not a served city. If the profile ever shows an address, it must be this one, spelled the same.
 
 ### C.1b The manifest had no address field — RESOLVED 2026-10-13
 
-> **Resolved 2026-10-13:** דרך שרה 25/2, זכרון יעקב (owner) — footer + `LocalBusiness` `PostalAddress` from the roster's `schema.address` (business-facts §C.1). Kept below for history.
+> **Resolved 2026-10-13:** דרך שרה 25/2, זכרון יעקב 3092325 (owner) — in the footer only; the owner chose to keep it OUT of the `LocalBusiness` schema, as the Business Profile hides it (business-facts §C.1).
 
 `roster/sites/3locksmiths.json` `schema` carries `type`, `priceRange`, `areaServed` and `sameAs` —
 **no `address`**. No page renders one. For a `Locksmith` node this is now the largest local-SEO gap
