@@ -201,7 +201,9 @@ the URL rather than hiding it behind a shortener:
 https://www.google.com/maps/place/%D7%A9%D7%9C%D7%95%D7%A9%D7%94+%D7%9E%D7%A0%D7%A2%D7%95%D7%9C%D7%A0%D7%99%D7%9D/data=!4m2!3m1!1s0x8bea25d577ac0a5:0xdb88c9f20e72c98b
 ```
 
-roster → `site.config.json` → `localBusinessSchema()` → `sameAs` on the 99 enriched pages.
+roster → `site.config.json` → `localBusinessSchema()` → `sameAs` on every enriched page (99 when it
+was linked on 2026-09-05; four fewer since the 2026-10-14 duplicate-intent merge,
+`docs/keyword-map.md` §8).
 
 | Signal              | Value                                                                   |
 | ------------------- | ----------------------------------------------------------------------- |
@@ -320,10 +322,10 @@ on 2026-10-13, the owner said: **"do not consider them as fake"**. The dashboard
 reviews, average 5**, and the owner chose to show **Google's own figure** on every page now.
 
 **What ships, and what it claims.** `★ 5.0 · 13 ביקורות בגוגל · נכון ל-13/10/2026` plus a link to
-Google's reviews page. The footer of every page, the homepage hero, `/contact/` and the 80
-service + city pages carry it (`content/enriched/_reputation.mjs` → `scripts/reputation.mjs`). It
-states what Google shows on the dated dashboard read. It quotes no review and calls no reviewer a
-verified customer. `Review` / `AggregateRating` markup stays forbidden (self-serving; CI blocks it).
+Google's reviews page. The footer of every page, the homepage hero, `/contact/` and the 76
+service + city pages (80 until the 2026-10-14 duplicate-intent merge) carry it
+(`content/enriched/_reputation.mjs` → `scripts/reputation.mjs`). It states what Google shows on the
+dated dashboard read. It quotes no review and calls no reviewer a verified customer. `Review` / `AggregateRating` markup stays forbidden (self-serving; CI blocks it).
 
 **What this register still records, so nobody launders it later.** On 2026-09-29 the owner said the
 three names are not the real technicians (§B.5); that statement has not been withdrawn, only the
@@ -552,7 +554,7 @@ between figures, slimmer limbs), so adopting it is a brand decision, not a free 
 
 | Fact                | Value                                            | Status                      |
 | ------------------- | ------------------------------------------------ | --------------------------- |
-| Service list        | 30 service pages + 25 location pages             | ✅ (in `content/site.json`) |
+| Service list        | 30 service pages + 24 location pages             | ✅ (in `content/site.json`) |
 | Price ranges        | per-page `pricing[]` in `content/enriched/*.mjs` | 🔶                          |
 | `priceRange`        | `₪₪`                                             | ✅ manifest                 |
 | Warranty ("אחריות") | claimed widely, no term stated                   | 🔶                          |
@@ -612,7 +614,8 @@ the owner has, both halves say the same thing.
 Previously removed from, and now restored across: the homepage `<title>` (`scripts/enrich.mjs`
 `HOME_SEO`), the homepage feature card and FAQ accordion including its `FAQPage` JSON-LD mirror
 (`scripts/claims.mjs`), the `/contact/` title (`scripts/pages.mjs`), and the authored modules
-`77.mjs`, `93.mjs`, `94.mjs`.
+`77.mjs`, `93.mjs`, `94.mjs`. (2026-10-14: `93.mjs` and `94.mjs` are deleted — their pages were
+merged into `/מנעולן-רכב/` (77) and `/מנעולן-לבית/` (78) and 301'd, `docs/keyword-map.md` §8.)
 
 The per-city response windows ("ברוב המקרים … תוך כ-30 עד 45 דקות") were authored, not measured.
 They are hedged and remain 🔶 — but see D.4 for the version that was not hedged.
@@ -862,7 +865,7 @@ Front Command alerts. Change the words only on the owner's say-so.
 | -------------------- | ---------------------------------------------------------------- | ----------------- |
 | `schema.areaServed`  | `null` in the manifest — but **synthesised** at build, see below | ⚠️ was mis-stated |
 | Claimed coverage     | "פריסה רחבה" — 56 pages; **not** the homepage title, see below   | 🔶                |
-| Location pages       | 25 cities/regions under `/locations/`                            | ✅ (routes exist) |
+| Location pages       | 24 under `/locations/`, 23 distinct cities/regions — see §E.1.2  | ✅ (routes exist) |
 | Withdrawn cities     | 7, on 2026-09-02 — see §E.1                                      | ✅ owner          |
 | Named neighbourhoods | e.g. דיזנגוף, רוטשילד, פלורנטין, רמת אביב                        | 🔶                |
 
@@ -940,6 +943,22 @@ expression, using `lower()` so both cases match, is written out in the header of
 ⚠️ **This is fleet-wide.** Every sibling site with Hebrew slugs has the same latent defect:
 galbath.co.il's uppercase rules catch only uppercase traffic, dalita.co.il's raw-Hebrew rules
 likewise. None of them redirect the lowercase URLs their own sitemaps publish.
+
+### E.1.2 The second נתניה page merged — 2026-10-14
+
+Not a withdrawal like §E.1 — a נתניה page still ships. On the owner's instruction four
+duplicate-intent pairs became one page each (`docs/keyword-map.md` §8), and one of them was a
+location pair —
+`/locations/שכפול-מפתחות-בנתניה/` (id 149) now 301s to `/locations/שכפול-מפתח-בנתניה/` (id 140),
+which matches the `שכפול-מפתח-ב<city>` pattern of the other cities. That leaves **24 location pages
+covering 23 distinct cities**: חולון still has two (`/locations/שכפול-מפתח-חולון/` and
+`/locations/שכפול-מפתחות-חולון/`), and that pair was not part of the merge.
+
+🔶 **The redirect inherits §E.1.1's defect.** `public/_redirects` carries the fallback lines (slash /
+no-slash × lowercase / uppercase hex), but they catch only UPPERCASE traffic. The lowercase form the
+site published needs the owner's zone-level Redirect Rule with `lower(http.request.uri.path)` —
+**not yet done**. The last recorded Search Console URL Inspection sweep (2026-09-02) found neither
+נתניה page indexed, and no newer per-URL indexing data is in the repo; re-check GSC before deploy.
 
 ### E.2 "פריסה ארצית" → "פריסה רחבה" — 2026-09-02
 

@@ -80,14 +80,20 @@ Google's doorway policy names, and the penalty lands on the domain, not the page
 
 ## Duplicate-city slugs
 
-Two cities already have two live pages each:
+One city still has two live pages:
 
-- `/locations/שכפול-מפתח-בנתניה/` **and** `/locations/שכפול-מפתחות-בנתניה/`
 - `/locations/שכפול-מפתח-חולון/` **and** `/locations/שכפול-מפתחות-חולון/`
 
-Both of each pair are live WordPress URLs holding ranking signal. If you are deepening one, **check
-the other and differentiate them** — don't write the same page twice. And **never merge or rename
-either without a `public/_redirects` 301** (`docs/keyword-map.md` §8).
+Both are live WordPress URLs holding ranking signal. If you are deepening one, **check the other and
+differentiate them** — don't write the same page twice. And **never merge or rename either without a
+`public/_redirects` 301** (`docs/keyword-map.md` §8).
+
+✅ **נתניה RESOLVED 2026-10-14** (owner instruction): `/locations/שכפול-מפתחות-בנתניה/` (id 149) was
+merged into `/locations/שכפול-מפתח-בנתניה/` (id 140), which matches the `שכפול-מפתח-ב<city>` pattern
+of the other cities, and now 301s to it. Its module is deleted and its path is in `scripts/pages.mjs`
+`PRUNE_PATHS` — deepen `140.mjs`, never recreate `149.mjs`. 🔶 The `_redirects` lines catch
+uppercase-hex traffic only; the lowercase form needs a zone-level Redirect Rule that is **the
+owner's action, not yet done**. 24 location pages now cover 23 distinct cities.
 
 ## Steps
 
@@ -122,7 +128,7 @@ the metadata · the sitemap entry · the one-`<h1>` build assertion.
 - [ ] Opens with a 40–60 word answer block.
 - [ ] 2–3 city-specific FAQs, all rendered.
 - [ ] `related.locations` set on **both** sides.
-- [ ] The duplicate-slug twin (if any) is differentiated, not duplicated.
+- [ ] The duplicate-slug twin (only חולון has one now) is differentiated, not duplicated.
 - [ ] Title has the brand exactly once; description 150–160 chars and unique.
 - [ ] `npm run enrich` run; verified in `out/` and `out/sitemap.xml`; JSON-LD parses.
 

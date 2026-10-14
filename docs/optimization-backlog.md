@@ -7,6 +7,18 @@ from this file**, so the numbering is a contract — add subsections, don't renu
 verified 2026-08-16. Where a finding says "live", it was confirmed with `curl` against
 `https://3locksmiths.co.il`, not inferred from the repo.
 
+> **2026-10-14 — FOUR DUPLICATE-INTENT PAIRS MERGED (owner instruction; not yet deployed).**
+> `/services/מנעולן-רכב/`, `/services/מנעולן-לבית/`, `/שכפול-שלט-לרכב-2/` and
+> `/locations/שכפול-מפתחות-בנתניה/` no longer ship (`PRUNE_PATHS` in `scripts/pages.mjs`); each is
+> 301'd to its survivor in `public/_redirects`, and every link and navigation surface now points at
+> the survivor. Survivors and reasons: `docs/keyword-map.md` §8. 105 routes, 101 sitemap URLs, 24
+> location pages. 🔶 **Pending owner:** those `_redirects` lines catch only UPPERCASE-encoded
+> traffic; the lowercase form the site published needs a zone-level Redirect Rule
+> (`docs/business-facts.md` §E.1.1) — not yet done. The last recorded Search Console URL Inspection
+> sweep (2026-09-02) found neither member of any pair indexed, and nothing newer is in the repo —
+> re-check GSC before deploying. Still live twins: `/קודן-לרכב/` ↔ `/services/קודן-לרכב/` and the
+> חולון pair (§3.3, §9.7).
+
 > **2026-08-25 (2) — EMERGENCY CLUSTER DEPLOYED.** Three pages live at ~2,500 rendered words each:
 > `/services/פתיחת-רכב-נעול/`, `/services/פתיחת-דלת-נעולה/`, `/services/מפתח-נשבר-במנעול/` —
 > Tier E in `docs/keyword-universe.md`, previously **zero coverage** and the highest-intent demand
@@ -65,14 +77,15 @@ The migration got this right. Protect it.
 
 **1.1 Route generation — sound.** `app/[...slug]/page.tsx` derives every route from
 `getContentPages()` with `dynamicParams = false`, so the emitted route set cannot drift from
-`content/site.json`. 108 pages + `/404` + `/_not-found` + `/thank-you` = 111 `index.html` files.
+`content/site.json`. 105 pages + `/404` + `/_not-found` + `/thank-you` = 108 `index.html` files
+(109 pages until the 2026-10-14 merge of four duplicate-intent pages, §3.3).
 
 **1.2 Canonicals — sound.** Present on all 64 real pages, self-referencing, trailing slash,
 percent-escaped. Sourced from the scraped `seo.canonical`, so they are byte-identical to the
 WordPress originals. Only `/404/` and `/_not-found/` lack one, which is correct.
 
 **1.3 Sitemap parity — sound.** `app/sitemap.ts` derives from `getSite().pages`, filters on
-`seo.canonical`, and excludes `/step/`. 104 `<url>` entries against 108 pages = exactly the four
+`seo.canonical`, and excludes `/step/`. 101 `<url>` entries against 105 pages = exactly the four
 calculator fragments excluded. **No hand-maintained array anywhere** — better than most of the fleet.
 
 **1.4 `lastModified` — absent.** The sitemap emits `changeFrequency` and `priority` but no
@@ -127,7 +140,7 @@ Spot-check any new block type for a skipped level.
 ## §3 Content depth — 🟢
 
 **This is the site's strongest area.** Median ~1,500 unique words; the deepest location pages reach
-~1,600. The 25 location pages **pass the doorway test** — `content/enriched/137.mjs` (תל אביב) names
+~1,600. The 24 location pages **pass the doorway test** — `content/enriched/137.mjs` (תל אביב) names
 דיזנגוף, רוטשילד, פלורנטין, נווה צדק, רמת אביב and שכונת התקווה and reasons about the city's parking
 and building stock. Substituting another city would make the page wrong, not merely generic.
 
@@ -155,11 +168,18 @@ the other 53 modules were written against — so it deliberately has no `95.mjs`
 that a **Tier-1 head term** sits on the thinnest, least-marked-up service page, and it ships one of
 the two malformed JSON-LD blocks. Author `content/enriched/95.mjs`. See `/new-service`.
 
-**3.3 Duplicate-intent pages.** `/מנעולן-רכב/` and `/services/מנעולן-רכב/` both exist and are both
-authored, as are the `מנעולן-לבית` and `קודן-לרכב` pairs, plus `שכפול-מפתח-בנתניה` /
-`שכפול-מפתחות-בנתניה` and the same pair for חולון. Both of each pair are live WordPress URLs. They
-are not currently cannibalising badly (titles and descriptions differ), but they should be
-differentiated deliberately — or consolidated **with a `_redirects` 301**, never without.
+**3.3 Duplicate-intent pages — four pairs merged 2026-10-14; two twins remain.**
+
+> ✅ **RESOLVED 2026-10-14 for four pairs (owner instruction).** Kept `/מנעולן-רכב/`,
+> `/מנעולן-לבית/`, `/services/שכפול-שלט-לרכב/` and `/locations/שכפול-מפתח-בנתניה/`; removed
+> `/services/מנעולן-רכב/`, `/services/מנעולן-לבית/`, `/שכפול-שלט-לרכב-2/` and
+> `/locations/שכפול-מפתחות-בנתניה/`, each 301'd to its survivor. Survivors and reasons:
+> `docs/keyword-map.md` §8. 🔶 The lowercase half of those 301s is still the owner's zone rule (§9.7).
+
+Still live, and both authored: `/קודן-לרכב/` ↔ `/services/קודן-לרכב/`, and
+`/locations/שכפול-מפתח-חולון/` ↔ `/locations/שכפול-מפתחות-חולון/`. Both of each pair are live
+WordPress URLs. They are not currently cannibalising badly (titles and descriptions differ), but they
+should be differentiated deliberately — or consolidated **with a `_redirects` 301**, never without.
 
 **3.4 The shared "why choose us" block.** `DEFAULT_FEATURES` in `lib/enrich/render.mjs:42` ships the
 same three cards on every page that doesn't override them, and the first one is
@@ -248,9 +268,10 @@ answer is a service-area business on the Google side, not an invented address. *
 Resolve in `docs/business-facts.md` §C.1 first.
 
 **5.2 ✅ Google Business Profile — supplied and linked 2026-09-05.** `schema.sameAs` now carries the
-profile URL, so the `LocalBusiness` node on all 99 enriched pages points at an external anchor for the
-first time. For a single-trade local business the profile outranks almost everything else on-page: it
-drives the map pack, it is where reviews live, and it is what makes `sameAs` meaningful.
+profile URL, so the `LocalBusiness` node on every enriched page (99 when linked 2026-09-05; four
+fewer since the 2026-10-14 duplicate-intent merge) points at an external anchor for the first time.
+For a single-trade local business the profile outranks almost everything else on-page: it drives
+the map pack, it is where reviews live, and it is what makes `sameAs` meaningful.
 
 **What remains is not a code task.** The profile's contents are unverified from here — phone, website
 link, categories, service areas, hours and review count are all owner checks, listed as a table in
@@ -260,8 +281,9 @@ link, categories, service areas, hours and review count are all owner checks, li
 the schema (`+972-55-6601006`). One number, four strings.
 
 **5.4 Coverage is unreconciled.** `schema.areaServed: null` in the manifest; "פריסה ארצית" in the
-homepage title (it is NOT — see business-facts §E); 23 derived cities in the schema; 25 location
-pages. The schema and the routes now agree; the manifest and the copy still do not.
+homepage title (it is NOT — see business-facts §E); 23 derived cities in the schema; 24 location
+pages covering 23 distinct cities (חולון still has two). The schema and the routes now agree; the
+manifest and the copy still do not.
 
 **5.5 No geo signals.** No `GeoCoordinates`, no `hasMap`, no map embed on `/contact/`.
 
@@ -444,7 +466,7 @@ Two lessons worth keeping:
   page was linked from all 64 footers. Use `node scripts/check-orphans.mjs`, which decodes both
   sides, and which now runs as a **blocking CI step**.
 - The page was orphaned because it is a duplicate-intent twin whose label matched a services
-  column entry. See §9.7.
+  column entry. See §9.7. (✅ 2026-10-14: merged into `/services/שכפול-שלט-לרכב/` and 301'd.)
 
 > ✅ **FIXED 2026-08-25.** `scripts/footer.mjs` (new, in the enrich chain) rebuilds the footer
 > on all 108 pages: a **שירותים** column (13 links incl. the Tier-1 page), an **אזורי שירות**
@@ -490,15 +512,33 @@ agree.
 
 **9.6 `/sitemap/` is a real page** (358 words) distinct from `/sitemap.xml`. Keep them straight.
 
-**9.7 🔶 Four duplicate-intent twin pairs — an owner decision.**
-`/מנעולן-רכב/` ↔ `/services/מנעולן-רכב/`, and the same for `מנעולן-לבית`, `קודן-לרכב` and
-`שכפול-שלט-לרכב` (whose top-level half carries WordPress's `-2` duplicate-slug suffix). Both
-halves of each pair are live permalinks holding ranking signal, so **neither is merged away**
-without a `public/_redirects` 301 (`docs/keyword-map.md` §8).
+**9.7 🔶 Duplicate-intent twin pairs — three of these four merged 2026-10-14; `קודן-לרכב` remains.**
 
-They are now all linked from the footer bottom bar, which fixes the orphan but means four labels
-appear twice in the chrome. The real question — consolidate with 301s, or differentiate the two
-halves deliberately — is a content decision for the owner, not something to resolve silently.
+> ✅ **RESOLVED 2026-10-14 (owner instruction) for `מנעולן-רכב`, `מנעולן-לבית` and
+> `שכפול-שלט-לרכב`**, together with the נתניה location pair (§3.3). Survivors: `/מנעולן-רכב/`,
+> `/מנעולן-לבית/`, `/services/שכפול-שלט-לרכב/`, `/locations/שכפול-מפתח-בנתניה/`; the other half of
+> each no longer ships (`PRUNE_PATHS` in `scripts/pages.mjs`) and is 301'd to its survivor. Every
+> authored link was repointed at the survivor; the header city mega-menu and the homepage areas
+> band are pruned by `scripts/prune-chrome-links.mjs`; and `scripts/footer.mjs` now puts
+> `/מנעולן-רכב/` and `/מנעולן-לבית/` at the head of the services column (`CORE_SERVICE_LANDERS`),
+> with the bottom bar skipping any lander that column already links (by href). Survivors and
+> reasons: `docs/keyword-map.md` §8 — the merge followed its rule, a 301 for every removed URL.
+>
+> 🔶 **Pending owner — not done.** The 16 new `public/_redirects` lines (slash / no-slash ×
+> lowercase / uppercase hex, four per removed URL) catch only UPPERCASE-encoded traffic, because of
+> the Cloudflare Pages defect in `docs/business-facts.md` §E.1.1. The lowercase form the site
+> published needs a zone-level Redirect Rule using `lower(http.request.uri.path)`. Until the owner
+> adds it, expect the lowercase removed URLs to 404 once deployed, as the withdrawn-city URLs did
+> (§E.1.1 there). The last recorded Search Console URL Inspection sweep (2026-09-02) found neither
+> member of any pair indexed, and no newer per-URL indexing data is in the repo — re-check GSC
+> before deploying.
+
+**Still open:** `/קודן-לרכב/` ↔ `/services/קודן-לרכב/` — both halves are live permalinks holding
+ranking signal, so **neither is merged away** without a `public/_redirects` 301
+(`docs/keyword-map.md` §8). The same holds for the חולון location pair (§3.3). The bottom bar still
+carries `/קודן-לרכב/` and the חולון twin, which keeps them reachable but means the `קודן לרכב` label
+appears twice in the chrome. Consolidate with 301s, or differentiate the two halves deliberately — a
+content decision for the owner, not something to resolve silently.
 
 ---
 

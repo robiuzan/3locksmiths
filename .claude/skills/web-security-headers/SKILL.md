@@ -118,10 +118,21 @@ lead-gen site that is a revenue bug.
 
 ## `public/_redirects`
 
-Also available on Cloudflare Pages, and this repo has no redirects file yet. It is the **prerequisite
-for any slug change** — the duplicate-city pairs, the cross-silo duplicates, `/שכפול-שלט-לרכב-2/`.
-Renaming or merging without a 301 discards the ranking signal that URL holds. Not a cleanup task; a
-deliberate project with a redirect map (`docs/keyword-map.md` §8).
+Also available on Cloudflare Pages, and it is the **prerequisite for any slug change** — today the
+חולון duplicate-city pair and the `/קודן-לרכב/` ↔ `/services/קודן-לרכב/` cross-silo pair, both
+still live twins. Renaming or merging without a 301 discards the ranking signal that URL holds. Not a
+cleanup task; a deliberate project with a redirect map (`docs/keyword-map.md` §8).
+
+✅ **2026-10-14:** four duplicate-intent pages were merged that way — `/services/מנעולן-רכב/`,
+`/services/מנעולן-לבית/`, `/שכפול-שלט-לרכב-2/` and `/locations/שכפול-מפתחות-בנתניה/` now 301 to
+their survivors (`docs/keyword-map.md` §8), via 16 fallback lines: four per removed URL, slash /
+no-slash × lowercase / uppercase hex.
+
+> 🔶 **Those lines catch UPPERCASE traffic only.** Cloudflare Pages uppercase-normalises a rule's
+> source path, and this site publishes lowercase `%d7` (`docs/business-facts.md` §E.1.1, and the
+> header of `public/_redirects`). The lowercase form needs a **zone-level Cloudflare Redirect Rule**
+> on `lower(http.request.uri.path)` — the owner's to create, **pending, not yet done**. Verify it
+> with `curl -sSI` in both cases once it exists; never record it as done before that.
 
 ## The lead form
 
@@ -179,5 +190,5 @@ Report the two separately. A devDependency advisory does not ship to users here.
   look fine.
 - A CSP that blocks the theme's CDN-hosted jQuery kills the nav, the carousels and the calculator on
   every page.
-- Zone-level settings (Scrape Shield, AI Crawl Control, cache rules) are the **owner's** to change.
-  Document the toggle; never assume it was flipped.
+- Zone-level settings (Scrape Shield, AI Crawl Control, cache rules, Redirect Rules) are the
+  **owner's** to change. Document the toggle; never assume it was flipped.

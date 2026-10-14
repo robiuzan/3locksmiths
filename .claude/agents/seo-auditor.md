@@ -16,7 +16,7 @@ issues, you never edit metadata or rebuild the export.
 Metadata does **not** come from per-route `generateMetadata` bodies you can read. It comes from
 `lib/content.ts:buildMetadata()`, which maps the scraped RankMath fields on each page in
 `content/site.json`. Those fields are set by `content/enriched/<id>.mjs` (`seo.title`,
-`seo.description`) for the 53 authored pages, and by the WordPress scrape for the other 11.
+`seo.description`) for the 94 authored pages, and by the WordPress scrape for the other 11.
 
 Two consequences:
 
@@ -35,32 +35,37 @@ Two consequences:
 - `docs/keyword-map.md` §3–§5 holds the title, H1 and description formulas, and §1 the silo model.
 - `docs/content-standards.md` §1 (word floors) and §2 (the doorway test).
 - The export: `out/**/index.html`, `out/sitemap.xml`, `out/robots.txt`.
-- `content/site.json` → the set of routes that must exist (111 pages).
+- `content/site.json` → the set of routes that must exist (105 pages since the 2026-10-14 merge).
 
 ## What to audit
 
-1. **Route and sitemap parity.** 111 pages → 111 `index.html` (plus `/404` and `/_not-found`) → 60
-   `<url>` in `sitemap.xml`. The gap is exactly the four `/step/` calculator fragments, which
-   `app/sitemap.ts` excludes deliberately. Any other gap is a finding (§1.3).
+1. **Route and sitemap parity.** 105 pages → 105 `index.html` (plus `/404`, `/_not-found` and
+   `/thank-you`) → 101 `<url>` in `sitemap.xml`. The gap is exactly the four `/step/` calculator
+   fragments, which `app/sitemap.ts` excludes deliberately. Any other gap is a finding (§1.3).
 2. **Titles.** Unique (currently zero duplicates — hold it), brand exactly once, under ~60 chars.
    Known: `/אודותינו/` doubles the brand **and** repeats the ⛔ 25-years claim (§2.1); five titles run
    62–69 chars (§2.2).
 3. **Descriptions.** Present, unique, 150–160 chars. Five real pages have none:
    `/services/שכפול-מפתח-לרכב/` and the four `/step/` routes (§2.3).
 4. **One H1 per page.** Currently true on all 66 — and `scripts/enrich.mjs` fails the build if an
-   enriched page has any other count. That guard covers 97 of 111 pages; the rest are unguarded, so
+   enriched page has any other count. That guard covers 94 of 105 pages; the rest are unguarded, so
    check them explicitly (§2.5).
 5. **Canonicals.** Self-referencing, trailing slash, percent-escaped, byte-identical to the sitemap
    `<loc>`. Sourced from the scraped `seo.canonical`, so they match the WordPress originals (§1.2).
 6. **Thin and duplicate-intent content.** Strip tags, subtract ~120–200 words of gogo chrome, count
    unique body words against `docs/content-standards.md` §1. **Set expectations correctly: the median
-   is ~1,500 words and the 25 location pages pass the doorway test.** The real gaps are the 11
+   is ~1,500 words and the 24 location pages pass the doorway test.** The real gaps are the 11
    un-enriched pages (§3.1), above all `/services/שכפול-מפתח-לרכב/` — a Tier-1 term on the site's
    weakest page (§3.2).
-7. **Duplicate-intent pairs.** `/מנעולן-רכב/` ↔ `/services/מנעולן-רכב/`, the same for `מנעולן-לבית`
-   and `קודן-לרכב`, plus `שכפול-מפתח-בנתניה` / `שכפול-מפתחות-בנתניה` and the חולון pair. All live
-   URLs. Assess cannibalisation, but **never propose a rename or merge without a `_redirects` 301
-   plan** (§3.3).
+7. **Duplicate-intent pairs.** Two remain, both halves live: `/קודן-לרכב/` ↔
+   `/services/קודן-לרכב/`, and the חולון pair (`שכפול-מפתח-חולון` / `שכפול-מפתחות-חולון`). Assess
+   cannibalisation, but **never propose a rename or merge without a `_redirects` 301 plan** (§3.3).
+   The other four were merged on 2026-10-14 (`docs/keyword-map.md` §8.1): `/services/מנעולן-רכב/`,
+   `/services/מנעולן-לבית/`, `/שכפול-שלט-לרכב-2/` and `/locations/שכפול-מפתחות-בנתניה/` no longer
+   ship and 301 to their survivors — any of them in `out/` or `sitemap.xml` is a finding. Their
+   lowercase 301 needs a zone-level Cloudflare Redirect Rule that is 🔶 **pending owner**; report it
+   as pending, never as done. Which half of any pair Google indexed is not known — the last
+   recorded URL Inspection sweep (2026-09-02) found neither member of any pair indexed.
 8. **Robots.** `app/robots.ts` emits a blanket allow. **Fetch the live `/robots.txt` separately** —
    Cloudflare prepends a managed block that the repo cannot override (§6.1). Never report the repo's
    intent as the live policy.

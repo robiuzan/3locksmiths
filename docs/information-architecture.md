@@ -79,7 +79,7 @@ exists in the scraped markup).
 
 **Targets:**
 
-- All 30 services and 25 locations reachable **within one hop** of any page.
+- All 30 services and 24 locations reachable **within one hop** of any page.
 - The dropdowns are the natural home for this — they already exist structurally.
 - Keyboard operable: `aria-expanded`, `aria-controls`, Escape closes, focus returns. The current
   mobile menu has none of these (backlog §11.3) and the fix is an **enhancement layer**, never an
@@ -96,7 +96,7 @@ exists in the scraped markup).
 ├── /services/                       hub  → 30 service pages
 │   ├── /services/<service>/         incl. 18 brand-key pages
 │   └── (planned) emergency cluster
-├── /אזורי-שירות/                    hub  → 25 location pages
+├── /אזורי-שירות/                    hub  → 24 location pages
 │   └── /locations/<city>/
 ├── /מדריכים/            (planned)   hub  → guides
 ├── /מחירון/                         pricing — the magnet for every "כמה עולה" query
@@ -118,11 +118,22 @@ exists in the scraped markup).
 
 ### 3.2 The duplicate-intent pairs
 
-`/מנעולן-רכב/` ↔ `/services/מנעולן-רכב/`, same for `מנעולן-לבית` and `קודן-לרכב`, plus the
-נתניה and חולון location pairs. **All are live URLs holding ranking signal.**
+`/קודן-לרכב/` ↔ `/services/קודן-לרכב/`, plus the חולון location pair
+(`/locations/שכפול-מפתח-חולון/` ↔ `/locations/שכפול-מפתחות-חולון/`). **Both halves of each are
+live URLs holding ranking signal.**
 
 Link them to each other so they read as related rather than competing. **Never merge or rename
 without a `public/_redirects` 301** (`docs/keyword-map.md` §8).
+
+✅ RESOLVED 2026-10-14: the `מנעולן-רכב` and `מנעולן-לבית` pairs, the נתניה location pair and
+`/שכפול-שלט-לרכב-2/` were merged on the owner's instruction, one page each. Survivors:
+`/מנעולן-רכב/`, `/מנעולן-לבית/`, `/services/שכפול-שלט-לרכב/`, `/locations/שכפול-מפתח-בנתניה/`.
+Every link and navigation surface now points at the survivor — 20 authored modules repointed,
+`scripts/footer.mjs` putting `/מנעולן-רכב/` and `/מנעולן-לבית/` at the head of the services column
+(the bottom bar skips any lander that column already links), and `scripts/prune-chrome-links.mjs`
+dropping the removed routes from the header city mega-menu and the homepage areas band. Why each
+survivor won, the 301 plan and the 🔶 pending zone-level rule for lowercase traffic:
+`docs/keyword-map.md` §8.1.
 
 ---
 
@@ -172,10 +183,10 @@ percent-encoded — decode consistently on both sides or the diff is meaningless
 ## 7. Checklist for any IA change
 
 - [ ] Footer reaches both silos; no `slice()` truncation; no empty column.
-- [ ] All 30 services and 25 locations within one hop of the header.
+- [ ] All 30 services and 24 locations within one hop of the header.
 - [ ] Every internal link has a trailing slash and is written unescaped.
 - [ ] Cross-silo edges present, and location adjacency set on **both** sides.
-- [ ] Duplicate-intent pairs cross-link rather than compete.
+- [ ] The remaining duplicate-intent pairs (§3.2) cross-link rather than compete.
 - [ ] Breadcrumbs render **and** emit `BreadcrumbList`.
 - [ ] Orphan check returns nothing.
 - [ ] `npm run enrich && npm run build`, then re-run the orphan check.

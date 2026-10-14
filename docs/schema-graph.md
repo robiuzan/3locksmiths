@@ -20,7 +20,7 @@ content/site.json  page.jsonLd[]  ──►  components/SiteFrame.tsx  ──►
   (103 of 108 pages)
 ```
 
-- For the **53 enriched pages**, `scripts/enrich.mjs` **overwrites** `page.jsonLd` entirely with
+- For the **94 enriched pages**, `scripts/enrich.mjs` **overwrites** `page.jsonLd` entirely with
   `[breadcrumbSchema, serviceSchema, howToSchema, faqSchema]`. Whatever WordPress emitted is
   discarded. It then asserts each block `JSON.parse`s and that the page has exactly one `<h1>`,
   failing the build if not.
@@ -43,8 +43,8 @@ validation at render time.
 | `/`                                                        | `LocalBusiness`+`Locksmith`, scraped `FAQPage` (**broken**), scraped `WebSite` | business node + valid `FAQPage` + `WebSite`    |
 | `/services/<slug>/` ×29                                    | `BreadcrumbList` · `Service` · `HowTo` · `FAQPage`                             | unchanged — this is correct                    |
 | `/services/שכפול-מפתח-לרכב/`                               | scraped only (**broken**)                                                      | full set — needs `content/enriched/95.mjs`     |
-| `/locations/<slug>/` ×25                                   | `BreadcrumbList` · `Service`+`areaServed` · `HowTo` · `FAQPage`                | unchanged, but fix the `קריות` area type (§5)  |
-| Top-level landers ×7                                       | `BreadcrumbList` · `Service` · `HowTo` · `FAQPage`                             | unchanged                                      |
+| `/locations/<slug>/` ×24                                   | `BreadcrumbList` · `Service`+`areaServed` · `HowTo` · `FAQPage`                | unchanged, but fix the `קריות` area type (§5)  |
+| Top-level landers ×6                                       | `BreadcrumbList` · `Service` · `HowTo` · `FAQPage`                             | unchanged                                      |
 | `/services/` (hub)                                         | **nothing**                                                                    | `CollectionPage` + `BreadcrumbList`            |
 | `/contact/`                                                | **nothing**                                                                    | `ContactPage` + `BreadcrumbList`               |
 | `/מחירון/`                                                 | `Service` + `FAQPage`                                                          | + `OfferCatalog` — **gated on §4.3**           |
@@ -147,9 +147,9 @@ must stay simple — no scripts, no attributes.
 
 ### 4.6 No `LocalBusiness` node per location
 
-One business, one node. The 25 location pages emit `Service` with `areaServed`, which is right.
-Seventeen `LocalBusiness` nodes would imply seventeen premises that do not exist and is a recognised
-local-spam pattern.
+One business, one node. The 24 location pages emit `Service` with `areaServed`, which is right.
+Twenty-four `LocalBusiness` nodes would imply twenty-four premises that do not exist and is a
+recognised local-spam pattern.
 
 ### 4.7 No dangling `@id`
 
@@ -177,7 +177,8 @@ Two corrections:
 The business node's own `areaServed` **is** now derived from the location set — `scripts/enrich.mjs`
 builds `CITIES` from `content/enriched/_manifest.json`, so it tracks the routes automatically and
 cannot go stale the way the old hardcoded 15-city array did. It currently emits 23 unique `City`
-nodes (25 location pages, minus the נתניה and חולון duplicate-slug pairs).
+nodes (24 location pages, minus the second חולון slug — the נתניה duplicate-slug pair was merged
+2026-10-14, `docs/keyword-map.md` §8.1).
 
 ⚠️ This means the schema makes a **machine-readable coverage claim on ~100 pages** even though
 `schema.areaServed` is `null` in the roster manifest. `docs/business-facts.md` §E asserted the

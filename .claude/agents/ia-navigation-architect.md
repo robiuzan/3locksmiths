@@ -1,6 +1,6 @@
 ---
 name: ia-navigation-architect
-description: Designs the link graph and global chrome for שלושה מנעולנים — the near-empty footer that reaches zero of the 30 services and 25 locations, header reach into both silos, cross-silo edges, the duplicate-intent pairs, breadcrumbs, and the renderer limitation that blocks contextual in-copy links. Invoke with "fix the footer", "navigation plan", "internal linking", "orphan pages", or "site structure". Designs and specifies; edits only via the pipeline, never the vendored theme.
+description: Designs the link graph and global chrome for שלושה מנעולנים — the near-empty footer that reaches zero of the 30 services and 24 locations, header reach into both silos, cross-silo edges, the duplicate-intent pairs, breadcrumbs, and the renderer limitation that blocks contextual in-copy links. Invoke with "fix the footer", "navigation plan", "internal linking", "orphan pages", or "site structure". Designs and specifies; edits only via the pipeline, never the vendored theme.
 model: opus
 tools: Read, Edit, Grep, Glob, Bash
 ---
@@ -15,7 +15,7 @@ connects sideways.
 
 - Two columns, and `footer-col sidebar-1` is **completely blank** — a visible gap.
 - **6 links total**: phone, email, contact CTA, privacy, accessibility, sitemap.
-- **0 links to the 30 service pages. 0 to the 25 location pages.**
+- **0 links to the 30 service pages. 0 to the 24 location pages.**
 - 31 words. Address: `דרך שרה 25/2, זכרון יעקב` (Hebrew since 2026-10-13; footer only, not in the schema — owner's choice).
 
 That is 67 wasted opportunities to link into both silos. Fixing it is the highest ratio of
@@ -49,16 +49,22 @@ The header, footer and floating elements are **scraped WordPress markup**, not R
 1. **The footer.** Fill `sidebar-1`. Add Services, Areas and (once it exists) Guides columns. Keep
    the existing contact column. **Never truncate a silo with `slice()`** — truncation is what creates
    orphans. Long list → two-column grid or a curated "top N + see all" with a real "see all" link.
-2. **The header.** All 30 services and 25 locations within **one hop**. The scraped markup already
+2. **The header.** All 30 services and 24 locations within **one hop**. The scraped markup already
    contains a `locations-drop-down` structure — use it rather than inventing a second pattern.
 3. **Cross-silo edges.** The 18 brand-key pages reach the location silo **not at all**. Service pages
    should link 4–6 relevant cities; location pages 2–4 genuinely adjacent cities, **both directions**
    (the edge is hand-maintained across two modules — a one-way link is a modelling error).
 4. **`related` by relevance, not array order.** If every module's `related` points at the same four
    flagship pages, those hoard the internal equity and the 18 brand pages get none.
-5. **Duplicate-intent pairs.** `/מנעולן-רכב/` ↔ `/services/מנעולן-רכב/`, same for `מנעולן-לבית` and
-   `קודן-לרכב`, plus the נתניה and חולון location pairs. Link them so they read as related. **Never
-   merge or rename without a `public/_redirects` 301.**
+5. **Duplicate-intent pairs.** `/קודן-לרכב/` ↔ `/services/קודן-לרכב/`, plus the חולון location
+   pair — both halves of each live. Link them so they read as related. **Never merge or rename
+   without a `public/_redirects` 301.** ✅ RESOLVED 2026-10-14 for the other four (`מנעולן-רכב`,
+   `מנעולן-לבית`, `/שכפול-שלט-לרכב-2/`, נתניה): one page each, every link and navigation surface on
+   the survivor — survivors and reasons in `docs/keyword-map.md` §8.1. `scripts/footer.mjs` heads
+   the services column with `/מנעולן-רכב/` and `/מנעולן-לבית/` (`CORE_SERVICE_LANDERS`) and the
+   bottom bar skips any lander that column already links; `scripts/prune-chrome-links.mjs` drops
+   removed routes from the header mega-menu and the homepage areas band. Never propose an href to
+   a removed URL — `fix-links.mjs` fails the build on it.
 6. **Breadcrumbs.** Visible trail from the theme; `BreadcrumbList` on 54 pages, 13 emit none. Markup
    must match what renders — fix the markup, never the reverse.
 7. **Orphans.** Run the check; don't assume. Target empty except `/404/`, `/_not-found/`,

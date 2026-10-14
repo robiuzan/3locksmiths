@@ -1,6 +1,6 @@
 # Keyword map
 
-The intent model behind the 64 routes, and the title / H1 / description formulas every page follows.
+The intent model behind the 105 routes, and the title / H1 / description formulas every page follows.
 Cited by `hebrew-copywriter`, `seo-auditor`, `local-seo-strategist`, `aeo-geo-strategist`,
 `/seo-metadata`, `/new-service` and `/new-city`.
 
@@ -11,25 +11,27 @@ Cited by `hebrew-copywriter`, `seo-auditor`, `local-seo-strategist`, `aeo-geo-st
 The live URL scheme is inherited from WordPress and is **load-bearing** — it holds every ranking
 signal this site has. It is not tidy, and it does not get tidied.
 
-| Silo                     | Path shape                                                                                                      | Count | Intent                              |
-| ------------------------ | --------------------------------------------------------------------------------------------------------------- | ----- | ----------------------------------- |
-| Homepage                 | `/`                                                                                                             | 1     | brand + head term                   |
-| Service silo             | `/services/<he-slug>/`                                                                                          | 30    | commercial, per service             |
-| Service hub              | `/services/`                                                                                                    | 1     | navigational                        |
-| Location silo            | `/locations/<he-slug>/`                                                                                         | 17    | commercial, service × city          |
-| Top-level Hebrew landers | `/מנעולן-רכב/`, `/מנעולן-לבית/`, `/מחירון/`, `/אודותינו/`, `/אזורי-שירות/`, `/קודן-לרכב/`, `/שכפול-שלט-לרכב-2/` | 7     | head terms + trust                  |
-| Calculator steps         | `/step/<he-slug>/`                                                                                              | 4     | funnel fragments, not landing pages |
-| Legal / utility          | `/contact/`, `/privacy-policy/`, `/accessibility-statement/`, `/sitemap/`                                       | 4     | trust + utility                     |
+| Silo                     | Path shape                                                                                | Count | Intent                              |
+| ------------------------ | ----------------------------------------------------------------------------------------- | ----- | ----------------------------------- |
+| Homepage                 | `/`                                                                                       | 1     | brand + head term                   |
+| Service silo             | `/services/<he-slug>/`                                                                    | 30    | commercial, per service             |
+| Service hub              | `/services/`                                                                              | 1     | navigational                        |
+| Location silo            | `/locations/<he-slug>/`                                                                   | 24    | commercial, service × city          |
+| Top-level Hebrew landers | `/מנעולן-רכב/`, `/מנעולן-לבית/`, `/מחירון/`, `/אודותינו/`, `/אזורי-שירות/`, `/קודן-לרכב/` | 6     | head terms + trust                  |
+| Calculator steps         | `/step/<he-slug>/`                                                                        | 4     | funnel fragments, not landing pages |
+| Legal / utility          | `/contact/`, `/privacy-policy/`, `/accessibility-statement/`, `/sitemap/`                 | 4     | trust + utility                     |
 
-**108 pages total. 104 in `sitemap.xml`** (the four `/step/` routes are excluded by `app/sitemap.ts`).
+**105 pages total. 101 in `sitemap.xml`** (the four `/step/` routes are excluded by `app/sitemap.ts`).
 
-Three quirks that are deliberate:
+Quirks that are deliberate:
 
-- **Duplicate intent across silos.** `/מנעולן-רכב/` and `/services/מנעולן-רכב/` both exist, as do
-  `/מנעולן-לבית/` / `/services/מנעולן-לבית/` and `/קודן-לרכב/` / `/services/קודן-לרכב/`. Both URLs
+- **Duplicate intent across silos.** `/קודן-לרכב/` and `/services/קודן-לרכב/` both exist. Both URLs
   are live on the source site. Each carries its own canonical and its own authored module. **Do not
-  consolidate them without a `_redirects` 301 plan** — see §7.
-- **`/שכפול-שלט-לרכב-2/`** carries WordPress's duplicate-slug `-2` suffix. It is the live URL.
+  consolidate them without a `_redirects` 301 plan** — see §8.
+  ✅ RESOLVED 2026-10-14 for the other two pairs: `/מנעולן-רכב/` and `/מנעולן-לבית/` survive, and
+  their `/services/` twins 301 to them (§8.1).
+- **`/שכפול-שלט-לרכב-2/`** carried WordPress's duplicate-slug `-2` suffix. ✅ RESOLVED 2026-10-14:
+  merged into `/services/שכפול-שלט-לרכב/`, which it 301s to (§8.1).
 - **Mixed taxonomy.** Two silos use English container segments with Hebrew slugs; top-level landers
   are pure Hebrew. That is the live scheme and it stays.
 
@@ -66,7 +68,7 @@ Also Tier 2 on the door side: `דלת פלדלת`, `דלת ממד`, `מנעול 
 
 ### Tier 3 — local terms
 
-`שכפול מפתח ב<city>` across 25 cities: תל אביב, חיפה, ראשון לציון, פתח תקווה, נתניה (×2 slugs),
+`שכפול מפתח ב<city>` across 23 cities on 24 pages: תל אביב, חיפה, ראשון לציון, פתח תקווה, נתניה,
 חולון (×2 slugs), רמת גן, גבעתיים, בת ים, כפר סבא, רעננה, חדרה, קריות, אשדוד, הרצליה, רחובות,
 בני ברק, מודיעין, רמת השרון, הוד השרון, לוד, נס ציונה, ראש העין.
 
@@ -74,9 +76,11 @@ Also Tier 2 on the door side: `דלת פלדלת`, `דלת ממד`, `מנעול 
 > business no longer services them (`docs/business-facts.md` §E.1). All seven 301 to
 > `/אזורי-שירות/` via `public/_redirects`. Do not re-add them as keyword targets.
 
-> Note the duplicate-city slugs: `שכפול-מפתח-בנתניה` **and** `שכפול-מפתחות-בנתניה`;
-> `שכפול-מפתח-חולון` **and** `שכפול-מפתחות-חולון`. Both of each pair are live. Treat as §7 — do not
-> merge without a 301 plan.
+> Note the duplicate-city slugs: `שכפול-מפתח-חולון` **and** `שכפול-מפתחות-חולון`. Both are live.
+> Treat as §8 — do not merge without a 301 plan.
+>
+> ✅ RESOLVED 2026-10-14: the נתניה pair (`שכפול-מפתח-בנתניה` / `שכפול-מפתחות-בנתניה`) was merged —
+> `שכפול-מפתח-בנתניה` survives and the other 301s to it (§8.1).
 >
 > **קריות is a region, not a city.** Any template that interpolates a bare `ב${city}` produces wrong
 > Hebrew for it. See §6.
@@ -149,7 +153,7 @@ Everything below is `<h2>`/`<h3>` with no skipped levels. `lib/enrich/render.mjs
 
 ## 5. Description formula
 
-150–160 characters, unique per route. Present on 104 of 108 pages today.
+150–160 characters, unique per route. Present on 101 of 105 pages today.
 
 ```
 <שירות> ב<מקום/מותג> <בידול אמיתי>. <מה קורה בפועל>. חייגו 076-599-1266.
@@ -187,7 +191,7 @@ see `docs/schema-graph.md` §5.
 
 ## 7. The expansion cap
 
-30 services × 25 locations = 750 possible cells. **Do not build them.**
+30 services × 24 locations = 720 possible cells. **Do not build them.**
 
 Order of operations:
 
@@ -209,9 +213,56 @@ gaps are in the pages that were skipped, not in the ones that don't exist yet.
 Every path in `content/site.json` is a live WordPress permalink carrying real ranking signal. This
 includes the ones that look like mistakes:
 
-- `/שכפול-שלט-לרכב-2/` — the `-2` is WordPress's duplicate-slug suffix.
-- `שכפול-מפתח-בנתניה` vs `שכפול-מפתחות-בנתניה`, and the same pair for חולון.
-- The `/מנעולן-רכב/` ↔ `/services/מנעולן-רכב/` duplicates.
+- `שכפול-מפתח-חולון` vs `שכפול-מפתחות-חולון` — both live.
+- The `/קודן-לרכב/` ↔ `/services/קודן-לרכב/` duplicates — both live.
 
 Renaming or merging any of them **without a `public/_redirects` 301 discards the signal that URL
 holds.** That is a deliberate project with a redirect map, not a cleanup task.
+
+✅ RESOLVED 2026-10-14: `/שכפול-שלט-לרכב-2/`, the נתניה pair and the `/מנעולן-רכב/` ↔
+`/services/מנעולן-רכב/` duplicates were listed here until the merge in §8.1. They followed this
+rule — the 301 plan shipped with the merge — and they are the precedent for the two pairs above.
+
+### 8.1 The 2026-10-14 merge — four pairs, one page each
+
+Owner instruction 2026-10-14: each pair below becomes one page — keep the SEO-strongest, 301 the
+other to it, and point every link and navigation surface at the survivor.
+
+| Pair           | Kept (survivor)                               | Removed → 301 to survivor                  | Why the survivor won                                                                   |
+| -------------- | --------------------------------------------- | ------------------------------------------ | -------------------------------------------------------------------------------------- |
+| מנעולן רכב     | `/מנעולן-רכב/` (id 77, core lander)           | `/services/מנעולן-רכב/` (id 93)            | shorter exact-match URL; 439 vs 145 inbound internal links; the original lander        |
+| מנעולן לבית    | `/מנעולן-לבית/` (id 78, core lander)          | `/services/מנעולן-לבית/` (id 94)           | same reasons; 319 vs 143 inbound links                                                 |
+| שכפול שלט לרכב | `/services/שכפול-שלט-לרכב/` (id 115, service) | `/שכפול-שלט-לרכב-2/` (id 113)              | the `-2` is WordPress's duplicate-slug artefact; 244 vs 109 inbound links              |
+| נתניה          | `/locations/שכפול-מפתח-בנתניה/` (id 140)      | `/locations/שכפול-מפתחות-בנתניה/` (id 149) | matches the `שכפול-מפתח-ב<city>` pattern of the other cities; 268 vs 224 inbound links |
+
+> ⚠️ **Which half Google indexed is not known.** The last recorded Search Console URL Inspection
+> sweep (2026-09-02) found neither member of any pair indexed, and the repo holds no newer per-URL
+> indexing data. The survivors were chosen on URL shape and internal-link weight, not on Google's
+> preference. 🔶 The owner should re-check both halves of each pair in GSC before deploy.
+
+**How it ships:**
+
+- `scripts/pages.mjs` `PRUNE_PATHS` lists the four removed paths (lowercase percent-encoded), so they
+  stop shipping. `content/enriched/93.mjs`, `94.mjs`, `113.mjs` and `149.mjs` are deleted.
+- 20 authored modules had their links to a removed page repointed at the survivor — dropped instead
+  where that would self-link (77, 78) or duplicate an entry already in the list (105, 148, 158).
+- `scripts/footer.mjs`: a core lander that is a service page to a visitor (`CORE_SERVICE_LANDERS`)
+  heads the services column once its `/services/` twin is gone, so `/מנעולן-רכב/` and
+  `/מנעולן-לבית/` top it; the bottom bar skips any lander the services column already links. The
+  bottom bar still carries `/קודן-לרכב/` and the חולון twin.
+- The header city mega-menu and the homepage areas band are pruned by
+  `scripts/prune-chrome-links.mjs`, which is route-driven.
+- `public/_redirects`: 16 fallback lines — 4 per removed URL (slash / no-slash × lowercase /
+  uppercase hex) — each 301 to the survivor.
+
+> 🔶 **Pending owner — the lowercase 301 is not live.** The Cloudflare Pages defect
+> (`docs/business-facts.md` §E.1.1) uppercase-normalises rule sources, and this site publishes
+> lowercase `%d7` — so the `_redirects` lines catch **only UPPERCASE** traffic. The lowercase form,
+> the one the sitemap, canonicals and every href carried, needs a **zone-level Cloudflare Redirect
+> Rule** on `lower(http.request.uri.path)`; the expression is written out in the merged-twins
+> section of `public/_redirects`. Adding it is the owner's action and it has not been done. Never
+> record it as done until the curl in that file's VERIFYING section passes, lowercase and uppercase.
+
+**Not merged — still live twins.** `/קודן-לרכב/` (189) ↔ `/services/קודן-לרכב/` (97), and
+`/locations/שכפול-מפתח-חולון/` ↔ `/locations/שכפול-מפתחות-חולון/`, were out of scope on 2026-10-14.
+Both halves of each stay live, under the rule at the top of this section.

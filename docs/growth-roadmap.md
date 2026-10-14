@@ -14,7 +14,7 @@ Be precise about this, because it changes what the work should be.
 
 **Strong already — protect it:**
 
-- Content depth is genuinely good: median ~1,500 unique words per page, and the 25 location pages
+- Content depth is genuinely good: median ~1,500 unique words per page, and the 24 location pages
   **pass the doorway test** with named neighbourhoods and real local reasoning (§3).
 - Technical SEO foundations are sound: canonicals on every page, sitemap derived from data with no
   hand-maintained array, exactly one `<h1>` on all 66 pages (build-enforced), zero duplicate titles or
@@ -239,7 +239,9 @@ note this is a **routing change**, not just another module.
 **Not before 4a.** Then, in order:
 
 1. Fix `קריות` typed as `City` → `AdministrativeArea` (§4.5).
-2. Differentiate the duplicate-city pairs (נתניה ×2, חולון ×2) rather than leaving near-twins.
+2. Differentiate the duplicate-city pair (חולון ×2) rather than leaving near-twins. ✅ The נתניה
+   pair was merged 2026-10-14 on the owner's instruction — `/locations/שכפול-מפתחות-בנתניה/` 301s to
+   `/locations/שכפול-מפתח-בנתניה/` (`docs/keyword-map.md` §8).
 3. **Emergency × city** for the top 5 cities only — `פתיחת רכב נעול בתל אביב` has real, urgent volume.
 4. Sub-city neighbourhood pages for Tel Aviv / Jerusalem / Haifa **only** where three or more genuinely
    local facts exist.
@@ -263,13 +265,18 @@ links (blocked on a renderer change — `docs/information-architecture.md` §4),
 calculator decision.
 
 1. **Service ↔ location cross-links** — the largest missing edge in the graph. The 24 brand-key pages
-   don't reach the 25 location pages at all (§9.3).
+   don't reach the 24 location pages at all (§9.3).
 2. **Contextual in-copy anchors** with descriptive Hebrew text. Nearly every internal link today is a
    nav label or card title, so the site emits almost no anchor-text diversity (§9.4).
 3. **Relevance-based `related`**, not array order — otherwise the flagship pages hoard internal equity
    (`/internal-linking` §2).
 4. **Give the hubs prose.** `/services/` is a bare grid at 371 words; `/אזורי-שירות/` likewise.
-5. **Link the duplicate-intent pairs** rather than merging them (a merge needs a `_redirects` 301).
+5. **Link the remaining duplicate-intent pairs** — `/קודן-לרכב/` ↔ `/services/קודן-לרכב/` and the
+   חולון pair are still live twins — rather than merging them without a plan (a merge needs a
+   `_redirects` 301). ✅ Four pairs were merged 2026-10-14 on the owner's instruction, each with a
+   301 to its survivor (`docs/keyword-map.md` §8, backlog §9.7). 🔶 Those 301s catch only
+   uppercase-encoded traffic until the owner adds the zone-level Redirect Rule for the lowercase
+   form (`docs/business-facts.md` §E.1.1) — not yet done.
 6. **Breadcrumbs everywhere**, with `BreadcrumbList` on the 11 pages that emit none (§4.8).
 7. **Revive the price calculator.** The four `/step/` pages are a genuine interactive conversion asset
    sitting at 173–182 words, excluded from the sitemap, and completely untracked. Either invest in it —

@@ -5,8 +5,8 @@ description: Israeli local-SEO doctrine for שלושה מנעולנים — the 
 
 # Local SEO — Israel
 
-One business, **no published address**, 25 location pages. Everything below follows from that
-asymmetry.
+One business, **no published address**, 24 location pages covering 23 distinct cities. Everything
+below follows from that asymmetry.
 
 ## 0. Start from the right premise
 
@@ -108,26 +108,36 @@ Typing a region as a `City` is a factual error in the graph. See `/schema-struct
 
 ## 5. Duplicate-city slugs
 
-Two cities have two live pages each:
+One city still has two live pages:
 
-- `/locations/שכפול-מפתח-בנתניה/` **and** `/locations/שכפול-מפתחות-בנתניה/`
 - `/locations/שכפול-מפתח-חולון/` **and** `/locations/שכפול-מפתחות-חולון/`
 
-Both of each pair are live WordPress URLs holding ranking signal. Assess cannibalisation — titles and
-descriptions currently differ, so it is not acute — but **a merge is only ever safe with a
-`public/_redirects` 301**. Not a cleanup task (`docs/keyword-map.md` §8).
+Both are live WordPress URLs holding ranking signal. Assess cannibalisation — titles and descriptions
+currently differ, so it is not acute — but **a merge is only ever safe with a `public/_redirects`
+301**. Not a cleanup task (`docs/keyword-map.md` §8). The same applies to the one cross-silo duplicate
+still live: `/קודן-לרכב/` ↔ `/services/קודן-לרכב/`.
 
-The same applies to the cross-silo duplicates: `/מנעולן-רכב/` ↔ `/services/מנעולן-רכב/`, and the same
-for `מנעולן-לבית` and `קודן-לרכב`.
+✅ **RESOLVED 2026-10-14 for four pairs** (owner instruction) — merged into the SEO-strongest half,
+the other 301s to it: נתניה keeps `/locations/שכפול-מפתח-בנתניה/` (`/locations/שכפול-מפתחות-בנתניה/`
+is gone), the cross-silo `מנעולן-רכב` and `מנעולן-לבית` pairs keep their core landers, and
+`/שכפול-שלט-לרכב-2/` now 301s to `/services/שכפול-שלט-לרכב/`. Survivors and reasons:
+`docs/keyword-map.md` §8.
+
+- **Which half Google indexed is unknown.** The last recorded Search Console URL Inspection sweep
+  (2026-09-02) found **neither** member of any of the four pairs indexed, and the repo holds no newer
+  per-URL indexing data. 🔶 The owner should re-check GSC before deploy.
+- 🔶 The `public/_redirects` fallback lines catch **uppercase-hex traffic only** (Cloudflare Pages
+  uppercase-normalises rule sources; the site publishes lowercase `%d7`). The lowercase form needs a
+  zone-level Redirect Rule on `lower(http.request.uri.path)` — **the owner's action, not yet done**.
 
 ## 6. Coverage honesty — four different answers
 
-| Source                        | Says              |
-| ----------------------------- | ----------------- |
-| Manifest `schema.areaServed`  | `null`            |
-| Sitewide copy (not the title) | פריסה רחבה        |
-| `scripts/enrich.mjs:CITIES`   | 23 derived cities |
-| `/locations/` routes          | 25 cities         |
+| Source                        | Says                |
+| ----------------------------- | ------------------- |
+| Manifest `schema.areaServed`  | `null`              |
+| Sitewide copy (not the title) | פריסה רחבה          |
+| `scripts/enrich.mjs:CITIES`   | 23 derived cities   |
+| `/locations/` routes          | 24 pages, 23 cities |
 
 An `areaServed` the business cannot actually service is a liability — it produces leads it can't serve
 and a claim it can't defend. Reconcile via `docs/business-facts.md` §E, then derive the schema list
@@ -152,7 +162,7 @@ it in `docs/business-facts.md` §E rather than padding. Full spec: `docs/content
 
 ## 9. The expansion cap
 
-30 services × 25 locations = 750 possible cells. **Do not build them.** Order of operations
+30 services × 24 locations = 720 possible cells. **Do not build them.** Order of operations
 (`docs/keyword-map.md` §7):
 
 1. Author `content/enriched/95.mjs` — a Tier-1 term currently on the site's weakest page.
@@ -182,6 +192,6 @@ contextually into the city set, and no location links to an adjacent city beyond
 ## Gotchas
 
 - **Never** a `LocalBusiness` node per city. One business, one node.
-- Never rename or merge a live slug without a `_redirects` 301 — including the duplicate-city pairs.
+- Never rename or merge a live slug without a `_redirects` 301 — including the remaining חולון pair.
 - Never invent an address, a review, a rating or a coverage claim to fill a checkbox.
 - Never edit `content/site.json`; the fix is always in an authored module or a pipeline script.

@@ -46,11 +46,12 @@ Consequences you must internalise:
 - **Phone (click-to-call):** `076-599-1266` (E.164 `+972765991266`) · **WhatsApp is still
   `+972556601006`** — the 076 line is not WhatsApp-capable, see `docs/business-facts.md` §C.5 ·
   `info@3locksmiths.co.il`.
-- **Coverage:** 25 location pages. Seven cities were withdrawn 2026-09-02 because the business no
+- **Coverage:** 24 location pages, 23 distinct cities (חולון still has two pages; the נתניה twin
+  was merged 2026-10-14 — §3 rule 5). Seven cities were withdrawn 2026-09-02 because the business no
   longer services them — see `docs/business-facts.md` §E.1. The sitewide phrase is now פריסה רחבה,
   not פריסה ארצית (§E.2), and it is still 🔶 — it is NOT in the homepage title, which §E used to say.
 - **Conversion goals, in order:** (1) phone call, (2) WhatsApp, (3) the Web3Forms lead form.
-- **Scale:** 71+ pages — 30 services, 25 locations, 7 top-level Hebrew landers, a /מדריכים/ guides
+- **Scale:** 71+ pages — 30 services, 24 locations, 6 top-level Hebrew landers, a /מדריכים/ guides
   hub + guides, an emergency cluster, 4 calculator steps, 4 legal/utility, 1 service hub, 1 homepage.
   Counts move as content ships — read `content/enriched/_manifest.json`, never assume.
 
@@ -82,9 +83,16 @@ Consequences you must internalise:
    overrides go in `app/enrich.css`; behaviour changes go in an enhancement layer.
 5. **Never rename or merge a live slug** without a `public/_redirects` 301 plan. Every path in
    `content/site.json` is a live WordPress permalink holding real ranking signal — **including** the
-   ones that look like typos: `/שכפול-שלט-לרכב-2/`, the `שכפול-מפתח-בנתניה` / `שכפול-מפתחות-בנתניה`
-   pair, the same pair for חולון, and the `/מנעולן-רכב/` ↔ `/services/מנעולן-רכב/` duplicates.
-   `docs/keyword-map.md` §8.
+   ones that look like typos: the `שכפול-מפתח-חולון` / `שכפול-מפתחות-חולון` pair and the
+   `/קודן-לרכב/` ↔ `/services/קודן-לרכב/` duplicates, both still live twins. `docs/keyword-map.md` §8.
+   ✅ **2026-10-14: four pairs were merged under exactly this rule** (owner instruction) — the
+   survivors are `/מנעולן-רכב/`, `/מנעולן-לבית/`, `/services/שכפול-שלט-לרכב/` and
+   `/locations/שכפול-מפתח-בנתניה/`; `/services/מנעולן-רכב/`, `/services/מנעולן-לבית/`,
+   `/שכפול-שלט-לרכב-2/` and `/locations/שכפול-מפתחות-בנתניה/` are pruned (`scripts/pages.mjs`
+   `PRUNE_PATHS`) and 301 to them. 🔶 The `public/_redirects` lines catch **uppercase-hex traffic
+   only** (the Pages rule-source defect); the lowercase form the site publishes needs a zone-level
+   Redirect Rule on `lower(http.request.uri.path)` — **the owner's action, not yet done**. Survivors
+   and the reasons each won: `docs/keyword-map.md` §8.
 6. **Do not import Tailwind's preflight or theme layer.** See §1. `app/globals.css` explains why in
    full; read the comment before touching it.
 7. **Pushing to `main` does not deploy production.** Production is Cloudflare Pages via
@@ -132,7 +140,7 @@ actions and ISR. Response headers come from `public/_headers` at the Cloudflare 
 app/
   layout.tsx           <html lang="he" dir="rtl">, GTM, icons, metadataBase
   page.tsx             the WordPress front page (id 7)
-  [...slug]/page.tsx   catch-all for all 63 other permalinks, dynamicParams = false
+  [...slug]/page.tsx   catch-all for all 104 other routes, dynamicParams = false
   sitemap.ts robots.ts
   globals.css          Tailwind UTILITIES ONLY — read the comment before editing
   enrich.css           styling for the authored blocks, scoped under .content-blocks
@@ -154,7 +162,7 @@ scripts/               scrape → transform → pages → build-manifest → enr
                        + calendar-sync.mjs (NETWORKED, human-run, never in a chain — see /israeli-calendar)
 content/
   site.json            ⭐ 18.5 MB build artifact — NEVER hand-edit
-  enriched/<id>.mjs    ⭐ 57 authored pages + _manifest.json (92xx guides, 93xx emergency)
+  enriched/<id>.mjs    ⭐ 94 authored pages + _manifest.json (92xx guides, 93xx emergency)
   enriched/_campaigns.mjs  ⭐ the announcement bar's lines and their windows — EDIT HERE
   enriched/_calendar.json  generated Israeli calendar (Hebcal, CC BY 4.0) — never hand-edit;
                            its hand-kept input is _calendar.overlay.json
