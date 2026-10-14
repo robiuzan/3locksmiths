@@ -326,7 +326,7 @@ export default {
   },
   related: {
     services: [
-      { label: "מנעולן לבית", href: "/services/מנעולן-לבית/" },
+      { label: "מנעולן לבית", href: "/מנעולן-לבית/" },
       { label: "תיקון דלתות", href: "/services/תיקון-דלתות/" },
       { label: "מנעול רב בריח", href: "/services/מנעול-רב-בריח/" },
       { label: "מולטילוק", href: "/services/מולטילוק/" },

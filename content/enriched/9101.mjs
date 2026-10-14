@@ -322,7 +322,7 @@ export default {
   },
   related: {
     services: [
-      { label: "מנעולן לבית", href: "/services/מנעולן-לבית/" },
+      { label: "מנעולן לבית", href: "/מנעולן-לבית/" },
       { label: "החלפת מנעולים", href: "/services/החלפת-מנעולים/" },
       { label: "דלת פלדלת", href: "/services/דלת-פלדלת/" },
       { label: "דלת ממד", href: "/services/דלת-ממד/" },

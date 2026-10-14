@@ -120,7 +120,7 @@ const infoLinks = byKind("core")
   .filter((p) => p.path && p.path !== HUB_AREAS && !inServiceColumn.has(p.path))
   .map((p) => ({ label: p.keyword || p.title, href: p.path }))
   // …plus any location twin deduped out of the areas column, so it keeps an inbound link.
-  // Labelled with its full keyword ("שכפול מפתחות נתניה") rather than the bare city, so the
+  // Labelled with its full keyword ("שכפול מפתח בחולון") rather than the bare city, so the
   // two halves of the pair are distinguishable.
   .concat(
     areaTwins.map((t) => {
@@ -144,6 +144,8 @@ const column = (heading, links, hubHref, hubLabel, extraClass) =>
 
 let rebuilt = 0;
 let skipped = 0;
+const liveRoutes = new Set(site.pages.map((p) => p.path));
+const staleDropped = new Map();
 
 for (const page of site.pages) {
   if (!/<footer/i.test(page.bodyHtml)) {
@@ -194,8 +196,26 @@ for (const page of site.pages) {
   // Bottom bar: prepend the informational landers to the legal menu, so /מחירון/ and
   // /אודותינו/ get a sitewide link without duplicating a label already in the services
   // column. Idempotent — skips anything already present.
+  //
+  // `npm run enrich` rewrites site.json in place and never re-scrapes, so whatever an earlier
+  // run prepended is still here. Before the add, drop an entry this pass would no longer emit:
+  // one whose page is gone (the four twins merged 2026-10-14) or that the services column now
+  // links. Every drop is logged below: inside this strip it never reaches fix-links, so the log
+  // is the only record of it.
   const legalMenu = root.querySelector("footer .footer-bot .footer-menu ul");
   if (legalMenu) {
+    for (const a of legalMenu.querySelectorAll("a")) {
+      const href = a.getAttribute("href");
+      if (!href?.startsWith("/")) continue;
+      const dead = !liveRoutes.has(href);
+      if (!dead && !inServiceColumn.has(href)) continue;
+      (a.closest("li") ?? a).remove();
+      const why = dead ? "page gone" : "in services column";
+      staleDropped.set(
+        `${href} (${why})`,
+        (staleDropped.get(`${href} (${why})`) ?? 0) + 1,
+      );
+    }
     const existing = legalMenu.querySelectorAll("a").map((a) => a.getAttribute("href"));
     const prepend = infoLinks
       .filter((l) => !existing.includes(l.href))
@@ -222,6 +242,9 @@ console.log(
   `footer: rebuilt ${rebuilt} page(s) (${skipped} without a footer row) — ` +
     `${serviceLinks.length} service links, ${areaLinks.length} area links per page.`,
 );
+for (const [entry, n] of staleDropped) {
+  console.log(`   bottom bar: dropped ${decodeURIComponent(entry)} ×${n}`);
+}
 
 if (rebuilt === 0) {
   console.error("\nFOOTER PROBLEM: no page had a .footer-top .footer-row to rebuild.");

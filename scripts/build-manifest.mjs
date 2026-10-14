@@ -151,12 +151,16 @@ const brandRows = byKind("brand-key");
 const locationRows = byKind("location");
 const topLocations = locationRows.slice(0, 6);
 
-// The /services/ half of each duplicate-intent pair (/services/מנעולן-רכב/ vs /מנעולן-רכב/ and
-// so on — see the twins block below) is never a DEFAULT link target. Until 2026-09-29
-// `serviceRows.slice(0, 6)` put two or three of them on every derived service, location, core
-// and guide page, sending the silo's default equity to the side of each pair Google had not
-// indexed. Every twin page authors its own `related`, so the core -> /services/ link that keeps
-// each /services/ half reachable lives in those authored lists (77, 78, 113, 189) — keep it there.
+// The /services/ half of a duplicate-intent pair (since the 2026-10-14 merge only
+// /services/קודן-לרכב/ vs /קודן-לרכב/ — see the twins block below) is never a DEFAULT link
+// target. Until 2026-09-29 `serviceRows.slice(0, 6)` put two or three of them on every derived
+// service, location, core and guide page, sending the silo's default equity to the /services/
+// side of each pair — "the side Google had not indexed", as the 2026-09-29 change put it. No
+// per-URL record of that is in the repo; the last recorded URL Inspection sweep (2026-09-02)
+// found neither half of any pair indexed. The twin page authors its own
+// `related`, so the core -> /services/ link that keeps /services/קודן-לרכב/ reachable lives in
+// 189's authored list — keep it there. 77, 78 and 113 carried the same link until their pairs
+// were merged (docs/keyword-map.md §8.1); 115 has no core twin now, so it is an ordinary row.
 const coreKeywords = new Set(byKind("core").map(normKeyword));
 const serviceRows = byKind("service").filter((r) => !coreKeywords.has(normKeyword(r)));
 
@@ -229,14 +233,16 @@ for (const r of rows) {
 }
 
 // --- duplicate-intent twins ------------------------------------------------------------
-// Several head terms exist at BOTH a top-level Hebrew permalink and a /services/ URL --
-// e.g. /מנעולן-רכב/ (core) and /services/מנעולן-רכב/, plus מנעולן-לבית, קודן-לרכב and
-// שכפול-שלט-לרכב. Both are live WordPress permalinks holding ranking signal, so they are
-// never merged (docs/keyword-map.md §8). Instead each twin links to the other, so they read
-// as related rather than competing (docs/information-architecture.md §3.2).
+// A head term can exist at BOTH a top-level Hebrew permalink and a /services/ URL -- today
+// only /קודן-לרכב/ (core, 189) and /services/קודן-לרכב/ (97). Both are live WordPress
+// permalinks holding ranking signal, so they are never merged without a public/_redirects 301
+// plan (docs/keyword-map.md §8). Instead each twin links to the other, so they read as related
+// rather than competing (docs/information-architecture.md §3.2).
 //
-// This also fixes a real orphan: /שכפול-שלט-לרכב-2/ (the WordPress duplicate-slug suffix)
-// had ZERO inbound links sitewide until this edge existed.
+// The מנעולן-רכב, מנעולן-לבית and שכפול-שלט-לרכב pairs were grouped here too until the owner had
+// them merged on 2026-10-14 (survivors 77, 78, 115; the others 301 — docs/keyword-map.md §8.1).
+// This edge once fixed a real orphan: /שכפול-שלט-לרכב-2/ (the WordPress duplicate-slug suffix,
+// merged away 2026-10-14) had ZERO inbound links sitewide until it existed.
 const byKeyword = new Map();
 for (const r of rows) {
   const k = normKeyword(r);
