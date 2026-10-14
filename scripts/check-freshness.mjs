@@ -63,6 +63,8 @@ if (existsSync(reviewsDir)) {
   }
 }
 sources.push(join(ROOT, "site.config.json"));
+// The reviews slider script: its content hash is written into site.json (assets.reviewsJs).
+sources.push(join(ROOT, "public", "assets", "reviews.js"));
 // The card behaviour file: its content hash is written into site.json (assets.liveJs).
 sources.push(join(ROOT, "public", "assets", "live.js"));
 

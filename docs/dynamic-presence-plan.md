@@ -85,9 +85,12 @@ deploy, no third-party widget, no edge HTML rewriting, no second React client is
    chain re-parse the body with node-html-parser's defaults, which drop comments, so the marker
    became an attribute. Wherever this document still says "`lm:ignore` sentinels", read "a
    `data-lm-ignore` region"._
-4. **Runtime input can only hide or select among pre-guarded variants — never inject text.** The one
+4. **Exception — the reviews slider only (State C, owner decisions 2026-10-13):** `public/assets/reviews.js` may place Google review content (reviewer name, stars, date, the original text) into the static slider shell that `scripts/reputation.mjs` renders, from ONE same-origin endpoint, `/api/reviews` — the standalone Worker in `workers/reviews/` (never `functions/`). It writes only by cloning the shell's `<template>` and setting `textContent` and allowlisted attributes; every other word is HTML in `content/site.json`. No review content is stored in `content/site.json`, git or logs — only the Worker's KV entry, ≤ 24 h. It shows nothing until `live.enabled` in `content/enriched/_reputation.mjs` (after Google approves API access), and fails closed to the static line. Never filtered by stars; never review schema. `scripts/check-reputation.mjs` enforces the shell and the script.
+
+   Otherwise: **runtime input can only hide or select among pre-guarded variants — never inject text.** The one
    runtime input is `status.json` (§4.4); if it is unreachable, slow or malformed the site fails
    **closed**: promos hidden, the evergreen phone line always visible.
+
 5. **No review, rating, count, badge, testimonial or "live stat" without a dated, sourced ledger
    row — and no `Review`/`AggregateRating` markup ever** (CI fails the build on it; Google gives no
    stars for self-serving reviews anyway).

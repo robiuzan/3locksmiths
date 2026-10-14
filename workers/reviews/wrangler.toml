@@ -1,0 +1,27 @@
+# 3locksmiths-reviews — deployed on its own from this folder (README.md), never with the site.
+# No secret belongs in this file: secrets go in with `wrangler secret put` (README step 5).
+name = "3locksmiths-reviews"
+main = "worker.mjs"
+compatibility_date = "2026-10-01"
+workers_dev = false
+
+routes = [
+  { pattern = "3locksmiths.co.il/api/reviews*", zone_name = "3locksmiths.co.il" },
+  { pattern = "www.3locksmiths.co.il/api/reviews*", zone_name = "3locksmiths.co.il" },
+]
+
+[[kv_namespaces]]
+binding = "REVIEWS"
+id = "SET_AFTER_wrangler_kv_namespace_create"   # README step 3
+
+[triggers]
+crons = ["17 */6 * * *"]
+
+[vars]
+LEDGER_URL = "https://3locksmiths.co.il/assets/reputation.json"
+GBP_ACCOUNT_ID = ""    # README step 6 — resolved once from the Business Profile APIs
+GBP_LOCATION_ID = ""
+
+# Review bodies must never reach a log.
+[observability]
+enabled = false

@@ -103,11 +103,11 @@ Consequences you must internalise:
 
 ## 4. Stack
 
-Next.js **16.2.9** App Router · React **19.2.4** · TypeScript strict · Tailwind **v4, utilities layer
+Next.js **16.4.0** App Router · React **19.2.4** · TypeScript strict · Tailwind **v4, utilities layer
 only** · `@ishub/site-kit` (vendored tarball) · `he` · `node-html-parser` (build
 scripts). Flat layout, path alias `@/* -> ./*`.
 
-> ⚠️ **This is not the Next.js you know.** 16.2.9 has breaking changes against older majors — `params`
+> ⚠️ **This is not the Next.js you know.** 16.4.0 has breaking changes against older majors — `params`
 > is a `Promise` in route handlers, and metadata/image APIs moved. Read
 > `node_modules/next/dist/docs/` before touching routing, metadata or image APIs. See `AGENTS.md`.
 
@@ -431,5 +431,5 @@ sitemap parity, unique titles, one H1, **JSON-LD parseability**, no `aggregateRa
 - Any topbar, popup, banner, feed, seasonal or reviews surface follows
   [docs/dynamic-presence-plan.md](docs/dynamic-presence-plan.md) and `/dynamic-presence`: every
   word ships through `content/site.json`, the browser only _selects_ a pre-guarded variant, the
-  edge only _hides_. Never a runtime text source, never a `functions/` folder, never a second
+  edge only _hides_. Never a runtime text source (one exception: the reviews slider — `docs/dynamic-presence-plan.md` §2.2 rule 4), never a `functions/` folder, never a second
   client component for it.

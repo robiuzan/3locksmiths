@@ -4,7 +4,12 @@ import "./globals.css";
 import "./enrich.css";
 import SiteAssets from "@/components/SiteAssets";
 import StickyCta from "@/components/StickyCta";
-import { getLiveHeadScript, getLiveScriptSrc, getSite } from "@/lib/content";
+import {
+  getLiveHeadScript,
+  getLiveScriptSrc,
+  getReviewsScriptSrc,
+  getSite,
+} from "@/lib/content";
 import { type SiteManifest } from "@ishub/site-kit";
 import { gtmHeadSnippet, gtmNoScriptSrc } from "@ishub/site-kit/analytics";
 import siteManifest from "@/site.config.json";
@@ -47,6 +52,14 @@ const liveHead = getLiveHeadScript();
  * document is right.
  */
 const liveJs = getLiveScriptSrc();
+
+/**
+ * The reviews slider (public/assets/reviews.js) — present only while content/enriched/
+ * _reputation.mjs `live.enabled` is on. Printed here, in the root layout, for the same reason as
+ * live.js: React does not run a <script> rendered inside a page body on the one soft navigation.
+ * It is idempotent and does nothing on a page without a slider shell.
+ */
+const reviewsJs = getReviewsScriptSrc();
 
 /** CDN host for manifest-managed media (the OG card today). Drives the <head> preconnect. */
 const mediaHost = manifest.images?.mediaHost;
@@ -176,6 +189,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           whatsappE164={manifest.contact.whatsappE164 ?? manifest.contact.phoneE164}
         />
         {liveJs && <script src={liveJs} defer />}
+        {reviewsJs && <script src={reviewsJs} defer />}
       </body>
     </html>
   );

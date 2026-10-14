@@ -41,8 +41,10 @@ const AI_CRAWLERS = [
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
-      { userAgent: "*", allow: "/" },
-      { userAgent: AI_CRAWLERS, allow: "/" },
+      // /api/ is the reviews Worker (workers/reviews/) — JSON for the slider, not a page. Both
+      // groups carry it: a crawler that matches the AI group ignores the "*" group entirely.
+      { userAgent: "*", allow: "/", disallow: "/api/" },
+      { userAgent: AI_CRAWLERS, allow: "/", disallow: "/api/" },
     ],
     sitemap: "https://3locksmiths.co.il/sitemap.xml",
     host: "https://3locksmiths.co.il",

@@ -72,6 +72,8 @@ export interface SiteData {
     liveHead?: string;
     /** The versioned URL of public/assets/live.js — see getLiveScriptSrc(). */
     liveJs?: string;
+    /** The versioned URL of public/assets/reviews.js, present only in live mode — see getReviewsScriptSrc(). */
+    reviewsJs?: string;
   };
   pages: SitePage[];
 }
@@ -119,6 +121,15 @@ export function getLiveHeadScript(): string | null {
  */
 export function getLiveScriptSrc(): string | null {
   return site.assets.liveJs ?? null;
+}
+
+/**
+ * The URL of public/assets/reviews.js (`?v=` content hash), or null while the reviews slider's
+ * live mode is off (content/enriched/_reputation.mjs `live.enabled`). The file fills the slider
+ * shell from /api/reviews and carries no copy. Written by scripts/reputation.mjs.
+ */
+export function getReviewsScriptSrc(): string | null {
+  return site.assets.reviewsJs ?? null;
 }
 
 export function getFrontPage(): SitePage {

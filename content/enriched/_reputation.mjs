@@ -27,9 +27,26 @@ export default {
     ask: "עבדנו אצלכם? כתבו לנו ביקורת בגוגל",
     newTab: " (נפתח בחלון חדש)",
     bandLabel: "ביקורות בגוגל",
+    // The review slider (live mode only). Every word ships here — public/assets/reviews.js carries none.
+    sliderNotice:
+      "הביקורות שנכתבו או עודכנו לאחרונה בגוגל, מהחדשה לישנה. אנחנו לא מסננים ולא בוחרים אילו ביקורות יוצגו.",
+    sliderLabel: "ביקורות מגוגל",
+    prev: "הביקורת הקודמת",
+    next: "הביקורת הבאה",
+    position: "{n} מתוך {total}",
+    anonymous: "ביקורת אנונימית",
+    cardRating: "דירוג {n} מתוך 5",
+    edited: "עודכנה",
+    ratingOnly: "דירוג בלבד",
   },
   // The "write a review" link (Google's own "Get more reviews" link, roster schema.reviewsWriteUri).
   ask: { enabled: true },
+  // Live mode (State C): the slider + numbers refreshed from the Business Profile API through the
+  // Worker in workers/reviews/. Switch ON only after Google approves API access (case
+  // 9-8690000041019) AND the Worker answers on https://3locksmiths.co.il/api/reviews — see
+  // workers/reviews/README.md. Owner 2026-10-13: every review shown, low ratings included; at most
+  // 10 reviews newer than the newest confirmed read; no review schema.
+  live: { enabled: false, endpoint: "/api/reviews", cap: 10, tolerance: 10 },
   reads: [
     {
       date: "2026-10-13",

@@ -998,6 +998,115 @@ html[data-live="off"] body .live-reviews-band {
   display: none;
 }
 
+/* ---- the reviews slider (live mode, plan §3.4 State C) ----------------------------------------
+   Shell rendered by scripts/reputation.mjs inside .live-reviews-band, filled by
+   public/assets/reviews.js from /api/reviews. Native scroll-snap — it follows dir="rtl" by itself,
+   swipes with no JS, and needs no carousel library (never the theme's owl: rtl.css forces it LTR).
+   Arrows are real buttons ≥ 44 px; no autoplay. Long reviews are shown in full, never clamped —
+   there is no per-review link to read the rest. Cards copy the .live-updates tokens. */
+body .live-reviews-slider {
+  margin-block-start: 20px;
+}
+body .live-reviews-slider__notice {
+  margin: 0 0 12px;
+  color: #34445b;
+  font-size: 14px;
+  text-align: center;
+}
+body .live-reviews-slider__track {
+  /* position: relative makes the track the containing block of each card's absolutely-positioned
+     .live-reviews__sr label — without it those labels escape the scroller's clipping and widen
+     the whole page by the scrolled-away cards (measured: 1265 → 1766 px at 1280). */
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  gap: 16px;
+  margin: 0;
+  padding-block: 4px 12px;
+  padding-inline: 2px;
+  list-style: none;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+}
+body .live-reviews-slider__track:focus-visible {
+  outline: 3px solid #011532;
+  outline-offset: 2px;
+}
+body .live-reviews-card {
+  position: relative;
+  flex: 0 0 min(320px, 85%);
+  scroll-snap-align: start;
+  padding: 20px;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 4px 16px rgba(1, 21, 50, 0.08);
+  color: #011532;
+  text-align: start;
+}
+body .live-reviews-card__head {
+  margin: 0 0 4px;
+  font-weight: 700;
+}
+body .live-reviews-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  margin: 0 0 8px;
+  color: #34445b;
+  font-size: 14px;
+}
+body .live-reviews-card__stars {
+  color: #9a6b00;
+  letter-spacing: 1px;
+}
+body .live-reviews-card__stars[data-stars="4"] span:nth-child(n + 5),
+body .live-reviews-card__stars[data-stars="3"] span:nth-child(n + 4),
+body .live-reviews-card__stars[data-stars="2"] span:nth-child(n + 3),
+body .live-reviews-card__stars[data-stars="1"] span:nth-child(n + 2) {
+  opacity: 0.25;
+}
+body .live-reviews-card__text,
+body .live-reviews-card__only {
+  margin: 0;
+  unicode-bidi: plaintext;
+}
+body .live-reviews-card__only {
+  color: #34445b;
+}
+body .live-reviews-slider__nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-block-start: 8px;
+}
+body .live-reviews-slider__btn {
+  min-inline-size: 44px;
+  min-block-size: 44px;
+  border: 1px solid #d9dce0;
+  border-radius: 50%;
+  background: #fff;
+  color: #011532;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+}
+body .live-reviews-slider__btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+body .live-reviews-slider__btn:focus-visible {
+  outline: 3px solid #011532;
+  outline-offset: 2px;
+}
+body .live-reviews-slider__pos {
+  color: #34445b;
+  font-size: 14px;
+}
+
 /* ---- motion preference (WCAG 2.3.3 / IS 5568) ---------------------------------------
    Zero `prefers-reduced-motion` rules exist in the vendored theme or in this file before this
    block. The theme's floating phone button pulses forever with no guard
@@ -1020,7 +1129,10 @@ html[data-live="off"] body .live-reviews-band {
   .live-dialog::backdrop,
   .live-updates,
   .live-reviews,
-  .live-reviews-band {
+  .live-reviews-band,
+  .live-reviews-slider,
+  .live-reviews-slider__track {
+    scroll-behavior: auto;
     animation: none;
     transition: none;
   }

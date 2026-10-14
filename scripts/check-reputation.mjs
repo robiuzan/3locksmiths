@@ -16,6 +16,7 @@
  *
  * Runs in npm `prebuild`.   node scripts/check-reputation.mjs   (exit 1 on any violation)
  */
+import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -30,7 +31,8 @@ import {
   latestRead,
   oneDecimal,
   validate,
-  wantsBand,
+  hasBand,
+  liveOn,
 } from "../lib/reviews/reputation.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -38,6 +40,8 @@ const REGISTER = join(ROOT, "content", "enriched", "_reputation.mjs");
 const SITE = join(ROOT, "content", "site.json");
 const MANIFEST = join(ROOT, "content", "enriched", "_manifest.json");
 const CONFIG = join(ROOT, "site.config.json");
+const REVIEWS_JS = join(ROOT, "public", "assets", "reviews.js");
+const LEDGER_OUT = join(ROOT, "public", "assets", "reputation.json");
 const PLACE_ID = "ChIJpcB6V12ivggRi8lyDvLJiNs"; // docs/business-facts.md §B.5
 const LAPSED_OK = process.env.LIVE_GATES === "lapsed-ok";
 
@@ -140,6 +144,118 @@ function checkBlock(el, where, label, { ask }) {
   }
 }
 
+const live = open && liveOn(register);
+
+/** Live mode: the band's slider shell matches the register and carries no review content. */
+function checkSlider(band, where) {
+  const sliders = band.querySelectorAll(".live-reviews-slider");
+  if (sliders.length !== (live ? 1 : 0))
+    problems.push(
+      `${where}: ${sliders.length} slider shell(s) in the band, expected ${live ? 1 : 0}`,
+    );
+  for (const sl of sliders) {
+    if (!sl.hasAttribute("hidden"))
+      problems.push(`${where}: the slider shell must start hidden`);
+    if (sl.getAttribute("data-endpoint") !== "/api/reviews")
+      problems.push(`${where}: the slider's data-endpoint must be /api/reviews`);
+    for (const [attr, want] of [
+      ["data-cap", register.live.cap],
+      ["data-tolerance", register.live.tolerance],
+      ["data-genuine", read.dashboard.total],
+      ["data-asof", read.date],
+    ]) {
+      if (sl.getAttribute(attr) !== String(want))
+        problems.push(
+          `${where}: slider ${attr}="${sl.getAttribute(attr)}" ≠ register ${want}`,
+        );
+    }
+    if (sl.querySelector(".live-reviews-slider__track")?.childNodes.length)
+      problems.push(
+        `${where}: the slider track must ship empty — review content is never stored`,
+      );
+    const tpl = sl.querySelector("template.live-reviews-slider__tpl");
+    if (!tpl) problems.push(`${where}: the slider has no card <template>`);
+    else {
+      for (const slot of [
+        ".live-reviews-card__name",
+        ".live-reviews-card__text",
+        ".live-reviews-card__date",
+      ]) {
+        const el = tpl.querySelector(slot);
+        if (!el) problems.push(`${where}: the card template lacks ${slot}`);
+        else if (el.textContent.trim())
+          problems.push(`${where}: ${slot} must ship empty`);
+      }
+    }
+    if (sl.querySelectorAll("button").length !== 2)
+      problems.push(`${where}: the slider needs exactly two arrow buttons`);
+  }
+}
+
+/**
+ * The slider script and the ledger file. reviews.js must carry no copy and no other way to write
+ * the page than the ones reviewed: textContent, `hidden`, `disabled`, and setAttribute on a short
+ * allowlist — never innerHTML, never a URL but /api/reviews.
+ */
+function checkLiveFiles() {
+  if (live !== Boolean(site.assets.reviewsJs))
+    problems.push(
+      `site.assets.reviewsJs is ${site.assets.reviewsJs ? "set" : "absent"} but live mode is ${live ? "on" : "off"}`,
+    );
+  if (existsSync(REVIEWS_JS)) {
+    const js = readFileSync(REVIEWS_JS, "utf8");
+    if (/[֐-׿]/.test(js))
+      problems.push(
+        "public/assets/reviews.js holds a Hebrew letter — copy belongs in the HTML shell",
+      );
+    for (const banned of [
+      "innerHTML",
+      "outerHTML",
+      "insertAdjacentHTML",
+      "document.write",
+      "eval(",
+      "new Function",
+    ]) {
+      if (js.includes(banned)) problems.push(`public/assets/reviews.js uses ${banned}`);
+    }
+    for (const m of js.matchAll(/setAttribute\(\s*"([^"]+)"/g)) {
+      if (!["data-stars", "datetime", "dir", "data-reviews-init"].includes(m[1]))
+        problems.push(
+          `public/assets/reviews.js sets the attribute "${m[1]}", which is not on the allowlist`,
+        );
+    }
+    if (/setAttribute\(\s*[^"\s]/.test(js))
+      problems.push("public/assets/reviews.js sets an attribute by a computed name");
+    for (const m of js.matchAll(/["'](\/[a-z][^"']*|https?:\/\/[^"']+)["']/gi)) {
+      if (m[1] !== "/api/reviews")
+        problems.push(`public/assets/reviews.js references the URL ${m[1]}`);
+    }
+    if (live) {
+      const h = createHash("sha256")
+        .update(readFileSync(REVIEWS_JS))
+        .digest("hex")
+        .slice(0, 12);
+      if (site.assets.reviewsJs !== `/assets/reviews.js?v=${h}`)
+        problems.push(
+          "site.assets.reviewsJs does not carry the hash of public/assets/reviews.js — run npm run enrich",
+        );
+    }
+  } else if (live)
+    problems.push("live mode is on but public/assets/reviews.js is missing");
+  if (existsSync(LEDGER_OUT)) {
+    const l = JSON.parse(readFileSync(LEDGER_OUT, "utf8"));
+    if (
+      l.open !== open ||
+      l.live !== live ||
+      l.genuine !== (read?.dashboard?.total ?? 0) ||
+      l.asOf !== (read?.date ?? null)
+    )
+      problems.push(
+        "public/assets/reputation.json disagrees with the register — run npm run enrich",
+      );
+  } else problems.push("public/assets/reputation.json is missing — run npm run enrich");
+}
+
 const tally = { footer: 0, ask: 0, band: 0, hero: 0, contact: 0 };
 for (const page of site.pages) {
   const where = `${page.path} (id ${page.id})`;
@@ -164,7 +280,7 @@ for (const page of site.pages) {
   }
 
   const bands = root.querySelectorAll(".live-reviews-band");
-  const wantBand = open && wantsBand(page, kindOf);
+  const wantBand = open && hasBand(register, page, kindOf);
   if (bands.length !== (wantBand ? 1 : 0))
     problems.push(`${where}: ${bands.length} band(s), expected ${wantBand ? 1 : 0}`);
   for (const b of bands) {
@@ -173,6 +289,7 @@ for (const page of site.pages) {
     if (!b.hasAttribute("data-lm-ignore"))
       problems.push(`${where}: the band must be data-lm-ignore`);
     checkBlock(b, where, "band", { ask: false });
+    checkSlider(b, where);
     tally.band++;
   }
 
@@ -190,6 +307,8 @@ for (const page of site.pages) {
     }
   }
 }
+
+checkLiveFiles();
 
 console.log(
   `reputation: ${open ? `OPEN — ${expectText.rating} · ${read.dashboard.total} reviews as of ${read.date}` : "closed"}; ` +

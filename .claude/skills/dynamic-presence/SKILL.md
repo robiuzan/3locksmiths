@@ -29,7 +29,7 @@ is the part you must hold in your head while touching any of it. Business facts 
    Without the exclusion one topbar edit re-stamps all ~105 sitemap URLs — the exact failure
    `lastmod.mjs:17-37` exists to prevent. The updates strip is deliberately **not** excluded: a
    new item is a real content change.
-4. **Runtime input can only hide or select — never inject text.** The one runtime input is
+4. **Exception — the reviews slider only (State C, owner decisions 2026-10-13):** `public/assets/reviews.js` may place Google review content (reviewer name, stars, date, the original text) into the static slider shell that `scripts/reputation.mjs` renders, from ONE same-origin endpoint, `/api/reviews` — the standalone Worker in `workers/reviews/` (never `functions/`). It writes only by cloning the shell's `<template>` and setting `textContent` and allowlisted attributes; every other word is HTML in `content/site.json`. No review content is stored in `content/site.json`, git or logs — only the Worker's KV entry, ≤ 24 h. It shows nothing until `live.enabled` in `content/enriched/_reputation.mjs` (after Google approves API access), and fails closed to the static line. Never filtered by stars; never review schema. `scripts/check-reputation.mjs` enforces the shell and the script. Otherwise: **runtime input can only hide or select — never inject text.** The one runtime input is
    `status.json` (`{ mode: normal|quiet|reduced|off }`). If it is unreachable, slow (> 1.5 s) or
    malformed, fail **closed**: promos hidden, the evergreen line (and the header's own phone
    number, which no line replaces) always visible. _As built (Phase 3, 2026-10-04):_ live.js

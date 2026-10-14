@@ -46,7 +46,7 @@ did on the live site.
 
 ## The stack, and what it forbids
 
-Next **16.2.9** · React **19.2.4** · TypeScript strict · Tailwind **v4, utilities layer only** ·
+Next **16.4.0** · React **19.2.4** · TypeScript strict · Tailwind **v4, utilities layer only** ·
 `@ishub/site-kit` (vendored tarball) · `he` · `node-html-parser`. Flat layout, alias `@/* -> ./*`.
 
 > ⚠️ **This is not the Next.js you know.** `params` is a **`Promise`** in this major. Read
