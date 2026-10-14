@@ -124,9 +124,9 @@ still live twins. Renaming or merging without a 301 discards the ranking signal 
 cleanup task; a deliberate project with a redirect map (`docs/keyword-map.md` §8).
 
 ✅ **2026-10-14:** four duplicate-intent pages were merged that way — `/services/מנעולן-רכב/`,
-`/services/מנעולן-לבית/`, `/שכפול-שלט-לרכב-2/` and `/locations/שכפול-מפתחות-בנתניה/` now 301 to
+`/services/מנעולן-לבית/`, `/שכפול-שלט-לרכב-2/` and `/locations/שכפול-מפתחות-בנתניה/` are 301'd to
 their survivors (`docs/keyword-map.md` §8), via 16 fallback lines: four per removed URL, slash /
-no-slash × lowercase / uppercase hex.
+no-slash × lowercase / uppercase hex. Not deployed yet.
 
 > 🔶 **Those lines catch UPPERCASE traffic only.** Cloudflare Pages uppercase-normalises a rule's
 > source path, and this site publishes lowercase `%d7` (`docs/business-facts.md` §E.1.1, and the

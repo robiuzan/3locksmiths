@@ -20,6 +20,10 @@ content/site.json  page.jsonLd[]  ──►  components/SiteFrame.tsx  ──►
   (103 of 108 pages)
 ```
 
+> 2026-10-14: that count is historical. After the duplicate-twin merge (`docs/keyword-map.md` §8.1)
+> 101 of the 105 pages carry JSON-LD — only the four `/step/` routes are bare — and only the
+> homepage still keeps scraped blocks.
+
 - For the **94 enriched pages**, `scripts/enrich.mjs` **overwrites** `page.jsonLd` entirely with
   `[breadcrumbSchema, serviceSchema, howToSchema, faqSchema]`. Whatever WordPress emitted is
   discarded. It then asserts each block `JSON.parse`s and that the page has exactly one `<h1>`,
@@ -31,6 +35,10 @@ content/site.json  page.jsonLd[]  ──►  components/SiteFrame.tsx  ──►
 **That asymmetry is the root cause of §4.1.** The generator is sound; the pass-through path has no
 gate.
 
+> 2026-10-14: superseded on both counts. `scripts/enrich.mjs` now validates every block sitewide,
+> repairing or dropping an unparseable scraped one, and six of the ten un-enriched pages carry
+> generated blocks from `scripts/pages.mjs`; the other four are the bare `/step/` routes (§2).
+
 `SiteFrame` injects each string with `dangerouslySetInnerHTML` — no parsing, no escaping, no
 validation at render time.
 
@@ -41,7 +49,7 @@ validation at render time.
 | Route                                                      | Emits today                                                                    | Target                                         |
 | ---------------------------------------------------------- | ------------------------------------------------------------------------------ | ---------------------------------------------- |
 | `/`                                                        | `LocalBusiness`+`Locksmith`, scraped `FAQPage` (**broken**), scraped `WebSite` | business node + valid `FAQPage` + `WebSite`    |
-| `/services/<slug>/` ×29                                    | `BreadcrumbList` · `Service` · `HowTo` · `FAQPage`                             | unchanged — this is correct                    |
+| `/services/<slug>/` ×52                                    | `BreadcrumbList` · `Service` · `HowTo` · `FAQPage`                             | unchanged — this is correct                    |
 | `/services/שכפול-מפתח-לרכב/`                               | scraped only (**broken**)                                                      | full set — needs `content/enriched/95.mjs`     |
 | `/locations/<slug>/` ×24                                   | `BreadcrumbList` · `Service`+`areaServed` · `HowTo` · `FAQPage`                | unchanged, but fix the `קריות` area type (§5)  |
 | Top-level landers ×6                                       | `BreadcrumbList` · `Service` · `HowTo` · `FAQPage`                             | unchanged                                      |
@@ -55,6 +63,14 @@ validation at render time.
 
 Measured on the 2026-08-02 export: 207 well-formed blocks, **2 unparseable**, 0 empty.
 `BreadcrumbList` on 53 pages; `FAQPage` 55; `HowTo` 53; `Service` 46.
+
+> 2026-10-14: the "Emits today" column is still largely the 2026-08-02 state; only the row counts
+> were kept current. In `content/site.json` every page but the four `/step/` routes now carries
+> JSON-LD (101 of 105 after the merge): `/contact/`, `/sitemap/`, the legal pages and the
+> `/services/` hub emit `BreadcrumbList` plus a `ContactPage` / `CollectionPage` / `WebPage` node
+> from `scripts/pages.mjs`, and `/services/שכפול-מפתח-לרכב/` emits the full set from its authored
+> module. The ×52 row excludes it and the two `/services/` pages merged away
+> (`docs/keyword-map.md` §8.1).
 
 ---
 
@@ -131,9 +147,9 @@ owner (`docs/business-facts.md` §D.1). Marking them up as `Offer` publishes the
 
 ### 4.4 `Review` / `AggregateRating` — sourced only
 
-Currently **absent from all 66 pages**, which is correct. Either shipping without a verifiable public
-source URL is a Google policy violation and a Rich Results failure. Do not seed sample data "to test
-the markup". Blocked on `docs/business-facts.md` §B.
+Currently **absent from all 105 pages**, which is correct. Either shipping without a verifiable
+public source URL is a Google policy violation and a Rich Results failure. Do not seed sample data
+"to test the markup". Blocked on `docs/business-facts.md` §B.
 
 ### 4.5 Schema must match visible content
 
@@ -211,7 +227,7 @@ try{JSON.parse(m[1]);}catch{bad++;console.log("UNPARSEABLE:",x);}}}
 console.log("unparseable blocks:",bad);'
 
 grep -rL 'application/ld+json' out --include=index.html      # pages with no schema
-grep -rl 'BreadcrumbList' out --include=index.html | wc -l   # 53 today
+grep -rl 'BreadcrumbList' out --include=index.html | wc -l   # 53 on 2026-08-02; re-measure
 grep -rl 'aggregateRating\|"@type": *"Review"' out --include=index.html  # must be empty
 grep -ro '"email":"[^"]*"' out/index.html                    # must NOT be a personal address
 ```

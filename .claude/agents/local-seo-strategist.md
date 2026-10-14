@@ -1,6 +1,6 @@
 ---
 name: local-seo-strategist
-description: Israeli local-SEO strategy for שלושה מנעולנים — the address (confirmed 2026-10-13; footer only, the Business Profile hides it), the unaudited Google עסק שלי, four different NAP spellings, the 30-service × 24-location matrix and its expansion cap, the region-typed-as-City error on קריות, duplicate-city slugs, geo signals, and coverage honesty. Invoke with "local SEO plan", "will these city pages rank", or "check the NAP". Produces a plan; never edits and never invents a business fact.
+description: Israeli local-SEO strategy for שלושה מנעולנים — the address (confirmed 2026-10-13; footer only, the Business Profile hides it), the unaudited Google עסק שלי, four different NAP spellings, the 53-service × 24-location matrix and its expansion cap, the region-typed-as-City error on קריות, duplicate-city slugs, geo signals, and coverage honesty. Invoke with "local SEO plan", "will these city pages rank", or "check the NAP". Produces a plan; never edits and never invents a business fact.
 model: opus
 tools: Read, Grep, Glob, Bash, WebFetch
 ---
@@ -59,7 +59,7 @@ audit the gaps.
    ✅ RESOLVED 2026-10-14 for נתניה: `/locations/שכפול-מפתח-בנתניה/` kept, `שכפול-מפתחות-בנתניה`
    301'd to it (`docs/keyword-map.md` §8.1). 🔶 Its lowercase 301 still needs the owner's zone-level
    Redirect Rule — pending, not done.
-7. **The matrix and the cap.** 30 services × 24 locations = 720 cells. Only `שכפול מפתח × city` is
+7. **The matrix and the cap.** 53 `/services/` pages × 24 locations = 1,272 cells. Only `שכפול מפתח × city` is
    expressed. Assess which cells have genuine demand — then apply the `docs/keyword-map.md` §7 cap:
    nothing new until `content/enriched/95.mjs` exists.
 8. **Geo signals.** No `GeoCoordinates`, no `hasMap`, no map embed on `/contact/` (§5.5). Coordinates

@@ -325,7 +325,8 @@ reviews, average 5**, and the owner chose to show **Google's own figure** on eve
 Google's reviews page. The footer of every page, the homepage hero, `/contact/` and the 76
 service + city pages (80 until the 2026-10-14 duplicate-intent merge) carry it
 (`content/enriched/_reputation.mjs` → `scripts/reputation.mjs`). It states what Google shows on the
-dated dashboard read. It quotes no review and calls no reviewer a verified customer. `Review` / `AggregateRating` markup stays forbidden (self-serving; CI blocks it).
+dated dashboard read. It quotes no review and calls no reviewer a verified customer.
+`Review` / `AggregateRating` markup stays forbidden (self-serving; CI blocks it).
 
 **What this register still records, so nobody launders it later.** On 2026-09-29 the owner said the
 three names are not the real technicians (§B.5); that statement has not been withdrawn, only the
@@ -552,15 +553,15 @@ between figures, slimmer limbs), so adopting it is a brand decision, not a free 
 
 ## D. Services & pricing
 
-| Fact                | Value                                            | Status                      |
-| ------------------- | ------------------------------------------------ | --------------------------- |
-| Service list        | 30 service pages + 24 location pages             | ✅ (in `content/site.json`) |
-| Price ranges        | per-page `pricing[]` in `content/enriched/*.mjs` | 🔶                          |
-| `priceRange`        | `₪₪`                                             | ✅ manifest                 |
-| Warranty ("אחריות") | claimed widely, no term stated                   | 🔶                          |
-| Response time       | "כ-20–40 דקות" and similar, per city             | 🔶                          |
-| 24/7 availability   | **confirmed by the owner 2026-08-30** — see D.3  | ✅ owner instruction        |
-| Key-type per model  | `keyModels[]` on brand pages — see D.5           | 🔶                          |
+| Fact                | Value                                                                                                                     | Status                      |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------- | --------------------------- |
+| Service list        | 53 `/services/` pages (21 services + 32 brand-key) + 6 top-level landers + 24 location pages (after the 2026-10-14 merge) | ✅ (in `content/site.json`) |
+| Price ranges        | per-page `pricing[]` in `content/enriched/*.mjs`                                                                          | 🔶                          |
+| `priceRange`        | `₪₪`                                                                                                                      | ✅ manifest                 |
+| Warranty ("אחריות") | claimed widely, no term stated                                                                                            | 🔶                          |
+| Response time       | "כ-20–40 דקות" and similar, per city                                                                                      | 🔶                          |
+| 24/7 availability   | **confirmed by the owner 2026-08-30** — see D.3                                                                           | ✅ owner instruction        |
+| Key-type per model  | `keyModels[]` on brand pages — see D.5                                                                                    | 🔶                          |
 
 ### D.1 Prices are authored, not sourced
 
@@ -615,7 +616,8 @@ Previously removed from, and now restored across: the homepage `<title>` (`scrip
 `HOME_SEO`), the homepage feature card and FAQ accordion including its `FAQPage` JSON-LD mirror
 (`scripts/claims.mjs`), the `/contact/` title (`scripts/pages.mjs`), and the authored modules
 `77.mjs`, `93.mjs`, `94.mjs`. (2026-10-14: `93.mjs` and `94.mjs` are deleted — their pages were
-merged into `/מנעולן-רכב/` (77) and `/מנעולן-לבית/` (78) and 301'd, `docs/keyword-map.md` §8.)
+merged into `/מנעולן-רכב/` (77) and `/מנעולן-לבית/` (78) with a `public/_redirects` 301 — 🔶 the
+lowercase half needs the owner's zone Redirect Rule, §E.1.2 — `docs/keyword-map.md` §8.)
 
 The per-city response windows ("ברוב המקרים … תוך כ-30 עד 45 דקות") were authored, not measured.
 They are hedged and remain 🔶 — but see D.4 for the version that was not hedged.
@@ -861,13 +863,13 @@ Front Command alerts. Change the words only on the owner's say-so.
 
 ## E. Coverage
 
-| Fact                 | Value                                                            | Status            |
-| -------------------- | ---------------------------------------------------------------- | ----------------- |
-| `schema.areaServed`  | `null` in the manifest — but **synthesised** at build, see below | ⚠️ was mis-stated |
-| Claimed coverage     | "פריסה רחבה" — 56 pages; **not** the homepage title, see below   | 🔶                |
-| Location pages       | 24 under `/locations/`, 23 distinct cities/regions — see §E.1.2  | ✅ (routes exist) |
-| Withdrawn cities     | 7, on 2026-09-02 — see §E.1                                      | ✅ owner          |
-| Named neighbourhoods | e.g. דיזנגוף, רוטשילד, פלורנטין, רמת אביב                        | 🔶                |
+| Fact                 | Value                                                                                                                        | Status            |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ----------------- |
+| `schema.areaServed`  | `null` in the manifest — but **synthesised** at build, see below                                                             | ⚠️ was mis-stated |
+| Claimed coverage     | "פריסה רחבה" — 56 pages before the 2026-10-14 merge (re-count after `npm run enrich`); **not** the homepage title, see below | 🔶                |
+| Location pages       | 24 under `/locations/`, 23 distinct cities/regions — see §E.1.2                                                              | ✅ (routes exist) |
+| Withdrawn cities     | 7, on 2026-09-02 — see §E.1                                                                                                  | ✅ owner          |
+| Named neighbourhoods | e.g. דיזנגוף, רוטשילד, פלורנטין, רמת אביב                                                                                    | 🔶                |
 
 The location pages name specific neighbourhoods and streets, which is exactly what makes them pass
 the doorway test — **but nobody has confirmed the business actually services those areas from a
@@ -948,11 +950,11 @@ likewise. None of them redirect the lowercase URLs their own sitemaps publish.
 
 Not a withdrawal like §E.1 — a נתניה page still ships. On the owner's instruction four
 duplicate-intent pairs became one page each (`docs/keyword-map.md` §8), and one of them was a
-location pair —
-`/locations/שכפול-מפתחות-בנתניה/` (id 149) now 301s to `/locations/שכפול-מפתח-בנתניה/` (id 140),
-which matches the `שכפול-מפתח-ב<city>` pattern of the other cities. That leaves **24 location pages
-covering 23 distinct cities**: חולון still has two (`/locations/שכפול-מפתח-חולון/` and
-`/locations/שכפול-מפתחות-חולון/`), and that pair was not part of the merge.
+location pair — `/locations/שכפול-מפתחות-בנתניה/` (id 149) now 301s, in `public/_redirects` (not
+yet deployed), to `/locations/שכפול-מפתח-בנתניה/` (id 140), whose singular `שכפול-מפתח-` prefix
+matches 20 of the other 23 city slugs. That leaves **24 location pages covering 23 distinct cities**: חולון
+still has two (`/locations/שכפול-מפתח-חולון/` and `/locations/שכפול-מפתחות-חולון/`), and that pair
+was not part of the merge.
 
 🔶 **The redirect inherits §E.1.1's defect.** `public/_redirects` carries the fallback lines (slash /
 no-slash × lowercase / uppercase hex), but they catch only UPPERCASE traffic. The lowercase form the

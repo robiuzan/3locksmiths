@@ -1,13 +1,13 @@
 ---
 name: new-city
-description: Add or deepen a location page the data-driven way — author content/enriched/<id>.mjs with genuinely local substance so the route, the link mesh, the Service + areaServed schema and the sitemap follow automatically. The existing 17 pass the doorway test; this skill is about holding that bar and fixing the region-typed-as-City error. Use when expanding coverage or retrofitting a city page. Triggers "add a city", "new location page", "cover <city>", "this city page is thin", "doorway".
+description: Add or deepen a location page the data-driven way — author content/enriched/<id>.mjs with genuinely local substance so the route, the link mesh, the Service + areaServed schema and the sitemap follow automatically. The original 17 passed the doorway test; this skill is about holding that bar and fixing the region-typed-as-City error. Use when expanding coverage or retrofitting a city page. Triggers "add a city", "new location page", "cover <city>", "this city page is thin", "doorway".
 ---
 
 # Add or deepen a location page
 
-**Read this first: the 17 existing location pages pass the doorway test.** They carry 1,282–1,598
-unique words and name real neighbourhoods, streets and local conditions. Your job is to hold that bar,
-not to climb to it.
+**Read this first: the 17 location pages this was written against passed the doorway test** (24
+exist after the 2026-10-14 merge). They carried 1,282–1,598 unique words and name real
+neighbourhoods, streets and local conditions. Your job is to hold that bar, not to climb to it.
 
 `content/enriched/137.mjs` (תל אביב) is the reference. It names דיזנגוף, רוטשילד, פלורנטין, נווה צדק,
 רמת אביב, הבורסה and שכונת התקווה, and reasons about parking in מרכז העיר and the older buildings of
@@ -89,11 +89,11 @@ differentiate them** — don't write the same page twice. And **never merge or r
 `public/_redirects` 301** (`docs/keyword-map.md` §8).
 
 ✅ **נתניה RESOLVED 2026-10-14** (owner instruction): `/locations/שכפול-מפתחות-בנתניה/` (id 149) was
-merged into `/locations/שכפול-מפתח-בנתניה/` (id 140), which matches the `שכפול-מפתח-ב<city>` pattern
-of the other cities, and now 301s to it. Its module is deleted and its path is in `scripts/pages.mjs`
-`PRUNE_PATHS` — deepen `140.mjs`, never recreate `149.mjs`. 🔶 The `_redirects` lines catch
-uppercase-hex traffic only; the lowercase form needs a zone-level Redirect Rule that is **the
-owner's action, not yet done**. 24 location pages now cover 23 distinct cities.
+merged into `/locations/שכפול-מפתח-בנתניה/` (id 140), whose singular `שכפול-מפתח-` prefix matches 20
+of the other 23 city slugs (the plural is left only on 147, 148 and 158), and is given a `public/_redirects` 301 to it. Its module is deleted and its
+path is in `scripts/pages.mjs` `PRUNE_PATHS` — deepen `140.mjs`, never recreate `149.mjs`. 🔶 The
+`_redirects` lines catch uppercase-hex traffic only; the lowercase form needs a zone-level Redirect
+Rule that is **the owner's action, not yet done**. 24 location pages now cover 23 distinct cities.
 
 ## Steps
 

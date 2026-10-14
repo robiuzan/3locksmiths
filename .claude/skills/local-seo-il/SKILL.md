@@ -118,10 +118,11 @@ currently differ, so it is not acute — but **a merge is only ever safe with a 
 still live: `/קודן-לרכב/` ↔ `/services/קודן-לרכב/`.
 
 ✅ **RESOLVED 2026-10-14 for four pairs** (owner instruction) — merged into the SEO-strongest half,
-the other 301s to it: נתניה keeps `/locations/שכפול-מפתח-בנתניה/` (`/locations/שכפול-מפתחות-בנתניה/`
-is gone), the cross-silo `מנעולן-רכב` and `מנעולן-לבית` pairs keep their core landers, and
-`/שכפול-שלט-לרכב-2/` now 301s to `/services/שכפול-שלט-לרכב/`. Survivors and reasons:
-`docs/keyword-map.md` §8.
+the other given a `public/_redirects` 301 to it (🔶 uppercase-hex only for now — below): נתניה keeps
+`/locations/שכפול-מפתח-בנתניה/` (`/locations/שכפול-מפתחות-בנתניה/` is gone), the cross-silo
+`מנעולן-רכב` and `מנעולן-לבית` pairs keep their core landers, and `/שכפול-שלט-לרכב-2/` folds into
+`/services/שכפול-שלט-לרכב/`. Nothing is deployed yet. Survivors and reasons: `docs/keyword-map.md`
+§8.
 
 - **Which half Google indexed is unknown.** The last recorded Search Console URL Inspection sweep
   (2026-09-02) found **neither** member of any of the four pairs indexed, and the repo holds no newer
@@ -153,16 +154,17 @@ roster manifest `schema.geo` once the address question (§2) is settled.
 > Replace the city name with another city name. Is the page now correct and publishable for that other
 > city? If yes, it is a doorway page.
 
-The existing 17 **pass**. Any new one must clear the same bar with **three or more** true, specific
-items: named neighbourhoods or landmarks; local building stock and access reality; travel and
-scheduling honesty for that distance; a city-specific FAQ; local pricing if it genuinely differs.
+The original 17 **passed** (24 location pages exist after the 2026-10-14 merge). Any new one must
+clear the same bar with **three or more** true, specific items: named neighbourhoods or landmarks;
+local building stock and access reality; travel and scheduling honesty for that distance; a
+city-specific FAQ; local pricing if it genuinely differs.
 
 **If none of those can be said truthfully about a city, that city does not warrant a page.** Record
 it in `docs/business-facts.md` §E rather than padding. Full spec: `docs/content-standards.md` §2–§3.
 
 ## 9. The expansion cap
 
-30 services × 24 locations = 720 possible cells. **Do not build them.** Order of operations
+53 services × 24 locations = 1,272 possible cells. **Do not build them.** Order of operations
 (`docs/keyword-map.md` §7):
 
 1. Author `content/enriched/95.mjs` — a Tier-1 term currently on the site's weakest page.

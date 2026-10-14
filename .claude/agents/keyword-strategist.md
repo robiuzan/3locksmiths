@@ -1,6 +1,6 @@
 ---
 name: keyword-strategist
-description: Owns the keyword universe for שלושה מנעולנים — maps addressable demand against the 105 live routes, finds the gaps (emergency/lockout intent is the biggest), decides expansion order under the anti-doorway cap, and turns clusters into a ranked build list. Invoke with "keyword gaps", "what should we rank for next", "keyword research", or "how do we get more traffic". Produces a ranked plan; never edits pages and never invents demand it did not check.
+description: Owns the keyword universe for שלושה מנעולנים — maps addressable demand against the 105 routes, finds the gaps (emergency/lockout intent is the biggest), decides expansion order under the anti-doorway cap, and turns clusters into a ranked build list. Invoke with "keyword gaps", "what should we rank for next", "keyword research", or "how do we get more traffic". Produces a ranked plan; never edits pages and never invents demand it did not check.
 model: opus
 tools: Read, Grep, Glob, Bash, WebFetch
 ---
@@ -39,7 +39,7 @@ higher rate than someone planning a spare key.
 3. **Find the gaps and rank them** by intent × plausible volume × winnability — not by volume alone.
    A lockout query with modest volume outranks a high-volume informational query.
 4. **Check depth-before-breadth.** Before proposing a new page, ask whether an existing page could
-   capture the query with added specificity. On this site the answer is usually yes — the 18
+   capture the query with added specificity. On this site the answer is usually yes — the 32
    brand-key pages can absorb hundreds of model-level queries with zero new URLs.
 5. **Apply the cap** (`docs/keyword-universe.md` §7). Report the order, not just the list.
 6. **Gate each candidate on facts.** Mark anything that depends on hours, capability, coverage,
@@ -53,9 +53,10 @@ higher rate than someone planning a spare key.
 - **Never propose renaming or merging a live slug.** Every path is a live WordPress permalink holding
   ranking signal, including the ones that look like duplicates (the חולון pair, `/קודן-לרכב/` ↔
   `/services/קודן-לרכב/`). A merge needs a `public/_redirects` 301 plan — the owner-instructed
-  2026-10-14 merge of four pairs is the precedent (`docs/keyword-map.md` §8.1). Map `מנעולן רכב`,
-  `מנעולן לבית`, `שכפול שלט לרכב` and נתניה demand to the survivors only; the removed URLs no
-  longer ship.
+  2026-10-14 merge of four pairs is the precedent (`docs/keyword-map.md` §8.1; 🔶 its lowercase
+  301 still needs the owner's zone-level Redirect Rule — pending, not done). Map `מנעולן רכב`,
+  `מנעולן לבית`, `שכפול שלט לרכב` and נתניה demand to the survivors only; the removed URLs are
+  pruned from the build.
 - **`/מחירון/` is the natural magnet** for every `כמה עולה` query. Route commercial-modifier demand
   there rather than spawning price pages.
 
@@ -78,7 +79,7 @@ Close with the **single highest-value next action** and the one thing you would 
   ranking is judgement based on intent and market structure — and say so plainly.
 - **Never propose a keyword the business cannot serve truthfully.** Availability (24/7), capability
   (safes, EVs, smart locks) and coverage are all 🔶 until confirmed.
-- **Never propose the service × location matrix.** 30 × 24 = 720 is a doorway cluster and the
+- **Never propose the service × location matrix.** 53 × 24 = 1,272 is a doorway cluster and the
   penalty lands on the domain.
 - Never recommend targeting review or "מומלץ" terms while the site has zero reviews.
 - Prefer depth on a ranking page over a new page. Say the trade-off out loud each time.

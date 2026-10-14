@@ -47,9 +47,10 @@ Two consequences:
    62–69 chars (§2.2).
 3. **Descriptions.** Present, unique, 150–160 chars. Five real pages have none:
    `/services/שכפול-מפתח-לרכב/` and the four `/step/` routes (§2.3).
-4. **One H1 per page.** Currently true on all 66 — and `scripts/enrich.mjs` fails the build if an
-   enriched page has any other count. That guard covers 94 of 105 pages; the rest are unguarded, so
-   check them explicitly (§2.5).
+4. **One H1 per page.** Last measured true on all 66 routes (an older, smaller export — re-measure
+   on the current 105) — and `scripts/enrich.mjs` fails the build if an enriched page has any other
+   count. That guard covers 94 of 105 pages; the rest are unguarded, so check them explicitly
+   (§2.5).
 5. **Canonicals.** Self-referencing, trailing slash, percent-escaped, byte-identical to the sitemap
    `<loc>`. Sourced from the scraped `seo.canonical`, so they match the WordPress originals (§1.2).
 6. **Thin and duplicate-intent content.** Strip tags, subtract ~120–200 words of gogo chrome, count

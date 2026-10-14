@@ -51,9 +51,11 @@ Consequences you must internalise:
   longer services them — see `docs/business-facts.md` §E.1. The sitewide phrase is now פריסה רחבה,
   not פריסה ארצית (§E.2), and it is still 🔶 — it is NOT in the homepage title, which §E used to say.
 - **Conversion goals, in order:** (1) phone call, (2) WhatsApp, (3) the Web3Forms lead form.
-- **Scale:** 71+ pages — 30 services, 24 locations, 6 top-level Hebrew landers, a /מדריכים/ guides
-  hub + guides, an emergency cluster, 4 calculator steps, 4 legal/utility, 1 service hub, 1 homepage.
-  Counts move as content ships — read `content/enriched/_manifest.json`, never assume.
+- **Scale:** 105 routes after the 2026-10-14 merge — 53 under `/services/` (21 services, the
+  emergency and keypad clusters among them, plus 32 brand-key pages), 24 locations, 6 top-level
+  Hebrew landers, a /מדריכים/ guides hub + guides, 4 calculator steps, 4 legal/utility, 1 service
+  hub, 1 homepage. Counts move as content ships — read `content/enriched/_manifest.json`, never
+  assume.
 
 > ⚠️ Several claims on this site are **not substantiated**: "מעל 25 שנות ניסיון" (the manifest has
 > `foundedYear: null`), every price, the warranty term, and coverage. See
@@ -90,7 +92,7 @@ Consequences you must internalise:
    `/locations/שכפול-מפתח-בנתניה/`; `/services/מנעולן-רכב/`, `/services/מנעולן-לבית/`,
    `/שכפול-שלט-לרכב-2/` and `/locations/שכפול-מפתחות-בנתניה/` are pruned (`scripts/pages.mjs`
    `PRUNE_PATHS`) and 301 to them. 🔶 The `public/_redirects` lines catch **uppercase-hex traffic
-   only** (the Pages rule-source defect); the lowercase form the site publishes needs a zone-level
+   only** (the Pages rule-source defect); the lowercase form the site published needs a zone-level
    Redirect Rule on `lower(http.request.uri.path)` — **the owner's action, not yet done**. Survivors
    and the reasons each won: `docs/keyword-map.md` §8.
 6. **Do not import Tailwind's preflight or theme layer.** See §1. `app/globals.css` explains why in

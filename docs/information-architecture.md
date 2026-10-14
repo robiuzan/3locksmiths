@@ -10,8 +10,8 @@ Owned by the `ia-navigation-architect` agent. The mechanics of editing each surf
 
 ## 0. The state today
 
-64 content pages, and a link graph that is close to a star: everything hangs off the homepage and
-almost nothing connects sideways.
+105 routes, and a link graph that is close to a star: everything hangs off the homepage and almost
+nothing connects sideways.
 
 | Surface              | Reaches                                      | Verdict |
 | -------------------- | -------------------------------------------- | ------- |
@@ -23,11 +23,15 @@ almost nothing connects sideways.
 | Contextual in-copy   | **none — blocked by the renderer**           | 🔴      |
 | Breadcrumbs          | visible on inner pages; `BreadcrumbList` ×54 | 🟡      |
 
+> 2026-10-14: the **Footer** row is the scraped footer of §1. `scripts/footer.mjs` has since
+> rebuilt it on every page — after the merge, a services column of 23 links and an areas column of
+> 23 (`docs/keyword-map.md` §8.1). The other rows were not re-measured.
+
 ---
 
 ## 1. The footer — the biggest single fix on the site
 
-### What it is now
+### What it was — the scraped WordPress footer
 
 ```
 <footer>
@@ -41,6 +45,11 @@ almost nothing connects sideways.
 **6 links total, on all 67 routes.** Zero reach into the 30 services or 25 locations. One empty
 column. The address is a Latin transliteration with no city
 (`docs/business-facts.md` §C.1).
+
+> 2026-10-14: historical. That is the footer as scraped; `scripts/footer.mjs` now rebuilds it on
+> every page in the enrich chain — after the duplicate-twin merge (§3.2), a services column of 23
+> links and an areas column of 23. Check the target below against that script before treating any
+> of it as open.
 
 ### What it must become
 
@@ -67,8 +76,9 @@ A four-column footer, filling `sidebar-1` and adding columns:
 ### Where to edit it
 
 The footer is **scraped WordPress chrome**, not a React component. It lives in `content/site.json`
-and is rewritten by **`scripts/transform.mjs`** at build time. See `/site-navigation` for the
-mechanics. **Never edit `content/site.json` or `public/wp-content/`.**
+and is rebuilt by **`scripts/footer.mjs`** in the enrich chain — not `scripts/transform.mjs`, which
+runs only in `npm run snapshot`. See `/site-navigation` for the mechanics. **Never edit
+`content/site.json` or `public/wp-content/`.**
 
 ---
 
@@ -79,7 +89,7 @@ exists in the scraped markup).
 
 **Targets:**
 
-- All 30 services and 24 locations reachable **within one hop** of any page.
+- All 53 services and 24 locations reachable **within one hop** of any page.
 - The dropdowns are the natural home for this — they already exist structurally.
 - Keyboard operable: `aria-expanded`, `aria-controls`, Escape closes, focus returns. The current
   mobile menu has none of these (backlog §11.3) and the fix is an **enhancement layer**, never an
@@ -93,8 +103,8 @@ exists in the scraped markup).
 
 ```
 /                                    home
-├── /services/                       hub  → 30 service pages
-│   ├── /services/<service>/         incl. 18 brand-key pages
+├── /services/                       hub  → 53 service pages
+│   ├── /services/<service>/         incl. 32 brand-key pages
 │   └── (planned) emergency cluster
 ├── /אזורי-שירות/                    hub  → 24 location pages
 │   └── /locations/<city>/
@@ -110,7 +120,7 @@ exists in the scraped markup).
 | -------------------------- | --------------- | ---------------------------------------------- |
 | service → location         | none contextual | 4–6 relevant cities per service page           |
 | location → service         | full list       | keep, but order by local relevance             |
-| brand-key → location       | **none**        | the 18 brand pages must reach the city silo    |
+| brand-key → location       | **none**        | the 32 brand pages must reach the city silo    |
 | location → nearby location | via `related`   | 2–4 genuinely adjacent, **both directions**    |
 | guide → service            | n/a             | 2–3 per guide, descriptive anchors             |
 | service → guide            | n/a             | 1–2 per service, once guides exist             |
@@ -128,12 +138,13 @@ without a `public/_redirects` 301** (`docs/keyword-map.md` §8).
 ✅ RESOLVED 2026-10-14: the `מנעולן-רכב` and `מנעולן-לבית` pairs, the נתניה location pair and
 `/שכפול-שלט-לרכב-2/` were merged on the owner's instruction, one page each. Survivors:
 `/מנעולן-רכב/`, `/מנעולן-לבית/`, `/services/שכפול-שלט-לרכב/`, `/locations/שכפול-מפתח-בנתניה/`.
-Every link and navigation surface now points at the survivor — 20 authored modules repointed,
-`scripts/footer.mjs` putting `/מנעולן-רכב/` and `/מנעולן-לבית/` at the head of the services column
-(the bottom bar skips any lander that column already links), and `scripts/prune-chrome-links.mjs`
-dropping the removed routes from the header city mega-menu and the homepage areas band. Why each
-survivor won, the 301 plan and the 🔶 pending zone-level rule for lowercase traffic:
-`docs/keyword-map.md` §8.1.
+Every link to a removed page now points at its survivor or is gone — 22 authored modules repointed
+(dropped instead where that would self-link or duplicate an entry),
+`scripts/footer.mjs` changed to put `/מנעולן-רכב/` and `/מנעולן-לבית/` at the head of the services
+column (the bottom bar drops any entry whose page is gone or that the column links), and
+`scripts/prune-chrome-links.mjs` dropping the removed routes from the header city mega-menu and the
+homepage areas band. Why each survivor won, the 301 plan and the 🔶 pending zone-level rule for
+lowercase traffic: `docs/keyword-map.md` §8.1.
 
 ---
 
@@ -162,8 +173,11 @@ Until one ships, in-copy references must **name** the target page in prose and r
 ## 5. Breadcrumbs
 
 Visible trail comes from the gogo theme; `BreadcrumbList` is generated by `scripts/enrich.mjs` for
-the 54 authored pages. **13 real pages emit none** (backlog §4.8). Markup and visible trail must
-agree — fix the markup to match what renders, never the reverse.
+the authored pages (94 after the 2026-10-14 merge; 54 when this was written) and by
+`scripts/pages.mjs` for its six utility pages (`/contact/`, `/sitemap/`, the two legal pages, and
+the `/services/` and `/מדריכים/` hubs). **13 real pages emitted none** when backlog §4.8 was
+written; in `content/site.json` on 2026-10-14 only the homepage and the four `/step/` routes do.
+Markup and visible trail must agree — fix the markup to match what renders, never the reverse.
 
 ---
 
@@ -183,7 +197,7 @@ percent-encoded — decode consistently on both sides or the diff is meaningless
 ## 7. Checklist for any IA change
 
 - [ ] Footer reaches both silos; no `slice()` truncation; no empty column.
-- [ ] All 30 services and 24 locations within one hop of the header.
+- [ ] All 53 services and 24 locations within one hop of the header.
 - [ ] Every internal link has a trailing slash and is written unescaped.
 - [ ] Cross-silo edges present, and location adjacency set on **both** sides.
 - [ ] The remaining duplicate-intent pairs (§3.2) cross-link rather than compete.

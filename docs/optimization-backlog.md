@@ -10,10 +10,12 @@ verified 2026-08-16. Where a finding says "live", it was confirmed with `curl` a
 > **2026-10-14 — FOUR DUPLICATE-INTENT PAIRS MERGED (owner instruction; not yet deployed).**
 > `/services/מנעולן-רכב/`, `/services/מנעולן-לבית/`, `/שכפול-שלט-לרכב-2/` and
 > `/locations/שכפול-מפתחות-בנתניה/` no longer ship (`PRUNE_PATHS` in `scripts/pages.mjs`); each is
-> 301'd to its survivor in `public/_redirects`, and every link and navigation surface now points at
-> the survivor. Survivors and reasons: `docs/keyword-map.md` §8. 105 routes, 101 sitemap URLs, 24
-> location pages. 🔶 **Pending owner:** those `_redirects` lines catch only UPPERCASE-encoded
-> traffic; the lowercase form the site published needs a zone-level Redirect Rule
+> 301'd to its survivor in `public/_redirects`, and no authored link or navigation surface points
+> at a removed page any more (repointed at the survivor, or dropped where that would self-link or
+> duplicate an entry, §9.7). Survivors and reasons: `docs/keyword-map.md` §8. 105 routes, 101
+> sitemap URLs, 24 location pages — measured in a simulated end-to-end run; the pipeline has not yet
+> been re-run in the repo. 🔶 **Pending owner:** those `_redirects` lines catch only
+> UPPERCASE-encoded traffic; the lowercase form the site published needs a zone-level Redirect Rule
 > (`docs/business-facts.md` §E.1.1) — not yet done. The last recorded Search Console URL Inspection
 > sweep (2026-09-02) found neither member of any pair indexed, and nothing newer is in the repo —
 > re-check GSC before deploying. Still live twins: `/קודן-לרכב/` ↔ `/services/קודן-לרכב/` and the
@@ -78,7 +80,8 @@ The migration got this right. Protect it.
 **1.1 Route generation — sound.** `app/[...slug]/page.tsx` derives every route from
 `getContentPages()` with `dynamicParams = false`, so the emitted route set cannot drift from
 `content/site.json`. 105 pages + `/404` + `/_not-found` + `/thank-you` = 108 `index.html` files
-(109 pages until the 2026-10-14 merge of four duplicate-intent pages, §3.3).
+**expected** — projected, not yet measured on `out/` (112 as of 2026-09-02, with 109 pages until
+the 2026-10-14 merge of four duplicate-intent pages, §3.3).
 
 **1.2 Canonicals — sound.** Present on all 64 real pages, self-referencing, trailing slash,
 percent-escaped. Sourced from the scraped `seo.canonical`, so they are byte-identical to the
@@ -180,6 +183,14 @@ Still live, and both authored: `/קודן-לרכב/` ↔ `/services/קודן-ל�
 `/locations/שכפול-מפתח-חולון/` ↔ `/locations/שכפול-מפתחות-חולון/`. Both of each pair are live
 WordPress URLs. They are not currently cannibalising badly (titles and descriptions differ), but they
 should be differentiated deliberately — or consolidated **with a `_redirects` 301**, never without.
+
+Original finding (before 2026-10-14), kept as history:
+
+`/מנעולן-רכב/` and `/services/מנעולן-רכב/` both exist and are both authored, as are the `מנעולן-לבית`
+and `קודן-לרכב` pairs, plus `שכפול-מפתח-בנתניה` / `שכפול-מפתחות-בנתניה` and the same pair for
+חולון. Both of each pair are live WordPress URLs. They are not currently cannibalising badly (titles
+and descriptions differ), but they should be differentiated deliberately — or consolidated **with a
+`_redirects` 301**, never without.
 
 **3.4 The shared "why choose us" block.** `DEFAULT_FEATURES` in `lib/enrich/render.mjs:42` ships the
 same three cards on every page that doesn't override them, and the first one is
@@ -466,7 +477,8 @@ Two lessons worth keeping:
   page was linked from all 64 footers. Use `node scripts/check-orphans.mjs`, which decodes both
   sides, and which now runs as a **blocking CI step**.
 - The page was orphaned because it is a duplicate-intent twin whose label matched a services
-  column entry. See §9.7. (✅ 2026-10-14: merged into `/services/שכפול-שלט-לרכב/` and 301'd.)
+  column entry. See §9.7. (✅ 2026-10-14: merged into `/services/שכפול-שלט-לרכב/` and 301'd — 🔶
+  the lowercase half of that 301 still needs the owner's zone rule, §9.7.)
 
 > ✅ **FIXED 2026-08-25.** `scripts/footer.mjs` (new, in the enrich chain) rebuilds the footer
 > on all 108 pages: a **שירותים** column (13 links incl. the Tier-1 page), an **אזורי שירות**
@@ -512,17 +524,21 @@ agree.
 
 **9.6 `/sitemap/` is a real page** (358 words) distinct from `/sitemap.xml`. Keep them straight.
 
-**9.7 🔶 Duplicate-intent twin pairs — three of these four merged 2026-10-14; `קודן-לרכב` remains.**
+**9.7 🔶 Duplicate-intent twin pairs — `מנעולן-רכב`, `מנעולן-לבית`, `שכפול-שלט-לרכב` (and the נתניה
+pair) merged 2026-10-14; `קודן-לרכב` and חולון remain.**
 
 > ✅ **RESOLVED 2026-10-14 (owner instruction) for `מנעולן-רכב`, `מנעולן-לבית` and
 > `שכפול-שלט-לרכב`**, together with the נתניה location pair (§3.3). Survivors: `/מנעולן-רכב/`,
 > `/מנעולן-לבית/`, `/services/שכפול-שלט-לרכב/`, `/locations/שכפול-מפתח-בנתניה/`; the other half of
 > each no longer ships (`PRUNE_PATHS` in `scripts/pages.mjs`) and is 301'd to its survivor. Every
-> authored link was repointed at the survivor; the header city mega-menu and the homepage areas
-> band are pruned by `scripts/prune-chrome-links.mjs`; and `scripts/footer.mjs` now puts
+> authored link to a removed page (22 modules) was repointed at its survivor, or dropped where that
+> would self-link (77, 78) or duplicate an entry already in the list (105, 148, 158); the header
+> city mega-menu and the homepage areas band are pruned automatically by
+> `scripts/prune-chrome-links.mjs`; and `scripts/footer.mjs` was changed (not automatic) to put
 > `/מנעולן-רכב/` and `/מנעולן-לבית/` at the head of the services column (`CORE_SERVICE_LANDERS`),
-> with the bottom bar skipping any lander that column already links (by href). Survivors and
-> reasons: `docs/keyword-map.md` §8 — the merge followed its rule, a 301 for every removed URL.
+> with the bottom bar dropping any entry whose page is gone or that the column already links (by
+> href). Survivors and reasons: `docs/keyword-map.md` §8 — the merge followed its rule, a 301 for
+> every removed URL.
 >
 > 🔶 **Pending owner — not done.** The 16 new `public/_redirects` lines (slash / no-slash ×
 > lowercase / uppercase hex, four per removed URL) catch only UPPERCASE-encoded traffic, because of
@@ -539,6 +555,17 @@ ranking signal, so **neither is merged away** without a `public/_redirects` 301
 carries `/קודן-לרכב/` and the חולון twin, which keeps them reachable but means the `קודן לרכב` label
 appears twice in the chrome. Consolidate with 301s, or differentiate the two halves deliberately — a
 content decision for the owner, not something to resolve silently.
+
+Original finding (before 2026-10-14), kept as history:
+
+`/מנעולן-רכב/` ↔ `/services/מנעולן-רכב/`, and the same for `מנעולן-לבית`, `קודן-לרכב` and
+`שכפול-שלט-לרכב` (whose top-level half carries WordPress's `-2` duplicate-slug suffix). Both
+halves of each pair are live permalinks holding ranking signal, so **neither is merged away**
+without a `public/_redirects` 301 (`docs/keyword-map.md` §8).
+
+They are now all linked from the footer bottom bar, which fixes the orphan but means four labels
+appear twice in the chrome. The real question — consolidate with 301s, or differentiate the two
+halves deliberately — is a content decision for the owner, not something to resolve silently.
 
 ---
 

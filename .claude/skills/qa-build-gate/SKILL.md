@@ -72,11 +72,11 @@ included because a Stop hook formats changed files — an unformatted file means
 ## 2. Route and sitemap parity
 
 ```bash
-find out -name index.html | wc -l          # 108 as of 2026-10-14 (was 112 — 4 twins merged; 119 before 2026-09-02)
+find out -name index.html | wc -l          # expect 108 after the 2026-10-14 merge (not yet measured); 112 as of 2026-09-02 (was 119 — 7 cities withdrawn)
 grep -c '<url>' out/sitemap.xml            # 101 — routes minus /step/ x4, /thank-you/ and the 404s (was 105)
 test -f out/robots.txt && echo ok
 
-# the four pages merged 2026-10-14 must NOT ship — they 301 to their survivors (expect no output)
+# the four pages merged 2026-10-14 must NOT ship (expect no output)
 for p in services/מנעולן-רכב services/מנעולן-לבית שכפול-שלט-לרכב-2 locations/שכפול-מפתחות-בנתניה; do
   test -e "out/$p" && echo "STILL SHIPS: /$p/"; done
 ```
@@ -85,7 +85,11 @@ The gap is the `/step/` calculator pages plus `/thank-you/` and the 404s, exclud
 Any other gap means a page was added or dropped — reconcile before shipping. Unlike most sites in this
 fleet there is **no hand-maintained URL array**, so a mismatch is a real signal. `content/site.json`
 holds 105 routes after the merge (was 109); the four dropped paths are in `scripts/pages.mjs`
-`PRUNE_PATHS` and in `public/_redirects` — see `docs/keyword-map.md` §8.
+`PRUNE_PATHS` and in `public/_redirects` — see `docs/keyword-map.md` §8. 🔶 Their `public/_redirects`
+lines catch uppercase-hex traffic only (the Pages rule-source defect, `docs/business-facts.md`
+§E.1.1); the lowercase 301 needs a zone-level Redirect Rule on `lower(http.request.uri.path)` — the
+owner's action, not yet done. Do not record the redirects as live until the curl in
+`public/_redirects` passes in both cases.
 
 ## 3. JSON-LD must parse — the check that matters most here
 
@@ -184,7 +188,7 @@ Object.entries(by).sort((a,b)=>b[1].b-a[1].b).slice(0,8)
 ```
 
 **The old "~58 MB" figure in this file was written at 64 routes and is gone; there were 112 when
-this was measured, and 108 after the 2026-10-14 merge.**
+this was measured, and 108 are expected after the 2026-10-14 merge (not yet measured).**
 Measured 2026-09-01, the breakdown is not what the prose used to claim:
 
 | Bytes   | Files | Type    | What it is                                                       |

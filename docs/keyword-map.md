@@ -14,14 +14,17 @@ signal this site has. It is not tidy, and it does not get tidied.
 | Silo                     | Path shape                                                                                | Count | Intent                              |
 | ------------------------ | ----------------------------------------------------------------------------------------- | ----- | ----------------------------------- |
 | Homepage                 | `/`                                                                                       | 1     | brand + head term                   |
-| Service silo             | `/services/<he-slug>/`                                                                    | 30    | commercial, per service             |
+| Service silo             | `/services/<he-slug>/`                                                                    | 53    | commercial, per service             |
 | Service hub              | `/services/`                                                                              | 1     | navigational                        |
 | Location silo            | `/locations/<he-slug>/`                                                                   | 24    | commercial, service × city          |
 | Top-level Hebrew landers | `/מנעולן-רכב/`, `/מנעולן-לבית/`, `/מחירון/`, `/אודותינו/`, `/אזורי-שירות/`, `/קודן-לרכב/` | 6     | head terms + trust                  |
+| Guides hub + guides      | `/מדריכים/`, `/מדריכים/<he-slug>/`                                                        | 12    | informational / question terms      |
 | Calculator steps         | `/step/<he-slug>/`                                                                        | 4     | funnel fragments, not landing pages |
 | Legal / utility          | `/contact/`, `/privacy-policy/`, `/accessibility-statement/`, `/sitemap/`                 | 4     | trust + utility                     |
 
 **105 pages total. 101 in `sitemap.xml`** (the four `/step/` routes are excluded by `app/sitemap.ts`).
+The service silo was 55 until the 2026-10-14 merge removed `/services/מנעולן-רכב/` and
+`/services/מנעולן-לבית/` (§8.1); it holds 21 service pages and 32 brand-key pages.
 
 Quirks that are deliberate:
 
@@ -29,9 +32,10 @@ Quirks that are deliberate:
   are live on the source site. Each carries its own canonical and its own authored module. **Do not
   consolidate them without a `_redirects` 301 plan** — see §8.
   ✅ RESOLVED 2026-10-14 for the other two pairs: `/מנעולן-רכב/` and `/מנעולן-לבית/` survive, and
-  their `/services/` twins 301 to them (§8.1).
+  their `/services/` twins 301 to them for uppercase-encoded requests only; the lowercase 301 is 🔶
+  pending the owner's zone rule (§8.1).
 - **`/שכפול-שלט-לרכב-2/`** carried WordPress's duplicate-slug `-2` suffix. ✅ RESOLVED 2026-10-14:
-  merged into `/services/שכפול-שלט-לרכב/`, which it 301s to (§8.1).
+  merged into `/services/שכפול-שלט-לרכב/` (301 uppercase-only until the 🔶 zone rule lands, §8.1).
 - **Mixed taxonomy.** Two silos use English container segments with Hebrew slugs; top-level landers
   are pure Hebrew. That is the live scheme and it stays.
 
@@ -53,12 +57,17 @@ Mapped to: `/`, `/מנעולן-רכב/`, `/מנעולן-לבית/`, `/services/�
 > service page** (763 words, no description, no `BreadcrumbList`, no `Service` node, malformed
 > JSON-LD). It is page id 95, the enrichment `referenceId`, and it has no authored module. Fixing it
 > is the highest-value single task on the site.
+>
+> 2026-10-14: stale. `content/enriched/95.mjs` exists, and `content/site.json` gives the page a
+> description and a parseable `BreadcrumbList` · `Service` · `HowTo` · `FAQPage` set. Re-measure its
+> depth before treating this as open.
 
 ### Tier 2 — brand-key terms (the site's real moat)
 
-24 of the 30 service pages target `שכפול מפתח ל<brand>`: מאזדה, טויוטה, יונדאי, קיה, פורד, סקודה,
-שברולט, סוזוקי, רנו, סיטרואן, פיגו, מיצובישי, סובארו, מרצדס, הונדה, אופל, במוו, פולקסווגן, plus
-`שכפול שלט לרכב`, `שחזור מפתח לרכב`, `קודן לרכב`.
+32 of the 53 service pages are brand-key pages targeting `שכפול מפתח ל<brand>`: מאזדה, טויוטה,
+יונדאי, קיה, פורד, סקודה, שברולט, סוזוקי, רנו, סיטרואן, פיגו, מיצובישי, סובארו, מרצדס, הונדה, אופל,
+במוו, פולקסווגן, and fourteen more added as ids 9501–9514 — plus `שכפול שלט לרכב`,
+`שחזור מפתח לרכב`, `קודן לרכב`.
 
 Lower volume each, but **high intent, low competition, and highly answerable** — a driver searching
 "שכפול מפתח מאזדה" wants a specific answer about their car. This is where the `specsTable` block
@@ -80,7 +89,8 @@ Also Tier 2 on the door side: `דלת פלדלת`, `דלת ממד`, `מנעול 
 > Treat as §8 — do not merge without a 301 plan.
 >
 > ✅ RESOLVED 2026-10-14: the נתניה pair (`שכפול-מפתח-בנתניה` / `שכפול-מפתחות-בנתניה`) was merged —
-> `שכפול-מפתח-בנתניה` survives and the other 301s to it (§8.1).
+> `שכפול-מפתח-בנתניה` survives and the other 301s to it — uppercase-encoded requests only until the
+> 🔶 owner-side zone rule is added (§8.1).
 >
 > **קריות is a region, not a city.** Any template that interpolates a bare `ב${city}` produces wrong
 > Hebrew for it. See §6.
@@ -136,7 +146,7 @@ The brand is therefore written **into** the title, exactly once:
 
 ## 4. H1 formula
 
-Exactly one `<h1>` per page — **currently true on all 66 emitted pages; protect it.**
+Exactly one `<h1>` per page — **currently true on all 105 pages; protect it.**
 
 The H1 is `hero.h1` in the authored module. It restates the keyword naturally and is _not_ identical
 to the title:
@@ -166,8 +176,9 @@ Rules:
 - Claim only what `docs/business-facts.md` confirms. The homepage description currently states
   "מעל 25 שנות ניסיון" (⛔) — it is written in `scripts/enrich.mjs:HOME_SEO` and needs the same fix
   as the `/אודותינו/` title.
-- **Missing on 5 real pages:** `/services/שכפול-מפתח-לרכב/` and the four `/step/` routes. The `/step/`
-  pages are funnel fragments and may legitimately stay bare; the service page may not.
+- **Missing on 4 real pages:** the four `/step/` routes, which are funnel fragments and may
+  legitimately stay bare. `/services/שכפול-מפתח-לרכב/` was a fifth and may not stay bare; it now has
+  one (measured in `content/site.json`, 2026-10-14).
 
 ---
 
@@ -191,7 +202,7 @@ see `docs/schema-graph.md` §5.
 
 ## 7. The expansion cap
 
-30 services × 24 locations = 720 possible cells. **Do not build them.**
+53 services × 24 locations = 1,272 possible cells. **Do not build them.**
 
 Order of operations:
 
@@ -205,6 +216,10 @@ Order of operations:
 
 **Do not add an 18th location or a 31st service before step 1.** The existing pages are good; the
 gaps are in the pages that were skipped, not in the ones that don't exist yet.
+
+> 2026-10-14: the numbers in that sentence are stale — it was written at 17 locations and 30
+> services; the site now has 24 location pages and 53 `/services/` pages, and `95.mjs` exists. The
+> intent (depth before breadth) stands, as does the matching cap in CLAUDE.md §13.
 
 ---
 
@@ -221,19 +236,20 @@ holds.** That is a deliberate project with a redirect map, not a cleanup task.
 
 ✅ RESOLVED 2026-10-14: `/שכפול-שלט-לרכב-2/`, the נתניה pair and the `/מנעולן-רכב/` ↔
 `/services/מנעולן-רכב/` duplicates were listed here until the merge in §8.1. They followed this
-rule — the 301 plan shipped with the merge — and they are the precedent for the two pairs above.
+rule: the merge carries its 301 plan (§8.1), whose lowercase half is 🔶 pending the owner's zone
+rule.
 
 ### 8.1 The 2026-10-14 merge — four pairs, one page each
 
 Owner instruction 2026-10-14: each pair below becomes one page — keep the SEO-strongest, 301 the
 other to it, and point every link and navigation surface at the survivor.
 
-| Pair           | Kept (survivor)                               | Removed → 301 to survivor                  | Why the survivor won                                                                   |
-| -------------- | --------------------------------------------- | ------------------------------------------ | -------------------------------------------------------------------------------------- |
-| מנעולן רכב     | `/מנעולן-רכב/` (id 77, core lander)           | `/services/מנעולן-רכב/` (id 93)            | shorter exact-match URL; 439 vs 145 inbound internal links; the original lander        |
-| מנעולן לבית    | `/מנעולן-לבית/` (id 78, core lander)          | `/services/מנעולן-לבית/` (id 94)           | same reasons; 319 vs 143 inbound links                                                 |
-| שכפול שלט לרכב | `/services/שכפול-שלט-לרכב/` (id 115, service) | `/שכפול-שלט-לרכב-2/` (id 113)              | the `-2` is WordPress's duplicate-slug artefact; 244 vs 109 inbound links              |
-| נתניה          | `/locations/שכפול-מפתח-בנתניה/` (id 140)      | `/locations/שכפול-מפתחות-בנתניה/` (id 149) | matches the `שכפול-מפתח-ב<city>` pattern of the other cities; 268 vs 224 inbound links |
+| Pair           | Kept (survivor)                               | Removed → 301 to survivor                  | Why the survivor won                                                                         |
+| -------------- | --------------------------------------------- | ------------------------------------------ | -------------------------------------------------------------------------------------------- |
+| מנעולן רכב     | `/מנעולן-רכב/` (id 77, core lander)           | `/services/מנעולן-רכב/` (id 93)            | shorter exact-match URL; 439 vs 145 inbound internal links; the original lander              |
+| מנעולן לבית    | `/מנעולן-לבית/` (id 78, core lander)          | `/services/מנעולן-לבית/` (id 94)           | same reasons; 319 vs 143 inbound links                                                       |
+| שכפול שלט לרכב | `/services/שכפול-שלט-לרכב/` (id 115, service) | `/שכפול-שלט-לרכב-2/` (id 113)              | the `-2` is WordPress's duplicate-slug artefact; 244 vs 109 inbound links                    |
+| נתניה          | `/locations/שכפול-מפתח-בנתניה/` (id 140)      | `/locations/שכפול-מפתחות-בנתניה/` (id 149) | singular `שכפול-מפתח-` prefix, as on 20 of the other 23 city slugs; 268 vs 224 inbound links |
 
 > ⚠️ **Which half Google indexed is not known.** The last recorded Search Console URL Inspection
 > sweep (2026-09-02) found neither member of any pair indexed, and the repo holds no newer per-URL
@@ -244,12 +260,13 @@ other to it, and point every link and navigation surface at the survivor.
 
 - `scripts/pages.mjs` `PRUNE_PATHS` lists the four removed paths (lowercase percent-encoded), so they
   stop shipping. `content/enriched/93.mjs`, `94.mjs`, `113.mjs` and `149.mjs` are deleted.
-- 20 authored modules had their links to a removed page repointed at the survivor — dropped instead
+- 22 authored modules had their links to a removed page repointed at the survivor — dropped instead
   where that would self-link (77, 78) or duplicate an entry already in the list (105, 148, 158).
-- `scripts/footer.mjs`: a core lander that is a service page to a visitor (`CORE_SERVICE_LANDERS`)
-  heads the services column once its `/services/` twin is gone, so `/מנעולן-רכב/` and
-  `/מנעולן-לבית/` top it; the bottom bar skips any lander the services column already links. The
-  bottom bar still carries `/קודן-לרכב/` and the חולון twin.
+- `scripts/footer.mjs` was changed for the merge: a core lander that is a service page to a visitor
+  (`CORE_SERVICE_LANDERS`) heads the services column once its `/services/` twin is gone, so
+  `/מנעולן-רכב/` and `/מנעולן-לבית/` top it; the bottom bar drops any entry whose page is gone or
+  that the services column already links. The bottom bar still carries `/קודן-לרכב/` and the חולון
+  twin.
 - The header city mega-menu and the homepage areas band are pruned by
   `scripts/prune-chrome-links.mjs`, which is route-driven.
 - `public/_redirects`: 16 fallback lines — 4 per removed URL (slash / no-slash × lowercase /

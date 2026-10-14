@@ -49,7 +49,7 @@ Two rules:
 - **Choose by genuine relevance.** A brand-key page (`שכפול מפתח מאזדה`) should relate to
   `שכפול מפתח לרכב`, `שחזור מפתח לרכב` and `קודן לרכב` — not to whatever sits next in the array. If a
   set of `related` blocks all point at the same four flagship pages, those pages hoard the internal
-  equity and the 24 brand-key pages get almost none.
+  equity and the 32 brand-key pages get almost none.
 - **Location adjacency is bidirectional.** If תל אביב lists רמת גן, רמת גן must list תל אביב. A
   one-way edge is a modelling error, and here it has to be maintained by hand across two modules.
 
@@ -62,7 +62,7 @@ topic or adjacency matters.
 
 ## 3. The biggest missing edge: service ↔ location
 
-No service page links contextually into the city set, and the 24 brand-key pages don't reach the 24
+No service page links contextually into the city set, and the 32 brand-key pages don't reach the 24
 location pages at all. That is the largest untapped mesh on the site.
 
 On a **service** page, add 4–6 locations to `related.locations`, weighted to the core service area.
@@ -86,7 +86,9 @@ All internal links need the **trailing slash** (`trailingSlash: true`), or they 
 ## 5. The duplicate-intent pairs — two are left; link them deliberately
 
 ✅ **RESOLVED 2026-10-14 for four pairs** (owner instruction): each was merged into its SEO-strongest
-half, the other half 301s to it, and every link and navigation surface now points at the survivor.
+half, the other half is 301'd to it (🔶 uppercase-hex traffic only for now — see the note below),
+and every link to a removed page is repointed at its survivor, or dropped where that would
+self-link (77, 78) or duplicate an entry (105, 148, 158). The chrome follows as described below.
 The table and the reason each survivor won are in `docs/keyword-map.md` §8.
 
 | Kept (link this)                | Removed → 301 to the survivor     |
@@ -97,10 +99,11 @@ The table and the reason each survivor won are in `docs/keyword-map.md` §8.
 | `/locations/שכפול-מפתח-בנתניה/` | `/locations/שכפול-מפתחות-בנתניה/` |
 
 **Never link a removed path** — it is no longer a route, so `scripts/fix-links.mjs` fails the build
-on it. The chrome followed by itself: `scripts/footer.mjs` heads the services column with
-`/מנעולן-רכב/` and `/מנעולן-לבית/` now that their `/services/` twins are gone (and the bottom bar
-skips any lander the column already links), and the header city mega-menu and the homepage areas band
-are pruned by `scripts/prune-chrome-links.mjs`, which is route-driven.
+on it. The chrome followed: `scripts/footer.mjs` was changed so that a core lander that is a
+service page to a visitor (`CORE_SERVICE_LANDERS`) heads the services column once its `/services/`
+twin is gone — so `/מנעולן-רכב/` and `/מנעולן-לבית/` top it — and the bottom bar now skips any
+lander the column already links (by href). The header city mega-menu and the homepage areas band are
+pruned automatically by `scripts/prune-chrome-links.mjs`, which is route-driven.
 
 These two pairs were out of scope and **both halves are still live**:
 

@@ -58,18 +58,21 @@ time. **That asymmetry is the root cause of the most important finding on this s
    publishes a coverage claim on ~100 pages while the manifest says `areaServed: null` (§4.6). Location pages type their city as `City` — but **קריות is a region** and must be
    `AdministrativeArea` (§4.5). `{ "@type": "Country", name: "IL" }` puts an ISO code in a `name`
    field (§4.7).
-5. **Per-route coverage.** 53 pages carry `BreadcrumbList`; `FAQPage` 55, `HowTo` 53, `Service` 46.
-   Nine real pages emit **nothing**: `/contact/`, `/services/` (hub), `/sitemap/`, the two legal pages
-   and the four `/step/` routes. The `/step/` pages are correctly bare; the others want at least a
-   `BreadcrumbList` (§4.8).
+5. **Per-route coverage.** 53 pages carry `BreadcrumbList`; `FAQPage` 55, `HowTo` 53, `Service` 46
+   (measured when 53 modules existed — re-measure on the current export). Nine real pages then
+   emitted **nothing**: `/contact/`, `/services/` (hub), `/sitemap/`, the two legal pages and the
+   four `/step/` routes. After the 2026-10-14 merge 101 of 105 pages carry JSON-LD and only the four
+   `/step/` routes are bare — correctly; any other page without at least a `BreadcrumbList` is a
+   finding (§4.8).
 6. **`FAQPage` matches visible content.** `faqSchema` derives from the same `data.faq.items` that
    `lib/enrich/render.mjs` renders, so the graph cannot drift from the copy. **Verify that property
    still holds** for any new block. Note `acceptedAnswer.text` wraps answers in `<p>…</p>` — acceptable,
    but the HTML must stay trivial.
 7. **`Offer` on `/מחירון/` — correctly absent.** Gated on owner-sourced prices (§4.9 /
    `docs/business-facts.md` §D.1). Every `pricing[]` row was authored, not supplied.
-8. **`Review` / `AggregateRating` — sourced only.** Verified zero across all 66 pages, which is
-   correct. Either appearing without a verifiable public source is **Critical** (§4.10).
+8. **`Review` / `AggregateRating` — sourced only.** Verified zero across all 66 pages (measured
+   when 53 modules existed — re-measure on the current export), which is correct. Either appearing
+   without a verifiable public source is **Critical** (§4.10).
 9. **Dangling `@id`.** `serviceJsonLd` wires `provider` to the business `@id`, which only resolves on
    the homepage — normal. Never invent a ref nothing defines.
 
