@@ -331,10 +331,13 @@ export default {
   },
   related: {
     services: [
-      { label: "מנעולן רכב", href: "/services/%d7%9e%d7%a0%d7%a2%d7%95%d7%9c%d7%9f-%d7%a8%d7%9b%d7%91/" },
+      {
+        label: "מנעולן רכב",
+        href: "/%d7%9e%d7%a0%d7%a2%d7%95%d7%9c%d7%9f-%d7%a8%d7%9b%d7%91/",
+      },
       {
         label: "מנעולן לבית",
-        href: "/services/%d7%9e%d7%a0%d7%a2%d7%95%d7%9c%d7%9f-%d7%9c%d7%91%d7%99%d7%aa/",
+        href: "/%d7%9e%d7%a0%d7%a2%d7%95%d7%9c%d7%9f-%d7%9c%d7%91%d7%99%d7%aa/",
       },
       { label: "קודן לרכב", href: "/services/%d7%a7%d7%95%d7%93%d7%9f-%d7%9c%d7%a8%d7%9b%d7%91/" },
       {

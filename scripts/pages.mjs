@@ -421,6 +421,17 @@ const PRUNE_PATHS = new Set([
   "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%91%d7%90%d7%a8-%d7%a9%d7%91%d7%a2/",
   // ירושלים — withdrawn 2026-09-02
   "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%91%d7%99%d7%a8%d7%95%d7%a9%d7%9c%d7%99%d7%9d/",
+  // Duplicate-intent twins merged into the other half of their pair (owner, 2026-10-14). Each
+  // is 301'd to the survivor in public/_redirects; docs/keyword-map.md §8 records why each
+  // survivor won.
+  // /services/מנעולן-רכב/ (93) -> /מנעולן-רכב/ (77)
+  "/services/%d7%9e%d7%a0%d7%a2%d7%95%d7%9c%d7%9f-%d7%a8%d7%9b%d7%91/",
+  // /services/מנעולן-לבית/ (94) -> /מנעולן-לבית/ (78)
+  "/services/%d7%9e%d7%a0%d7%a2%d7%95%d7%9c%d7%9f-%d7%9c%d7%91%d7%99%d7%aa/",
+  // /שכפול-שלט-לרכב-2/ (113) -> /services/שכפול-שלט-לרכב/ (115)
+  "/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%a9%d7%9c%d7%98-%d7%9c%d7%a8%d7%9b%d7%91-2/",
+  // /locations/שכפול-מפתחות-בנתניה/ (149) -> /locations/שכפול-מפתח-בנתניה/ (140)
+  "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97%d7%95%d7%aa-%d7%91%d7%a0%d7%aa%d7%a0%d7%99%d7%94/",
 ]);
 
 // The homepage's "המאמרים האחרונים שלנו" band, whose only card was the "Hello world!" demo post

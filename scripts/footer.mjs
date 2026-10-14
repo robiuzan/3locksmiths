@@ -24,6 +24,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parse } from "node-html-parser";
+import { CORE_SERVICE_LANDERS } from "../lib/reviews/reputation.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const FILE = join(ROOT, "content", "site.json");
@@ -72,15 +73,27 @@ function dedupeByLabel(items) {
 // normal `service` row in the manifest, so it is already included — concatenating it again
 // listed "שכפול מפתח לרכב" twice. Brand-key pages are 18 and belong behind the services hub
 // rather than in a footer column.
+//
+// A core lander that is a service page to a visitor heads the column when its /services/ twin
+// is gone — /מנעולן-רכב/ and /מנעולן-לבית/ since their twins were merged into them (2026-10-14,
+// public/_redirects). One whose twin still ships (קודן לרכב) stays in the bottom bar, so the
+// column never lists the same words twice.
+const serviceRows = byKind("service");
+const serviceLabels = new Set(serviceRows.map((p) => p.keyword || p.title));
 const [serviceLinks] = dedupeByLabel(
-  byKind("service")
+  byKind("core")
+    .filter(
+      (p) => CORE_SERVICE_LANDERS.has(p.id) && !serviceLabels.has(p.keyword || p.title),
+    )
+    .concat(serviceRows)
     .map((p) => ({ label: p.keyword || p.title, href: p.path }))
     .filter((l) => l.href),
 );
+const inServiceColumn = new Set(serviceLinks.map((l) => l.href));
 
-// Areas column: every location, deduped by city name. נתניה and חולון each have TWO live
-// location pages (duplicate WordPress permalinks), and a column reading "נתניה · נתניה" is
-// just confusing. The deduped-out twins are not dropped from the site — they move to the
+// Areas column: every location, deduped by city name. חולון has TWO live location pages
+// (duplicate WordPress permalinks; נתניה had two until 2026-10-14), and a column reading
+// "חולון · חולון" is just confusing. The deduped-out twins are not dropped from the site — they move to the
 // bottom-bar strip below, so nothing is orphaned. Never truncate a silo to fit a layout.
 const [areaLinks, areaTwins] = dedupeByLabel(
   byKind("location")
@@ -96,16 +109,15 @@ const guideLinks = byKind("guide")
 
 // Bottom-bar links: every top-level Hebrew lander, as a secondary-navigation strip.
 //
-// These are ALL head-term pages, and four of them are duplicate-intent twins of a /services/
-// URL (מנעולן רכב, מנעולן לבית, שכפול שלט לרכב, קודן לרכב) — both halves of each pair are live
-// WordPress permalinks holding ranking signal, so neither is merged away
-// (docs/keyword-map.md §8). An earlier version of this filter dropped any lander whose label
-// matched a services-column label, to avoid showing the same words twice. That left
-// /שכפול-שלט-לרכב-2/ with ZERO inbound links sitewide — a real orphan. A repeated label in a
-// secondary-nav strip is a much smaller problem than an unreachable page, so they all ship
-// here. The underlying duplication is a content decision flagged for the owner.
+// These are ALL head-term pages. One is still a duplicate-intent twin of a /services/ URL
+// (קודן לרכב); three more were until the owner had them merged on 2026-10-14 — /services/
+// מנעולן-רכב/ and /services/מנעולן-לבית/ into the landers, /שכפול-שלט-לרכב-2/ into its /services/
+// twin, all 301'd in public/_redirects (docs/keyword-map.md §8). An earlier version of this
+// filter dropped any lander whose label matched a services-column label, and left
+// /שכפול-שלט-לרכב-2/ with ZERO inbound links sitewide — a real orphan. So it filters by HREF:
+// only a lander the services column already links is left out.
 const infoLinks = byKind("core")
-  .filter((p) => p.path && p.path !== HUB_AREAS)
+  .filter((p) => p.path && p.path !== HUB_AREAS && !inServiceColumn.has(p.path))
   .map((p) => ({ label: p.keyword || p.title, href: p.path }))
   // …plus any location twin deduped out of the areas column, so it keeps an inbound link.
   // Labelled with its full keyword ("שכפול מפתחות נתניה") rather than the bare city, so the

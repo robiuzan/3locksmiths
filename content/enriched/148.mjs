@@ -374,10 +374,6 @@ export default {
       href: "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%91%d7%a0%d7%aa%d7%a0%d7%99%d7%94/",
     },
     {
-      label: "שכפול מפתחות נתניה",
-      href: "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97%d7%95%d7%aa-%d7%91%d7%a0%d7%aa%d7%a0%d7%99%d7%94/",
-    },
-    {
       label: "שכפול מפתח בפתח תקווה",
       href: "/locations/%d7%a9%d7%9b%d7%a4%d7%95%d7%9c-%d7%9e%d7%a4%d7%aa%d7%97-%d7%a4%d7%aa%d7%97-%d7%aa%d7%a7%d7%95%d7%95%d7%94/",
     },

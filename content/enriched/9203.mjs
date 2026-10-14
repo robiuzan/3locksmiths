@@ -352,7 +352,7 @@ export default {
       },
       {
         label: "מנעולן רכב",
-        href: "/services/%d7%9e%d7%a0%d7%a2%d7%95%d7%9c%d7%9f-%d7%a8%d7%9b%d7%91/",
+        href: "/%d7%9e%d7%a0%d7%a2%d7%95%d7%9c%d7%9f-%d7%a8%d7%9b%d7%91/",
       },
       { label: "מחירון", href: "/%d7%9e%d7%97%d7%99%d7%a8%d7%95%d7%9f/" },
     ],
