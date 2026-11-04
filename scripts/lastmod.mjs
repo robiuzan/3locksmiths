@@ -26,7 +26,8 @@
  *     practice: a sitewide sweep (the 2026-09-02 phone-number rewrite touched every module)
  *     moves all 105 dates at once even for pages whose output is unchanged.
  *   - A hash of the rendered page. Moves exactly when the bytes a visitor receives move,
- *     which is what `<lastmod>` is specified to mean.
+ *     which is what `<lastmod>` is specified to mean. Since 2026-11-04 that is the page's own
+ *     <main>, its metadata and its JSON-LD — not the shared header and footer (see mainOf).
  *
  * DETERMINISM. `npm run enrich` is byte-reproducible and CI asserts that. Identical input
  * therefore hashes identically, the stored dates are reused untouched, and re-running this
@@ -40,7 +41,14 @@
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { join } from "node:path";
+import { parse } from "node-html-parser";
 import { withoutLiveRegions } from "../lib/live/regions.mjs";
+
+// `--rekey`: the one-off migration that moves the ledger to a new fingerprint WITHOUT re-dating.
+// A page whose stored hash still equals the legacy fingerprint keeps its date; anything else is a
+// real change and is stamped as usual. Run once when the fingerprint definition changes, commit the
+// ledger, and the ordinary chain (no flag) is a no-op afterwards.
+const REKEY = process.argv.includes("--rekey");
 
 const ROOT = process.cwd();
 const SITE = join(ROOT, "content", "site.json");
@@ -59,17 +67,62 @@ if (!pages.length) {
 }
 
 /**
- * What a visitor actually receives: the body, the metadata that renders into <head>, and the
- * structured data. Deliberately excludes `scripts` (the theme replay list, identical on every
- * page) and `bodyClass`, neither of which is content a recrawl would care about.
+ * The page's OWN content: its <main> element, with the live regions cut, as the raw bytes that
+ * ship. Since 2026-11-04 the header and footer are out of the fingerprint.
+ *
+ * WHY — the footer and header are identical on every page, so any edit to them (the 2026-10-13
+ * address line, a footer column, a header label) re-dated all ~109 URLs at once, which tells Google
+ * the whole site changed when no page's content did, and spends the one per-page freshness signal
+ * the sitemap carries. `<lastmod>` is for the page's own content.
+ *
+ * THE NESTED-MAIN TRAP — the homepage's price calculator is a `<main class="page-quiz">` INSIDE
+ * `<main class="page-template-builder">`. Slicing from the first `<main` to the first `</main>`
+ * would keep ~14% of the homepage and stop its FAQ, brand grid and advantages from ever moving its
+ * date. The element is found with the parser (the selector scripts/enrich.mjs uses) and cut by its
+ * source offsets, so the outer element is taken whole. A page with no <main> hashes its whole body.
  */
+const PARSE = {
+  blockTextElements: { script: true, style: true, noscript: true, pre: true },
+};
+function mainOf(html) {
+  const body = withoutLiveRegions(html);
+  const root = parse(body, PARSE);
+  const main =
+    root.querySelector("main.page-template-builder") || root.querySelector("main");
+  if (!main) return body;
+  const [start, end] = main.range;
+  return body.slice(start, end);
+}
+
+/**
+ * What a visitor actually receives of THIS page: its <main>, the metadata that renders into
+ * <head>, and the structured data. Deliberately excludes `scripts` (the theme replay list,
+ * identical on every page) and `bodyClass`, neither of which is content a recrawl would care about.
+ */
+const hash16 = (v) =>
+  createHash("sha256").update(JSON.stringify(v)).digest("hex").slice(0, 16);
 const fingerprint = (p) =>
-  createHash("sha256")
-    .update(
-      JSON.stringify([withoutLiveRegions(p.bodyHtml ?? ""), p.seo ?? {}, p.jsonLd ?? []]),
-    )
-    .digest("hex")
-    .slice(0, 16);
+  hash16([mainOf(p.bodyHtml ?? ""), p.seo ?? {}, p.jsonLd ?? []]);
+/** The fingerprint until 2026-11-04 (whole body). Only `--rekey` uses it. */
+const legacyFingerprint = (p) =>
+  hash16([withoutLiveRegions(p.bodyHtml ?? ""), p.seo ?? {}, p.jsonLd ?? []]);
+
+// Self-check: the extraction must take the outer homepage <main> whole (the FAQ sits after the
+// nested calculator <main>), and an authored page's <main> must hold its content blocks.
+const home = pages.find((p) => p.isFront);
+if (home && !mainOf(home.bodyHtml ?? "").includes("section-faq")) {
+  console.error(
+    "lastmod: the homepage <main> extraction lost the FAQ — the nested-main trap.",
+  );
+  process.exit(1);
+}
+const authored = pages.find((p) => (p.bodyHtml ?? "").includes('data-enriched="1"'));
+if (authored && !mainOf(authored.bodyHtml).includes("content-blocks")) {
+  console.error(
+    `lastmod: the <main> of ${authored.path} has no content-blocks — extraction is wrong.`,
+  );
+  process.exit(1);
+}
 
 // The body with every live region (`data-lm-ignore`) cut out — lib/live/regions.mjs explains
 // why an attribute, why the raw string, and why a nested region is cut once. The announcement
@@ -82,13 +135,18 @@ const next = {};
 let added = 0;
 let changed = 0;
 let held = 0;
+let rekeyed = 0;
 
 // Sorted by path so the file diffs cleanly and never reorders on a pipeline change.
 for (const page of [...pages].sort((a, b) => a.path.localeCompare(b.path))) {
   const hash = fingerprint(page);
   const before = previous[page.path];
 
-  if (!before) {
+  if (REKEY && before && before.hash === legacyFingerprint(page)) {
+    // Same content under the old definition: same date under the new one.
+    next[page.path] = { hash, lastmod: before.lastmod };
+    rekeyed++;
+  } else if (!before) {
     next[page.path] = { hash, lastmod: today };
     added++;
   } else if (before.hash !== hash) {
@@ -106,6 +164,9 @@ writeFileSync(LEDGER, JSON.stringify(next, null, 2) + "\n", "utf8");
 
 console.log(
   `lastmod: ${Object.keys(next).length} pages — ${added} new, ${changed} changed, ${held} unchanged` +
+    (REKEY
+      ? `, ${rekeyed} rekeyed to the <main> fingerprint with their dates kept`
+      : "") +
     (dropped.length ? `, ${dropped.length} removed` : ""),
 );
 for (const p of dropped) console.log(`  removed: ${decodeURIComponent(p)}`);
