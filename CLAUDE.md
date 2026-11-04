@@ -150,11 +150,14 @@ scripts/               scrape → transform → pages → build-manifest → enr
                        + check-freshness.mjs / check-orphans.mjs / check-catalog-images.mjs
                        + check-placeholders.mjs (release guards + the image approval queue)
                        + check-campaigns.mjs / check-live-regions.mjs / check-schedule.mjs (prebuild)
+                       + check-prices.mjs / check-answer-block.mjs / check-boilerplate.mjs (prebuild,
+                         the GEO pattern — ratcheted by check-ratchet.mjs + content/geo-ratchet.json)
                        + phone.mjs (carries a NAP phone change into the scraped chrome)
                        + calendar-sync.mjs (NETWORKED, human-run, never in a chain — see /israeli-calendar)
 content/
   site.json            ⭐ 18.5 MB build artifact — NEVER hand-edit
-  enriched/<id>.mjs    ⭐ 57 authored pages + _manifest.json (92xx guides, 93xx emergency)
+  enriched/<id>.mjs    ⭐ 98 authored pages + _manifest.json (92xx guides, 93xx emergency)
+  enriched/_prices.mjs ⭐ the four car-key price rows (owner, 2026-11-04) — import, never retype
   enriched/_campaigns.mjs  ⭐ the announcement bar's lines and their windows — EDIT HERE
   enriched/_calendar.json  generated Israeli calendar (Hebcal, CC BY 4.0) — never hand-edit;
                            its hand-kept input is _calendar.overlay.json
@@ -310,7 +313,18 @@ literal Hebrew route **directory** (`app/מדריכים/`) breaks the Next 16 ex
 - `scripts/check-claims.mjs` — run before shipping. Scans the **rendered** `content/site.json` for
   claims our own data refutes. It exists because module-level review cannot see renderer defaults:
   `DEFAULT_STATS` shipped `25+ שנות ניסיון`, `30–60 ד׳ זמן מענה ממוצע` and `אלפי לקוחות מרוצים` to
-  ~60 pages while every authored module was clean. See `docs/business-facts.md` §D.4.
+  ~60 pages while every authored module was clean. See `docs/business-facts.md` §D.4. Since
+  2026-11-04 it also carries the arrival rule: an arrival step or sentence may not promise minutes.
+- **The GEO pattern gates** (2026-11-04, all in `prebuild`): `scripts/check-prices.mjs` (every
+  car-key price on its key type's row of `content/enriched/_prices.mjs`, read from the rendered
+  site, homepage included; a fifth number on a car page always fails), `scripts/check-answer-block.mjs`
+  (question heading + a 40–60 word first paragraph with a price or duration; and, on pages marked
+  done, the checklist, 4–6 timed steps and the שחזור coverage of brand pages) and
+  `scripts/check-boilerplate.mjs` (no first paragraph or FAQ answer copied across modules). They and
+  the arrival rule are RATCHETED through `content/geo-ratchet.json` (`scripts/check-ratchet.mjs`):
+  pages in `done` pass in full, every other page's count may only fall. **Never raise a baseline**;
+  after a batch, lower it with the gate's `--ratchet` flag. `check-typography.mjs` now also walks
+  the `_*.mjs` registers.
 
 ---
 
@@ -394,6 +408,8 @@ npm run format                     # FIRST — prettier rewrites modules, which 
 npm run enrich                     # if you touched content/enriched, lib/enrich or scripts
 node scripts/check-freshness.mjs   # content/site.json must be newer than its sources
 node scripts/check-claims.mjs      # no claim our own data refutes may reach the browser
+node scripts/check-prices.mjs && node scripts/check-answer-block.mjs && node scripts/check-boilerplate.mjs
+                                   # the GEO pattern, ratcheted (content/geo-ratchet.json)
 node scripts/check-dates.mjs       # a guide's visible date moves with its content, and only then
 npm run lint && npm run typecheck && npm run format:check && npm run build
 node scripts/check-orphans.mjs     # decode-aware; the shell version lies here

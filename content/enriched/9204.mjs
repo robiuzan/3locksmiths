@@ -19,16 +19,20 @@
 //   ownership test, and the anatomy of a quote that grows on site.
 //
 // CLAIM DISCIPLINE (docs/business-facts.md):
-//   • No years in business (§A.1 — foundedYear is null). No 24/7 or מסביב לשעון (§D.3 — published
-//     hours are 08:00–18:00). No rating, review count or customer count (§B). No response-time or
-//     arrival-time promise anywhere. No licence, certification or insurance claim about ourselves.
+//   • No years in business (§A.1 — foundedYear is null). 24/7 is confirmed (§D.3), but this page
+//     judges ANY locksmith, so it makes no availability claim about us. No rating, review count or
+//     customer count (§B). No response-time or arrival-time promise anywhere. No licence,
+//     certification or insurance claim about ourselves.
 //   • LAW: the page never states what Israeli law or an insurance policy requires. Where it
 //     matters it tells the reader to check with the relevant body. Saying "we are not the address
 //     for a legal ruling" is what makes the rest of the page credible.
-//   • PRICES: only the four sitewide rows (200 – 350 / 350 – 550 / 450 – 900 / 300 – 600 ₪). No
-//     invented bait figure is quoted, even as an illustration of a bait figure.
+//   • PRICES: only rows of the owner's four-row model (content/enriched/_prices.mjs, §D.1), and
+//     always as the ranges WE publish — never as "the market's": we hold no market data, and until
+//     2026-11-04 two passages here said "בשוק הישראלי". No invented bait figure is quoted, even as
+//     an illustration of a bait figure.
 //   • No `authorName` — nobody is named on this site (§A) and a fabricated byline is worse than
 //     none.
+import { PRICE } from "./_prices.mjs";
 //   • `related` / `areas` are intentionally NOT authored — scripts/enrich.mjs derives both from
 //     the build manifest.
 export default {
@@ -46,11 +50,11 @@ export default {
       "מדריך צרכני: אילו שאלות סוגרות את השיחה, איך נראה תרגיל המחיר הנמוך מבפנים, ולמה דווקא מנעולן שמבקש מכם מסמכים הוא הסימן הטוב.",
   },
   intro: {
-    heading: "מה בודקים לפני שמזמינים מנעולן – התשובה הקצרה",
+    heading: "מה בודקים לפני שמזמינים מנעולן?",
     paragraphs: [
-      "מנעולן אמין נבדק בשלושה דברים, וכולם ניתנים לבדיקה עוד לפני שמישהו יוצא אליכם. הוא מוסר מחיר או טווח מחיר בטלפון, לא אחרי שהעבודה נגמרה. הוא אומר במפורש אם זה מחיר סופי ומה בדיוק עלול להוסיף עליו. והוא מבקש מכם מסמך שמוכיח שהרכב או הדירה שייכים לכם. מי שמתחמק משלושת אלה, גם אם הוא אדיב מאוד בטלפון, הוא סיכון ולא מציאה.",
+      "מנעולן אמין נבדק בשלושה דברים, וכולם נבדקים בשיחת טלפון של שתי דקות, לפני שמישהו יוצא אליכם: הוא מוסר מחיר או טווח מחיר בטלפון, אומר במפורש אם זה המחיר הסופי ומה עלול להוסיף עליו, ומבקש מסמך שמוכיח שהרכב או הדירה שייכים לכם. מי שמתחמק משלושת אלה הוא סיכון, לא מציאה.",
       "כמעט אף אחד לא בוחר מנעולן ברוגע. בוחרים אותו כשהמפתח נשאר בפנים והדלת כבר נסגרה, כשהתיק והארנק בתוך הרכב, או בערב שבו אין ממי לבקש עצה. במצב כזה הלקוח לא משווה הצעות, לא קורא ביקורות ולא בודק מי עונה לו – הוא לוחץ על התוצאה הראשונה ומקווה לטוב. הפער הזה, בין לקוח בלחץ לבין נותן שירות שיודע שהלקוח בלחץ, הוא בדיוק המקום שבו נולדות רוב תלונות הצרכנים בענף.",
-      "החדשות הטובות הן שאת רוב הבדיקה אפשר לעשות בשיחת טלפון אחת בת שתי דקות, ואפשר לעשות אותה גם כשלוחצים. אין צורך להבין במנעולים, אין צורך לדעת מה זה צילינדר רב־בריחי ואין צורך להתווכח על מחיר. צריך רק לשאול ארבע או חמש שאלות ישירות, לשמוע אם התשובות ברורות או מתחמקות, ולהחליט לפי זה. מנעולן שעובד נקי עונה על כולן בלי היסוס, כי אין לו מה להסתיר מהן.",
+      "החדשות הטובות הן שאת השיחה הזאת אפשר לנהל גם כשלוחצים. אין צורך להבין במנעולים, אין צורך לדעת מה זה צילינדר רב־בריחי ואין צורך להתווכח על מחיר. צריך רק לשאול ארבע או חמש שאלות ישירות, לשמוע אם התשובות ברורות או מתחמקות, ולהחליט לפי זה. מנעולן שעובד נקי עונה על כולן בלי היסוס, כי אין לו מה להסתיר מהן.",
       "המדריך הזה עובר על השיחה עצמה, על תרגיל המחיר הנמוך ואיך הוא בנוי מבפנים, על שאלת הוכחת הבעלות שהיא המבחן החד ביותר בענף, על הדרך לוודא שמאחורי המספר עומד עסק אמיתי, ועל מה לעשות אם המחיר בכל זאת קפץ כשהעבודה כבר התחילה. הוא אינו מדריך פתיחת דלתות ואינו מדריך מנעולים – הוא מדריך קנייה.",
     ],
     outro: [
@@ -58,10 +62,10 @@ export default {
     ],
   },
   pricing: [
-    { service: "פתיחת דלת רכב או עבודת צילינדר", price: "300 – 600 ₪" },
-    { service: "שכפול מפתח רכב סטנדרטי", price: "200 – 350 ₪" },
-    { service: "שכפול מפתח עם שבב אימובילייזר", price: "350 – 550 ₪" },
-    { service: "מפתח חכם עם קידוד יחידה", price: "450 – 900 ₪" },
+    { service: "פתיחת רכב נעול", price: PRICE.remoteOrOpening },
+    { service: "שכפול מפתח מכני", price: PRICE.mechanical },
+    { service: "שכפול מפתח עם שבב אימובילייזר", price: PRICE.chipOrFlip },
+    { service: "מפתח חכם עם קידוד יחידה", price: PRICE.smart },
   ],
   process: [
     {
@@ -263,7 +267,7 @@ export default {
     {
       heading: "מה נחשב מחיר הוגן, ומה כבר לא",
       paragraphs: [
-        "מחיר הוגן אינו בהכרח המחיר הזול ביותר. הוא מחיר שאפשר להסביר: מה כלול בו, למה הוא בגובה הזה, ומה היה משנה אותו. בשוק המנעולנות בישראל עבודות פתיחה ועבודות צילינדר נעות בדרך כלל בטווח של 300 – 600 ₪, שכפול מפתח רכב סטנדרטי בטווח של 200 – 350 ₪, מפתח עם שבב אימובילייזר בטווח של 350 – 550 ₪, ומפתח חכם שדורש קידוד יחידה בטווח של 450 – 900 ₪.",
+        `מחיר הוגן אינו בהכרח המחיר הזול ביותר. הוא מחיר שאפשר להסביר: מה כלול בו, למה הוא בגובה הזה, ומה היה משנה אותו. לשם השוואה, אלה הטווחים שאנחנו מפרסמים: פתיחת רכב נעול ${PRICE.remoteOrOpening}, שכפול מפתח מכני ${PRICE.mechanical}, מפתח עם שבב אימובילייזר ${PRICE.chipOrFlip}, ומפתח חכם שדורש קידוד יחידה ${PRICE.smart}.`,
         "הטווחים האלה הם נקודת ייחוס, לא תעריף מחייב, והם משתנים לפי הדגם, לפי סוג המנעול ולפי מורכבות המקרה. הערך שלהם הוא בקצוות: הצעה שנמצאת הרבה מתחת לקצה התחתון היא לרוב מחיר פתיחה שיגדל, והצעה שנמצאת הרבה מעל הקצה העליון דורשת הסבר לפני שמאשרים אותה. באמצע, ההבדל בין הצעה להצעה הוא לגיטימי לגמרי ואינו מעיד על אף אחד לרעה.",
       ],
       bullets: [
@@ -351,7 +355,7 @@ export default {
       },
       {
         q: "כמה עולה קריאת מנעולן?",
-        a: "בשוק הישראלי עבודות פתיחה ועבודות צילינדר נעות בדרך כלל בטווח של 300 – 600 ₪, שכפול מפתח רכב סטנדרטי בטווח של 200 – 350 ₪, מפתח עם שבב בטווח של 350 – 550 ₪ ומפתח חכם עם קידוד בטווח של 450 – 900 ₪. אלה טווחי ייחוס ולא תעריף מחייב.",
+        a: `אין מחיר אחד לקריאה – המחיר נקבע לפי העבודה. לשם השוואה, אלה הטווחים שאנחנו מפרסמים: פתיחת רכב נעול ${PRICE.remoteOrOpening}, שכפול מפתח מכני ${PRICE.mechanical}, מפתח עם שבב ${PRICE.chipOrFlip} ומפתח חכם עם קידוד ${PRICE.smart}. אלה טווחי ייחוס ולא תעריף מחייב, ובכל מקרה כדאי לקבל טווח בטלפון לפני היציאה.`,
       },
       {
         q: "מחיר נמוך במיוחד תמיד אומר שמדובר בהונאה?",

@@ -79,16 +79,21 @@ two pages compete for one query and both lose.
 
 ## Pricing discipline
 
-The site has **zero price contradictions** — a genuine trust asset. The sitewide rows are:
+Car-key prices follow the owner's four-row model (2026-11-04, `docs/business-facts.md` §D.1),
+held in `content/enriched/_prices.mjs` — modules import it, never retype it:
 
-| Row                     | Price       |
-| ----------------------- | ----------- |
-| שכפול מפתח רכב סטנדרטי  | 200 – 350 ₪ |
-| שכפול מפתח חכם עם קידוד | 450 – 900 ₪ |
-| שכפול שלט / פתיחת רכב   | 300 – 600 ₪ |
+| Key type                        | Row         |
+| ------------------------------- | ----------- |
+| מפתח מכני                       | 200 – 350 ₪ |
+| מפתח עם שבב · מפתח מתקפל עם שלט | 350 – 550 ₪ |
+| מפתח חכם · Push-Start           | 450 – 900 ₪ |
+| שלט נפרד · פתיחת רכב נעול       | 300 – 600 ₪ |
+| מפתח חדש ללא מקור (שחזור)       | לפי דגם     |
 
-**A brief must reuse these, never invent a fourth.** All are 🔶 owner-unsourced
-(`docs/business-facts.md` §D.1).
+**A brief names the key type for every price and lets the row follow; it never invents a number.**
+The ranges are still 🔶 (chosen, not sourced). On 2026-11-03 the site carried about 130
+contradictions of this model; `scripts/check-prices.mjs` fails any new one and ratchets the old
+ones down batch by batch.
 
 ## Linking
 

@@ -121,6 +121,24 @@ function withDerivedLinks(data) {
     out.areas = (row.relatedLocations || []).map(linkTo).filter(Boolean);
     out.areasDerived = true;
   }
+  // The "before you choose a locksmith" checklist (Phase 3) links to the pages that answer its
+  // questions in full — the vetting guide, the cost guide, שחזור. Authored as page ids so a module
+  // never types a percent-encoded href; an id that does not resolve fails the build, because a
+  // checklist link that quietly disappears is a broken promise in the copy above it.
+  if (out.checklist?.links?.length) {
+    out.checklist = {
+      ...out.checklist,
+      links: out.checklist.links.map((l) => {
+        if (typeof l !== "number") return l;
+        const r = linkTo(l);
+        if (!r)
+          throw new Error(
+            `enrich: checklist link ${l} on page ${data.id} is not in the manifest`,
+          );
+        return r;
+      }),
+    };
+  }
   // The "שכפול מפתח" family hub (scripts/build-manifest.mjs `family`). Unlike `related`, an id that
   // does not resolve is a hard failure: a hub that silently loses a brand is the starvation this
   // block exists to end. `family: false` in a module opts a page out.

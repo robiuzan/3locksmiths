@@ -77,6 +77,19 @@ export interface KeyModelCard {
   alt?: string; // overrides the catalog's own alt once the slot is published
 }
 
+/**
+ * "What to check before you choose a locksmith" (Phase 3 GEO pattern). Items state only practices
+ * docs/business-facts.md confirms (§D.13) or checks the reader can make; never a credential.
+ * `links` are page ids — scripts/enrich.mjs resolves each to { label, href } from the manifest and
+ * fails the build on an unknown id — or an explicit RelatedLink for an exceptional anchor.
+ */
+export interface Checklist {
+  heading: string; // a question, e.g. "מה חשוב לבדוק לפני שמזמינים שכפול מפתח לרכב?"
+  intro?: string;
+  items: string[]; // at least 4 on a page marked done (scripts/check-answer-block.mjs)
+  links?: Array<number | RelatedLink>;
+}
+
 export interface StatItem {
   value: string;
   label: string;
@@ -138,6 +151,7 @@ export interface EnrichedPage {
   specsTable?: SpecsTable;
   scenarios?: ScenarioCard[];
   guides?: GuideSection[];
+  checklist?: Checklist;
   stats?: StatItem[];
   areas?: AreaItem[];
   /** Set by withDerivedLinks when `areas` was not authored (a rotating window, not geography). */

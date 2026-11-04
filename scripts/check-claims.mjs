@@ -21,6 +21,7 @@
  */
 import { readFileSync } from "node:fs";
 import { parse } from "node-html-parser";
+import { judge } from "./check-ratchet.mjs";
 
 const site = JSON.parse(readFileSync("content/site.json", "utf8"));
 const pages = Array.isArray(site) ? site : (site.pages ?? Object.values(site));
@@ -294,6 +295,44 @@ for (const page of pages) {
     }
   }
 }
+
+/**
+ * ARRIVAL TIMES IN MINUTES (2026-11-04, Phase 3). The owner confirmed 24/7 availability — never a
+ * response time — yet 18 city pages carried a numeric window on their arrival step ("הגעה אליכם
+ * בתל אביב · כ-20–40 דקות"). An arrival step states the rule, not minutes: "לפי המרחק – נמסור
+ * זמן משוער בטלפון". RATCHETED (scripts/check-ratchet.mjs), unlike every rule above: full rule on
+ * pages marked done, and elsewhere the count may only fall, so the city batches retire the windows
+ * page by page instead of all at once.
+ *
+ * An arrival step is one whose TITLE starts with the arrival — "הגעה …", "הגעת הניידת …",
+ * "מגיעים …". Titles that only mention it ("בהגעה – זיהוי הדדי", "תיאום הגעה", "לפני כל נגיעה",
+ * where נגיעה means touching) are other steps. The prose rule catches "נגיע תוך 30 דקות" anywhere
+ * in the visible copy; "כלי הגעה" (a reach tool, 9301) is not about arrival at all.
+ */
+const ARRIVAL_TITLE = /^(?:הגעה|הגעת|מגיעים|מגיעה|נגיע|יציאה|הניידת יוצאת)/;
+const ARRIVAL_PROSE =
+  /(?:נגיע|מגיעים|הניידת מגיעה|זמן ההגעה|זמן הגעה|ההגעה אליכם)(?:\s+\S+){0,3}?\s+(?:תוך|בתוך|בעוד|כעבור)\s*(?:כ-|כ־)?\d+/;
+const arrivalViolations = [];
+for (const page of pages) {
+  const root = parse(String(page.bodyHtml ?? ""), { comment: false });
+  for (const step of root.querySelectorAll(".enrich-step")) {
+    const title = (step.querySelector("h3")?.text ?? "").trim();
+    const time = (step.querySelector(".step-time")?.text ?? "").trim();
+    if (ARRIVAL_TITLE.test(title) && /\d/.test(time)) {
+      arrivalViolations.push({ id: page.id, path: page.path, found: `${title} ${time}` });
+    }
+  }
+  const m = visible(page.bodyHtml ?? "")
+    .replace(/כלי הגעה/g, " ")
+    .match(ARRIVAL_PROSE);
+  if (m) arrivalViolations.push({ id: page.id, path: page.path, found: m[0] });
+}
+const arrival = judge("arrival-minutes", arrivalViolations, {
+  verbose: process.argv.includes("--verbose"),
+  describe: (v) => `id ${v.id} ${decodeURIComponent(v.path ?? "")} — "${v.found}"`,
+});
+for (const l of arrival.lines) (arrival.failed ? console.error : console.log)(l);
+if (arrival.failed) failures++;
 
 console.log(`claims: scanned ${pages.length} rendered pages`);
 if (infoCounts.size) {

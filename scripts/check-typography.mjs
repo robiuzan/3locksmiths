@@ -72,7 +72,11 @@ const RESIDUAL = [
   ["typographic-apostrophe", /[֐-׿]’/],
 ];
 
-const files = readdirSync(ENRICHED).filter((f) => /^\d+\.mjs$/.test(f));
+// Page modules (`<id>.mjs`, default export) AND the shared registers (`_prices.mjs`,
+// `_campaigns.mjs`, `_updates.mjs`, `_reputation.mjs` — named exports). The registers carry
+// shipped copy too: the price scope line under every family table, the topbar lines, the updates
+// strip. Walking only `<id>.mjs` left all of it unguarded until 2026-11-04.
+const files = readdirSync(ENRICHED).filter((f) => /^(?:\d+|_[a-z-]+)\.mjs$/.test(f));
 let fixedFiles = 0;
 let fixedCount = 0;
 const residuals = [];
@@ -80,7 +84,7 @@ const residuals = [];
 for (const f of files) {
   const path = join(ENRICHED, f);
   const mod = await import(pathToFileURL(path).href);
-  const data = mod.default;
+  const data = /^\d/.test(f) ? mod.default : { ...mod };
   if (!data) continue;
 
   // Walk the string values only, so JS quote characters in the source are never touched.

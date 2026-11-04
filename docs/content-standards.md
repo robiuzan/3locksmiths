@@ -78,17 +78,25 @@ The authored modules are typed by `lib/enrich/types.ts` (`EnrichedPage`) and ren
 
 1. `hero.h1` + `hero.tagline` — the H1 is the keyword, naturally phrased.
 2. `intro.heading` + 2–3 `paragraphs`, opening with the §5 answer block.
-3. `pricing[]` — rows specific to this service.
-4. `process[]` — the real sequence with realistic `time` values.
+3. `pricing[]` — rows specific to this service, and every car-key price taken from
+   `content/enriched/_prices.mjs` (`import { PRICE } from "./_prices.mjs"`), never retyped: the
+   owner's four-row model (docs/business-facts.md §D.1). `scripts/check-prices.mjs` fails a price
+   whose label names a key type on another row.
+4. `process[]` — 4–6 real steps with realistic `time` values; an arrival step says
+   `לפי המרחק`, never minutes (`scripts/check-claims.mjs`, arrival rule).
 5. `specsTable` — the citable artifact. Key types, systems, complexity, duration, price band.
 6. `scenarios[]` — when this service is the right call.
-7. `faq.items[]` — 4–6, **specific to this service**.
-8. `related.services[]` + `related.locations[]` — by relevance, never by array order. A module
+7. `faq.items[]` — 4–6, **specific to this service**; the cost question first. No answer copied
+   verbatim from another module (`scripts/check-boilerplate.mjs`).
+8. `checklist` — "מה חשוב לבדוק לפני…": at least 4 items a reader can check, at least one specific
+   to this page, built only on practices `docs/business-facts.md` §D.13 confirms; `links` as page
+   ids (9204, 9201, 96…), resolved by `scripts/enrich.mjs`. Rendered after the guides.
+9. `related.services[]` + `related.locations[]` — by relevance, never by array order. A module
    that omits `related` gets a derived default from `scripts/build-manifest.mjs` (since
    2026-09-29 a rotating sibling window plus the priority services, so no page is starved of
    links). That default is a floor, not relevance: author `related` when adjacency or topic
    matters.
-9. `cta`.
+10. `cta`.
 
 ### Location page (`kind: "location"`)
 
@@ -132,9 +140,17 @@ Every service, location and guide page opens with one. This is what an answer en
 - Self-contained — no pronoun points outside the block, because that is how it gets quoted.
 - Carries the concrete number, range or duration where one exists.
 
-Today this lives as the first paragraph of `intro.paragraphs`. It is usually close but often longer
-than 60 words and buried behind a scene-setting sentence. Tightening the first paragraph of each
-authored module is a cheap, high-yield pass.
+It lives as the first paragraph of `intro.paragraphs`, under `intro.heading`, which ends with "?".
+On service and brand pages it carries a ₪ price (or "לפי דגם" for the no-key case); on city pages
+and guides a price or a duration. Words are counted as tokens holding a letter or a digit, so
+"200 – 350 ₪" is two.
+
+**Enforced since 2026-11-04** by `scripts/check-answer-block.mjs` in `prebuild`, and RATCHETED
+(`scripts/check-ratchet.mjs`): pages listed in `content/geo-ratchet.json` `done` must pass in full;
+on every other page the number of failures may only fall. On 2026-11-04, 7 of 91 required pages
+passed; Batch 0 (95, 96, 9201, 9202, 9204) is done. The same file holds the ratchets for
+`check-prices`, `check-boilerplate` and the arrival rule. Never raise a baseline: lower it with the
+gate's `--ratchet` flag after a batch.
 
 ---
 
@@ -181,7 +197,11 @@ Full rules: `/hebrew-rtl`.
 
 - [ ] Meets the §1 floor in unique words, chrome excluded.
 - [ ] Passes the §2 substitution test with three or more specific items.
-- [ ] Opens with a 40–60 word answer block that is complete in its first sentence.
+- [ ] Opens with a 40–60 word answer block that is complete in its first sentence, under a
+      question heading (`node scripts/check-answer-block.mjs`).
+- [ ] Every car-key price comes from `_prices.mjs` and sits on its key type's row
+      (`node scripts/check-prices.mjs`); no answer is copied from another page
+      (`node scripts/check-boilerplate.mjs`).
 - [ ] Carries every required block for its type (§3).
 - [ ] FAQ items are specific to this page and are rendered visibly.
 - [ ] Every gated claim (§6) has a `docs/business-facts.md` row, or is absent.

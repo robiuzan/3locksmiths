@@ -100,9 +100,11 @@ The `specsTable` is the single most valuable block — it is the site's best cit
 4. Write `faq.items` **specific to this service** — these become the `FAQPage`, so every question must
    be one a real customer asks and every answer must render on the page.
 5. Set `related` by **relevance, not array order** (`/internal-linking` §2).
-6. Keep `pricing[]` consistent with sibling pages. The site currently has **zero** price
-   contradictions — a real asset. Don't introduce the first one. Prices are 🔶 unsourced
-   (`docs/business-facts.md` §D.1), so don't invent a new range either.
+6. Take every car-key price from `content/enriched/_prices.mjs` (`import { PRICE } from
+"./_prices.mjs"`) by key type — the owner's four-row model, `docs/business-facts.md` §D.1 — and
+   never invent a range. `scripts/check-prices.mjs` fails a price on the wrong row. Add a
+   `checklist` (at least 4 items, only §D.13 practices) and keep any arrival step non-numeric
+   (`docs/content-standards.md` §3).
 7. Title and description per `docs/keyword-map.md` §3 and §5 — brand **exactly once**, under ~60 chars.
 8. `npm run enrich` — **not** `npm run snapshot`, which re-scrapes the live origin.
 9. `npm run lint && npm run typecheck && npm run build`.

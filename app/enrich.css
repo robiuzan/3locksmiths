@@ -126,6 +126,28 @@ body .section-advantages .grid-item-top .icon > svg.ls-icon {
   color: var(--acsent-color, #009f3c);
   font-weight: 800;
 }
+/* The Phase 3 checklist's onward links: a wrapped row of plain, underlined anchors in the hub's
+   navy (the theme's #0089FF link blue fails AA on the green-tinted callout). Logical properties
+   only; the outline is ours because the theme removes focus outlines. */
+.content-blocks .enrich-check__links {
+  list-style: none;
+  padding-inline-start: 0;
+  margin-block: 16px 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 22px;
+}
+.content-blocks .enrich-check__links a {
+  color: #011532;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.content-blocks .enrich-check__links a:focus-visible {
+  outline: 2px solid #011532;
+  outline-offset: 3px;
+  border-radius: 2px;
+}
 .content-blocks .enrich-subgrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

@@ -87,8 +87,16 @@ Google policy violation and stays in a codebase far longer than intended.
    module (`137.mjs`) is the standard: it names דיזנגוף, רוטשילד, פלורנטין, נווה צדק, רמת אביב.
 5. Fill `specsTable` wherever a table would beat prose. It is the most citable artifact on the site
    and most competitors don't publish one.
-6. Keep `pricing[]` consistent with sibling pages — the site currently has **no** price
-   contradictions, which is a real asset. Don't introduce the first one.
+6. Take every car-key price from `content/enriched/_prices.mjs` (`import { PRICE } from
+"./_prices.mjs"`) — the owner's four-row model (`docs/business-facts.md` §D.1): mechanical,
+   chip or flip-with-remote, smart / Push-Start, remote-only or opening, and `לפי דגם` for a key
+   with no original. Map the key type to its row (`KEY_TYPE_ROW`); never retype a number. On
+   2026-11-03 the site carried about 130 contradictions of exactly this kind, and
+   `scripts/check-prices.mjs` now fails any new one.
+   Give service, brand and city pages a `checklist` (at least 4 items, only practices §D.13
+   confirms), the cost question first in the FAQ, 4–6 timed process steps, and an arrival step that
+   says `לפי המרחק` rather than minutes. `scripts/check-answer-block.mjs` holds pages marked done
+   in `content/geo-ratchet.json` to all of it.
 7. When asked for options, give 2–3 tight variants, not a wall of text.
 
 ## The highest-value task on the site

@@ -65,8 +65,8 @@ An answer engine lifts a **contiguous, self-contained span**. Structure for that
 
 ```
 ## כמה זמן לוקח לשכפל מפתח רכב?
-שכפול וקידוד מפתח רכב אורכים 20–45 דקות ומתבצעים בשטח, ליד הרכב, בלי גרירה למוסך.
-מפתח סטנדרטי מוכן תוך כ-20 דקות; מפתח חכם עם קידוד שבב לוקח עד 45 דקות, בהתאם לדגם.
+שכפול וקידוד מפתח רכב אורכים 20–90 דקות לפי סוג המפתח, ומתבצעים בשטח, ליד הרכב, בלי גרירה.
+מפתח מכני מוכן תוך 20–30 דקות; מפתח חכם עם קידוד לוקח 45–90 דקות, לפי הדגם.
 ```
 
 **Measured 2026-11-03 across the 62 car-key family and cost pages:** 40 first paragraphs are within
@@ -74,6 +74,13 @@ An answer engine lifts a **contiguous, self-contained span**. Structure for that
 first ₪ comes after a median 230 words on brand pages. Tightening the first paragraph is the
 cheapest high-yield pass available. The 2026-11-04 plan (Phase 3) does it batch by batch, with the
 shared rows in `content/enriched/_prices.mjs`.
+
+**Enforced since 2026-11-04**, in `prebuild`: `scripts/check-answer-block.mjs` (question heading,
+40–60 words, a price or duration), `scripts/check-prices.mjs` (every car-key price on its key
+type's row), `scripts/check-boilerplate.mjs` (no answer copied across modules). All three are
+ratcheted through `content/geo-ratchet.json`: pages marked `done` pass in full, the rest may only
+improve. Batch 0 — 95, 96, 9201, 9202, 9204 — is done; the brand batches follow
+(`docs/content-standards.md` §5).
 
 **Rendering rules:** the answer must be in the HTML at first paint. **Both currently hold and must be
 preserved:**

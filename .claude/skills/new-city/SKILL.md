@@ -100,6 +100,11 @@ either without a `public/_redirects` 301** (`docs/keyword-map.md` §8).
    the concrete outcome (`docs/content-standards.md` §5).
 5. Put the local substance in `intro.paragraphs` and `process[]` — the process steps in `137.mjs`
    reference actual areas ("הניידת הקרובה", named neighbourhoods), which is what makes them non-generic.
+   The arrival step names the route, never minutes: its `time` is `לפי המרחק` (the owner confirmed
+   24/7, not a response time). Eighteen city pages still carried a numeric window on 2026-11-04;
+   `scripts/check-claims.mjs` ratchets them out and fails any new one.
+   Prices come from `content/enriched/_prices.mjs` by key type (`scripts/check-prices.mjs`), and
+   the page gets a `checklist` (`docs/content-standards.md` §3).
 6. Write 2–3 **city-specific** FAQs.
 7. Set `related.locations` from **real geographic adjacency**, and add this city to its neighbours'
    `related.locations` too — the edge is bidirectional and maintained by hand.

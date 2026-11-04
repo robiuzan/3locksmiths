@@ -594,7 +594,11 @@ between figures, slimmer limbs), so adopting it is a brand decision, not a free 
 > That settles which row a key type belongs to. It does **not** source the ranges: they stay 🔶
 > and are never emitted as `Offer`. The ~20 rows that still contradict the model are reconciled
 > page by page in Phase 3 (`scripts/check-prices.mjs`); until then some pages show the old rows.
-> The homepage FAQ and calculator already use the four rows (2026-11-04).
+> The homepage FAQ and calculator already use the four rows (2026-11-04), and so does Batch 0 —
+> pages 95, 96, 9201, 9202 and 9204, reconciled the same day. That left 118 contradictions on
+> other pages, the gate's ratchet baseline (`content/geo-ratchet.json`). The vetting guide (9204)
+> also called our ranges what "the Israeli market" charges; we hold no market data, so it now
+> presents them as the ranges we publish.
 
 Every `pricing[]` row in `content/enriched/<id>.mjs` (e.g. `"שכפול מפתח רכב סטנדרטי" → "200 – 350 ₪"`)
 was authored during the enrichment pass. **None is traced to an owner-supplied price list.** They are

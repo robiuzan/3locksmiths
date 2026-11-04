@@ -1,0 +1,17 @@
+{
+  "doc": "GEO content ratchet (scripts/check-ratchet.mjs). `done`: pages that completed the Phase 3 pattern; every rule applies to them in full. `baseline`: per rule, the violation count allowed on all other pages; it may only fall. Lower it with the gate's --ratchet flag after a batch. Never raise it by hand.",
+  "done": [
+    95,
+    96,
+    9201,
+    9202,
+    9204
+  ],
+  "baseline": {
+    "price-row": 118,
+    "answer-block": 84,
+    "boilerplate": 116,
+    "arrival-minutes": 24,
+    "geo-pattern": 0
+  }
+}
