@@ -5,12 +5,20 @@
     96,
     9201,
     9202,
-    9204
+    9204,
+    121,
+    118,
+    122,
+    98,
+    119,
+    100,
+    109,
+    117
   ],
   "baseline": {
-    "price-row": 118,
-    "answer-block": 84,
-    "boilerplate": 116,
+    "price-row": 90,
+    "answer-block": 76,
+    "boilerplate": 89,
     "arrival-minutes": 24,
     "geo-pattern": 0
   }

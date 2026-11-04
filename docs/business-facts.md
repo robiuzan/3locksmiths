@@ -605,6 +605,12 @@ between figures, slimmer limbs), so adopting it is a brand decision, not a free 
 > other pages, the gate's ratchet baseline (`content/geo-ratchet.json`). The vetting guide (9204)
 > also called our ranges what "the Israeli market" charges; we hold no market data, so it now
 > presents them as the ranges we publish.
+>
+> **B1 — DRAFT, not shippable yet.** The eight brand pages 121, 118, 122, 98, 119, 100, 109 and
+> 117 were reworked the same day on branch `geo/p3-b1-brands-draft`; with them 90 contradictions
+> remain elsewhere. They keep the modules' own technical statements, unconfirmed, so they ship only
+> after a partner locksmith signs the batch's claims sheet (`docs/claims-sheets/2026-11-b1.md`).
+> Subaru (124) stays unchanged as the control for the Peugeot title experiment.
 
 Every `pricing[]` row in `content/enriched/<id>.mjs` (e.g. `"שכפול מפתח רכב סטנדרטי" → "200 – 350 ₪"`)
 was authored during the enrichment pass. **None is traced to an owner-supplied price list.** They are
