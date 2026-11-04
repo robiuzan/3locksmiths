@@ -14,15 +14,15 @@ Status key: ✅ confirmed · 🔶 unconfirmed, do not state · ⛔ contradicted 
 
 ## A. Identity & people
 
-| Fact              | Value                | Status | Source                      |
-| ----------------- | -------------------- | ------ | --------------------------- |
-| Brand name (he)   | שלושה מנעולנים       | ✅     | manifest `brandName`        |
-| Brand name (en)   | 3 Locksmiths         | ✅     | manifest `brandNameEn`      |
-| Legal name / ח.פ. | —                    | 🔶     | manifest `legalName: null`  |
-| Owner / founder   | —                    | 🔶     | named nowhere in the repo   |
-| Named technician  | —                    | 🔶     | no person named on any page |
-| Years in business | "מעל 25 שנות ניסיון" | ⛔     | see §A.1                    |
-| Team size         | **three locksmiths** | ✅     | owner, 2026-08-30 — §A.2    |
+| Fact              | Value                                            | Status | Source                                              |
+| ----------------- | ------------------------------------------------ | ------ | --------------------------------------------------- |
+| Brand name (he)   | שלושה מנעולנים                                   | ✅     | manifest `brandName`                                |
+| Brand name (en)   | 3 Locksmiths                                     | ✅     | manifest `brandNameEn`                              |
+| Legal name / ח.פ. | — (each partner invoices under his own business) | 🔶     | manifest `legalName: null`; owner 2026-11-04 — §A.3 |
+| Owner / founder   | —                                                | 🔶     | named nowhere in the repo                           |
+| Named technician  | —                                                | 🔶     | no person named on any page                         |
+| Years in business | "מעל 25 שנות ניסיון"                             | ⛔     | see §A.1                                            |
+| Team size         | **three locksmiths**                             | ✅     | owner, 2026-08-30 — §A.2                            |
 
 ### A.1 The 25-years claim — the flagship trust defect
 
@@ -95,6 +95,15 @@ What follows from it:
   the data controller the privacy notice must name, and the party any priced offer would have to
   identify (Consumer Protection Law §14ג). Nothing in `docs/dynamic-presence-plan.md` collects data,
   so it blocks nothing there — but it blocks any lead form beyond the existing one.
+- ✅ **Receipts — owner, in session 2026-11-04: each of the three locksmiths invoices under his
+  own business.** There is no single "שלושה מנעולנים" entity on the receipt. Consequences:
+  - The guide `/מדריכים/איך-לבחור-מנעולן-אמין/` (9204) may not tell readers that the business
+    name on the phone, the site and the receipt must match — for this business it cannot. The
+    receipt check is reworded to "a lawful receipt with a registered עוסק number", which every
+    partner can pass.
+  - 🔶 The privacy notice still has to name a data controller for the lead form; with three
+    separate businesses the owner must say who that is. Open, and it blocks any new data use
+    (post-job WhatsApp, a second form).
 
 ## B. Reputation & social proof
 
@@ -305,6 +314,11 @@ claiming plural vans (`הניידות שלנו`), a price quoted in advance, and
 dealerships and fleets — 🔶 none of which is confirmed here. Replace the two photos with real
 key/lock photos and re-read the description against this file.
 
+> **Update 2026-11-04 (owner, in session):** plural vans and the price-by-phone practice are now ✅
+> (§D.13). "Regular service to garages, dealerships and fleets" is still 🔶 — the homepage FAQ that
+> said `נותני שירות קבועים לעשרות מוסכים ועסקים` was rewritten the same day and
+> `scripts/check-claims.mjs` (`customer-count`) now blocks it.
+
 **Identifiers, recorded here because Google lets them be stored indefinitely:** Place ID
 `ChIJpcB6V12ivggRi8lyDvLJiNs`; the Google-issued reviews page
 `https://search.google.com/local/reviews?placeid=ChIJpcB6V12ivggRi8lyDvLJiNs`. The official
@@ -337,14 +351,14 @@ would make the site's "★ 5.0" disagree with the cards beneath it.
 
 ## C. Contact & NAP
 
-| Fact               | Value                                                      | Status | Source                                                                  |
-| ------------------ | ---------------------------------------------------------- | ------ | ----------------------------------------------------------------------- |
-| Phone (display)    | 076-599-1266                                               | ✅     | manifest `contact.phoneDisplay` — changed 2026-09-02, §C.5              |
-| Phone (E.164)      | +972765991266                                              | ✅     | manifest `contact.phoneE164` — changed 2026-09-02, §C.5                 |
-| WhatsApp           | +972556601006                                              | ✅     | manifest `contact.whatsappE164` — **deliberately the old number**, §C.5 |
-| Email              | info@3locksmiths.co.il                                     | ✅     | **verified 2026-08-24** — live routing rule, see §C.3                   |
-| **Street address** | דרך שרה 25/2, זכרון יעקב                                   | ✅     | owner 2026-10-13, מיקוד 3092325 — footer only, not in the schema (§C.1) |
-| Opening hours      | 2 `OpeningHoursSpecification` nodes in the scraped JSON-LD | 🔶     | scraped from WordPress, never verified against the business             |
+| Fact               | Value                                                         | Status | Source                                                                                              |
+| ------------------ | ------------------------------------------------------------- | ------ | --------------------------------------------------------------------------------------------------- |
+| Phone (display)    | 076-599-1266                                                  | ✅     | manifest `contact.phoneDisplay` — changed 2026-09-02, §C.5                                          |
+| Phone (E.164)      | +972765991266                                                 | ✅     | manifest `contact.phoneE164` — changed 2026-09-02, §C.5                                             |
+| WhatsApp           | +972556601006                                                 | ✅     | manifest `contact.whatsappE164` — **deliberately the old number**, §C.5                             |
+| Email              | info@3locksmiths.co.il                                        | ✅     | **verified 2026-08-24** — live routing rule, see §C.3                                               |
+| **Street address** | דרך שרה 25/2, זכרון יעקב                                      | ✅     | owner 2026-10-13, מיקוד 3092325 — footer only, not in the schema (§C.1)                             |
+| Opening hours      | 24/7 — one `OpeningHoursSpecification`, 00:00–23:59, all week | ✅     | owner 2026-08-30, Business Profile 2026-09-05 — §D.3 (this row said "scraped, 🔶" until 2026-11-04) |
 
 ### C.1 The address — CORRECTED 2026-08-25
 
@@ -550,15 +564,16 @@ between figures, slimmer limbs), so adopting it is a brand decision, not a free 
 
 ## D. Services & pricing
 
-| Fact                | Value                                            | Status                      |
-| ------------------- | ------------------------------------------------ | --------------------------- |
-| Service list        | 30 service pages + 25 location pages             | ✅ (in `content/site.json`) |
-| Price ranges        | per-page `pricing[]` in `content/enriched/*.mjs` | 🔶                          |
-| `priceRange`        | `₪₪`                                             | ✅ manifest                 |
-| Warranty ("אחריות") | claimed widely, no term stated                   | 🔶                          |
-| Response time       | "כ-20–40 דקות" and similar, per city             | 🔶                          |
-| 24/7 availability   | **confirmed by the owner 2026-08-30** — see D.3  | ✅ owner instruction        |
-| Key-type per model  | `keyModels[]` on brand pages — see D.5           | 🔶                          |
+| Fact                | Value                                                        | Status                      |
+| ------------------- | ------------------------------------------------------------ | --------------------------- |
+| Service list        | 30 service pages + 25 location pages                         | ✅ (in `content/site.json`) |
+| Price ranges        | per-page `pricing[]` in `content/enriched/*.mjs`             | 🔶                          |
+| `priceRange`        | `₪₪`                                                         | ✅ manifest                 |
+| Warranty ("אחריות") | on the work and the coding, **no fixed term**                | ✅ owner 2026-11-04 — §D.2  |
+| Practices per job   | price by phone, fixed price, ownership check, pay after test | ✅ owner 2026-11-04 — §D.13 |
+| Response time       | "כ-20–40 דקות" and similar, per city                         | 🔶                          |
+| 24/7 availability   | **confirmed by the owner 2026-08-30** — see D.3              | ✅ owner instruction        |
+| Key-type per model  | `keyModels[]` on brand pages — see D.5                       | 🔶                          |
 
 ### D.1 Prices are authored, not sourced
 
@@ -572,8 +587,19 @@ An `Offer` carrying an unconfirmed price is worse than no `Offer`.
 
 ### D.2 The warranty has no term
 
+> ✅ **Owner, in session 2026-11-04: there is a warranty, on the work and on the coding, with no
+> fixed term.** That settles the scope; it does not create a term. The approved wording is
+> `אחריות על העבודה ועל הקידוד`. A duration — `שנה`, `עד שנה`, `30 יום`, `חצי שנה` — is still ⛔,
+> because nobody has stated one, and `scripts/check-claims.mjs` blocks it (`warranty-term`).
+>
+> The scraped homepage FAQ said `אחריות מלאה של עד שנה`, in the accordion and in its FAQPage
+> mirror, until 2026-11-04 — the one place on the site that stated a term. It was removed by
+> `scripts/claims.mjs` (`home-faq-warranty-*`) and the guard above now fails the build if any
+> term returns.
+
 "אחריות" / "אחריות מלאה" appears throughout the authored copy with **no duration, scope or
-exclusions**. Do not state a term. Do not let "אחריות מלאה" be read as a period.
+exclusions**. Do not state a term. Do not let "אחריות מלאה" be read as a period. New copy uses the
+approved wording above rather than "אחריות מלאה".
 
 ### D.3 "24/7" — ⛔ removed 2026-08-25, ✅ CONFIRMED AND RESTORED 2026-08-30
 
@@ -855,6 +881,30 @@ It shows only while the fleet status switch says `reduced` (`docs/dynamic-presen
 `../Sys Admin/runbooks/fleet-status-switch.md`); otherwise it ships hidden on every page, inside a
 `data-nosnippet` region. It promises no hours and no arrival time, and the site never repeats Home
 Front Command alerts. Change the words only on the owner's say-so.
+
+### D.13 Four practices on every job — ✅ OWNER, 2026-11-04
+
+The owner confirmed in session, on 2026-11-04, that **all three locksmiths do all four of these on
+every job**. They were 🔶 until then (§B.5 listed "a price quoted in advance" among the
+unconfirmed profile claims) and they appear on ~98 pages and in the JSON-LD of ~80.
+
+| Practice                                                     | Approved wording (use these, not stronger ones) |
+| ------------------------------------------------------------ | ----------------------------------------------- |
+| A price range is given by phone before the van is dispatched | `טווח מחיר נמסר בטלפון לפני היציאה`             |
+| The agreed price does not change on site                     | `המחיר שסוכם אינו משתנה בשטח`                   |
+| Ownership documents are always checked before a key is coded | `אימות בעלות לפני כל קידוד`                     |
+| Payment only after the key is cut, coded and start-tested    | `התשלום בסיום, אחרי בדיקת התנעה`                |
+
+**What this does NOT cover:** a price for a specific job before the make, model and year are known
+(the range is per key type — §D.1, still 🔶); an arrival time (§D.3, §D.11); a warranty term
+(§D.2). "מחיר קבוע" for a job that turns out to need more work is not covered either — the copy
+already says "if something turns out more complex, we tell you before continuing", and that stays.
+
+Because these are now ✅, the "what to check before choosing a locksmith" blocks may ask readers
+to verify them — the business passes its own test.
+
+**Vans — owner, 2026-11-04:** each of the three locksmiths works from an equipped van, so the
+plural `הניידות שלנו` (33 pages) is true. It stays; new copy may use it.
 
 ## E. Coverage
 

@@ -34,13 +34,13 @@ Structural facts about the market, not claims about specific competitors:
 
 Confirmed by inspection of our own export, not by comparison:
 
-| Asset               | Detail                                                            |
-| ------------------- | ----------------------------------------------------------------- |
-| Content depth       | median ~1,500 words/page; location pages pass the doorway test    |
-| `specsTable` blocks | key type × system × complexity × duration × price — rare in trade |
-| Structured data     | `Service` + `HowTo` + `FAQPage` + `BreadcrumbList` on 54 pages    |
-| Transparent pricing | published ranges, internally consistent sitewide                  |
-| Brand-key silo      | 18 make-specific pages                                            |
+| Asset               | Detail                                                                                                               |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| Content depth       | median ~1,500 words/page; location pages pass the doorway test                                                       |
+| `specsTable` blocks | key type × system × complexity × duration × price — rare in trade                                                    |
+| Structured data     | `Service` + `HowTo` + `FAQPage` + `BreadcrumbList` on all 98 authored pages, every block parsing (2026-11-03)        |
+| Transparent pricing | published ranges — but the same key type sits on different rows across pages (fixed by the 2026-11-04 plan, Phase 3) |
+| Brand-key silo      | 32 make-specific pages, each with a key-model grid and a specs table                                                 |
 
 **These are the moat.** Competitive strategy should widen them, not chase whatever a competitor does.
 
@@ -48,13 +48,18 @@ Confirmed by inspection of our own export, not by comparison:
 
 ## 3. Where this site is behind
 
-| Gap                   | Consequence                                                   |
-| --------------------- | ------------------------------------------------------------- |
-| Unaudited GBP         | in the pack since 2026-09-05, but its contents are unverified |
-| Zero reviews          | loses the pack and loses the click even when ranked           |
-| No emergency coverage | absent from the highest-intent half of the market             |
-| No editorial content  | no topical-authority signal, no AEO citations                 |
-| AI crawlers blocked   | cannot be cited by any assistant (backlog §6.1)               |
+Rewritten 2026-11-03. The previous version listed "unaudited GBP", "zero reviews", "no emergency
+coverage", "no editorial content" and "AI crawlers blocked" — all five had been fixed or had changed
+by then (GBP audited 2026-09-05, 13 reviews on the owner's dashboard 2026-10-13, emergency cluster
+and 12 guides shipped, the Cloudflare AI block gone from the live `robots.txt`).
+
+| Gap (observed 2026-11-03)                           | Consequence                                                        |
+| --------------------------------------------------- | ------------------------------------------------------------------ |
+| 30 of 32 brand pages and page 95 never crawled      | they cannot rank or be cited; see `docs/geo-observations.md` §1.3  |
+| Brand pages linked from 7–10 pages each             | no crawl path; competitors link every brand from every family page |
+| Cost answered ~230 words in, not first              | both benchmarks put the price in the title, H1 or first block      |
+| No "what to check before choosing" block            | both benchmarks carry buyer checks; we had them on 10 of 62 pages  |
+| Same key type priced on different rows across pages | a quoted price can contradict another page of ours                 |
 
 ---
 
@@ -62,9 +67,13 @@ Confirmed by inspection of our own export, not by comparison:
 
 Fill one row per genuine competitor, from live observation. **Date every entry.**
 
-| Competitor                                      | Domain | Where they beat us | Where they're weak | Observed |
-| ----------------------------------------------- | ------ | ------------------ | ------------------ | -------- |
-| _(empty — populate from live SERP observation)_ |        |                    |                    |          |
+| Competitor | Domain          | Where they beat us                                                                                                                                                                                                                                                                                                                                                                               | Where they're weak                                                                                                                                                                                                                                                                                                                                    | Observed                                                                                                                   |
+| ---------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| מפתח עכשיו | carkeynow.co.il | Brand page (Peugeot) puts cost in the title ("כמה זה עולה") and H1 ("מחירון בפנים"); price table ~150 words in, per key type and model group, with scope lines (arrival + coding included, VAT excluded, "משוערים"); dealer-vs-us table; time-per-key-type table; "when to duplicate" list; 11-item TOC; 27-brand + 10-city + 6-service link blocks on every brand page; named technician byline | Claims we may not make: "10+ שנות ניסיון", "100% אחריות בכתב", "20 דק׳ זמן הגעה ממוצע", "פריסה ארצית", "אחריות 30 יום". Its Peugeot chip/smart ranges differ between two tables on the same page; "20 minutes" header vs "שעה-שעתיים" body; brand block omits 7 of its own brands; one blog post, which 404s                                          | 2026-11-03, WebFetch of `/`, `/שכפול-מפתח-לפיגו/`, `/בלוג/` — structure only, no ranking or traffic measured               |
+| קי פור מי  | keyforme.co.il  | Parent page opens with "כמה עולה לשכפל…", a 19-make price table with a price-driver column, VAT note and a dated "last checked" stamp; 28-tile make grid mid-parent; identical "לפי עיר" (74) and "לפי יצרן" (36) hubs on every sub-page; parent bold-first in the header dropdown; 6-step process table; 15-item FAQ with buyer checks; author byline                                           | Location pages largely templated (Holon copies 13 of 15 parent FAQ answers); 13 of 19 make prices differ between parent and Holon; Peugeot priced three ways on one page; warranty "שנה" vs "חצי שנה"; makes inside the city list, duplicate city spellings; the two URLs the brief cited (`/שכפול-מפתח-לוקיישן/`, `/שכפול-מפתח-לפואינט/`) return 404 | 2026-11-03, WebFetch of `/`, `/שכפול-מפתחות-לרכב/`, `/שכפול-מפתח-לרכב-בחולון/`, `/שכפול-מפתח-לרכב-לפיגו/` — structure only |
+
+Neither competitor's AI citations or traffic were measured. The monthly probe in
+`docs/geo-observations.md` §1.5 records who is cited, for us and for both of them.
 
 ### How to populate it honestly
 
