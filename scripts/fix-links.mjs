@@ -261,6 +261,11 @@ const brandKey = (s) =>
     .replace(/[\s-]/g, "")
     .trim();
 const brandByKey = new Map(brandRows.map((p) => [brandKey(p.brand), p]));
+// The homepage "אזורי השירות שלנו" band is scraped WordPress markup listing the 15 cities the
+// original site had; the 10 added since (9601–9612) reached the homepage only through the footer.
+// Completed the same way as the brand grid: from the manifest, keyed on the stored href.
+const locationRows = pageManifest.pages.filter((p) => p.kind === "location");
+let areasAdded = 0;
 
 let brandLinked = 0;
 let brandAdded = 0;
@@ -323,6 +328,34 @@ for (const page of site.pages) {
     }
   }
 
+  // 3. complete the homepage areas band (2026-11-04). The clone keeps the theme's own markup and
+  // pin icon; the href is the manifest's stored path, which is what prune-chrome-links.mjs (run just
+  // before this) keeps — a decoded href in a .location-list would be deleted by it next run.
+  const areaList = page.isFront
+    ? root.querySelector("section.section-areas ul.location-list")
+    : null;
+  if (areaList) {
+    const items = areaList.querySelectorAll("li");
+    const have = new Set(
+      areaList.querySelectorAll("a.location-item").map((a) => a.getAttribute("href")),
+    );
+    if (items.length) {
+      for (const row of locationRows) {
+        if (have.has(row.path)) continue;
+        const clone = parse(items[0].toString()).querySelector("li");
+        const a = clone.querySelector("a.location-item");
+        const cap = clone.querySelector(".caption");
+        if (!a || !cap) break;
+        a.setAttribute("href", row.path);
+        cap.set_content(row.title);
+        areaList.appendChild(clone);
+        have.add(row.path);
+        areasAdded++;
+        changed = true;
+      }
+    }
+  }
+
   if (changed) page.bodyHtml = root.toString();
 }
 
@@ -330,7 +363,8 @@ writeFileSync(FILE, JSON.stringify(site, null, 2), "utf8");
 console.log(
   `fix-links: remapped ${remapped}, normalized ${slashed} trailing slash(es), unlinked ${unlinked} dead archive link(s), ` +
     `normalized ${telFixed} tel: href(s) + ${emailFixed} legacy email(s), tagged ${ctaTagged} data-cta, set ${redirectsSet} form redirect(s), ` +
-    `wired ${brandLinked} brand card(s), added ${brandAdded}, removed ${brandRemoved} duplicate(s).`,
+    `wired ${brandLinked} brand card(s), added ${brandAdded}, removed ${brandRemoved} duplicate(s), ` +
+    `added ${areasAdded} city link(s) to the homepage areas band.`,
 );
 
 if (unresolved.length) {

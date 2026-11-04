@@ -88,6 +88,22 @@ export interface AreaItem {
   href: string;
 }
 
+/** One entry in the family hub. `current` marks the page being rendered (shown as text). */
+export interface HubLink extends RelatedLink {
+  current?: boolean;
+}
+
+/**
+ * The "שכפול מפתח" family hub — set by scripts/enrich.mjs withDerivedLinks from the manifest's
+ * `family` key; never authored. A module may write `family: false` to opt its page out.
+ */
+export interface FamilyHub {
+  role: "parent" | "child";
+  parent: RelatedLink; // page 95, /services/שכפול-מפתח-לרכב/
+  brands: HubLink[]; // all brand pages, code-point order
+  locations: HubLink[]; // one page per city, code-point order
+}
+
 export interface EnrichedPage {
   id: number; // matches SitePage.id in content/site.json
   kind: PageKind;
@@ -119,6 +135,10 @@ export interface EnrichedPage {
   guides?: GuideSection[];
   stats?: StatItem[];
   areas?: AreaItem[];
+  /** Set by withDerivedLinks when `areas` was not authored (a rotating window, not geography). */
+  areasDerived?: boolean;
+  /** Derived family hub; `false` opts the page out. */
+  family?: FamilyHub | false;
 
   // Per-model key grid (brand-key pages). Absent → section skipped.
   keyModels?: {

@@ -164,8 +164,16 @@ const serviceRows = byKind("service").filter((r) => !coreKeywords.has(normKeywor
 // (docs/keyword-map.md §2), not "whichever rows happen to come first". Synthetic ids from
 // scripts/pages.mjs — stable, like REFERENCE_ID.
 const PRIORITY_SERVICE_IDS = [9301, 9302, 9304, 9102]; // פתיחת רכב / פתיחת דלת / 24 שעות / החלפת מנעולים
+// /services/שחזור-מפתח-לרכב/ — the no-key case. Every brand page links it (added 2026-11-04): a
+// driver searching "שחזור מפתח <brand>" lands on the brand page, and the generic how-it-works
+// page is one click away instead of only in the footer.
+const RESTORE_ID = 96;
 // enrich.mjs drops an id it cannot resolve without a word, so a retired id would silently
 // shrink every derived page's links. Fail here instead.
+if (!serviceRows.some((s) => s.id === RESTORE_ID)) {
+  console.error(`build-manifest: RESTORE_ID ${RESTORE_ID} is not a live service row`);
+  process.exit(1);
+}
 for (const id of PRIORITY_SERVICE_IDS) {
   if (!serviceRows.some((s) => s.id === id)) {
     console.error(
@@ -197,9 +205,10 @@ for (const r of rows) {
   const relatedServices = [];
   const relatedLocations = [];
   if (r.kind === "brand-key") {
-    // 5 sibling brands + parent ref (95)
+    // 5 sibling brands + parent ref (95) + the no-key page (96)
     relatedServices.push(...nextSiblings(brandRows, r, 5));
     if (r.id !== REFERENCE_ID) relatedServices.push(REFERENCE_ID);
+    relatedServices.push(RESTORE_ID);
   } else if (r.kind === "service") {
     const kodan = isKodan(r);
     if (kodan && kodanHub && kodanHub.id !== r.id) relatedServices.push(kodanHub.id);
@@ -258,11 +267,83 @@ for (const group of byKeyword.values()) {
 }
 if (twinEdges) console.log(`twins: linked ${twinEdges} duplicate-intent edge(s)`);
 
+// --- the "שכפול מפתח" family hub (2026-11-04) -----------------------------------------------
+// Page 95 (/services/שכפול-מפתח-לרכב/), the 32 brand pages and the 25 city pages carry one link
+// block listing every brand and every city (lib/enrich/render.mjs renderFamilyHub). Measured
+// 2026-11-03: every brand page had 7–10 inbound links and 30 of 32 had never been crawled, while
+// the cities — in every footer — were indexed. This is the set that block reads.
+//
+// Built from `rows` (pages that exist), never from the BRANDS / CITIES literals above: CITIES
+// still lists withdrawn cities, and a withdrawn page must drop out of 58 hubs by itself.
+//
+// One entry per city. נתניה and חולון each have two live permalinks (docs/keyword-map.md §8); the
+// hub lists the one whose copy is about car keys — 147 for חולון (151 is the home/door page,
+// 151.mjs:1) and 140 for נתניה. The other twin keeps its inbound links from the footer strip.
+const FAMILY_CITY_PICK = { נתניה: 140, חולון: 147 };
+// Code-point order, never Intl or localeCompare: the CI byte-check runs on another machine. BYD is
+// filed under its Hebrew reading so it sits with the ב brands rather than before all of them.
+const SORT_KEY = { BYD: "בי וואי די" };
+const sortKey = (s) => (SORT_KEY[s] ?? s).replace(/['׳’]/g, "");
+const byKey = (a, b) => (a.k < b.k ? -1 : a.k > b.k ? 1 : 0);
+
+const familyBrands = brandRows
+  .map((r) => ({ id: r.id, k: sortKey(r.brand) }))
+  .sort(byKey)
+  .map((x) => x.id);
+
+const byCity = new Map();
+for (const r of locationRows) {
+  if (!byCity.has(r.city)) byCity.set(r.city, []);
+  byCity.get(r.city).push(r);
+}
+const familyCities = [];
+for (const [city, group] of byCity) {
+  let pick = group[0];
+  if (group.length > 1) {
+    pick = group.find((r) => r.id === FAMILY_CITY_PICK[city]);
+    if (!pick) {
+      console.error(
+        `build-manifest: ${group.length} location pages for "${city}" (${group.map((r) => r.id).join(", ")}) ` +
+          "and no FAMILY_CITY_PICK entry naming one of them — the hub would list the city twice.",
+      );
+      process.exit(1);
+    }
+  }
+  familyCities.push({ id: pick.id, k: sortKey(city) });
+}
+for (const [city, id] of Object.entries(FAMILY_CITY_PICK)) {
+  if (!byCity.get(city)?.some((r) => r.id === id)) {
+    console.error(
+      `build-manifest: FAMILY_CITY_PICK names ${id} for "${city}", which is not a live location row.`,
+    );
+    process.exit(1);
+  }
+}
+const familyLocations = familyCities.sort(byKey).map((x) => x.id);
+if (familyBrands.length !== brandRows.length || familyLocations.length !== byCity.size) {
+  console.error(
+    `build-manifest: family hub has ${familyBrands.length}/${brandRows.length} brands and ` +
+      `${familyLocations.length}/${byCity.size} cities — a member was lost.`,
+  );
+  process.exit(1);
+}
+for (const r of rows) {
+  if (r.id === REFERENCE_ID || r.kind === "brand-key" || r.kind === "location")
+    r.inFamily = true;
+}
+const family = { parent: REFERENCE_ID, brands: familyBrands, locations: familyLocations };
+
 // id -> {path,title} lookup so authors can resolve related ids to label+href.
 const lookup = {};
 for (const p of site.pages) lookup[p.id] = { path: p.path, title: dec(p.title) };
 
-const manifest = { referenceId: REFERENCE_ID, count: rows.length, lookup, pages: rows };
+const manifest = {
+  referenceId: REFERENCE_ID,
+  count: rows.length,
+  family,
+  lookup,
+  pages: rows,
+};
 writeFileSync(
   join(ENRICHED, "_manifest.json"),
   JSON.stringify(manifest, null, 2),
@@ -273,6 +354,10 @@ const byK = rows.reduce((a, r) => ((a[r.kind] = (a[r.kind] || 0) + 1), a), {});
 console.log(`manifest: ${rows.length} pages →`, byK);
 console.log("brands:", brandRows.map((b) => `${b.id}:${b.brand}`).join(", "));
 console.log("locations:", locationRows.map((l) => `${l.id}:${l.city}`).join(", "));
+console.log(
+  `family hub: parent ${REFERENCE_ID}, ${familyBrands.length} brands, ${familyLocations.length} cities, ` +
+    `on ${rows.filter((r) => r.inFamily).length} pages`,
+);
 console.log(
   "services(generic, twins excluded):",
   serviceRows.map((s) => `${s.id}:${s.keyword}`).join(", "),

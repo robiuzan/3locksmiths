@@ -84,6 +84,7 @@ for (const f of files) {
  * This is a fallback for modules that omit it, which is now the preferred way to author one.
  */
 const MANIFEST_BY_ID = new Map(PAGE_MANIFEST.pages.map((p) => [p.id, p]));
+const FAMILY = PAGE_MANIFEST.family ?? null;
 // Manifest titles are the scraped WordPress titles with curly quotes folded to ASCII for
 // matching (build-manifest.mjs dec()), so "שכפול מפתח פיג'ו" arrives with U+0027. A visible
 // label must use גרש/גרשיים (CLAUDE.md §8), and check-typography.mjs only scans authored
@@ -106,8 +107,34 @@ function withDerivedLinks(data) {
   }
   // `areas` is the location-page "other cities we serve" band. Default it to the sibling
   // locations the manifest already picked, so a new city page links into the mesh for free.
+  // `areasDerived` marks that default: it is a rotating window, not geography, so the family hub
+  // never calls it "nearby" (renderFamilyHub shows the nearby line only for authored areas).
   if (!out.areas && out.kind === "location") {
     out.areas = (row.relatedLocations || []).map(linkTo).filter(Boolean);
+    out.areasDerived = true;
+  }
+  // The "שכפול מפתח" family hub (scripts/build-manifest.mjs `family`). Unlike `related`, an id that
+  // does not resolve is a hard failure: a hub that silently loses a brand is the starvation this
+  // block exists to end. `family: false` in a module opts a page out.
+  if (row.inFamily && out.family !== false && FAMILY) {
+    const entry = (id) => {
+      const r = MANIFEST_BY_ID.get(id);
+      if (!r) throw new Error(`enrich: family hub id ${id} is not in the manifest`);
+      return {
+        label: hebrewPunct(r.brand ?? r.city ?? r.title),
+        href: r.path,
+        current: id === data.id,
+      };
+    };
+    const parent = MANIFEST_BY_ID.get(FAMILY.parent);
+    if (!parent)
+      throw new Error(`enrich: family parent ${FAMILY.parent} is not in the manifest`);
+    out.family = {
+      role: data.id === FAMILY.parent ? "parent" : "child",
+      parent: { label: hebrewPunct(parent.title), href: parent.path },
+      brands: FAMILY.brands.map(entry),
+      locations: FAMILY.locations.map(entry),
+    };
   }
   return out;
 }
@@ -122,7 +149,16 @@ function breadcrumbSchema(data, page) {
     list.push({ name: "אזורי שירות", item: `${ORIGIN}/אזורי-שירות/` });
   else if (data.kind === "guide")
     list.push({ name: "מדריכים", item: `${ORIGIN}/מדריכים/` });
-  else if (data.kind === "service" || data.kind === "brand-key")
+  else if (data.kind === "brand-key") {
+    // A brand page sits under page 95 (2026-11-04): בית › שירותים › שכפול מפתח לרכב › <brand>.
+    // The visible trail (lib/enrich/render.mjs crumbs) carries the same four levels.
+    list.push({ name: "שירותים", item: `${ORIGIN}/services/` });
+    if (data.family?.parent)
+      list.push({
+        name: data.family.parent.label,
+        item: `${ORIGIN}${data.family.parent.href}`,
+      });
+  } else if (data.kind === "service")
     list.push({ name: "שירותים", item: `${ORIGIN}/services` });
   list.push({ name: data.keyword, item: abs(page) });
   return J({
