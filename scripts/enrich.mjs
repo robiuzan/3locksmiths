@@ -48,10 +48,12 @@ const HOME_SEO = {
   // is the strongest differentiator this business has in the SERP — a lockout at 02:00 is the
   // highest-intent query in the trade, and the category leader has been claiming it unopposed.
   //
-  // 58 chars, inside the ~60 limit. "פתיחה" stays dropped: the H1 and the two פתיחה service
-  // pages already carry that intent, and the length has to pay for "24/7".
-  title: "מנעולן 24/7 לרכב ולבית – שכפול וקידוד | שלושה מנעולנים",
-  description: `שלושה מנעולנים – מנעולן 24/7 לרכב ולבית: שכפול וקידוד מפתחות, פתיחת דלת נעולה והחלפת מנעולים אצלכם בשטח, במחיר שקוף מראש. חייגו ${manifest.contact.phoneDisplay} בכל שעה.`,
+  // 2026-11-04 pivot (owner decision): the homepage leads with car-key duplication, but the
+  // ranking page for "שכפול מפתח לרכב" stays /services/שכפול-מפתח-לרכב/ (id 95). So the head term
+  // "מנעולן 24/7 לרכב ולבית" keeps first position and the keyword comes second — leading with it
+  // would make the homepage a second page 95 for the same query. 57 code points, brand once.
+  title: "מנעולן 24/7 לרכב ולבית – שכפול מפתח לרכב | שלושה מנעולנים",
+  description: `שכפול מפתח לרכב בשטח, ליד הרכב: חיתוך, קידוד שבב, שלט ומפתח חכם, בלי גרירה למוסך. מנעולן 24/7 גם לבית – פתיחת דלת והחלפת מנעולים. חייגו ${manifest.contact.phoneDisplay} בכל שעה.`,
 };
 
 const site = JSON.parse(readFileSync(SITE, "utf8"));

@@ -38,6 +38,7 @@
  *   node scripts/claims.mjs      (exit 1 if a ⛔ claim survives the pass)
  */
 import { readFileSync, writeFileSync } from "node:fs";
+import { parse } from "node-html-parser";
 
 const PATH = "content/site.json";
 
@@ -45,6 +46,18 @@ const PATH = "content/site.json";
 // roster is a bug — which is exactly the defect the `us-phone-number-in-cta` rule below cleans up.
 const manifest = JSON.parse(readFileSync("site.config.json", "utf8"));
 const PHONE = manifest.contact?.phoneDisplay ?? "076-599-1266";
+
+// Link targets come from the build manifest (scripts/build-manifest.mjs runs earlier in the
+// chain), never typed here: a hand-typed percent-encoded href is the easiest dead link to ship.
+const PAGE_MANIFEST = JSON.parse(readFileSync("content/enriched/_manifest.json", "utf8"));
+function pathOf(id) {
+  const p = PAGE_MANIFEST.lookup?.[id]?.path;
+  if (!p) {
+    console.error(`claims: no manifest path for page ${id} — the link target is gone.`);
+    process.exit(1);
+  }
+  return p;
+}
 
 /** Enumerated rewrites. `from` must be the exact scraped text. */
 const REWRITES = [
@@ -194,9 +207,243 @@ const HTML_REWRITES = [
   },
 ];
 
+/**
+ * HOMEPAGE-ONLY rewrites (page 7), added 2026-11-04 with the "שכפול מפתח לרכב" pivot.
+ *
+ * WHY A THIRD LIST — the two lists above act on every page. That is fine for strings that only
+ * ever existed on the homepage, and it has bitten once: `home-card-247-heading` also rewrites the
+ * renderer's default feature card and page 95's outro, because the same words appear there. These
+ * rules are scoped to the front page by construction, so a phrase that also lives in an authored
+ * module can never be rewritten by accident.
+ *
+ * DECODED MODE — applied to `bodyHtml` and to each `jsonLd` string after parsing, never to the raw
+ * file text, so attribute quotes are written as plain `"`. (The raw-file idiom writes them `\\"`;
+ * mixing the two puts a literal backslash into an href that no link checker sees.)
+ *
+ * END STATE, NOT MATCH COUNT — page 7's HTML is stateful: after the first run the `from` strings
+ * are gone, so "matched once" can only ever be true on one run. What is checked instead holds on
+ * every run and after a re-scrape: `from` is absent and `to` is present (twice for FAQ strings,
+ * which the accordion and its FAQPage mirror both carry — `mirror: true`).
+ *
+ * The FAQ answers state the four sitewide price rows (owner, 2026-11-04 — docs/business-facts.md
+ * §D.1, still 🔶 as ranges) and the four confirmed practices (§D.13). No warranty term (§D.2), no
+ * customer count, no "all makes" claim.
+ */
+const HOME_CLAIM_REWRITES = [
+  // --- the FAQ accordion + its FAQPage JSON-LD mirror ------------------------------------
+  {
+    // "כל מותגי הרכב הקיימים בישראל, כולל רכבים יוקרתיים" is an absolute claim nobody can back;
+    // the question is replaced with the one buyers actually ask.
+    id: "home-faq-all-brands-q",
+    from: "האם אתם עובדים עם כל סוגי הרכב?",
+    to: "איך מתבצע שכפול מפתח ליד הרכב?",
+    mirror: true,
+  },
+  {
+    id: "home-faq-all-brands-a",
+    from: "כן. אנו מתמחים בכל מותגי הרכב הקיימים בישראל, כולל רכבים יוקרתיים.",
+    to: "מזהים בטלפון את הרכב ואת סוג המפתח ונותנים טווח מחיר, מגיעים עם ניידת, חותכים להב לפי המפתח הקיים ומקודדים את השבב למחשב הרכב. בסיום בודקים נעילה והתנעה, ורק אז משלמים – עם אחריות על העבודה ועל הקידוד.",
+    mirror: true,
+  },
+  {
+    // §D.2 — the only warranty TERM the site ever stated ("עד שנה"). The owner confirmed a
+    // warranty on the work and the coding with no term (2026-11-04), so the scope lives in the
+    // process answer above and this slot answers what to prepare instead.
+    id: "home-faq-warranty-q",
+    from: "האם יש אחריות על המפתח?",
+    to: "מה צריך להכין לפני שמזמינים שכפול מפתח?",
+    mirror: true,
+  },
+  {
+    id: "home-faq-warranty-a",
+    from: "בוודאי. כל מפתח משוכפל מגיע עם אחריות מלאה של עד שנה",
+    to: "את המפתח הקיים, רישיון רכב ותעודה מזהה של הבעלים, ואת היצרן, הדגם ושנת הייצור. בלי אף מפתח מקורי מדובר בשחזור ולא בשכפול.",
+    mirror: true,
+  },
+  {
+    // §B.5 — "regular service to dozens of garages" is unsourced social proof.
+    id: "home-faq-garages-q",
+    from: "האם אתם עובדים עם מוסכים וסוכנויות?",
+    to: "מה ההבדל בין שכפול לשחזור מפתח?",
+    mirror: true,
+  },
+  {
+    id: "home-faq-garages-a",
+    from: "בהחלט. אנו נותני שירות קבועים לעשרות מוסכים ועסקים בענף הרכב.",
+    to: "שכפול מעתיק מפתח קיים שעובד. שחזור מפיק מפתח חדש כשאין אף מפתח, לפי קוד הצילינדר או מספר השלדה, ולרוב גם מוחק ממחשב הרכב את המפתח שאבד.",
+    mirror: true,
+  },
+  {
+    id: "home-faq-smart-key-a",
+    from: "בהחלט. אנו מצוידים בטכנולוגיה לקידוד ושכפול מפתחות חכמים כולל אימובילייזר.",
+    to: "כן, לרוב יצרני הרכב הנפוצים. מפתח חכם עם התנעת לחצן מקודד מול מחשב הרכב, ליד הרכב, ועולה בדרך כלל 450 – 900 ₪ לפי הדגם.",
+    mirror: true,
+  },
+  {
+    id: "home-faq-duration-q",
+    from: "כמה זמן לוקח השירות?",
+    to: "כמה זמן אורך שכפול מפתח בשטח?",
+    mirror: true,
+  },
+  {
+    // Work time at the car, from page 95's key-type table — never an arrival time (§D.11).
+    id: "home-faq-duration-a",
+    from: "לרוב, שכפול מפתח רגיל לוקח עד 30 דקות. למפתח חכם – עד שעה",
+    to: "מפתח מכני כ-20–30 דקות, מפתח עם שבב כ-30–45 דקות, מפתח מתקפל עם שלט כ-40–60 דקות ומפתח חכם כ-45–90 דקות, לפי הדגם.",
+    mirror: true,
+  },
+  {
+    id: "home-faq-cost-q",
+    from: "כמה עולה מפתח חדש לרכב?",
+    to: "מה טווח המחירים לשכפול מפתח לרכב?",
+    mirror: true,
+  },
+  {
+    // A non-answer that sent visitors to /מחירון/, whose car rows contradict the rest of the
+    // site (80.mjs — flagged to the owner). The four sitewide rows instead.
+    id: "home-faq-cost-a",
+    from: "המחירים משתנים לפי סוג המפתח והרכב. הכנס לעמוד המחירון שלנו לעיון מפורט.",
+    to: "מפתח מכני 200 – 350 ₪, מפתח עם שבב או מתקפל עם שלט 350 – 550 ₪, מפתח חכם 450 – 900 ₪ ושלט נפרד 300 – 600 ₪. כשאין אף מפתח מקורי, המחיר נקבע לפי הדגם.",
+    mirror: true,
+  },
+
+  // --- body-only claims -----------------------------------------------------------------
+  {
+    // §B.5 — garages, dealerships and fleets, plus a superlative ("החדשני ביותר… מקסימלית").
+    id: "home-about-b2b",
+    from: "<p>השירות שלנו כולל שכפול מפתחות לרכב חכם, אימובילייזר, מפתחות רגילים ושירותים נוספים למוסכים, סוכנויות וציי רכב. אנו עובדים עם הציוד החדשני ביותר כדי להבטיח דיוק, מהירות ובטיחות מקסימלית.</p>",
+    to: "<p>המחיר מכסה את העבודה כולה – חיתוך הלהב, קידוד השבב, סנכרון השלט ובדיקת ההתנעה. המפתחות הקיימים ממשיכים לעבוד כשהם נוכחים בקידוד, ואם אין בידכם אף מפתח, זה כבר שחזור ומחירו נקבע לפי הדגם.</p>",
+  },
+  {
+    // "בזמן שיא" is a superlative speed claim and "כל נציג עובר הכשרה" is unsourced. Replaced by
+    // the three checks a buyer should make — practices the owner confirmed (§D.13), so the business
+    // passes its own test. The guide link is safe because 9204's receipt row was reworded the same
+    // day (each partner invoices under his own business, §A.3).
+    id: "home-form-paragraph",
+    from: "<p>אנו בשלושה מנעולנים מאמינים כי כל קריאה היא קריאה דחופה, ולכן פועלים במהירות ובמקצועיות להגיע לכל לקוח בזמן שיא. כל נציג אצלנו עובר הכשרה אישית ומתחייב לתת מענה אדיב, סבלני ומדויק. אנו זמינים לכל שאלה, מספקים ייעוץ טלפוני חינם ונותנים שירות מלא גם בשטח.</p>",
+    to: `<p>שלושה דברים שכדאי לוודא מול כל מנעולן: שקיבלתם טווח מחיר בטלפון לפני היציאה, שהמחיר שסוכם לא משתנה בשטח, ושאתם משלמים רק אחרי שהמפתח קודד ונבדק בהתנעה. אצלנו שלושתם הם הנוהל בכל עבודה. עוד בדיקות במדריך <a class="enrich-home-link" href="${pathOf(9204)}">איך לבחור מנעולן אמין</a>.</p>`,
+  },
+  {
+    // §A.1 — a years-of-experience heading with no number behind it (foundedYear: null).
+    id: "home-form-years",
+    from: "<h5>שנים של ניסיון:</h5>",
+    to: "<h5>מה להכין לפני השיחה:</h5>",
+  },
+  {
+    // §A.1 — "ניסיון מוכח" restates the years claim the site cannot source.
+    id: "home-adv-1-body",
+    from: "<p>כל עבודה מבוססת על ניסיון מוכח והתמודדות עם כל סוגי הרכבים והמפתחות.</p>",
+    to: "<p>השבב מקודד למחשב הרכב ליד הרכב, והמפתחות הקיימים ממשיכים לעבוד כשהם נוכחים בקידוד.</p>",
+  },
+  {
+    // An unquantified speed promise ("במהירות… פתרון מיידי"), 🔶 under §D.
+    id: "home-adv-2-body",
+    from: "<p>אנו מגיעים במהירות לאתר הלקוח עם כל הציוד הדרוש לפתרון מיידי.</p>",
+    to: "<p>הניידת מגיעה עם מכונת חיתוך וציוד קידוד, והרכב נשאר במקום – בלי גרירה למוסך.</p>",
+  },
+  {
+    // A response-time card with nothing measured behind it (§D, §D.11). The slot now carries the
+    // home side of the business, which the pivot must not drop. scripts/advantage-icons.mjs keys
+    // its icon on this heading.
+    id: "home-adv-5-heading",
+    from: "<h3>זמן תגובה מהיר</h3>",
+    to: "<h3>גם מנעולן לבית</h3>",
+  },
+  {
+    id: "home-adv-5-body",
+    from: "<p>אנו מכבדים את זמנכם ומספקים שירותים מהירים ויעילים מבלי לוותר על האיכות.</p>",
+    to: "<p>פתיחת דלת נעולה, החלפת צילינדר ושדרוג מנעולים – באותה זמינות, גם בבית ובעסק.</p>",
+  },
+  {
+    // An absolute all-vehicles expertise claim.
+    id: "home-serv-all-vehicles",
+    from: "<h3>מומחים לכל סוגי הרכב דברו איתנו עכשיו</h3>",
+    to: "<h3>מסרו יצרן, דגם ושנת ייצור – ונגיד לכם איזה מפתח צריך</h3>",
+  },
+
+  // --- the calculator's prices: US DOLLARS on an Israeli site --------------------------------
+  // The gogo theme's demo prices, shown as the calculator's result (quiz.js reads the text only).
+  // Car options take the sitewide rows (§D.1); options with no sitewide row say what sets the
+  // price. Home-side rows contradict each other across pages (a standard cylinder is 150–400,
+  // 300–600 or 350–550 ₪ depending on the page), so only the row those pages agree on is quoted.
+  {
+    id: "home-calc-car-opening",
+    from: '<span class="price">$200 - $400</span>',
+    to: '<span class="price">300 – 600 ₪</span>',
+    group: true,
+  },
+  {
+    id: "home-calc-car-no-key",
+    from: '<span class="price">$450 - $700</span>',
+    to: '<span class="price">לפי דגם</span>',
+    group: true,
+  },
+  {
+    id: "home-calc-car-remote-key",
+    from: '<span class="price">$300 - $600</span>',
+    to: '<span class="price">350 – 550 ₪</span>',
+    group: true,
+  },
+  {
+    id: "home-calc-car-remote-repair-switch",
+    from: '<span class="price">$500 - $800</span>',
+    to: '<span class="price">לפי דגם</span>',
+    group: true,
+  },
+  {
+    id: "home-calc-car-immobiliser",
+    from: '<span class="price">$600 - $1,000</span>',
+    to: '<span class="price">לפי דגם</span>',
+    group: true,
+  },
+  {
+    id: "home-calc-home-stuck-key",
+    from: '<span class="price">$150 - $250</span>',
+    to: '<span class="price">לפי בדיקת המנעול</span>',
+    group: true,
+  },
+  {
+    id: "home-calc-home-cylinder",
+    from: '<span class="price">$200 - $350</span>',
+    to: '<span class="price">לפי סוג הצילינדר</span>',
+    group: true,
+  },
+  {
+    id: "home-calc-home-multipoint-cylinder",
+    from: '<span class="price">$300 - $500</span>',
+    to: '<span class="price">450 – 900 ₪</span>',
+    group: true,
+  },
+  {
+    id: "home-calc-home-latch",
+    from: '<span class="price"> $250 - $450</span>',
+    to: '<span class="price">לפי בדיקה במקום</span>',
+    group: true,
+  },
+  {
+    id: "home-calc-home-security-door",
+    from: '<span class="price"> $500 - $850</span>',
+    to: '<span class="price">450 – 900 ₪</span>',
+    group: true,
+  },
+];
+
 /** ⛔ patterns that must not survive. Mirrors scripts/check-claims.mjs. */
 const FORBIDDEN = [
-  ["years-in-business", /\d{1,2}\s*\+?\s*שנות ניסיון|ניסיון של\s*\d{1,2}\s*שנ/],
+  [
+    "years-in-business",
+    /\d{1,2}\s*\+?\s*שנות ניסיון|ניסיון של\s*\d{1,2}\s*שנ|שנים של ניסיון|ניסיון מוכח/,
+  ],
+  // §D.2 — the warranty is confirmed with NO term (owner, 2026-11-04). Any duration is invented.
+  [
+    "warranty-term",
+    /אחריות(?:\s+(?:מלאה|בכתב))?\s+(?:של\s+|ל-?|למשך\s+)?(?:עד\s+)?(?:\d+\s*|(?:חצי|שלוש|ארבע|חמש|שש|שתי|שני)\s+)?(?:שנה|שנתיים|שנים|חודש|חודשים|חודשיים|יום|ימים)|(?:שנה|שנתיים|חודשיים|\d+\s*(?:שנים|חודשים|ימים|יום))\s+(?:של\s+)?אחריות|(?:שנת|שנות|חודשי)\s+אחריות/,
+  ],
+  // §B.5 — no customer, garage or fleet count is sourced.
+  ["customer-count", /(?:עשרות|מאות|אלפי)\s+(?:לקוחות|מוסכים|עסקים|סוכנויות|ציי רכב)/],
+  // The theme's US-dollar demo prices. Anchored on the calculator's span: `$` + digit also occurs
+  // legitimately in inline script (regex back-references), which is not a price.
+  ["usd-price", /class="price">\s*\$/],
   // "always-open" was here until 2026-08-30. Removed, not relaxed: the owner confirmed 24/7
   // (docs/business-facts.md §D.3) and the schema now publishes 00:00–23:59 all week, so the
   // claim is sourced. A guard that forbids something we can source is a guard people learn to
@@ -231,6 +478,90 @@ for (const p of docPages) {
     p.bodyHtml = p.bodyHtml.split(r.from).join(r.to);
   }
 }
+
+// --- homepage-only pass (page 7): decoded mode, end-state assertions --------------------------
+const home = docPages.find((p) => p.isFront);
+if (!home) {
+  console.error("claims: no front page in content/site.json.");
+  process.exit(1);
+}
+const homeFails = [];
+let homeApplied = 0;
+for (const r of HOME_CLAIM_REWRITES) {
+  // A rule whose output contains its own input would re-apply on every run.
+  if (r.to.includes(r.from))
+    homeFails.push(`${r.id}: \`to\` contains \`from\` — not idempotent`);
+  const hit = home.bodyHtml.split(r.from).length - 1;
+  if (hit) {
+    home.bodyHtml = home.bodyHtml.split(r.from).join(r.to);
+    homeApplied += hit;
+  }
+  if (r.mirror && Array.isArray(home.jsonLd)) {
+    home.jsonLd = home.jsonLd.map((s) => {
+      if (typeof s !== "string" || !s.includes(r.from)) return s;
+      homeApplied++;
+      return s.split(r.from).join(r.to);
+    });
+  }
+}
+const homeHay = () =>
+  [home.bodyHtml, ...(Array.isArray(home.jsonLd) ? home.jsonLd : [])].join("\n");
+for (const r of HOME_CLAIM_REWRITES) {
+  const hay = homeHay();
+  const left = hay.split(r.from).length - 1;
+  const present = hay.split(r.to).length - 1;
+  if (left) homeFails.push(`${r.id}: \`from\` still present ×${left}`);
+  // Grouped calculator rows share their output text, so only presence is meaningful there.
+  const want = r.mirror ? 2 : 1;
+  if (r.group ? present < 1 : present !== want)
+    homeFails.push(
+      `${r.id}: \`to\` present ×${present}, expected ${r.group ? "≥1" : want}`,
+    );
+}
+
+// The accordion and its FAQPage block must say the same thing, question for question. Google reads
+// the JSON-LD; a visitor reads the accordion; a mismatch is the self-contradiction §D.3 warns about.
+const faqRoot = parse(home.bodyHtml, {
+  blockTextElements: { script: true, style: true },
+});
+const accordion = faqRoot.querySelectorAll(".section-faq .acc-item").map((it) => ({
+  q: (it.querySelector(".acc-item__header__title")?.text ?? "").trim(),
+  a: (it.querySelector(".acc-item__body p")?.innerHTML ?? "").trim(),
+}));
+let faqBlock = null;
+for (const s of home.jsonLd ?? []) {
+  try {
+    const o = JSON.parse(s);
+    if (o?.["@type"] === "FAQPage") faqBlock = o;
+  } catch {
+    homeFails.push("a homepage JSON-LD block no longer parses");
+  }
+}
+if (!faqBlock) homeFails.push("the homepage FAQPage block is missing");
+else {
+  const schema = (faqBlock.mainEntity ?? []).map((e) => ({
+    q: String(e.name ?? "").trim(),
+    a: String(e.acceptedAnswer?.text ?? "")
+      .replace(/^\s*<p>/, "")
+      .replace(/<\/p>\s*$/, "")
+      .trim(),
+  }));
+  if (schema.length !== accordion.length)
+    homeFails.push(
+      `FAQPage has ${schema.length} questions, the accordion ${accordion.length}`,
+    );
+  schema.forEach((e, i) => {
+    const v = accordion[i];
+    if (!v || v.q !== e.q || v.a !== e.a)
+      homeFails.push(`FAQ #${i + 1} differs between the accordion and FAQPage: "${e.q}"`);
+  });
+}
+if (homeFails.length) {
+  console.error(`\nclaims: the homepage pass did not reach its end state:`);
+  for (const f of homeFails) console.error("  ! " + f);
+  process.exit(1);
+}
+
 out = JSON.stringify(doc, null, 2);
 
 writeFileSync(PATH, out);
@@ -241,6 +572,9 @@ console.log(
   `claims: rewrote ${applied.reduce((a, [, n]) => a + n, 0)} occurrence(s) across ${applied.length} rule(s).`,
 );
 for (const [id, n] of applied) console.log(`   ${id.padEnd(24)} ×${n}`);
+console.log(
+  `claims: homepage pass — ${homeApplied} replacement(s) this run, all ${HOME_CLAIM_REWRITES.length} rule(s) at their end state; FAQPage matches the accordion.`,
+);
 if (stale.length) {
   console.log(
     `   ${stale.length} rule(s) matched nothing (already clean, or STALE — remove if the source text is gone):`,

@@ -42,8 +42,28 @@ const visible = (html) =>
 const BLOCKING = [
   {
     id: "years-in-business",
-    re: /\b\d{1,2}\s*\+?\s*שנות ניסיון|ניסיון של\s*\d{1,2}\s*שנ|מעל\s*\d{1,2}\s*שנות/,
+    // "שנים של ניסיון" and "ניסיון מוכח" added 2026-11-04: the homepage carried both — a years
+    // heading with no number and a "proven experience" card — and the numeric rule saw neither.
+    re: /\b\d{1,2}\s*\+?\s*שנות ניסיון|ניסיון של\s*\d{1,2}\s*שנ|מעל\s*\d{1,2}\s*שנות|שנים של ניסיון|ניסיון מוכח/,
     why: "site.config.json has foundedYear: null — we cannot source any number of years.",
+  },
+  {
+    // The homepage FAQ said "אחריות מלאה של עד שנה" — visible and in its FAQPage JSON-LD — until
+    // 2026-11-04. The owner confirmed a warranty on the work and the coding with NO term
+    // (docs/business-facts.md §D.2), so any duration is invented. Tested against the rendered copy
+    // only: "אחריות אלא פריט שמוחלף מדי כמה שנים" (113) must not match, and does not.
+    id: "warranty-term",
+    // Shapes covered (each mutation-tested 2026-11-04): "אחריות של עד שנה", "אחריות מלאה ל-12
+    // חודשים", "אחריות בכתב ל-30 יום", "אחריות למשך שנתיים", "אחריות לחצי שנה", "שנה אחריות",
+    // "3 שנים אחריות", "שנת אחריות".
+    re: /אחריות(?:\s+(?:מלאה|בכתב))?\s+(?:של\s+|ל-?|למשך\s+)?(?:עד\s+)?(?:\d+\s*|(?:חצי|שלוש|ארבע|חמש|שש|שתי|שני)\s+)?(?:שנה|שנתיים|שנים|חודש|חודשים|חודשיים|יום|ימים)|(?:שנה|שנתיים|חודשיים|\d+\s*(?:שנים|חודשים|ימים|יום))\s+(?:של\s+)?אחריות|(?:שנת|שנות|חודשי)\s+אחריות/,
+    why: "the warranty is confirmed with no term (§D.2) — a duration is a promise nobody made.",
+  },
+  {
+    // The gogo theme's US-dollar demo prices sat in the homepage calculator until 2026-11-04.
+    id: "foreign-currency-price",
+    re: /\$\s?\d/,
+    why: "a US-dollar price on an Israeli site — prices are ₪, from the sitewide rows (§D.1).",
   },
   // "always-open" lived here until 2026-08-30, when the owner confirmed 24/7 availability
   // (docs/business-facts.md §D.3). The schema now publishes 00:00–23:59 across all seven days,
@@ -60,8 +80,10 @@ const BLOCKING = [
   },
   {
     id: "customer-count",
-    re: /אלפי לקוחות|מאות לקוחות|אלפי מפתחות/,
-    why: "no genuine, ledgered review exists (docs/business-facts.md §B.5) — the count has no source.",
+    // Widened 2026-11-04: "נותני שירות קבועים לעשרות מוסכים ועסקים" lived in the homepage FAQ and
+    // its FAQPage mirror, and "אלפי לקוחות" was the only shape this rule knew.
+    re: /אלפי לקוחות|מאות לקוחות|אלפי מפתחות|(?:עשרות|מאות|אלפי)\s+(?:לקוחות|מוסכים|עסקים|סוכנויות|ציי רכב)/,
+    why: "no customer, garage or fleet count is sourced (docs/business-facts.md §B.5).",
   },
   {
     id: "ratings",
@@ -119,7 +141,10 @@ const BLOCKING_RAW = [
 
 /** 🔶 — unconfirmed, reported but never failing. See docs/business-facts.md. */
 const INFO = [
-  { id: "warranty", re: /אחריות מלאה|באחריות מלאה|שנת אחריות/g },
+  // "שנת אחריות" moved to BLOCKING (warranty-term) 2026-11-04. The scope itself is confirmed
+  // (§D.2); "אחריות מלאה" stays counted because "מלאה" can be read as a promise wider than the
+  // approved "אחריות על העבודה ועל הקידוד".
+  { id: "warranty", re: /אחריות מלאה|באחריות מלאה/g },
   { id: "coverage", re: /פריסה ארצית|פריסה רחבה|בכל הארץ/g },
   { id: "price", re: /\d{2,4}\s*[–-]\s*\d{2,4}\s*₪/g },
 ];

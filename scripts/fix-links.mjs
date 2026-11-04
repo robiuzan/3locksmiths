@@ -64,7 +64,10 @@ const THANK_YOU_URL = "https://3locksmiths.co.il/thank-you/";
 // defect). Replaced sitewide with the manifest email. 🔶 confirm info@ deliverability —
 // the manifest lists "email" under _needsConfirmation.
 const EMAIL = manifest.contact?.email ?? "";
-const LEGACY_EMAILS = ["robiuzan@gmail.com"];
+// service@ was the homepage FAQ's "שלח הודעה" button, the only occurrence on the site. Only
+// info@ is verified as routed (docs/business-facts.md §C.3); a mailto to an unrouted address loses
+// the lead silently. Added 2026-11-04 — remove it here if the owner confirms service@ delivers.
+const LEGACY_EMAILS = ["robiuzan@gmail.com", "service@3locksmiths.co.il"];
 
 /** Is this tel: href the business number in any of its scraped spellings, or the dead placeholder? */
 function isBusinessTel(rawTel) {

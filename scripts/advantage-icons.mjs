@@ -41,13 +41,20 @@ const FONT = join(
   "fa-solid-900.svg",
 );
 
-/** Heading → Font Awesome 5 solid glyph name. Decorative only. */
+/**
+ * Heading → Font Awesome 5 solid glyph name. Decorative only.
+ *
+ * Three headings changed 2026-11-04 with the "שכפול מפתח לרכב" pivot (scripts/scraped-copy.mjs
+ * and scripts/claims.mjs rewrite them earlier in the chain): "מומחיות במנעולנות רכב" → "קידוד שבב
+ * במקום", "התאמה לרכב חכם" → "מפתח חכם ושלט", and the unsourced "זמן תגובה מהיר" → "גם מנעולן
+ * לבית". Keys are replaced, never added, so the count check below still means "exactly six".
+ */
 const ICON = {
-  "מומחיות במנעולנות רכב": "car",
+  "קידוד שבב במקום": "microchip",
   "שירות מהיר בשטח": "tools",
-  "התאמה לרכב חכם": "key",
+  "מפתח חכם ושלט": "key",
   "זמינות 24/7": "clock",
-  "זמן תגובה מהיר": "bolt",
+  "גם מנעולן לבית": "home",
   "שקיפות מלאה": "file-invoice",
 };
 
