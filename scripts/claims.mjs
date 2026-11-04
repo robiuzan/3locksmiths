@@ -91,11 +91,10 @@ const REWRITES = [
   // already overwrote the original scraped wording, so simply removing the rules would leave the
   // hedged 08:00–18:00 copy frozen on the homepage forever. `from` is therefore the text this
   // script itself wrote, not the WordPress original.
-  {
-    id: "home-card-247-heading",
-    from: "מענה לקריאות דחופות",
-    to: "זמינות 24/7",
-  },
+  // `home-card-247-heading` lived here until 2026-11-04 and rewrote "מענה לקריאות דחופות" in the
+  // WHOLE file — 245 times a run, in 54 authored modules and the renderer's default card — which
+  // left sentences like "אנחנו נותנים זמינות 24/7" on about 30 pages. It now lives in
+  // HOME_CLAIM_REWRITES, matched on the homepage card's own <h3>.
   {
     id: "home-card-247-body",
     from: "קריאות דחופות מטופלות בעדיפות. התקשרו ונעדכן זמן הגעה מדויק.",
@@ -214,10 +213,10 @@ const HTML_REWRITES = [
  * HOMEPAGE-ONLY rewrites (page 7), added 2026-11-04 with the "שכפול מפתח לרכב" pivot.
  *
  * WHY A THIRD LIST — the two lists above act on every page. That is fine for strings that only
- * ever existed on the homepage, and it has bitten once: `home-card-247-heading` also rewrites the
- * renderer's default feature card and page 95's outro, because the same words appear there. These
- * rules are scoped to the front page by construction, so a phrase that also lives in an authored
- * module can never be rewritten by accident.
+ * ever existed on the homepage, and it bit once: `home-card-247-heading` (moved here 2026-11-04)
+ * rewrote the renderer's default feature card and running text in 54 modules, because the same
+ * words appear there. These rules are scoped to the front page by construction, so a phrase that
+ * also lives in an authored module can never be rewritten by accident.
  *
  * DECODED MODE — applied to `bodyHtml` and to each `jsonLd` string after parsing, never to the raw
  * file text, so attribute quotes are written as plain `"`. (The raw-file idiom writes them `\\"`;
@@ -308,6 +307,14 @@ const HOME_CLAIM_REWRITES = [
     from: "המחירים משתנים לפי סוג המפתח והרכב. הכנס לעמוד המחירון שלנו לעיון מפורט.",
     to: "מפתח מכני 200 – 350 ₪, מפתח עם שבב או מתקפל עם שלט 350 – 550 ₪, מפתח חכם 450 – 900 ₪ ושלט נפרד 300 – 600 ₪. כשאין אף מפתח מקורי, המחיר נקבע לפי הדגם.",
     mirror: true,
+  },
+  {
+    // The homepage's 24/7 feature card (24/7 confirmed by the owner 2026-08-30, §D.3). Scoped to
+    // this card's <h3>: as a whole-file rule it also rewrote the same three words inside running
+    // text on other pages ("אנחנו נותנים מענה לקריאות דחופות" → "…נותנים זמינות 24/7").
+    id: "home-card-247-heading",
+    from: "<h3>מענה לקריאות דחופות</h3>",
+    to: "<h3>זמינות 24/7</h3>",
   },
   {
     // The 24/7 answer promised "זמן הגעה מדויק"; what a call gives is an estimate. `from` is what
