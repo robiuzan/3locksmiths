@@ -87,6 +87,16 @@ const BLOCKING = [
     why: "no customer, garage or fleet count is sourced (docs/business-facts.md §B.5).",
   },
   {
+    // §C.5 — 076 is a VoIP line and cannot receive WhatsApp; WhatsApp stayed on the old number,
+    // which appears only inside the WhatsApp links. Until 2026-11-04 fifteen sentences told readers
+    // to WhatsApp "the same number" or "למספר 076", one said the line "מקבל גם וואטסאפ", and a stats
+    // card captioned the 076 number "מענה בטלפון ובוואטסאפ" on about 95 pages. Each one turns
+    // conversion goal #2 into a message that never arrives.
+    id: "whatsapp-on-076",
+    re: /(?:וואטסאפ|ווטסאפ|WhatsApp)\s+(?:לאותו מספר|למספר\s*0?76)|076[-\d]*,?\s+(?:פעיל|מקבל)\s+גם\s+(?:ב)?(?:וואטסאפ|ווטסאפ)|076[-\d]*\s+מענה בטלפון ובוואטסאפ/,
+    why: "the 076 line is not WhatsApp-capable (docs/business-facts.md §C.5) — point to the WhatsApp button.",
+  },
+  {
     id: "ratings",
     re: /aggregateRating|reviewCount/,
     why: "no genuine, ledgered review (docs/business-facts.md §B.5); a fabricated rating is a Google policy violation.",

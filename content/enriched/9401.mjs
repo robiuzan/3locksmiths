@@ -280,7 +280,7 @@ export default {
     { icon: "plug", value: "בצמת", label: "ניתוק במחבר המקורי, בלי חיתוך חוטים" },
     { icon: "file-contract", value: "בודקים פוליסה", label: "מבררים מה הביטוח דורש לפני שמנתקים" },
     { icon: "car-side", value: "בשטח", label: "העבודה מתבצעת ליד הרכב, בלי גרירה" },
-    { icon: "headset", value: "076-599-1266", label: "מענה בטלפון ובוואטסאפ" },
+    { icon: "headset", value: "076-599-1266", label: "מענה טלפוני 24/7" },
   ],
   faq: {
     subtitle: "השאלות שנשאלות בפועל לפני ואחרי ניתוק קודן ברכב.",

@@ -296,7 +296,7 @@ export default {
     { icon: "lock-open", value: "שחרור בשטח", label: "נעילת הגנה משוחררת ליד הרכב" },
     { icon: "keyboard", value: "איפוס קוד", label: "קוד חדש שאתם בוחרים ומקבלים בכתב" },
     { icon: "id-card", value: "אימות בעלות", label: "רישיון רכב ותעודה מזהה לפני טיפול" },
-    { icon: "headset", value: "076-599-1266", label: "מענה בטלפון ובוואטסאפ" },
+    { icon: "headset", value: "076-599-1266", label: "מענה טלפוני 24/7" },
   ],
   faq: {
     subtitle: "השאלות שנשאלות בטלפון כשהקודן ננעל והרכב עומד.",

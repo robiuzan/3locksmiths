@@ -480,6 +480,12 @@ goal #2 (CLAUDE.md §2) into a dead link on every page — the sticky CTA, /than
 block all read that one field. Confirmed with the owner on 2026-09-02. **This is the only place in
 the codebase where 055-6601006 is still correct**, and `scripts/phone.mjs` exempts exactly it.
 
+> **2026-11-04 — the copy still said otherwise.** Fifteen sentences in 13 modules told readers to
+> WhatsApp "the same number" or "למספר 076", one said the line "מקבל גם וואטסאפ", and the stats
+> card captioned the 076 number "מענה בטלפון ובוואטסאפ" on about 95 pages. All now point to the
+> WhatsApp button ("בנייד, מהכפתור שבתחתית המסך" — the sticky bar is mobile-only), the caption reads
+> "מענה טלפוני 24/7", and `scripts/check-claims.mjs` blocks the pairing (`whatsapp-on-076`).
+
 Where the change had to be applied, and why it is not one edit:
 
 | Layer                       | Mechanism                                                                 |

@@ -267,7 +267,7 @@ export default {
     { icon: "car-side", value: "כל הדגמים", label: "מפתחות ושלטים לרכבי פולקסווגן" },
     { icon: "microchip", value: "קידוד בשטח", label: "צריבת שבב מול מחשב הרכב" },
     { icon: "tools", value: "בשטח", label: "הניידת מגיעה אליכם עם הציוד" },
-    { icon: "headset", value: "076-599-1266", label: "מענה בטלפון ובוואטסאפ" },
+    { icon: "headset", value: "076-599-1266", label: "מענה טלפוני 24/7" },
   ],
   faq: {
     subtitle: "מענה לשאלות הנפוצות ביותר שלקוחות פולקסווגן שואלים אותנו.",
