@@ -18,6 +18,9 @@ Status key: ✅ confirmed · 🔶 unconfirmed, do not state · ⛔ contradicted 
 | ----------------- | ------------------------------------------------ | ------ | --------------------------------------------------- |
 | Brand name (he)   | שלושה מנעולנים                                   | ✅     | manifest `brandName`                                |
 | Brand name (en)   | 3 Locksmiths                                     | ✅     | manifest `brandNameEn`                              |
+| Description       | שכפול מפתחות, קידוד ופתיחת מנעולים               | ✅     | owner, in session 2026-11-04 — roster `tagline`     |
+| Logo              | the header logo `3-מנעולנים-לוגו.webp`, 500×160  | ✅     | owner supplied it 2026-11-04 — byte-identical file  |
+| Privacy notice    | names שלושה מנעולנים as responsible for the data | ✅     | owner, in session 2026-11-04 — §A.3                 |
 | Legal name / ח.פ. | — (each partner invoices under his own business) | 🔶     | manifest `legalName: null`; owner 2026-11-04 — §A.3 |
 | Owner / founder   | —                                                | 🔶     | named nowhere in the repo                           |
 | Named technician  | —                                                | 🔶     | no person named on any page                         |
@@ -101,9 +104,10 @@ What follows from it:
     name on the phone, the site and the receipt must match — for this business it cannot. The
     receipt check is reworded to "a lawful receipt with a registered עוסק number", which every
     partner can pass.
-  - 🔶 The privacy notice still has to name a data controller for the lead form; with three
-    separate businesses the owner must say who that is. Open, and it blocks any new data use
-    (post-job WhatsApp, a second form).
+  - ✅ **Owner, in session 2026-11-04: the privacy notice names "שלושה מנעולנים"** as the party
+    responsible for the information the site and its lead form collect. It is the brand the three
+    partners work under, not a registered company, so `legalName` stays null and the notice no
+    longer calls the business "החברה".
 
 ## B. Reputation & social proof
 
@@ -333,7 +337,9 @@ reads. New reviews kept thanking אבי / אביעד / שרון, and one describ
 on 2026-10-13, the owner said: **"do not consider them as fake"**. The dashboard showed **13
 reviews, average 5**, and the owner chose to show **Google's own figure** on every page now.
 
-**What ships, and what it claims.** `★ 5.0 · 13 ביקורות בגוגל · נכון ל-13/10/2026` plus a link to
+**What ships, and what it claims.** The newest dated reading — since 2026-11-04
+`★ 5.0 · 15 ביקורות בגוגל · נכון ל-04/11/2026`, from the owner's screenshot of the profile as its
+manager sees it (13 on 2026-10-13) — plus a link to
 Google's reviews page. The footer of every page, the homepage hero, `/contact/` and the 80
 service + city pages carry it (`content/enriched/_reputation.mjs` → `scripts/reputation.mjs`). It
 states what Google shows on the dated dashboard read. It quotes no review and calls no reviewer a
@@ -579,7 +585,7 @@ between figures, slimmer limbs), so adopting it is a brand decision, not a free 
 | Practices per job   | price by phone, fixed price, ownership check, pay after test | ✅ owner 2026-11-04 — §D.13 |
 | Response time       | "כ-20–40 דקות" and similar, per city                         | 🔶                          |
 | 24/7 availability   | **confirmed by the owner 2026-08-30** — see D.3              | ✅ owner instruction        |
-| Key-type per model  | `keyModels[]` on brand pages — see D.5                       | 🔶                          |
+| Key-type per model  | `keyModels[]` on brand pages — see D.5                       | ✅ B1 brands · 🔶 the rest  |
 
 ### D.1 Prices are authored, not sourced
 
@@ -606,11 +612,12 @@ between figures, slimmer limbs), so adopting it is a brand decision, not a free 
 > also called our ranges what "the Israeli market" charges; we hold no market data, so it now
 > presents them as the ranges we publish.
 >
-> **B1 — DRAFT, not shippable yet.** The eight brand pages 121, 118, 122, 98, 119, 100, 109 and
-> 117 were reworked the same day on branch `geo/p3-b1-brands-draft`; with them 90 contradictions
-> remain elsewhere. They keep the modules' own technical statements, unconfirmed, so they ship only
-> after a partner locksmith signs the batch's claims sheet (`docs/claims-sheets/2026-11-b1.md`).
-> Subaru (124) stays unchanged as the control for the Peugeot title experiment.
+> **B1 — confirmed 2026-11-04.** The eight brand pages 121, 118, 122, 98, 119, 100, 109 and 117
+> were reworked the same day; with them 90 contradictions remain elsewhere. They keep the modules'
+> own technical statements, and the owner confirmed every line of the batch's claims sheet
+> (`docs/claims-sheets/2026-11-b1.md`, 480 lines) in session: "all claims are true". That stands
+> in place of the partner locksmith's sign-off the plan named. Subaru (124) stays unchanged as the
+> control for the Peugeot title experiment.
 
 Every `pricing[]` row in `content/enriched/<id>.mjs` (e.g. `"שכפול מפתח רכב סטנדרטי" → "200 – 350 ₪"`)
 was authored during the enrichment pass. **None is traced to an owner-supplied price list.** They are
@@ -706,7 +713,11 @@ scan could ever have reached.
 default is asserted on ~55 pages at once. It must be a description of what the business does, or a
 ✅ row in this file. Never a number, a duration, a guarantee or a count.
 
-### D.5 Per-model key types on the brand pages — 🔶 open
+### D.5 Per-model key types on the brand pages — ✅ for the B1 brands, 🔶 for the rest
+
+> **2026-11-04:** for Peugeot, Toyota, Hyundai, Kia, Mazda, Skoda, Suzuki and Renault the owner
+> confirmed every model line on the B1 claims sheet (`docs/claims-sheets/2026-11-b1.md`). The other
+> brand pages stay 🔶 until their own batch's sheet is confirmed.
 
 `content/enriched/99.mjs` (פורד) now renders a `keyModels[]` grid: eight Ford models, each with
 the key type we say is fitted to it, a button count, a model-year span and a price range.

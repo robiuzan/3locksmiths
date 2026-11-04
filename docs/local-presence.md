@@ -68,6 +68,7 @@ One row per check. `Δ` is against the previous row, so the first row has none.
 | 2026-10-08 | 11    | —   | 5      | Google's keyless map embed, two reads (a different method — not compared with the rows above).                                                                                                                                               |
 | 2026-10-11 | 11    | −9  | 5      | `/maps/preview/place` ×3: 38,008 / 38,008 / 17,805 B. Two new 2-day-old reviews thank אביעד and אבי; the furniture review still visible.                                                                                                     |
 | 2026-10-13 | 13    | +2  | 5      | **The owner's dashboard** (owner, in session). The authoritative count. This row is what the site shows (`content/enriched/_reputation.mjs`).                                                                                                |
+| 2026-11-04 | 15    | +2  | 5      | **The owner's reading** (owner, in session): a screenshot of the profile as its manager sees it — "5.0 · 15 Google reviews", "You manage this Business Profile". This row is what the site shows.                                            |
 
 > ⚠️ **2026-10-13 — the owner reversed the 2026-09-29 position** (§2 below; business-facts §B.6):
 > the reviews on the profile are not to be treated as fake, and the site shows **Google's own

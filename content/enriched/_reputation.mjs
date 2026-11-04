@@ -54,5 +54,12 @@ export default {
       owner: "owner, in session 2026-10-13: the dashboard shows 13 reviews, average 5",
       source: "Business Profile dashboard, read by the owner — docs/local-presence.md §3",
     },
+    {
+      date: "2026-11-04",
+      dashboard: { total: 15, rating: 5 },
+      owner:
+        "owner, in session 2026-11-04: 15 Google reviews, average 5 — a screenshot of the profile as its manager sees it ('You manage this Business Profile')",
+      source: "Business Profile, read by the owner — docs/local-presence.md §3",
+    },
   ],
 };

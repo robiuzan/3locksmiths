@@ -40,7 +40,9 @@ const EMAIL = manifest.contact.email;
 const BRAND = manifest.brandName;
 const HOURS = "זמינים 24/7, כל ימות השבוע";
 // Last review date of the legal/accessibility copy. Bump when the text is revised.
-const LEGAL_UPDATED = "2 באוגוסט 2026";
+// 4 November 2026: the privacy notice now names who is responsible for the information (owner,
+// in session — docs/business-facts.md §A.3) and no longer calls the business "החברה".
+const LEGAL_UPDATED = "4 בנובמבר 2026";
 /**
  * The accessibility statement's own dates, dd/mm/yyyy (CLAUDE.md §8). Separate from
  * LEGAL_UPDATED, which the privacy policy still uses. Move ACCESSIBILITY_UPDATED whenever the
@@ -186,8 +188,14 @@ function privacyBody() {
         P([`<em>עודכן לאחרונה: ${esc(LEGAL_UPDATED)}</em>`]),
         H2("כללי"),
         P([
-          `${esc(BRAND)} (להלן: "אנחנו" או "החברה") מכבדים את פרטיות המשתמשים באתר ${esc(ORIGIN.replace("https://", ""))} (להלן: "האתר"). מדיניות זו מתארת אילו נתונים נאספים באתר, לאילו מטרות נעשה בהם שימוש וכיצד ניתן לממש את הזכויות הקבועות בחוק הגנת הפרטיות, התשמ״א-1981 ובתקנותיו.`,
+          `${esc(BRAND)} (להלן: "אנחנו") מכבדים את פרטיות המשתמשים באתר ${esc(ORIGIN.replace("https://", ""))} (להלן: "האתר"). מדיניות זו מתארת אילו נתונים נאספים באתר, לאילו מטרות נעשה בהם שימוש וכיצד ניתן לממש את הזכויות הקבועות בחוק הגנת הפרטיות, התשמ״א-1981 ובתקנותיו.`,
           "השימוש באתר מהווה הסכמה לתנאי מדיניות זו. אם אינכם מסכימים לתנאים, אנא הימנעו משימוש באתר.",
+        ]),
+        // Named by the owner, 2026-11-04. Each partner locksmith invoices under his own business
+        // (§A.3), so this names the party responsible for the site's data, not a registered company.
+        H2("מי אחראי על המידע"),
+        P([
+          `האחראי על המידע הנאסף באתר ובטופס יצירת הקשר הוא <strong>${esc(BRAND)}</strong>, שמפעילים את האתר ואת שירות המנעולנות. לכל פנייה בנושא המידע שלכם אפשר לפנות אלינו בדרכים שבסעיף הזכויות שלכם בהמשך.`,
         ]),
         H2("איזה מידע נאסף"),
         UL([

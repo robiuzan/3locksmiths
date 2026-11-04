@@ -21,6 +21,11 @@ const SITE = join(ROOT, "content", "site.json");
 const ENRICHED = join(ROOT, "content", "enriched");
 const ORIGIN = "https://3locksmiths.co.il";
 const LB_ID = `${ORIGIN}/#LocalBusiness`;
+// The header logo the scraped chrome already serves (public/wp-content/uploads — vendored, never
+// edited). Percent-encoded so the schema URL is plain ASCII, as Google's examples are.
+const HEADER_LOGO = encodeURI(
+  `${ORIGIN}/wp-content/uploads/2025/11/3-מנעולנים-לוגו.webp`,
+);
 
 // NAP for the LocalBusiness node comes from the manifest — never hardcoded (backlog §4.3).
 // Values themselves change in the roster (Israeli services sites/roster/sites/3locksmiths.json).
@@ -332,13 +337,15 @@ function localBusinessSchema() {
   const sameAs = manifest.schema?.sameAs ?? [];
   // The Business Profile's Maps URL doubles as `hasMap`. Only a Google Maps URL qualifies.
   const map = sameAs.find((u) => /^https:\/\/www\.google\.com\/maps\//.test(u));
-  // Entity fields added 2026-11-04, each from the roster and each omitted while unset — an
-  // invented description or logo is worse than none (docs/business-facts.md §A):
+  // Entity fields added 2026-11-04, each from the roster or the owner and each omitted while
+  // unset — an invented description or logo is worse than none (docs/business-facts.md §A):
   //   alternateName  the English brand, so "3 Locksmiths" resolves to the same entity;
-  //   description    roster shortPitch / tagline — both null today, so absent;
-  //   logo           the catalog's `logo` slot — not published yet, so absent.
+  //   description    roster shortPitch / tagline — the owner's sentence, 2026-11-04;
+  //   logo           the catalog's `logo` slot when Media Studio publishes one; until then the
+  //                  header logo the site already serves. The owner supplied the logo on
+  //                  2026-11-04 and it is byte-identical to that file (500×160, sha256 31855b40…).
   const description = manifest.shortPitch || manifest.tagline || null;
-  const logo = originalUrl(imageRef("logo"));
+  const logo = originalUrl(imageRef("logo")) ?? HEADER_LOGO;
   return J({
     "@context": "https://schema.org",
     "@type": ["LocalBusiness", "Locksmith"],
