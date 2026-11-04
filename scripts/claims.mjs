@@ -104,7 +104,10 @@ const REWRITES = [
   {
     id: "home-faq-247",
     from: "שעות הפעילות המפורסמות שלנו הן א׳–ו׳ 08:00–18:00 ושבת 08:00–17:00. לקריאה דחופה מחוץ לשעות אלה התקשרו ל-055-6601006 ונאמר לכם מיד אם יש ניידת פנויה באזורכם.",
-    to: `כן. אנחנו זמינים 24/7, כולל לילות, שבתות וחגים. התקשרו ל-${PHONE} ונמסור לכם זמן הגעה מדויק.`,
+    // "זמן הגעה משוער" since 2026-11-04 (was "מדויק" — an exact time nobody can promise; §D.3
+    // confirms 24/7, never a response time). HOME_CLAIM_REWRITES `home-faq-247-estimate` carries
+    // the old wording forward, so a re-scrape and the stored page converge on the same text.
+    to: `כן. אנחנו זמינים 24/7, כולל לילות, שבתות וחגים. התקשרו ל-${PHONE} ונמסור לכם זמן הגעה משוער.`,
   },
 ];
 
@@ -304,6 +307,14 @@ const HOME_CLAIM_REWRITES = [
     id: "home-faq-cost-a",
     from: "המחירים משתנים לפי סוג המפתח והרכב. הכנס לעמוד המחירון שלנו לעיון מפורט.",
     to: "מפתח מכני 200 – 350 ₪, מפתח עם שבב או מתקפל עם שלט 350 – 550 ₪, מפתח חכם 450 – 900 ₪ ושלט נפרד 300 – 600 ₪. כשאין אף מפתח מקורי, המחיר נקבע לפי הדגם.",
+    mirror: true,
+  },
+  {
+    // The 24/7 answer promised "זמן הגעה מדויק"; what a call gives is an estimate. `from` is what
+    // REWRITES `home-faq-247` wrote until 2026-11-04 — that rule now writes `to` itself.
+    id: "home-faq-247-estimate",
+    from: `התקשרו ל-${PHONE} ונמסור לכם זמן הגעה מדויק.`,
+    to: `התקשרו ל-${PHONE} ונמסור לכם זמן הגעה משוער.`,
     mirror: true,
   },
 

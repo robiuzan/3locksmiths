@@ -91,7 +91,10 @@ const REWRITES = [
     // car-services band, so the homepage offered "sliding door repair" as a car locksmith service.
     id: "home-services-demo-line",
     from: "התקשרו עכשיו והתנסו בשירות לקוחות יוצא דופן ותיקון דלתות הזזה.",
-    to: "התקשרו עכשיו ונמסור לכם מחיר ברור וזמן הגעה מדויק, לפני שאנחנו יוצאים אליכם.",
+    // Until 2026-11-04 this wrote "מחיר ברור וזמן הגעה מדויק": a price before the range is known
+    // and an exact arrival time nobody can promise. A re-scrape now lands on the confirmed wording
+    // directly; HOME_REWRITES `home-services-line-estimate` carries the old text forward.
+    to: "התקשרו עכשיו ונמסור לכם טווח מחיר וזמן הגעה משוער, לפני שאנחנו יוצאים אליכם.",
   },
 
   // --- §h1: the homepage heading and the line under it ---
@@ -225,6 +228,12 @@ const HOME_REWRITES = [
     id: "home-band-intro",
     from: "<p>אנו מספקים קשת רחבה של שירותי מנעולנות רכב – ממפתחות פשוטים ועד לקידוד חכם ומורכב.</p>",
     to: "<p>חותכים את הלהב ומקודדים את השבב ליד הרכב, באותו ביקור. אותה ניידת גם פותחת רכב נעול ומשכפלת שלטים.</p>",
+  },
+  {
+    // What REWRITES `home-services-demo-line` wrote until 2026-11-04 (it now writes `to` itself).
+    id: "home-services-line-estimate",
+    from: "התקשרו עכשיו ונמסור לכם מחיר ברור וזמן הגעה מדויק, לפני שאנחנו יוצאים אליכם.",
+    to: "התקשרו עכשיו ונמסור לכם טווח מחיר וזמן הגעה משוער, לפני שאנחנו יוצאים אליכם.",
   },
   { id: "home-band-chip-2", from: "שכפול מהיר</li>", to: "מפתח עם שבב</li>" },
   { id: "home-band-chip-3", from: "קידוד מתקדם</li>", to: "מפתח מתקפל עם שלט</li>" },

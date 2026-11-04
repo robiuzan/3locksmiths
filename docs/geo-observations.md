@@ -141,6 +141,9 @@ Mechanism notes, so reports do not repeat old mistakes:
 
 ## 3. Log (append below, newest last)
 
-| Date       | What changed or was observed                                         | Source    |
-| ---------- | -------------------------------------------------------------------- | --------- |
-| 2026-11-03 | Baseline in §1 recorded before the homepage pivot and the family hub | this file |
+| Date       | What changed or was observed                                                                                                                                                                                                                                                       | Source                          |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------- |
+| 2026-11-03 | Baseline in §1 recorded before the homepage pivot and the family hub                                                                                                                                                                                                               | this file                       |
+| 2026-11-04 | AI-crawler tripwire green: 9 bots allowed in robots.txt, 200 to each user agent                                                                                                                                                                                                    | `scripts/check-ai-crawlers.mjs` |
+| 2026-11-04 | COMMITTED, NOT DEPLOYED — homepage pivot and four claims removed (`60203f1`); lastmod keyed on `<main>` (`d0cef3b`); family hub on 58 pages (`5099788`); sitewide schema, question headings, `/llms.txt` (`0d99118`); GEO gates and Batch 0 — 95, 96, 9201, 9202, 9204 (`af8c18f`) | git                             |
+| —          | Add one row per DEPLOY with its date and Pages deployment id: the deploy date, not the commit date, is the attribution point for any movement in §1's numbers                                                                                                                      | —                               |
