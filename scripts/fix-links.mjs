@@ -117,6 +117,13 @@ function routeOf(href) {
   };
 }
 
+// Services mega-menu items whose caption names a page other than the one they link to. The
+// scraped menu sent "ניתוק קודן לרכב" to the key-coding page /קודן-לרכב/ on every page, while
+// the page it names (id 9401) exists (live audit 2026-11-04). Keyed on caption + menu, resolved
+// from the page set, idempotent.
+const MENU_RETARGET = [{ caption: "ניתוק קודן לרכב", toId: 9401 }];
+let retargeted = 0;
+
 let remapped = 0;
 let slashed = 0;
 let unlinked = 0;
@@ -151,6 +158,26 @@ for (const page of site.pages) {
     if (!href.startsWith("/") || ASSET.test(href.split(/[?#]/)[0])) continue;
 
     const { key, suffix } = routeOf(href);
+
+    if (a.closest(".services-drop-down")) {
+      const caption = (a.querySelector(".caption")?.text ?? "")
+        .replace(/\s+/g, " ")
+        .trim();
+      const rule = MENU_RETARGET.find((r) => r.caption === caption);
+      if (rule) {
+        const to = site.pages.find((p) => p.id === rule.toId)?.path;
+        if (!to)
+          throw new Error(
+            `fix-links: menu item "${rule.caption}" targets missing page ${rule.toId}`,
+          );
+        if (routeOf(to).key !== key) {
+          a.setAttribute("href", to);
+          retargeted++;
+          changed = true;
+          continue;
+        }
+      }
+    }
 
     const target = REMAP.get("/" + key);
     if (target) {
@@ -364,7 +391,7 @@ console.log(
   `fix-links: remapped ${remapped}, normalized ${slashed} trailing slash(es), unlinked ${unlinked} dead archive link(s), ` +
     `normalized ${telFixed} tel: href(s) + ${emailFixed} legacy email(s), tagged ${ctaTagged} data-cta, set ${redirectsSet} form redirect(s), ` +
     `wired ${brandLinked} brand card(s), added ${brandAdded}, removed ${brandRemoved} duplicate(s), ` +
-    `added ${areasAdded} city link(s) to the homepage areas band.`,
+    `added ${areasAdded} city link(s) to the homepage areas band, retargeted ${retargeted} menu item(s).`,
 );
 
 if (unresolved.length) {

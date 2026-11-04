@@ -1521,3 +1521,29 @@ html:root {
   height: 100%;
   object-fit: cover;
 }
+
+/* Footer bottom row on phones (live audit 2026-11-04): the theme lays these links out as one
+   flex row that never wraps (main.css .footer-bot .footer-menu ul), so below ~700 px five of the
+   eleven — the accessibility statement and the privacy policy among them — sat off-screen behind
+   the root's overflow-x:hidden, unreachable. Wrap between whole items instead. */
+@media (max-width: 767.98px) {
+  body .footer .footer-bot .footer-menu ul {
+    flex-wrap: wrap;
+    gap: 8px 20px;
+    margin: 0;
+  }
+  body .footer .footer-bot .footer-menu ul li {
+    margin: 0;
+  }
+}
+
+/* The brand breadcrumb gained a fourth level on 2026-11-04. On phones each item split inside
+   itself ("שכפול / מפתח לרכב") and the trail read jumbled. Wrap between whole items; the last
+   item, the page itself, may still wrap inside so a long title cannot overflow. */
+body .breadcrumbs {
+  flex-wrap: wrap;
+  row-gap: 4px;
+}
+body .breadcrumbs li:not(:last-child) {
+  white-space: nowrap;
+}

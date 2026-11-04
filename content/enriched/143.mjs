@@ -4,6 +4,9 @@ export default {
   kind: "location",
   keyword: "שכפול מפתח בת ים",
   city: "בת ים",
+  // The question headings would read "כמה עולה שכפול מפתח בת ים?" from the keyword (audit 2026-11-04).
+  pricingHeading: "כמה עולה שכפול מפתח בבת ים?",
+  processHeading: "איך מתבצע שכפול מפתח בבת ים?",
   seo: {
     title: "שכפול מפתח בבת ים – מנעולן זמין בעיר | שלושה מנעולנים",
     description:

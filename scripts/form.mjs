@@ -37,7 +37,12 @@ const site = JSON.parse(readFileSync(FILE, "utf8"));
 // Israeli mobile formats a real customer might type: 0501234567, 050-1234567, 050 123 4567,
 // +972501234567, +972-50-1234567. Deliberately permissive — a false rejection on a lockout
 // call is a lost job, which costs far more than a slightly malformed number.
-const PHONE_PATTERN = "(?:0|\\+?972[-\\s]?)5[0-9][-\\s]?[0-9]{3}[-\\s]?[0-9]{4}";
+//
+// The hyphens inside [ ] are ESCAPED. Browsers compile `pattern` with the `v` flag, where a bare
+// "-" in a class is a syntax error; the unescaped form made every browser drop the pattern, so any
+// text passed as a phone number (live audit 2026-11-04). The self-check at the bottom compiles the
+// pattern with `v` and fails the build if that ever regresses.
+const PHONE_PATTERN = "(?:0|\\+?972[\\-\\s]?)5[0-9][\\-\\s]?[0-9]{3}[\\-\\s]?[0-9]{4}";
 const PHONE_TITLE = "מספר טלפון נייד ישראלי, למשל 050-1234567";
 
 const phoneField = () =>
@@ -52,6 +57,7 @@ const consentLine = () =>
 
 let normalized = 0;
 let skipped = 0;
+let repaired = 0;
 
 for (const page of site.pages) {
   if (!/api\.web3forms\.com/.test(page.bodyHtml)) continue;
@@ -63,6 +69,22 @@ for (const page of site.pages) {
 
   for (const form of root.querySelectorAll("form")) {
     if (!/api\.web3forms\.com/.test(form.getAttribute("action") || "")) continue;
+    // Repair the pattern on forms normalized before the escape fix — the skip below would
+    // otherwise keep the broken pattern on every page forever. NOT setAttribute: node-html-parser
+    // re-quotes every attribute through JSON.stringify and then deletes all backslashes, which
+    // turned the pattern into "(?:0|+?972[-s]?)…" — a regex that cannot compile at all. Swap the
+    // raw tag instead, which keeps the value byte for byte.
+    for (const phone of form.querySelectorAll('input[name="phone"]')) {
+      if (phone.getAttribute("pattern") !== PHONE_PATTERN) {
+        const tag = phone.toString();
+        const fixed = /\spattern="[^"]*"/.test(tag)
+          ? tag.replace(/\spattern="[^"]*"/, () => ` pattern="${PHONE_PATTERN}"`)
+          : tag.replace(/^<input/, () => `<input pattern="${PHONE_PATTERN}"`);
+        phone.replaceWith(fixed);
+        repaired++;
+        changed = true;
+      }
+    }
     if (form.getAttribute("data-form-normalized")) {
       skipped++;
       continue;
@@ -127,11 +149,59 @@ for (const page of site.pages) {
   if (changed) page.bodyHtml = root.toString();
 }
 
+// Self-check: the pattern must compile the way browsers compile it (the `v` flag), accept the
+// formats above and reject text that is not a phone number.
+{
+  let re;
+  try {
+    re = new RegExp(`^(?:${PHONE_PATTERN})$`, "v");
+  } catch (err) {
+    console.error(
+      `\nFORM PROBLEM: the phone pattern does not compile with the v flag — ${err.message}`,
+    );
+    process.exit(1);
+  }
+  const accept = [
+    "0501234567",
+    "050-1234567",
+    "050 123 4567",
+    "+972501234567",
+    "+972-50-1234567",
+  ];
+  const reject = ["abc", "1", "050-123", "0761234567"];
+  const wrong = [
+    ...accept.filter((v) => !re.test(v)).map((v) => `rejects ${v}`),
+    ...reject.filter((v) => re.test(v)).map((v) => `accepts ${v}`),
+  ];
+  if (wrong.length) {
+    console.error(`\nFORM PROBLEM: the phone pattern ${wrong.join(", ")}.`);
+    process.exit(1);
+  }
+  // …and what actually ships: every phone field in the output must carry exactly that pattern.
+  // The constant alone proved nothing — the homepage once shipped it with its backslashes gone.
+  const strays = [];
+  for (const page of site.pages) {
+    const root = parse(page.bodyHtml ?? "");
+    for (const phone of root.querySelectorAll('input[name="phone"]')) {
+      if (phone.getAttribute("pattern") !== PHONE_PATTERN)
+        strays.push(`${decodeURIComponent(page.path)}: ${phone.getAttribute("pattern")}`);
+    }
+  }
+  if (strays.length) {
+    console.error(
+      `\nFORM PROBLEM: ${strays.length} phone field(s) ship another pattern:`,
+    );
+    for (const s of strays.slice(0, 10)) console.error(`  ${s}`);
+    process.exit(1);
+  }
+}
+
 writeFileSync(FILE, JSON.stringify(site, null, 2), "utf8");
 console.log(
   `form: normalized ${normalized} form(s)` +
     (skipped ? ` (${skipped} already normalized)` : "") +
-    " — validation on, phone field added, RTL/he, consent linked.",
+    (repaired ? `, repaired the phone pattern on ${repaired}` : "") +
+    " — validation on, phone field added, RTL/he, consent linked; phone pattern compiles with v.",
 );
 
 if (normalized === 0 && skipped === 0) {

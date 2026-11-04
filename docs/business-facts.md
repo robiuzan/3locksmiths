@@ -491,6 +491,16 @@ the codebase where 055-6601006 is still correct**, and `scripts/phone.mjs` exemp
 > card captioned the 076 number "מענה בטלפון ובוואטסאפ" on about 95 pages. All now point to the
 > WhatsApp button ("בנייד, מהכפתור שבתחתית המסך" — the sticky bar is mobile-only), the caption reads
 > "מענה טלפוני 24/7", and `scripts/check-claims.mjs` blocks the pairing (`whatsapp-on-076`).
+>
+> **Same day, after the deploy — the live audit found six more.** "שלחו הודעה למספר 076-599-1266"
+> under the question "אפשר לקבל הצעת מחיר בוואטסאפ?" (/מחירון/), four "חייגו 076-599-1266 או
+> שלחו הודעת וואטסאפ" with no pointer (121 twice — the B1 rework had dropped the earlier fix — 96,
+> 194), and the /contact/ meta description. The regex rule tests the page as one flattened
+> string, so it could not see them. `scripts/check-whatsapp-076.mjs` now checks one text block at a
+> time (paragraph, list item, cell, heading, or a whole FAQ item): a message sent to the 076
+> number always fails, and the 076 number beside WhatsApp fails unless the block points to the
+> button ("כפתור") or carries a wa.me link. Mutation-tested against the six live strings, five
+> variants and the approved wordings; check-claims runs it in prebuild.
 
 Where the change had to be applied, and why it is not one edit:
 

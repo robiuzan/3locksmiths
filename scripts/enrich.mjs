@@ -246,10 +246,13 @@ function serviceSchema(data, page) {
     name: data.keyword,
     description: data.seo?.description || "",
     provider: { "@id": LB_ID },
+    // A service page is served where the business is: the same places as the LocalBusiness
+    // node. It used to say { Country: "IL" } — the whole country, which the business does not
+    // cover since 7 cities were withdrawn on 2026-09-02 (live audit 2026-11-04, business-facts §E).
     areaServed:
       data.kind === "location" && data.city
         ? { "@type": placeType(data.city), name: data.city }
-        : { "@type": "Country", name: "IL" },
+        : CITIES.map((c) => ({ "@type": placeType(c), name: c })),
     url: abs(page),
   });
 }

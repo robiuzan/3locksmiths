@@ -21,6 +21,7 @@
  */
 import { readFileSync } from "node:fs";
 import { parse } from "node-html-parser";
+import { whatsapp076Problems, whatsapp076TextProblem } from "./check-whatsapp-076.mjs";
 import { judge } from "./check-ratchet.mjs";
 
 const site = JSON.parse(readFileSync("content/site.json", "utf8"));
@@ -156,7 +157,8 @@ const INFO = [
   // (§D.2); "אחריות מלאה" stays counted because "מלאה" can be read as a promise wider than the
   // approved "אחריות על העבודה ועל הקידוד".
   { id: "warranty", re: /אחריות מלאה|באחריות מלאה/g },
-  { id: "coverage", re: /פריסה ארצית|פריסה רחבה|בכל הארץ/g },
+  // "הפריסה הארצית" and "ברחבי הארץ" slipped past the first form (live audit 2026-11-04).
+  { id: "coverage", re: /ה?פריסה ה?ארצית|פריסה רחבה|בכל הארץ|לכל הארץ|ברחבי הארץ/g },
   { id: "price", re: /\d{2,4}\s*[–-]\s*\d{2,4}\s*₪/g },
 ];
 
@@ -186,6 +188,19 @@ for (const page of pages) {
     if (failures <= 25) {
       console.error(`  ⛔ [${rule.id}] ${where}`);
       console.error(`       "${m[0].trim()}"  —  ${rule.why}`);
+    }
+  }
+  // Block by block, not on the flattened page (scripts/check-whatsapp-076.mjs, 2026-11-04 audit).
+  const wa076 = whatsapp076Problems(page.bodyHtml ?? page.body ?? page.html);
+  const metaRule = whatsapp076TextProblem(meta);
+  if (metaRule) wa076.push({ rule: metaRule, text: meta });
+  for (const p of wa076) {
+    failures++;
+    if (failures <= 25) {
+      console.error(`  ⛔ [whatsapp-076:${p.rule}] ${where}`);
+      console.error(
+        `       "${p.text.slice(0, 160)}"  —  WhatsApp is not on the 076 line (docs/business-facts.md §C.5); point to the WhatsApp button or link wa.me.`,
+      );
     }
   }
   for (const rule of INFO) {

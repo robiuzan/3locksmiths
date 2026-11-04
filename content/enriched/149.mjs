@@ -4,6 +4,9 @@ export default {
   kind: "location",
   keyword: "שכפול מפתחות נתניה",
   city: "נתניה",
+  // The question headings would read "כמה עולה שכפול מפתחות נתניה?" from the keyword (audit 2026-11-04).
+  pricingHeading: "כמה עולה שכפול מפתחות בנתניה?",
+  processHeading: "איך מתבצע שכפול מפתחות בנתניה?",
   seo: {
     title: "שכפול מפתחות נתניה – מנעולן זמין בעיר | שלושה מנעולנים",
     description:
