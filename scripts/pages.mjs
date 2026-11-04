@@ -513,11 +513,27 @@ function withChrome(innerHtml) {
  * emitted no schema at all). Authored pages get theirs from scripts/enrich.mjs; these
  * generated hubs have no module, so they need it here.
  */
-function hubJsonLd({ name, segments, crumb, type = "CollectionPage" }) {
+function hubJsonLd({ name, segments, crumb, type = "CollectionPage", items }) {
   const url = `${ORIGIN}${encPath(segments)}`;
   const trail = [{ name: "בית", item: `${ORIGIN}/` }];
   if (crumb) trail.push(crumb);
   trail.push({ name, item: url });
+  // `items` (2026-11-04): what the hub lists, as an ItemList — the same links the page shows, in
+  // the same order, with canonical (percent-encoded) URLs. Hrefs arrive decoded ("/services/…/").
+  const list = items?.length
+    ? {
+        mainEntity: {
+          "@type": "ItemList",
+          numberOfItems: items.length,
+          itemListElement: items.map((it, i) => ({
+            "@type": "ListItem",
+            position: i + 1,
+            name: it.label,
+            url: `${ORIGIN}${encPath(it.href.split("/").filter(Boolean))}`,
+          })),
+        },
+      }
+    : {};
   return [
     JSON.stringify({
       "@context": "https://schema.org",
@@ -536,6 +552,7 @@ function hubJsonLd({ name, segments, crumb, type = "CollectionPage" }) {
       url,
       isPartOf: { "@id": `${ORIGIN}/#LocalBusiness` },
       inLanguage: "he-IL",
+      ...list,
     }),
   ];
 }
@@ -1085,7 +1102,11 @@ site.pages.push(
     id: 9005,
     title: "שירותים",
     segments: ["services"],
-    jsonLd: hubJsonLd({ name: "שירותים", segments: ["services"] }),
+    jsonLd: hubJsonLd({
+      name: "שירותים",
+      segments: ["services"],
+      items: serviceGroups.flatMap((g) => g.links),
+    }),
     seo: {
       title: `שירותי מנעולנות לרכב ולבית – פריסה רחבה | ${BRAND}`,
       description: `כל שירותי המנעולנות של ${BRAND}: שכפול ושחזור מפתחות לרכב, קודן, פתיחת דלתות, החלפת מנעולים ותיקון דלתות – בשטח, בפריסה רחבה.`,
@@ -1128,7 +1149,14 @@ site.pages.push(
     id: 9200,
     title: "מדריכים",
     segments: [GUIDES_SEGMENT],
-    jsonLd: hubJsonLd({ name: "מדריכים", segments: [GUIDES_SEGMENT] }),
+    jsonLd: hubJsonLd({
+      name: "מדריכים",
+      segments: [GUIDES_SEGMENT],
+      items: GUIDES.map((g) => ({
+        label: g.title,
+        href: `/${GUIDES_SEGMENT}/${g.slug}/`,
+      })),
+    }),
     seo: {
       title: `מדריכים למנעולנות רכב ובית | ${BRAND}`,
       description: `מדריכים של ${BRAND}: כמה עולה שכפול מפתח לרכב, מה עושים כשאבד המפתח היחיד, וההבדל בין מפתח עם שבב למפתח חכם – עם מחירים וזמנים.`,

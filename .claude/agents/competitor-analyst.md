@@ -57,8 +57,11 @@ pricing · an 18-page brand-key silo.
 
 ## Where we are behind
 
-Business Profile live but 0 reviews · no emergency coverage · no editorial content · **all major AI
-crawlers blocked at the Cloudflare edge** (backlog §6.1), so we cannot be cited by assistants at all.
+As of 2026-11-03 (`docs/competitors.md` §3): 30 of 32 brand pages and page 95 never crawled by
+Google, so they cannot rank or be cited; cost answered ~230 words in rather than first; no "what to
+check before choosing" block on most pages. The AI-crawler block at the Cloudflare edge (backlog
+§6.1) is gone — verify with `node scripts/check-ai-crawlers.mjs`. Competitor rows are in
+`docs/competitors.md` §4 (carkeynow.co.il, keyforme.co.il, observed 2026-11-03).
 
 ## Method
 

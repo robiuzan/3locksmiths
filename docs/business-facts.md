@@ -567,7 +567,7 @@ between figures, slimmer limbs), so adopting it is a brand decision, not a free 
 | Fact                | Value                                                        | Status                      |
 | ------------------- | ------------------------------------------------------------ | --------------------------- |
 | Service list        | 30 service pages + 25 location pages                         | ✅ (in `content/site.json`) |
-| Price ranges        | per-page `pricing[]` in `content/enriched/*.mjs`             | 🔶                          |
+| Price ranges        | four rows in `content/enriched/_prices.mjs` (2026-11-04)     | 🔶 ranges — §D.1            |
 | `priceRange`        | `₪₪`                                                         | ✅ manifest                 |
 | Warranty ("אחריות") | on the work and the coding, **no fixed term**                | ✅ owner 2026-11-04 — §D.2  |
 | Practices per job   | price by phone, fixed price, ownership check, pay after test | ✅ owner 2026-11-04 — §D.13 |
@@ -576,6 +576,25 @@ between figures, slimmer limbs), so adopting it is a brand decision, not a free 
 | Key-type per model  | `keyModels[]` on brand pages — see D.5                       | 🔶                          |
 
 ### D.1 Prices are authored, not sourced
+
+> **Owner, in session 2026-11-04 — one four-row model.** On 2026-11-03 the same key type sat on
+> different rows on different pages: a chip key was 200 – 350 ₪ on page 95 and the cost guide but
+> 350 – 550 ₪ in 17 brand tables, and Push-Start was 300 – 600 ₪ in 18 legacy rows but 450 – 900 ₪
+> in the same pages' spec tables. The site now has one set of rows, held in
+> `content/enriched/_prices.mjs`:
+>
+> | Key type                            | Row         |
+> | ----------------------------------- | ----------- |
+> | מפתח מכני                           | 200 – 350 ₪ |
+> | מפתח עם שבב · מפתח מתקפל עם שלט     | 350 – 550 ₪ |
+> | מפתח חכם · Push-Start               | 450 – 900 ₪ |
+> | שלט נפרד · פתיחת רכב נעול           | 300 – 600 ₪ |
+> | מפתח חדש ללא מקור (no original key) | לפי דגם     |
+>
+> That settles which row a key type belongs to. It does **not** source the ranges: they stay 🔶
+> and are never emitted as `Offer`. The ~20 rows that still contradict the model are reconciled
+> page by page in Phase 3 (`scripts/check-prices.mjs`); until then some pages show the old rows.
+> The homepage FAQ and calculator already use the four rows (2026-11-04).
 
 Every `pricing[]` row in `content/enriched/<id>.mjs` (e.g. `"שכפול מפתח רכב סטנדרטי" → "200 – 350 ₪"`)
 was authored during the enrichment pass. **None is traced to an owner-supplied price list.** They are
@@ -621,9 +640,9 @@ read cold from `/maps/preview/place` (§B.4). So the claim now rests on the owne
 on a public source any third party can check — the profile, the `openingHoursSpecification` we ship and
 the visible copy all say the same thing. That is as well-sourced as any claim on this site gets.
 
-⚠️ **CLAUDE.md §2 still lists "24/7" among the unsubstantiated claims, and still says the schema says
-08:00–18:00.** Both halves have been wrong since 2026-08-30. It is not corrected here because that
-file currently holds another session's uncommitted edit; whoever commits it next should fix that line.
+✅ **CLAUDE.md §2 is corrected** (checked 2026-11-04): it records 24/7 as confirmed by the owner on
+2026-08-30 and published by the profile since 2026-09-05, and no longer says the schema ships
+08:00–18:00.
 
 **The history is worth keeping**, because the defect was not "an unconfirmed claim" — it was a
 self-contradiction. Until 2026-08-25 every page published `openingHoursSpecification` 08:00–18:00

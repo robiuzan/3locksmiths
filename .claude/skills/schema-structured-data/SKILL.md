@@ -1,28 +1,26 @@
 ---
 name: schema-structured-data
-description: Emit and fix the JSON-LD graph — the builders in scripts/enrich.mjs, why two scraped blocks currently fail to parse and how to close that gap, reading the LocalBusiness node from the manifest instead of hardcoded literals (it publishes a personal Gmail today), the region-typed-as-City fix, BreadcrumbList coverage, and the Offer and Review gates. Use when wiring or auditing structured data, or before a Rich Results Test. Triggers "add schema", "JSON-LD", "BreadcrumbList", "structured data", "rich results", "Offer".
+description: Emit and fix the JSON-LD graph — the builders in scripts/enrich.mjs, the rule that every block must parse (scraped ones included), the LocalBusiness node read from the manifest, the homepage's generated WebSite and its FAQPage mirrored from the accordion, region typing through areaKind, BreadcrumbList and ItemList coverage, and the Offer and Review gates. Use when wiring or auditing structured data, or before a Rich Results Test. Triggers "add schema", "JSON-LD", "BreadcrumbList", "structured data", "rich results", "Offer".
 ---
 
 # Structured data
 
 Target graph: `docs/schema-graph.md`. This skill is how to emit it.
 
-## Two sources — and only one is validated
+## Two sources — both validated now
 
 ```
 content/site.json  page.jsonLd[]  ──►  SiteFrame  ──►  <script type="application/ld+json">
         ▲                    ▲
   scraped verbatim     REPLACED WHOLESALE by scripts/enrich.mjs
-  (11 un-enriched       for the 53 pages that have a content/enriched/<id>.mjs
-   pages + homepage
-   extras)
+  (today: only the      for the 98 pages that have a content/enriched/<id>.mjs
+   homepage FAQPage)    and the generated pages from scripts/pages.mjs
 ```
 
-`scripts/enrich.mjs` **overwrites** `page.jsonLd` for enriched pages and asserts each generated block
-`JSON.parse`s, failing the build otherwise. Scraped blocks on the other pages — and the homepage's
-extra blocks, which are kept alongside the generated `LocalBusiness` — **pass through unvalidated**.
-
-**That gap is the most important defect on this site.** Two blocks currently ship broken.
+`scripts/enrich.mjs` **overwrites** `page.jsonLd` for authored pages and asserts each generated
+block `JSON.parse`s, failing the build otherwise. It also repairs or drops any scraped block that
+fails to parse. On the homepage it keeps only the scraped `FAQPage`, which `scripts/claims.mjs`
+rewrites and checks against the visible accordion (2026-11-04). All 504 blocks parsed on 2026-11-04.
 
 ## The builders
 
@@ -33,143 +31,74 @@ breadcrumbSchema(data, page); // BreadcrumbList — בית › שירותים|א
 serviceSchema(data, page); // Service + provider @id + areaServed   (skipped for kind:"core")
 howToSchema(data); // HowTo from data.process[]              (skipped when absent)
 faqSchema(data); // FAQPage from data.faq.items[]          (skipped when absent)
-localBusinessSchema(); // homepage only, prepended
+articleSchema(data, page); // Article for kind:"guide" (author only when the module names one)
+localBusinessSchema(); // first block on every emitting page; the @id the others point at
+webSiteSchema(); // homepage only — publisher is the business @id
 ```
 
 They are driven **entirely by the authored module**, so the graph cannot drift from the copy. Preserve
 that: any new block must derive from the same data `lib/enrich/render.mjs` renders, never be authored
 separately.
 
-## Fix 1 — make every block parse
+## Fixed defects — keep them fixed
 
-Two pages ship an unparseable block, both inherited from the scrape, both failing with _"Bad control
-character in string literal"_ (a raw newline inside a JSON string):
+Three defects this skill used to teach are closed. Each is now a regression check, not a task:
 
-- `out/index.html` — the homepage `FAQPage`. **The homepage FAQ rich result is dead.**
-- `out/services/שכפול-מפתח-לרכב/index.html`
+- **Every block parses.** The two scraped blocks that failed with _"Bad control character in string
+  literal"_ (the homepage `FAQPage` and one on page 95) are gone. Page 95 has an authored module, and
+  `enrich.mjs` repairs or drops any scraped block that fails. **A block that does not parse is a
+  stop-ship.**
+- **The business node reads the manifest.** `name`, `alternateName`, `telephone`, `email`,
+  `priceRange`, `sameAs`, `hasMap` and `address` come from `site.config.json` (synced from the
+  roster). The personal Gmail is gone, and CI fails if it returns. Values change in the **roster
+  manifest**, then sync down. Never edit `site.config.json` directly.
+- **`קריות` is a region.** Its module sets `areaKind: "region"`, and `placeType()` in `enrich.mjs`
+  types it `AdministrativeArea` in the page's `Service.areaServed` and in the business node's list
+  (2026-11-04). Give any future region the same field; never special-case a string.
 
-Two ways to close it, ideally both:
-
-```js
-// scripts/enrich.mjs — validate EVERYTHING, not just what we generated
-for (const p of site.pages) {
-  p.jsonLd = (p.jsonLd || []).filter((s) => {
-    try {
-      JSON.parse(s);
-      return true;
-    } catch {
-      problems.push(`id ${p.id}: dropping unparseable scraped JSON-LD`);
-      return false;
-    }
-  });
-}
-```
-
-A malformed block is worth strictly less than no block, so dropping it is a strict improvement. The
-better fix is to make those pages generate their own: author `content/enriched/95.mjs` (see
-`/new-service`) and give the homepage a real `faq` block.
-
-**A block that does not parse is a stop-ship.**
-
-## Fix 2 — the business node must read from the manifest
-
-`localBusinessSchema()` hardcodes every field. Three are wrong:
-
-```js
-// scripts/enrich.mjs — CURRENT (wrong)
-name: "שלושה מנעולנים",
-telephone: "+972-55-6601006",        // manifest: +972765991266
-email: "robiuzan@gmail.com",         // 🔴 a personal Gmail, LIVE on the homepage
-```
-
-`lib/enrich/render.mjs:20` already reads `site.config.json` for `contact.formAccessKey` — **copy that
-pattern**:
-
-```js
-const manifest = JSON.parse(readFileSync(join(ROOT, "site.config.json"), "utf8"));
-// ...
-name: manifest.brandName,
-telephone: manifest.contact.phoneE164,
-email: manifest.contact.email,
-priceRange: manifest.schema.priceRange,
-```
-
-Values themselves change in the **roster manifest**, then sync down. Never edit `site.config.json`
-directly.
-
-`email` is **Critical** — ship it ahead of anything cosmetic.
-
-## Fix 3 — קריות is a region, not a city
-
-```js
-// CURRENT
-areaServed: data.kind === "location" && data.city
-  ? { "@type": "City", name: data.city }
-  : { "@type": "Country", name: "IL" };
-```
-
-Add an explicit field to the authored module rather than special-casing a string:
-
-```js
-// content/enriched/<id>.mjs
-city: "קריות",
-areaKind: "region",   // "city" | "region"
-
-// scripts/enrich.mjs
-{ "@type": data.areaKind === "region" ? "AdministrativeArea" : "City", name: data.city }
-```
-
-Also fix `{ "@type": "Country", name: "IL" }` → `name: "Israel"`. An ISO code in a `name` field is
-wrong.
+Still open: the non-location fallback `{ "@type": "Country", name: "IL" }` puts an ISO code in a
+`name` field. `name: "Israel"` would be correct.
 
 ## Per route type
 
-| Route                    | Emit                                                            |
-| ------------------------ | --------------------------------------------------------------- |
-| `/`                      | `LocalBusiness`+`Locksmith` · `WebSite` · a **valid** `FAQPage` |
-| `/services/<slug>/`      | `BreadcrumbList` · `Service` · `HowTo` · `FAQPage`              |
-| `/locations/<slug>/`     | the same + `areaServed` with the right area type                |
-| Top-level landers        | `BreadcrumbList` · `Service` · `HowTo` · `FAQPage`              |
-| `/services/` (hub)       | `CollectionPage` + `BreadcrumbList` — **emits nothing today**   |
-| `/contact/`              | `ContactPage` + `BreadcrumbList` — **emits nothing today**      |
-| `/אודותינו/`             | `AboutPage` + `BreadcrumbList`                                  |
-| `/מחירון/`               | + `OfferCatalog` — **gated, see below**                         |
-| legal pages, `/sitemap/` | `BreadcrumbList` only                                           |
-| `/step/<slug>/`          | **nothing** — funnel fragments, correctly bare                  |
-
-Current coverage: `BreadcrumbList` 53, `FAQPage` 55, `HowTo` 53, `Service` 46. Nine real pages emit
-nothing at all (backlog §4.8).
+The measured table — every route type, what it emits and what is still a target — is
+`docs/schema-graph.md` §2 (2026-11-04). In short: the homepage emits the business node, `WebSite`
+and `FAQPage`; service, brand and city pages emit `BreadcrumbList` · `Service` · `HowTo` · `FAQPage`;
+the `core` landers skip `Service` by design; guides emit `Article`; the `/services/` and `/מדריכים/`
+hubs emit a `CollectionPage` with an `ItemList`; only the four `/step/` routes are bare.
 
 ## The gating rules — correctness, not preference
 
 1. **Every block must parse.** See Fix 1. Stop-ship.
 2. **`Review` / `AggregateRating` ship only with a verifiable public source.** Verified absent from
-   all 66 pages today, which is correct. An invented rating is a Google policy violation and a Rich
+   all 109 pages today, which is correct. An invented rating is a Google policy violation and a Rich
    Results failure. Do not seed sample data "to test the markup". Blocked on
    `docs/business-facts.md` §B.
-3. **`Offer` / `OfferCatalog` only when the prices are owner-sourced.** Every `pricing[]` row was
-   authored during enrichment, not supplied by the owner (`docs/business-facts.md` §D.1). Marking them
-   up publishes them as commitments.
+3. **`Offer` / `OfferCatalog` only when the prices are owner-sourced.** The owner chose one four-row
+   model on 2026-11-04 (`content/enriched/_prices.mjs`), which says which row a key type belongs to —
+   not that the ranges are sourced (`docs/business-facts.md` §D.1). Marking them up publishes them as
+   commitments.
 4. **Schema must match visible content.** Every `FAQPage` question must render on the page. That holds
    today because `faqSchema` and the renderer read the same `data.faq.items`. Note
    `acceptedAnswer.text` wraps answers in `<p>…</p>` — fine, but keep the HTML trivial.
 5. **No `LocalBusiness` node per location.** One business, one node. Seventeen would imply seventeen
    premises that do not exist.
 6. **`foundingDate` follows `foundedYear`.** The manifest says `null`, so the field is absent — it is
-   **never** inferred from "מעל 25 שנות ניסיון" in the copy.
-7. **Hours must not contradict the copy.** The node claims Sun–Fri 08:00–18:00 while the homepage
-   title claims `מנעולן 24/7`. Resolve the fact before adjusting either.
+   **never** inferred from a years claim in the copy.
+7. **Hours must not contradict the copy.** Resolved: the owner confirmed 24/7 on 2026-08-30, and the
+   node ships every day 00:00–23:59 (`docs/business-facts.md` §D.3). Any future hours change starts
+   with the fact, then both halves together.
 
 ## Missing fields and what blocks each
 
-`address`, `geo`, `hasMap`, `foundingDate`, `founder`, `aggregateRating` — all blocked on
-`docs/business-facts.md`. **Add the row; don't fill the value.** And they belong in the **roster
-manifest**, never in `site.config.json` directly.
+`geo`, `foundingDate`, `founder`, `logo`, `description`, `aggregateRating` — all blocked on
+`docs/business-facts.md` or on an owner asset. **Add the row; don't fill the value.** They belong in
+the **roster manifest**, never in `site.config.json` directly. `logo` appears automatically once
+`images.logo` is published, and `description` once the roster has a `tagline` or `shortPitch`.
 
-`sameAs` is **no longer blocked**: it carries one Google Business Profile URL as of 2026-09-05
-(`docs/business-facts.md` §B.4). Further URLs go in the roster manifest's `schema.sameAs`, then sync.
-`hasMap` is now sourceable from the same profile if anyone wants it, but `geo` is not — the pin
-Google serves is a service-area centroid, not premises.
+`sameAs` and `hasMap` carry the Google Business Profile URL (since 2026-09-05 and 2026-11-04,
+`docs/business-facts.md` §B.4). Further URLs go in the roster manifest's `schema.sameAs`, then sync.
+`geo` stays out: the pin Google serves is a service-area centroid, not premises.
 
 (2026-10-13: the address is confirmed but the owner keeps it out of the schema — footer only; roster `schema.address` is absent on purpose, business-facts §C.1.) Historically the manifest's `schema` block had **no `address` field at all**, so adding one is a manifest-schema
 change as well as a data question.

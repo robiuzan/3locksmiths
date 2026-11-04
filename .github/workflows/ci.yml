@@ -163,6 +163,12 @@ jobs:
       - name: Assert no orphaned routes
         run: node scripts/check-orphans.mjs
 
+      # /llms.txt is generated from the manifest by app/llms.txt/route.ts, so no module-level
+      # claims gate ever sees it. This one does: every URL must be in out/sitemap.xml, no gated
+      # claim, Hebrew punctuation. It reads out/, so it must run after the build (2026-11-04).
+      - name: Assert llms.txt
+        run: node scripts/check-llms.mjs
+
       - name: Assert titles and descriptions are unique
         run: |
           set -euo pipefail

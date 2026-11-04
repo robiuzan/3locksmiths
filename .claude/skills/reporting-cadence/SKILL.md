@@ -17,17 +17,17 @@ comparing "not measured" to "measured", not "worse" to "better". Say so rather t
 
 ## What is measurable today
 
-| Signal                             | Source             | Status                               |
-| ---------------------------------- | ------------------ | ------------------------------------ |
-| Call clicks by surface             | GTM → GA4          | ✅ 13 `data-cta` values live         |
-| WhatsApp clicks                    | GTM → GA4          | ✅ sticky bar on every route         |
-| Form submissions                   | `/thank-you/` view | ✅ URL conversion                    |
-| Impressions, clicks, CTR, position | Search Console     | ✅ once verified + sitemap submitted |
-| Indexed page count                 | Search Console     | ✅                                   |
-| Core Web Vitals (field)            | Search Console     | 🟡 needs traffic volume              |
-| Map pack performance               | Business Profile   | 🟢 profile live, claimed and correct |
-| Reviews                            | Business Profile   | 🔴 **0** (owner, 2026-09-05)         |
-| AI citations                       | manual             | 🔴 all crawlers blocked (§6.1)       |
+| Signal                             | Source             | Status                                                            |
+| ---------------------------------- | ------------------ | ----------------------------------------------------------------- |
+| Call clicks by surface             | GTM → GA4          | ✅ 13 `data-cta` values live                                      |
+| WhatsApp clicks                    | GTM → GA4          | ✅ sticky bar on every route                                      |
+| Form submissions                   | `/thank-you/` view | ✅ URL conversion                                                 |
+| Impressions, clicks, CTR, position | Search Console     | ✅ once verified + sitemap submitted                              |
+| Indexed page count                 | Search Console     | ✅                                                                |
+| Core Web Vitals (field)            | Search Console     | 🟡 needs traffic volume                                           |
+| Map pack performance               | Business Profile   | 🟢 profile live, claimed and correct                              |
+| Reviews                            | Business Profile   | 🟡 13, avg 5 (owner's dashboard, 2026-10-13)                      |
+| AI citations                       | manual probe       | 🟡 crawlers allowed; unmeasured — `docs/geo-observations.md` §1.5 |
 
 Two of the most important rows are red for the same reason: the owner-blocked critical path in
 `docs/growth-roadmap.md` §1.

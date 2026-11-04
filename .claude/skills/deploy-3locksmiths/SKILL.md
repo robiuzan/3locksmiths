@@ -160,10 +160,11 @@ curl -sS https://3locksmiths.co.il/ | grep -c 'tel:%5Bphone%5D'           # targ
 curl -sS https://3locksmiths.co.il/ | grep -c 'href="#"'                  # target 0 — see below
 ```
 
-Check: the page is the new build; titles carry the brand exactly once; the sitemap lists **104**
-URLs; `robots.txt` matches the intended AI-crawler stance (**Cloudflare prepends a managed block** —
-see `/aeo-answer-content`); GTM returns 200; and any new `public/_headers` entries actually appear in
-the response (`/web-security-headers`).
+Check: the page is the new build; titles carry the brand exactly once; the sitemap lists **105**
+URLs; `/llms.txt` returns 200; `robots.txt` matches the intended AI-crawler stance and
+`node scripts/check-ai-crawlers.mjs` is green (the Cloudflare managed block that once overrode it can
+return with a zone toggle — see `/aeo-answer-content`); GTM returns 200; and any new
+`public/_headers` entries actually appear in the response (`/web-security-headers`).
 
 > The `href="#"` check is there because of a 2026-08-26 finding: the homepage brand grid shipped all
 > 17 of its cards pointing at `#`, dead, while the brand pages they should have reached existed the

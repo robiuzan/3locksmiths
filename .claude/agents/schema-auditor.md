@@ -1,6 +1,6 @@
 ---
 name: schema-auditor
-description: Read-only validation of the JSON-LD in the built HTML against docs/schema-graph.md — every block must parse (two currently do not), the LocalBusiness+Locksmith node's NAP against the manifest including the personal email it currently publishes, Service/HowTo/FAQPage per authored page, BreadcrumbList coverage, the region-typed-as-City error, and Review/AggregateRating only when sourced. Invoke with "schema audit", "validate the JSON-LD", or "check structured data". Reports only; never edits or fabricates.
+description: Read-only validation of the JSON-LD in the built HTML against docs/schema-graph.md — every block must parse (all 504 did on 2026-11-04; a failure is a stop-ship), the LocalBusiness+Locksmith node's NAP against the manifest, the homepage FAQPage against its visible accordion, Service/HowTo/FAQPage per authored page, BreadcrumbList and ItemList coverage, region typing for קריות, no Offer while prices are 🔶, and Review/AggregateRating never. Invoke with "schema audit", "validate the JSON-LD", or "check structured data". Reports only; never edits or fabricates.
 model: sonnet
 tools: Read, Grep, Glob, Bash, WebFetch
 ---
@@ -38,36 +38,33 @@ time. **That asymmetry is the root cause of the most important finding on this s
 
 ## What to audit
 
-1. **Parseability first — this gates everything.** Two blocks currently fail `JSON.parse` with _"Bad
-   control character in string literal"_ (a raw newline inside a JSON string): the homepage's scraped
-   `FAQPage`, and one on `/services/שכפול-מפתח-לרכב/`. **The homepage FAQ rich result is dead.** Report
-   this before anything else (§4.1). A block that does not parse is a **stop-ship**.
+1. **Parseability first — this gates everything.** Every block must `JSON.parse`. All 504 did on
+   2026-11-04. The two scraped blocks that failed until 2026-08 (the homepage `FAQPage` and one on
+   page 95) are gone. A block that does not parse is a **stop-ship** (§4.1).
 2. **The business node's identity.** `@type: ["LocalBusiness","Locksmith"]`, `@id`
-   `https://3locksmiths.co.il/#LocalBusiness`. Correct. But every field is a **hardcoded literal in
-   `scripts/enrich.mjs`**, not read from the manifest, and:
-   - `email` is **`robiuzan@gmail.com`** — a personal Gmail, live on the homepage, against the
-     manifest's `info@3locksmiths.co.il`. This is **Critical** (§4.2).
-   - `telephone` is `+972-55-6601006` against the manifest's `+972765991266` — two NAP spellings.
-   - The `address` is country-only ON PURPOSE: the street address is confirmed but the owner keeps it in the footer only (2026-10-13, business-facts §C.1); before that there was **no `address`**, because the manifest had no address field (§5.1 /
-     `docs/business-facts.md` §C.1). Route it to business-facts; **never invent one.**
-3. **Opening hours vs the title.** The node claims Sun–Fri 08:00–18:00 and Sat 08:00–17:00 while the
-   homepage title claims `מנעולן 24/7`. One is wrong and both are 🔶 (§4.4).
-4. **`areaServed`.** The business node derives its `City` nodes from the build manifest, so they
-   track the 25 location pages automatically (23 unique, after the duplicate-slug pairs). It still
-   publishes a coverage claim on ~100 pages while the manifest says `areaServed: null` (§4.6). Location pages type their city as `City` — but **קריות is a region** and must be
-   `AdministrativeArea` (§4.5). `{ "@type": "Country", name: "IL" }` puts an ISO code in a `name`
-   field (§4.7).
-5. **Per-route coverage.** 53 pages carry `BreadcrumbList`; `FAQPage` 55, `HowTo` 53, `Service` 46.
-   Nine real pages emit **nothing**: `/contact/`, `/services/` (hub), `/sitemap/`, the two legal pages
-   and the four `/step/` routes. The `/step/` pages are correctly bare; the others want at least a
-   `BreadcrumbList` (§4.8).
+   `https://3locksmiths.co.il/#LocalBusiness`. Every field is read from the manifest (§3). Check that
+   `telephone` is `+972765991266` and `email` is `info@3locksmiths.co.il` — a personal address is
+   **Critical** (§4.2). The `address` is country-only ON PURPOSE: the street address is confirmed but
+   the owner keeps it in the footer only (2026-10-13, business-facts §C.1). Route any gap to
+   business-facts; **never invent one.**
+3. **Opening hours.** Every day 00:00–23:59, matching the owner-confirmed 24/7 (business-facts §D.3).
+   A mismatch with the visible copy is a finding.
+4. **`areaServed`.** The business node derives its places from the build manifest, so they track the
+   25 location pages automatically (23 unique, after the duplicate-slug pairs). It still publishes a
+   coverage claim on ~100 pages while the manifest says `areaServed: null` (§5). `קריות` must be
+   `AdministrativeArea` — its module sets `areaKind: "region"` (fixed 2026-11-04). The fallback
+   `{ "@type": "Country", name: "IL" }` still puts an ISO code in a `name` field (§5).
+5. **Per-route coverage.** Compare against the route table in §2. On 2026-11-04: business node on
+   105 pages, `BreadcrumbList` 104, `FAQPage` 99, `HowTo` 98, `Service` 80, `Article` 11, and
+   `ItemList` on the two hubs. Only the four `/step/` routes are bare, correctly. The homepage's
+   `FAQPage` must equal its visible accordion, item for item — `scripts/claims.mjs` asserts it.
 6. **`FAQPage` matches visible content.** `faqSchema` derives from the same `data.faq.items` that
    `lib/enrich/render.mjs` renders, so the graph cannot drift from the copy. **Verify that property
    still holds** for any new block. Note `acceptedAnswer.text` wraps answers in `<p>…</p>` — acceptable,
    but the HTML must stay trivial.
 7. **`Offer` on `/מחירון/` — correctly absent.** Gated on owner-sourced prices (§4.9 /
    `docs/business-facts.md` §D.1). Every `pricing[]` row was authored, not supplied.
-8. **`Review` / `AggregateRating` — sourced only.** Verified zero across all 66 pages, which is
+8. **`Review` / `AggregateRating` — sourced only.** Verified zero across all 109 pages, which is
    correct. Either appearing without a verifiable public source is **Critical** (§4.10).
 9. **Dangling `@id`.** `serviceJsonLd` wires `provider` to the business `@id`, which only resolves on
    the homepage — normal. Never invent a ref nothing defines.

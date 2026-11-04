@@ -17,16 +17,26 @@ content/site.json  page.jsonLd[]  ──►  components/SiteFrame.tsx  ──►
         │                    │
   scraped verbatim      REPLACED WHOLESALE by scripts/enrich.mjs
   from the live WP        for every page with a content/enriched/<id>.mjs module
-  (103 of 108 pages)
+  (today: only the homepage FAQPage survives)
 ```
 
-- For the **53 enriched pages**, `scripts/enrich.mjs` **overwrites** `page.jsonLd` entirely with
-  `[breadcrumbSchema, serviceSchema, howToSchema, faqSchema]`. Whatever WordPress emitted is
-  discarded. It then asserts each block `JSON.parse`s and that the page has exactly one `<h1>`,
-  failing the build if not.
-- For the **homepage (id 7)**, `enrich.mjs` _prepends_ `localBusinessSchema()` and **keeps the scraped
-  blocks**. They are not validated.
-- For the **10 other un-enriched pages**, the scraped blocks pass through untouched and unvalidated.
+State on 2026-11-04 (measured on `content/site.json`):
+
+- For the **98 authored pages**, `scripts/enrich.mjs` **overwrites** `page.jsonLd` entirely with
+  `[localBusinessSchema, breadcrumbSchema, serviceSchema or articleSchema, howToSchema, faqSchema]`.
+  `serviceSchema` returns nothing for `kind: "core"`. Whatever WordPress emitted is discarded. It
+  then asserts each block `JSON.parse`s and that the page has exactly one `<h1>`, failing the build
+  if not.
+- For the **homepage (id 7)**, `enrich.mjs` emits `localBusinessSchema()` and `webSiteSchema()` and
+  keeps only the scraped `FAQPage`. The scraped business, `WebSite` and `Organization` blocks are
+  dropped. `scripts/claims.mjs` rewrites that FAQ and fails the build unless every question and
+  answer equals the visible accordion.
+- The **generated pages** from `scripts/pages.mjs` (`/services/`, `/מדריכים/`, `/sitemap/`,
+  `/contact/` and the two legal pages) carry `BreadcrumbList` plus a page node, and `enrich.mjs`
+  prepends the business node they point at.
+- The four `/step/` fragments emit nothing, correctly.
+- Any unparseable scraped block is repaired or dropped by `enrich.mjs`. The artifact holds 504 blocks
+  and all of them parse.
 
 **That asymmetry is the root cause of §4.1.** The generator is sound; the pass-through path has no
 gate.
@@ -38,23 +48,25 @@ validation at render time.
 
 ## 2. Node per route type
 
-| Route                                                      | Emits today                                                                    | Target                                         |
-| ---------------------------------------------------------- | ------------------------------------------------------------------------------ | ---------------------------------------------- |
-| `/`                                                        | `LocalBusiness`+`Locksmith`, scraped `FAQPage` (**broken**), scraped `WebSite` | business node + valid `FAQPage` + `WebSite`    |
-| `/services/<slug>/` ×29                                    | `BreadcrumbList` · `Service` · `HowTo` · `FAQPage`                             | unchanged — this is correct                    |
-| `/services/שכפול-מפתח-לרכב/`                               | scraped only (**broken**)                                                      | full set — needs `content/enriched/95.mjs`     |
-| `/locations/<slug>/` ×25                                   | `BreadcrumbList` · `Service`+`areaServed` · `HowTo` · `FAQPage`                | unchanged, but fix the `קריות` area type (§5)  |
-| Top-level landers ×7                                       | `BreadcrumbList` · `Service` · `HowTo` · `FAQPage`                             | unchanged                                      |
-| `/services/` (hub)                                         | **nothing**                                                                    | `CollectionPage` + `BreadcrumbList`            |
-| `/contact/`                                                | **nothing**                                                                    | `ContactPage` + `BreadcrumbList`               |
-| `/מחירון/`                                                 | `Service` + `FAQPage`                                                          | + `OfferCatalog` — **gated on §4.3**           |
-| `/אודותינו/`                                               | `Service` + `FAQPage`                                                          | `AboutPage` + `BreadcrumbList`                 |
-| `/privacy-policy/` `/accessibility-statement/` `/sitemap/` | **nothing**                                                                    | `BreadcrumbList` only                          |
-| `/step/<slug>/` ×4                                         | **nothing**                                                                    | **nothing** — funnel fragments, correctly bare |
-| `/404`                                                     | none                                                                           | none                                           |
+"Business node" below is the `LocalBusiness`+`Locksmith` node, which every emitting page carries.
 
-Measured on the 2026-08-02 export: 207 well-formed blocks, **2 unparseable**, 0 empty.
-`BreadcrumbList` on 53 pages; `FAQPage` 55; `HowTo` 53; `Service` 46.
+| Route                                            | Emits today (2026-11-04)                                                         | Target                                                                    |
+| ------------------------------------------------ | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| `/`                                              | business node · `WebSite` · `FAQPage` (7 items, equal to the accordion)          | met                                                                       |
+| `/services/<slug>/` ×55 (23 services, 32 brands) | business node · `BreadcrumbList` · `Service` · `HowTo` · `FAQPage`               | met — includes page 95                                                    |
+| `/locations/<slug>/` ×25                         | business node · `BreadcrumbList` · `Service`+`areaServed` · `HowTo` · `FAQPage`  | met — `קריות` is `AdministrativeArea` since 2026-11-04 (§5)               |
+| Top-level landers ×7 (`kind: "core"`)            | business node · `BreadcrumbList` · `HowTo` · `FAQPage` — no `Service`, by design | `/אודותינו/` → `AboutPage`; `/מחירון/` → `OfferCatalog` **gated on §4.3** |
+| Guides ×11                                       | business node · `BreadcrumbList` · `Article` · `HowTo` · `FAQPage`               | met — `author` blocked on business-facts §A                               |
+| `/services/` and `/מדריכים/` (hubs)              | business node · `BreadcrumbList` · `CollectionPage` → `ItemList` (55 / 11)       | met                                                                       |
+| `/contact/`                                      | business node · `BreadcrumbList` · `ContactPage`                                 | met                                                                       |
+| `/privacy-policy/` `/accessibility-statement/`   | business node · `BreadcrumbList` · `WebPage`                                     | met                                                                       |
+| `/sitemap/`                                      | business node · `BreadcrumbList` · `CollectionPage`                              | met — no `ItemList`, skipped on purpose                                   |
+| `/step/<slug>/` ×4                               | nothing                                                                          | nothing — funnel fragments, correctly bare                                |
+| `/404`                                           | none                                                                             | none                                                                      |
+
+Measured 2026-11-04 on `content/site.json`: 504 blocks, 0 unparseable. Business node on 105 pages;
+`BreadcrumbList` 104; `FAQPage` 99; `HowTo` 98; `Service` 80; `Article` 11. On 2026-08-02 it was 207
+blocks with 2 unparseable.
 
 ---
 
@@ -72,24 +84,26 @@ Built by `localBusinessSchema()` in `scripts/enrich.mjs`, `@id` = `https://3lock
 The dual type is correct — `Locksmith` matches `schema.type` in the manifest, and pairing it with
 `LocalBusiness` is valid and widely understood.
 
-**Everything else about this node is hardcoded in `enrich.mjs` rather than read from the manifest, and
-three fields are wrong:**
+**Since 2026-08 every field is read from the manifest** (`site.config.json`, synced from the roster),
+never typed in `enrich.mjs`. Measured on the homepage node, 2026-11-04:
 
-| Field          | Emitted                              | Manifest                 | Verdict                             |
-| -------------- | ------------------------------------ | ------------------------ | ----------------------------------- |
-| `name`         | `שלושה מנעולנים`                     | same                     | correct by coincidence              |
-| `telephone`    | `+972-55-6601006`                    | `+972765991266`          | ⚠️ two NAP spellings                |
-| `email`        | **`robiuzan@gmail.com`**             | `info@3locksmiths.co.il` | 🔴 **Critical — §4.2**              |
-| `priceRange`   | `₪₪`                                 | `₪₪`                     | correct by coincidence              |
-| `address`      | **absent**                           | **absent**               | blocked — business-facts §C.1       |
-| `areaServed`   | 23 `City` nodes, derived             | `areaServed: null`       | tracks routes; קריות still mistyped |
-| `openingHours` | Sun–Fri 08:00–18:00, Sat 08:00–17:00 | —                        | ⚠️ contradicts the "24/7" title     |
-| `foundingDate` | absent                               | `foundedYear: null`      | correct — do not infer it           |
-| `sameAs`       | 1 Business Profile URL               | same                     | ✅ live 2026-09-05 — facts §B.4     |
+| Field                       | Emitted                                               | Verdict                                            |
+| --------------------------- | ----------------------------------------------------- | -------------------------------------------------- |
+| `name` / `alternateName`    | `שלושה מנעולנים` / `3 Locksmiths`                     | ✅ manifest                                        |
+| `telephone`                 | `+972765991266`                                       | ✅ the 076 line — business-facts §C.5              |
+| `email`                     | `info@3locksmiths.co.il`                              | ✅ the personal Gmail is gone (§4.2)               |
+| `priceRange`                | `₪₪`                                                  | ✅ manifest                                        |
+| `address`                   | `addressCountry: "IL"` only                           | ✅ the owner's choice, 2026-10-13 — facts §C.1     |
+| `areaServed`                | 22 `City` + 1 `AdministrativeArea` (`קריות`), derived | ✅ tracks the location routes (§5)                 |
+| `openingHoursSpecification` | every day 00:00–23:59                                 | ✅ owner-confirmed 24/7 — facts §D.3               |
+| `sameAs` / `hasMap`         | the Business Profile URL                              | ✅ live 2026-09-05 — facts §B.4                    |
+| `knowsLanguage`             | `he`                                                  | ✅ added 2026-11-04                                |
+| `knowsAbout`                | 23 service names from the build manifest              | ✅ added 2026-11-04                                |
+| `image`                     | the catalog hero                                      | 🟡 an AI-generated scene; the logo would be better |
+| `logo` / `description`      | absent until `images.logo` / a roster tagline exists  | 🔶 owner                                           |
+| `foundingDate`              | absent                                                | ✅ correct — `foundedYear: null`, never infer it   |
 
-**Fix direction:** `localBusinessSchema()` should read from `site.config.json` (already imported by
-`app/layout.tsx` as the manifest) rather than carrying its own literals. Values themselves change in
-the **roster manifest**, then sync down. Never edit `site.config.json` directly.
+Values change in the **roster manifest**, then sync down. Never edit `site.config.json` directly.
 
 ---
 
@@ -97,20 +111,9 @@ the **roster manifest**, then sync down. Never edit `site.config.json` directly.
 
 ### 4.1 Every block must parse — including the ones we didn't generate
 
-Two pages ship an unparseable `application/ld+json` block, both inherited from the WordPress scrape:
-
-- `out/index.html` — the homepage `FAQPage`. Fails with _"Bad control character in string literal"_: a
-  raw newline inside a JSON string. **Google cannot read it, so the homepage FAQ rich result is
-  dead.**
-- `out/services/שכפול-מפתח-לרכב/index.html` — same class of defect.
-
-`enrich.mjs` already validates every block it _generates_. The gap is that scraped blocks are passed
-through unvalidated. Close it in one of two ways:
-
-1. Validate all `page.jsonLd` entries at the end of `enrich.mjs` (not just generated ones) and drop or
-   repair anything that fails. A malformed block is worth strictly less than no block.
-2. Author `content/enriched/95.mjs` and give the homepage a generated `FAQPage`, which replaces both
-   broken blocks at source. Preferred — it fixes the cause, not the symptom.
+✅ **Fixed.** Both broken blocks are gone: page 95 has an authored module, and the homepage `FAQPage`
+is rewritten and validated by `scripts/claims.mjs`. `enrich.mjs` also repairs or drops any scraped
+block that fails to parse. The rule stays:
 
 **A block that does not `JSON.parse` is a stop-ship.**
 
@@ -120,8 +123,8 @@ through unvalidated. Close it in one of two ways:
 personal Gmail published as the business's contact address in structured data. It is wrong for the
 business, it leaks a personal address, and it contradicts the manifest.
 
-Fix: read `contact.email` from the manifest. This is Critical and should ship ahead of anything
-cosmetic.
+✅ **Fixed** — `email` is read from `manifest.contact.email` and is `info@3locksmiths.co.il`. A
+personal address in the business node is still a stop-ship.
 
 ### 4.3 `Offer` / `PriceSpecification` only when the prices are owner-sourced
 
@@ -131,7 +134,7 @@ owner (`docs/business-facts.md` §D.1). Marking them up as `Offer` publishes the
 
 ### 4.4 `Review` / `AggregateRating` — sourced only
 
-Currently **absent from all 66 pages**, which is correct. Either shipping without a verifiable public
+Currently **absent from all 109 pages**, which is correct. Either shipping without a verifiable public
 source URL is a Google policy violation and a Rich Results failure. Do not seed sample data "to test
 the markup". Blocked on `docs/business-facts.md` §B.
 
@@ -168,16 +171,17 @@ areaServed: data.kind === "location" && data.city
 
 Two corrections:
 
-- **`קריות` is a region, not a city.** It must be `{ "@type": "AdministrativeArea", name: "קריות" }`.
-  Typing a region as a `City` is a factual error in the graph. Add a `kind: "city" | "region"` field
-  to the authored module rather than special-casing a string.
+- ✅ **`קריות` is a region, not a city** — fixed 2026-11-04. Its module sets `areaKind: "region"`,
+  and `placeType()` in `scripts/enrich.mjs` types it `AdministrativeArea` in both the page's
+  `Service.areaServed` and the business node's list. Set the same field on any future region.
 - **`{ "@type": "Country", name: "IL" }`** should carry the country name (`"Israel"`) or use a proper
   identifier. `"IL"` is an ISO code in a `name` field.
 
 The business node's own `areaServed` **is** now derived from the location set — `scripts/enrich.mjs`
 builds `CITIES` from `content/enriched/_manifest.json`, so it tracks the routes automatically and
-cannot go stale the way the old hardcoded 15-city array did. It currently emits 23 unique `City`
-nodes (25 location pages, minus the נתניה and חולון duplicate-slug pairs).
+cannot go stale the way the old hardcoded 15-city array did. It currently emits 23 unique places
+(25 location pages, minus the נתניה and חולון duplicate-slug pairs): 22 `City` and one
+`AdministrativeArea`.
 
 ⚠️ This means the schema makes a **machine-readable coverage claim on ~100 pages** even though
 `schema.areaServed` is `null` in the roster manifest. `docs/business-facts.md` §E asserted the
@@ -185,7 +189,7 @@ opposite until 2026-09-02, which is why a coverage change was planned twice from
 
 ---
 
-## 6. Guides (when `/מדריכים/` lands)
+## 6. Guides (live since 2026-08-26)
 
 `Article` with `headline`, `description`, `image`, `datePublished`, `dateModified`, `author` (a
 `Person` with a **real** name), `publisher` → the business `@id`, and `mainEntityOfPage`. Plus
@@ -210,7 +214,7 @@ try{JSON.parse(m[1]);}catch{bad++;console.log("UNPARSEABLE:",x);}}}
 console.log("unparseable blocks:",bad);'
 
 grep -rL 'application/ld+json' out --include=index.html      # pages with no schema
-grep -rl 'BreadcrumbList' out --include=index.html | wc -l   # 53 today
+grep -rl 'BreadcrumbList' out --include=index.html | wc -l   # 104 on 2026-11-04
 grep -rl 'aggregateRating\|"@type": *"Review"' out --include=index.html  # must be empty
 grep -ro '"email":"[^"]*"' out/index.html                    # must NOT be a personal address
 ```

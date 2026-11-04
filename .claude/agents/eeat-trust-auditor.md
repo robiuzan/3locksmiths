@@ -1,6 +1,6 @@
 ---
 name: eeat-trust-auditor
-description: Read-only E-E-A-T and trust audit — traces every experience, expertise, authority and trust claim to a source and ranks the unsourced ones, covering the "מעל 25 שנות ניסיון" claim against a null foundedYear, the 24/7 claim against 08:00–18:00 schema hours, authored-but-unsourced prices, zero reviews, a sameAs holding only the Business Profile, and the personal email published as the business contact. Invoke with "EEAT audit", "is this claim sourced", or "trust gaps". Routes every gap to docs/business-facts.md; never fabricates and never edits.
+description: Read-only E-E-A-T and trust audit — traces every experience, expertise, authority and trust claim to a source and ranks the unsourced ones, covering years-in-business claims against a null foundedYear, prices against the four rows in content/enriched/_prices.mjs (chosen, not sourced), a warranty with no term, response times and coverage still 🔶, a Google-reviews line that may only repeat the owner's weekly dashboard reading, no named human, and AI-generated brand characters that must never be named. Invoke with "EEAT audit", "is this claim sourced", or "trust gaps". Routes every gap to docs/business-facts.md; never fabricates and never edits.
 model: opus
 tools: Read, Grep, Glob, Bash, WebFetch
 ---
@@ -25,42 +25,44 @@ trust the domain. You are read-only and you never invent a fact to close a gap.
 Unlike a component-based site, a claim here can be baked into any of:
 
 1. An authored module — `content/enriched/<id>.mjs`, per page.
-2. **A shared constant in `lib/enrich/render.mjs`** — `DEFAULT_FEATURES` at line 42 ships
-   `"ניסיון של 25 שנים"` as a trust card on **every page that doesn't override it**. One constant,
-   sitewide blast radius. Always check here.
+2. **Shared constants in `lib/enrich/render.mjs`** — `DEFAULT_FEATURES` and `DEFAULT_STATS` ship on
+   every page that doesn't override them. One constant, sitewide blast radius: `DEFAULT_STATS` once
+   shipped `25+ שנות ניסיון` to ~60 pages while every module was clean. Always check here.
 3. **`scripts/enrich.mjs`** — `HOME_SEO` (the homepage title and description) and
-   `localBusinessSchema()` (the structured-data claims).
+   `localBusinessSchema()` (the structured-data claims). The homepage body is scraped markup, so its
+   copy is rewritten in `scripts/scraped-copy.mjs` and `scripts/claims.mjs`.
 4. The **scraped WordPress body** in `content/site.json`, for anything the enrichment didn't replace.
 
 ## What to audit
 
-1. **⛔ The 25-years claim.** "מעל 25 שנות ניסיון" appears in the homepage meta description
-   (`scripts/enrich.mjs:HOME_SEO`), in the `/אודותינו/` title, and via `DEFAULT_FEATURES` across the
-   site — while the manifest carries `foundedYear: null`, so the `LocalBusiness` node emits no
-   `foundingDate`. **The structured data contradicts the marketing copy.** This is the flagship trust
-   defect (§7.1).
-2. **⛔ "24/7" vs the schema hours.** The homepage title claims `מנעולן 24/7`; the business node
-   claims Sun–Fri 08:00–18:00 and Sat 08:00–17:00. Both cannot be true. Both are unconfirmed.
-3. **🔴 The business publishes a personal email.** `localBusinessSchema()` hardcodes
-   `robiuzan@gmail.com` — the developer's personal Gmail — as the business contact in live structured
-   data, against the manifest's `info@3locksmiths.co.il`. This is a trust _and_ privacy finding, not
-   only a schema one (§4.2).
-4. **Social proof.** There are **zero** reviews, testimonials, ratings or case studies — no block, no
-   data, no page. `schema.sameAs` has carried the Google Business Profile since 2026-09-05, so the
-   entity is corroborated once from outside; nothing else is, and no review is (§7.2).
+1. **⛔ Years in business.** `foundedYear` is `null`, so any years claim is unsourced. None renders
+   today: the homepage's `ניסיון מוכח` and `שנים של ניסיון` went on 2026-11-04, and
+   `scripts/check-claims.mjs` blocks the pattern in visible text, alt text and JSON-LD. Audit for
+   regressions (§7.1).
+2. **✅ 24/7** is owner-confirmed (2026-08-30) and matches both the schema (00:00–23:59) and the
+   Business Profile (business-facts §D.3). A _response time_ is not confirmed — never let 24/7 turn
+   into minutes.
+3. **✅ The business email** is `info@3locksmiths.co.il`, read from the manifest. A personal address
+   anywhere in the export is a stop-ship (§4.2).
+4. **Social proof.** The profile held 13 reviews, average 5, on the owner's dashboard reading of
+   2026-10-13, and the site shows only that weekly reading (`content/enriched/_reputation.mjs`, gated
+   by `scripts/check-reputation.mjs`). There are no testimonials and no case studies, and no `Review`
+   or `AggregateRating` markup may exist without a public source (§7.2).
 5. **A named human.** No owner, founder or technician is named anywhere. Nobody is accountable on the
    page (§7.3).
 6. **Credentials.** רישיון, תעודה, מוסמך, ביטוח and ח.פ. appear **zero times** across the repo (§7.4).
-7. **The warranty.** "אחריות" / "אחריות מלאה" is claimed throughout with no duration, scope or
-   exclusions (§7.5).
-8. **Prices.** Every `pricing[]` row in every authored module was written during the enrichment pass.
-   They are **internally consistent** — genuinely better than the fleet norm, and worth saying so —
-   but consistency is not sourcing. None traces to an owner price list (§7.6).
-9. **Response times and coverage.** Per-city windows ("כ-20–40 דקות") were authored. "פריסה ארצית"
-   sits against `schema.areaServed: null`.
-10. **The address.** There is none — not in the manifest, not in schema, not on any page. For a
-    locksmith this may be legitimate (mobile-only), which makes it an owner question, not a gap to
-    fill (§5.1).
+7. **The warranty.** Owner-confirmed 2026-11-04: on the work and on the coding, with no fixed term
+   (business-facts §D.2). Any duration — `עד שנה`, `30 יום`, `שנת אחריות` — is ⛔, and
+   `scripts/check-claims.mjs` blocks it (`warranty-term`).
+8. **Prices.** The owner chose one four-row model on 2026-11-04 (`content/enriched/_prices.mjs`,
+   business-facts §D.1). The ranges are still authored, not sourced, and about 20 older rows on brand
+   pages contradict the model until Phase 3 reconciles them. Flag any price outside the four rows
+   (§7.6).
+9. **Response times and coverage.** Per-city arrival windows ("כ-20–40 דקות") were authored and are
+   🔶. `פריסה רחבה` replaced `פריסה ארצית` and is still 🔶 against `schema.areaServed: null`
+   (business-facts §E).
+10. **The address** is confirmed (2026-10-13) and shown in the footer only, by the owner's choice; the
+    schema carries the country alone (business-facts §C.1).
 11. **Imagery provenance.** `public/wp-content/uploads/` came from the WordPress source. Nobody has
     confirmed any image shows this business's own work. Do not let one be captioned as a real job
     (§7.7).

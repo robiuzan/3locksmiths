@@ -4,6 +4,9 @@ export default {
   kind: "location",
   keyword: "שכפול מפתח בקריות",
   city: "קריות",
+  // A region — the towns around Haifa Bay — not a city: schema.org areaServed types it as an
+  // AdministrativeArea (scripts/enrich.mjs placeType; docs/schema-graph.md §5).
+  areaKind: "region",
   seo: {
     title: "שכפול מפתח בקריות – מנעולן זמין באזור | שלושה מנעולנים",
     description:

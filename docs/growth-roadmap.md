@@ -25,13 +25,13 @@ Be precise about this, because it changes what the work should be.
 
 **The actual problems are not content volume. They are:**
 
-| Gap              | State                                                                            |
-| ---------------- | -------------------------------------------------------------------------------- |
-| **Proof**        | zero reviews, zero ratings, no named human, no credentials; GBP live 2026-09-05  |
-| **Reachability** | every major AI crawler blocked at the Cloudflare edge (§6.1)                     |
-| **Measurement**  | ✅ fixed 2026-08-24 — 13 per-surface `data-cta`, `/thank-you/` conversion        |
-| **Live defects** | ✅ all cleared 2026-08-24 and guarded by blocking CI checks                      |
-| **Coverage**     | emergency/lockout intent — the highest-intent locksmith queries — barely covered |
+| Gap              | State                                                                                       |
+| ---------------- | ------------------------------------------------------------------------------------------- |
+| **Proof**        | zero reviews, zero ratings, no named human, no credentials; GBP live 2026-09-05             |
+| **Reachability** | ✅ AI crawlers allowed (2026-11-03); the gate now is indexing — 30/32 brand pages uncrawled |
+| **Measurement**  | ✅ fixed 2026-08-24 — 13 per-surface `data-cta`, `/thank-you/` conversion                   |
+| **Live defects** | ✅ all cleared 2026-08-24 and guarded by blocking CI checks                                 |
+| **Coverage**     | emergency/lockout intent — the highest-intent locksmith queries — barely covered            |
 
 A locksmith site ranks on **local trust signals** far more than on word count. The content work is
 mostly done; the trust, measurement and reachability work has barely started.
@@ -53,7 +53,7 @@ in parallel, but these determine the ceiling. Chase them first and chase them ha
 | 6   | Licence / insurance / ח.פ. — any verifiable credential                                     | §7.4, the whole authority dimension                                               |
 | 7   | A named human + photo (owner or lead technician)                                           | §7.3, article authorship, AEO                                                     |
 | 8   | Sign-off on the price ranges already published                                             | §7.6, `Offer` schema, pricing page                                                |
-| 9   | Cloudflare AI-crawler policy decision                                                      | **the entire AEO/GEO dimension** (§6.1)                                           |
+| 9   | ~~Cloudflare AI-crawler policy decision~~ ✅ crawlers allowed by 2026-11-03                | §6.1 — keep `scripts/check-ai-crawlers.mjs` green                                 |
 | 10  | ~~Correct business email~~ ✅ confirmed 2026-08-24                                         | §4.2 — done, see business-facts §C.3                                              |
 | 11  | **Remove the 12 non-genuine reviews** (business-facts §B.5) and start the genuine ask-flow | every reviews state in `docs/dynamic-presence-plan.md` §3.4; the profile's safety |
 | 12  | Push `main` (29 commits behind production) and enable secret scanning                      | any scheduled routine, any CI gate that guards a deploy                           |
@@ -140,25 +140,28 @@ This is the highest-leverage dimension for this site, and most of it is owner-bl
 
 Three gates, strictly in order. Work on gate 3 is wasted while gate 1 is shut.
 
-**Gate 1 — reachability.** Cloudflare's managed `robots.txt` currently sends `Disallow: /` to
-ClaudeBot, GPTBot, Google-Extended, CCBot, Bytespider, Amazonbot, Applebot-Extended and
-meta-externalagent. **No repo change overrides this.** The owner decides in the Cloudflare dashboard.
-Distinguish the three permissions when presenting the choice: training (`ai-train`), retrieval (**this
-is what produces citations**), and attribution (`use=reference`). Blocking training while allowing
-retrieval is a coherent, common position (§6.1).
+> **Status 2026-11-04:** gates 1 and 2 are open; the binding constraint is that Google has not
+> indexed the brand pages (an unindexed page cannot appear in an AI Overview). The execution plan
+> is the 2026-11-04 GEO plan: homepage pivot, family link hub, `llms.txt`, answer-first copy in
+> batches, and the dated log in `docs/geo-observations.md`.
 
-**Gate 2 — parseability.** The two broken JSON-LD blocks (Phase 0). An assistant that can't parse the
-FAQ block loses the cleanest machine-readable answer set on the site.
+**Gate 1 — reachability. ✅ open since before 2026-11-03.** From 2026-08-16 Cloudflare's managed
+`robots.txt` sent `Disallow: /` to ClaudeBot, GPTBot, Google-Extended, CCBot and others, and no repo
+change could override it. The live file now matches `app/robots.ts`. It is a zone setting and can
+return silently: run `node scripts/check-ai-crawlers.mjs` after any Cloudflare change (§6.1).
+
+**Gate 2 — parseability. ✅** Every JSON-LD block parses, and the homepage FAQPage is asserted equal
+to its accordion.
 
 **Gate 3 — citability.**
 
 1. **Answer blocks.** Open every service, location and guide page with a 40–60 word self-contained
-   answer, complete in its first sentence. None of the 53 modules does this today; the first paragraph
-   scene-sets before answering. Cheapest high-yield content pass available (§6.2).
+   answer, complete in its first sentence. Measured 2026-11-03: 4 of 62 family and cost pages sit
+   under a real question heading, one opens with a price (§6.2).
 2. **Comparison tables** — the citable asset. Expand `specsTable` coverage and add genuinely new ones:
    chip key vs smart key, cost by scenario, what needs the vehicle present.
-3. **`public/llms.txt`** once gate 1 opens.
-4. **Freshness and authorship** — `datePublished` / `dateModified` / a real author on guides (§6.5).
+3. ✅ **`/llms.txt`** — generated by `app/llms.txt/route.ts` since 2026-11-04.
+4. **Freshness and authorship** — guides carry both dates; no author by design (§6.5).
 
 ---
 
@@ -347,14 +350,14 @@ triage.
 
 ## KPIs
 
-| Dimension   | Metric                                                             | Today               |
-| ----------- | ------------------------------------------------------------------ | ------------------- |
-| Conversion  | calls, WhatsApp, form leads — by page and surface                  | partly unmeasured   |
-| Local       | GBP views, calls, direction requests, review count and rating      | GBP live, 0 reviews |
-| Rankings    | head terms, brand-key cluster, emergency cluster, location cluster | untracked           |
-| Indexation  | indexed pages, impressions, CTR (Search Console)                   | 104 URLs submitted  |
-| AEO         | citations in AI answers; crawler reachability                      | blocked at edge     |
-| Performance | LCP / CLS / INP field data, mobile                                 | unmeasured          |
-| Trust       | reviews published, credentials shown, claims sourced               | zero                |
+| Dimension   | Metric                                                             | Today                                           |
+| ----------- | ------------------------------------------------------------------ | ----------------------------------------------- |
+| Conversion  | calls, WhatsApp, form leads — by page and surface                  | partly unmeasured                               |
+| Local       | GBP views, calls, direction requests, review count and rating      | 13 reviews, avg 5 (owner, 2026-10-13)           |
+| Rankings    | head terms, brand-key cluster, emergency cluster, location cluster | baseline 2026-11-03, `docs/geo-observations.md` |
+| Indexation  | indexed pages, impressions, CTR (Search Console)                   | 2/32 brand pages, 23/25 cities (2026-11-03)     |
+| AEO         | citations in AI answers; crawler reachability                      | reachable; citations unmeasured — probe §1.5    |
+| Performance | LCP / CLS / INP field data, mobile                                 | unmeasured                                      |
+| Trust       | reviews published, credentials shown, claims sourced               | zero                                            |
 
 Set the baseline **after Phase 1** — before then, most of these cannot be read honestly.

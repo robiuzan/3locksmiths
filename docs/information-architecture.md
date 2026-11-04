@@ -10,22 +10,29 @@ Owned by the `ia-navigation-architect` agent. The mechanics of editing each surf
 
 ## 0. The state today
 
-64 content pages, and a link graph that is close to a star: everything hangs off the homepage and
-almost nothing connects sideways.
+Measured on the built export, 2026-11-04. 109 pages. The star shape this section used to describe is
+gone: the footer has linked both silos since 2026-08-26, and since 2026-11-04 the family hub links
+every "שכפול מפתח" page to every brand and city page. What is still thin is the header and the copy
+itself.
 
-| Surface              | Reaches                                      | Verdict |
-| -------------------- | -------------------------------------------- | ------- |
-| Header nav           | ~5 top-level pages + two dropdowns           | 🟡      |
-| **Footer**           | **6 links. 0 services. 0 locations.**        | 🔴      |
-| Floating button      | phone only                                   | 🟢      |
-| Sticky mobile bar    | call + WhatsApp (added 2026-08-24)           | 🟢      |
-| In-content `related` | per-page service/location carousel           | 🟡      |
-| Contextual in-copy   | **none — blocked by the renderer**           | 🔴      |
-| Breadcrumbs          | visible on inner pages; `BreadcrumbList` ×54 | 🟡      |
+| Surface              | Reaches                                                                                  | Verdict |
+| -------------------- | ---------------------------------------------------------------------------------------- | ------- |
+| Header nav           | 7 top-level items; 2 dropdowns with 9 services and 15 of 25 cities; **no brand page**    | 🟡      |
+| Footer               | 72 links: all 23 services, all 25 cities, 12 guides, 7 core pages; no brand page         | 🟢      |
+| Family hub           | all 58 family pages: page 95 + 32 brands + 23 cities (`renderFamilyHub`)                 | 🟢      |
+| Homepage areas block | all 25 cities (completed 2026-11-04 in `scripts/fix-links.mjs`)                          | 🟢      |
+| Floating button      | phone only                                                                               | 🟢      |
+| Sticky mobile bar    | call + WhatsApp (added 2026-08-24)                                                       | 🟢      |
+| In-content `related` | per-page service/location carousel                                                       | 🟡      |
+| Contextual in-copy   | a few pipeline-placed links on the homepage only; **typed in-copy links not built (§4)** | 🔴      |
+| Breadcrumbs          | visible on inner pages; `BreadcrumbList` on 104 of 109; brand pages carry the 95 level   | 🟢      |
 
 ---
 
 ## 1. The footer — the biggest single fix on the site
+
+> ✅ **Done 2026-08-26** (`ebb913e`): `scripts/footer.mjs` rebuilds the footer from the build
+> manifest on every `npm run enrich`. The section below is the original reasoning, kept for its rules.
 
 ### What it is now
 
@@ -67,8 +74,9 @@ A four-column footer, filling `sidebar-1` and adding columns:
 ### Where to edit it
 
 The footer is **scraped WordPress chrome**, not a React component. It lives in `content/site.json`
-and is rewritten by **`scripts/transform.mjs`** at build time. See `/site-navigation` for the
-mechanics. **Never edit `content/site.json` or `public/wp-content/`.**
+and is rebuilt by **`scripts/footer.mjs`** in the enrich chain. Not `scripts/transform.mjs`: that
+one runs only in `npm run snapshot`. See `/site-navigation` for the mechanics. **Never edit
+`content/site.json` or `public/wp-content/`.**
 
 ---
 
@@ -172,7 +180,8 @@ percent-encoded — decode consistently on both sides or the diff is meaningless
 ## 7. Checklist for any IA change
 
 - [ ] Footer reaches both silos; no `slice()` truncation; no empty column.
-- [ ] All 30 services and 25 locations within one hop of the header.
+- [ ] All 23 services, 32 brand pages and 25 cities within one hop of the header (today: 9 services
+      and 15 cities, §0).
 - [ ] Every internal link has a trailing slash and is written unescaped.
 - [ ] Cross-silo edges present, and location adjacency set on **both** sides.
 - [ ] Duplicate-intent pairs cross-link rather than compete.

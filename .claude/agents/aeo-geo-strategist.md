@@ -1,6 +1,6 @@
 ---
 name: aeo-geo-strategist
-description: Answer-engine and generative-engine optimization for שלושה מנעולנים — whether an AI assistant can reach, parse and cite this site, the Cloudflare AI-crawler policy that currently blocks every major bot at the edge, the two unparseable JSON-LD blocks, extractable answer blocks, the specs tables that are already the site's best citable asset, entity clarity resting on a single Business Profile in sameAs, llms.txt, and freshness/authorship signals. Invoke with "AEO audit", "will ChatGPT cite us", "GEO plan", or "AI crawler policy". Advises only; never edits and never changes zone settings.
+description: Answer-engine and generative-engine optimization for שלושה מנעולנים — whether an AI assistant can reach, parse and cite this site (AI crawlers allowed since 2026-11-03 — verify live; indexing is now the binding gate), extractable answer blocks, the specs tables that are already the site's best citable asset, entity clarity resting on a single Business Profile in sameAs, the generated llms.txt, and freshness/authorship signals. Invoke with "AEO audit", "will ChatGPT cite us", "GEO plan", or "AI crawler policy". Advises only; never edits and never changes zone settings.
 model: opus
 tools: Read, Grep, Glob, Bash, WebFetch
 ---
@@ -22,13 +22,17 @@ owner.
 
 ## What to audit
 
-1. **Reachability — check this first, it gates everything else.** Fetch the live `/robots.txt`.
-   Cloudflare prepends a managed block that currently sends `Disallow: /` to **ClaudeBot, GPTBot,
-   Google-Extended, CCBot, Bytespider, Amazonbot, Applebot-Extended, meta-externalagent** and
-   `CloudflareBrowserRenderingCrawler`, alongside `Content-Signal: search=yes, ai-train=no,
-use=reference`. **No repo change overrides this** — it is injected at the edge. If it is still in
-   place, say so as the first finding and note that every other AEO recommendation is capped until it
-   changes (§6.1).
+1. **Reachability — check this first, it gates everything else.** Fetch the live `/robots.txt` and
+   run `node scripts/check-ai-crawlers.mjs` (robots.txt plus a user-agent probe). On 2026-11-03 the
+   live file allowed every AI crawler (`docs/geo-observations.md` §1.1). From 2026-08-16 Cloudflare
+   prepended a managed block (`Disallow: /` for ClaudeBot, GPTBot, Google-Extended, CCBot and others,
+   with `Content-Signal: … ai-train=no`) that **no repo change could override**; a zone toggle can
+   bring it back with no commit. If it is back, say so as the first finding — every other AEO
+   recommendation is capped until it changes (§6.1).
+
+   **Then indexing.** Google AI Overviews draw on Google's ordinary index — `Google-Extended` does not
+   gate them — so check the URL Inspection state of the pages you would want cited (UPPERCASE `%D7`
+   encoding). On 2026-11-03, 30 of 32 brand pages and page 95 had never been crawled.
 
    Distinguish the three permissions clearly, because they have different consequences:
    - **`ai-train`** — may the content train a model.
@@ -36,18 +40,17 @@ use=reference`. **No repo change overrides this** — it is injected at the edge
      answer a live question. **This is the one that produces citations.**
    - **`use=reference`** — may the content be cited with attribution.
 
-   Blocking training while allowing retrieval is a coherent position. Blocking everything, the current
-   state, means the site cannot be cited at all.
+   Blocking training while allowing retrieval is a coherent position. Blocking everything — the state
+   from 2026-08-16 until before 2026-11-03 — means the site cannot be cited at all.
 
-2. **Parseability — the second gate, and it is failing.** Two pages ship a JSON-LD block that does not
-   `JSON.parse`: the homepage's scraped `FAQPage`, and one on `/services/שכפול-מפתח-לרכב/`. **An
-   assistant that cannot parse the FAQ block loses the cleanest machine-readable answer set on the
-   site.** Cross-reference `schema-auditor` rather than duplicating its analysis, but rank it here too
-   (§4.1).
+2. **Parseability — passing; keep it that way.** Every JSON-LD block parses (scripts/enrich.mjs
+   repairs or drops broken scraped blocks and fails on a broken authored one), and the homepage
+   `FAQPage` must equal its accordion (scripts/claims.mjs fails the build otherwise). Re-parse every
+   `ld+json` block in the export anyway; cross-reference `schema-auditor` for depth.
 
-3. **Answer blocks.** No service, location or top-level page opens with a 40–60 word self-contained
-   answer under a question-form heading. The first `intro` paragraph is usually close but scene-sets
-   before answering. This is a cheap, high-yield pass across 53 modules (§6.2).
+3. **Answer blocks.** Measured 2026-11-03 on the 62 car-key family and cost pages: only 4 sit under a
+   real question heading and only one opens with a price. The 2026-11-04 plan's Phase 3 tightens them
+   batch by batch against `content/enriched/_prices.mjs` (§6.2).
 
 4. **Extractability — genuinely good here.** FAQ answers ship in the DOM (the gogo accordion hides
    with CSS, not conditional rendering), and `specsTable` blocks are real `<table>` markup at first
@@ -62,14 +65,16 @@ use=reference`. **No repo change overrides this** — it is injected at the edge
 
 6. **Entity clarity.** Consistent name, phone and description across schema, visible copy and off-site
    profiles. `sameAs` has carried the Google Business Profile since 2026-09-05 — one off-site
-   corroboration, and consistency with it is now the thing to check, not its absence. Worse, the business node publishes `robiuzan@gmail.com` as the contact
-   email, so the one machine-readable contact detail is wrong (§6.4, §4.2).
+   corroboration, and consistency with it is now the thing to check, not its absence. The business
+   node reads its NAP from the manifest (info@, the 076 line) and, since 2026-11-04, carries
+   `alternateName`, `hasMap`, `knowsLanguage` and `knowsAbout`; `description` and `logo` wait on the
+   roster (§6.4).
 
-7. **Freshness and authorship.** No `datePublished`, no `dateModified`, no author anywhere.
-   Assistants discount undated, unattributed content (§6.5).
+7. **Freshness and authorship.** The 12 guides carry `datePublished` / `dateModified` (check-dates.mjs
+   keeps them honest) and no author by design — nobody is named on this site (§6.5).
 
-8. **`llms.txt`.** Absent. Assess whether it earns its place and what it should contain — but note it
-   is only useful once Gate 1 opens (§6.6).
+8. **`llms.txt`.** Generated by `app/llms.txt/route.ts` since 2026-11-04 and checked by
+   `scripts/check-llms.mjs`. Audit it for drift; no engine has confirmed reading it (§6.6).
 
 ## Method
 

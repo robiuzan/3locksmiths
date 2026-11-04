@@ -61,9 +61,10 @@ Two consequences:
    and `קודן-לרכב`, plus `שכפול-מפתח-בנתניה` / `שכפול-מפתחות-בנתניה` and the חולון pair. All live
    URLs. Assess cannibalisation, but **never propose a rename or merge without a `_redirects` 301
    plan** (§3.3).
-8. **Robots.** `app/robots.ts` emits a blanket allow. **Fetch the live `/robots.txt` separately** —
-   Cloudflare prepends a managed block that the repo cannot override (§6.1). Never report the repo's
-   intent as the live policy.
+8. **Robots.** `app/robots.ts` emits a blanket allow plus an AI-crawler allow group. **Fetch the live
+   `/robots.txt` separately** — from 2026-08-16 Cloudflare prepended a managed block the repo could not
+   override (§6.1); it was gone by 2026-11-03 but is a zone toggle away. Never report the repo's intent
+   as the live policy; `node scripts/check-ai-crawlers.mjs` checks both the file and enforcement.
 9. **Orphans and internal links.** Crawl `href`s in the export; the mesh is inherited from WordPress
    and currently has no orphans (§9.1). Verify rather than assume.
 

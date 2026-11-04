@@ -71,6 +71,14 @@ for (const f of files) {
   else console.warn(`  ! ${f}: missing default export with numeric id`);
 }
 
+// Service areas that are regions, not cities (a module sets `areaKind: "region"`). קריות is a
+// cluster of towns around Haifa Bay; typing it as a schema.org City states something false about
+// the place (docs/schema-graph.md §5, docs/keyword-map.md §6).
+const REGIONS = new Set(
+  enriched.filter((m) => m.areaKind === "region" && m.city).map((m) => m.city),
+);
+const placeType = (name) => (REGIONS.has(name) ? "AdministrativeArea" : "City");
+
 /**
  * Fill `related` / `areas` from the build manifest when a module does not author them.
  *
@@ -159,7 +167,9 @@ function breadcrumbSchema(data, page) {
         item: `${ORIGIN}${data.family.parent.href}`,
       });
   } else if (data.kind === "service")
-    list.push({ name: "שירותים", item: `${ORIGIN}/services` });
+    // Trailing slash (2026-11-04): /services 301s to /services/, and the visible crumb already
+    // links the slashed form.
+    list.push({ name: "שירותים", item: `${ORIGIN}/services/` });
   list.push({ name: data.keyword, item: abs(page) });
   return J({
     "@context": "https://schema.org",
@@ -215,7 +225,7 @@ function serviceSchema(data, page) {
     provider: { "@id": LB_ID },
     areaServed:
       data.kind === "location" && data.city
-        ? { "@type": "City", name: data.city }
+        ? { "@type": placeType(data.city), name: data.city }
         : { "@type": "Country", name: "IL" },
     url: abs(page),
   });
@@ -288,14 +298,38 @@ function schemaImage(page) {
   return originalUrl(ref) ?? `${ORIGIN}/wp-content/uploads/2025/04/157336036_m.jpg`;
 }
 
+/**
+ * What the business does, for `knowsAbout` — the service pages' own titles, derived from the
+ * manifest so a new service page is added here by itself. Strings, not invented Thing nodes.
+ */
+const SERVICE_TOPICS = [
+  ...new Set(
+    PAGE_MANIFEST.pages
+      .filter((p) => p.kind === "service")
+      .map((p) => hebrewPunct(p.title)),
+  ),
+];
+
 function localBusinessSchema() {
   const sameAs = manifest.schema?.sameAs ?? [];
+  // The Business Profile's Maps URL doubles as `hasMap`. Only a Google Maps URL qualifies.
+  const map = sameAs.find((u) => /^https:\/\/www\.google\.com\/maps\//.test(u));
+  // Entity fields added 2026-11-04, each from the roster and each omitted while unset — an
+  // invented description or logo is worse than none (docs/business-facts.md §A):
+  //   alternateName  the English brand, so "3 Locksmiths" resolves to the same entity;
+  //   description    roster shortPitch / tagline — both null today, so absent;
+  //   logo           the catalog's `logo` slot — not published yet, so absent.
+  const description = manifest.shortPitch || manifest.tagline || null;
+  const logo = originalUrl(imageRef("logo"));
   return J({
     "@context": "https://schema.org",
     "@type": ["LocalBusiness", "Locksmith"],
     "@id": LB_ID,
     name: manifest.brandName,
+    ...(manifest.brandNameEn ? { alternateName: manifest.brandNameEn } : {}),
+    ...(description ? { description } : {}),
     url: `${ORIGIN}/`,
+    ...(logo ? { logo } : {}),
     telephone: manifest.contact.phoneE164,
     email: manifest.contact.email,
     // Read from the manifest, never hardcoded. This was a literal pointing at
@@ -312,6 +346,9 @@ function localBusinessSchema() {
       addressCountry: manifest.schema?.address?.addressCountry ?? "IL",
     },
     ...(sameAs.length ? { sameAs } : {}),
+    ...(map ? { hasMap: map } : {}),
+    knowsLanguage: "he",
+    knowsAbout: SERVICE_TOPICS,
     priceRange: manifest.schema?.priceRange ?? "₪₪",
     // 24/7 — confirmed by the owner 2026-08-30 (docs/business-facts.md §D.3). Until then this
     // published 08:00–18:00 while parts of the copy claimed 24/7, so every page contradicted
@@ -335,7 +372,25 @@ function localBusinessSchema() {
         closes: "23:59",
       },
     ],
-    areaServed: CITIES.map((c) => ({ "@type": "City", name: c })),
+    areaServed: CITIES.map((c) => ({ "@type": placeType(c), name: c })),
+  });
+}
+
+/**
+ * The site itself, on the homepage (2026-11-04). It replaces the scraped WordPress `Organization`
+ * block, which declared a second, unconnected entity (`@id` "…#Organization" with no slash and an
+ * empty `sameAs`) beside the LocalBusiness — two answers to "who is this" on the same page.
+ */
+function webSiteSchema() {
+  return J({
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": `${ORIGIN}/#website`,
+    url: `${ORIGIN}/`,
+    name: manifest.brandName,
+    ...(manifest.brandNameEn ? { alternateName: manifest.brandNameEn } : {}),
+    inLanguage: "he-IL",
+    publisher: { "@id": LB_ID },
   });
 }
 
@@ -396,12 +451,31 @@ for (const raw of enriched) {
 const home = byId.get(HOME_ID);
 if (home) {
   home.seo = { ...home.seo, ...HOME_SEO };
+  // Drop our own previous LocalBusiness/WebSite (rebuilt below) and the scraped Organization
+  // (see webSiteSchema); keep the rest — the FAQPage mirror of the accordion.
   const existing = (home.jsonLd || []).filter(
-    (s) => !s.includes('"@id":"' + LB_ID + '"'),
+    (s) =>
+      !s.includes('"@id":"' + LB_ID + '"') &&
+      !s.includes('"@id":"' + ORIGIN + '/#website"') &&
+      !s.includes("#Organization"),
   );
-  home.jsonLd = [localBusinessSchema(), ...existing];
+  home.jsonLd = [localBusinessSchema(), webSiteSchema(), ...existing];
 } else {
   problems.push(`homepage id ${HOME_ID} not in site.json`);
+}
+
+// Generated pages with no module (the /services/ and /מדריכים/ hubs, /contact/, /sitemap/, the
+// legal pages) point at the business with `isPartOf: {"@id": …#LocalBusiness}` but did not declare
+// it, so the reference dangled — the same defect fixed for authored pages on 2026-08-26.
+let lbAdded = 0;
+for (const p of site.pages) {
+  const blocks = p.jsonLd || [];
+  const refers = blocks.some((s) => s.includes(`"@id":"${LB_ID}"`));
+  const declares = blocks.some((s) => s.includes('"LocalBusiness"'));
+  if (refers && !declares) {
+    p.jsonLd = [localBusinessSchema(), ...blocks];
+    lbAdded++;
+  }
 }
 
 // --- validate EVERY JSON-LD block sitewide, including scraped pass-through blocks ---
@@ -454,6 +528,9 @@ if (ogUrl) {
     }
     p.seo.ogType = p.seo.ogType || (p.id === HOME_ID ? "website" : "article");
     p.seo.ogLocale = p.seo.ogLocale || "he_IL";
+    // og:site_name (2026-11-04): share cards and some answer engines show it as the source name;
+    // without it they fall back to the bare domain. lib/content.ts already maps the field.
+    p.seo.ogSiteName = p.seo.ogSiteName || manifest.brandName;
     p.seo.ogUrl = p.seo.ogUrl || `${ORIGIN}${p.path}`;
     // summary_large_image needs an image to be worth anything, so it is set alongside one.
     p.seo.twitterCard = p.seo.twitterCard || "summary_large_image";
@@ -464,7 +541,7 @@ if (ogUrl) {
 writeFileSync(SITE, JSON.stringify(site, null, 2), "utf8");
 console.log(
   `enrich: injected ${injected}/${enriched.length} pages, schema set, titles decoded, ` +
-    `JSON-LD repaired ${repairedLd} / dropped ${droppedLd}.`,
+    `JSON-LD repaired ${repairedLd} / dropped ${droppedLd}, business node added to ${lbAdded} generated page(s).`,
 );
 console.log(
   ogUrl

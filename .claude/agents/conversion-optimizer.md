@@ -78,11 +78,16 @@ Conversion work that adds pressure without adding proof makes the page worse.
 
 - **No invented testimonials, ratings, "X לקוחות החודש", or countdown timers.** A fabricated trust
   signal is a Google policy violation and a lie to the customer.
-- The site has **zero** social proof (§7.2). The highest-value CRO change available is not a button
-  colour — it is real reviews. **Escalate rather than substituting fake urgency.**
-- Pricing is published and internally consistent — a genuine trust asset. Don't break it.
-- "24/7" is still 🔶 while the schema says 08:00–18:00. Do not build urgency copy on an unconfirmed
-  availability claim.
+- Social proof is thin and must stay sourced. The Business Profile held 13 reviews, average 5, on the
+  owner's dashboard reading of 2026-10-13, and the site shows only that weekly reading
+  (`content/enriched/_reputation.mjs`). More real reviews is still the highest-value CRO change.
+  **Escalate rather than substituting fake urgency.**
+- Pricing is published but **not yet consistent**: the same key type sits on different rows across
+  pages (`docs/competitors.md` §3). The owner approved four rows on 2026-11-04, and
+  `content/enriched/_prices.mjs` holds them. Never add a price outside them.
+- "24/7" is ✅ — owner-confirmed 2026-08-30, the schema ships 00:00–23:59 and the profile has shown
+  `פתוח 24 שעות` since 2026-09-05 (`docs/business-facts.md` §D.3). Availability is a fact; a
+  response time is not. Never promise minutes.
 
 ## Method
 

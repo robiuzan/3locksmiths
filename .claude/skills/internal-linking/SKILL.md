@@ -14,7 +14,7 @@ designed** — which means it is complete but not shaped.
 | ----------------------------- | --------------------------------------------------------------------------- |
 | Orphans                       | **none** — the ported header, footer and in-content links reach every route |
 | Deliberate shaping            | only `related.services[]` / `related.locations[]` in the authored modules   |
-| Service → location contextual | **zero** beyond `related`                                                   |
+| Service → location contextual | **zero** beyond `related` and, on the 58 family pages, the hub (2026-11-04) |
 | Location → location           | only via `related.locations[]`                                              |
 | Contextual in-copy anchors    | **near zero** — links are nav items, cards and chips                        |
 | Breadcrumbs                   | visible from the theme; `BreadcrumbList` on 103 of 108 pages                |
@@ -62,8 +62,10 @@ topic or adjacency matters.
 
 ## 3. The biggest missing edge: service ↔ location
 
-No service page links contextually into the city set, and the 24 brand-key pages don't reach the 17
-location pages at all. That is the largest untapped mesh on the site.
+**Partly closed 2026-11-04.** The family hub (below) links every brand page to every city page and
+back, on all 58 "שכפול מפתח" pages. What is still missing is the CONTEXTUAL edge: a sentence on a
+service page that names a city, or on a city page that names a brand, with a descriptive anchor —
+which needs the typed in-copy links renderer change (`docs/information-architecture.md` §4).
 
 On a **service** page, add 4–6 locations to `related.locations`, weighted to the core service area.
 On a **location** page, add 2–4 genuinely adjacent cities plus the services most searched there.
@@ -78,8 +80,19 @@ As you author or deepen a module, put 2–3 links **inside the prose** with desc
 - ✅ `<a href="/services/שחזור-מפתח-לרכב/">שחזור מפתח שאבד לרכב</a>`
 - ❌ "לחצו כאן", "למידע נוסף", a bare URL
 
-Hebrew `href`s are written **unescaped** in the module; the build percent-escapes them on output so
-they match the canonical and the sitemap `<loc>`. **Do not pre-encode them.**
+**Correction (2026-11-04):** the build does NOT percent-escape hrefs. `scripts/fix-links.mjs`
+validates a decoded or an encoded href alike and leaves either spelling as written (`fix-links.mjs`
+"Normalize to the trailing-slash form"). Both work for users and crawlers, but the stored spelling —
+the manifest's lowercase percent-encoded `path` — is what every generated link uses, and inside a
+`.location-list` it is the only spelling `scripts/prune-chrome-links.mjs` keeps. Prefer deriving
+links from the manifest (`related` omitted → `withDerivedLinks`) over typing them.
+
+## The family hub (2026-11-04)
+
+Page 95 and its 57 brand and city pages carry one block listing every brand page and every city
+(`renderFamilyHub` in `lib/enrich/render.mjs`, data from the manifest's `family` key). It took every
+brand page from 7–10 linking pages to at least 60. Never add a brand or city by hand: a new page joins
+the hub through `scripts/build-manifest.mjs`, and a withdrawn one leaves it the same way.
 
 All internal links need the **trailing slash** (`trailingSlash: true`), or they 301 and waste a hop.
 

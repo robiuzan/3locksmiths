@@ -53,3 +53,15 @@
   # changing the port itself — see docs/optimization-backlog.md §12.5.
   # ---------------------------------------------------------------------------------------
   Content-Security-Policy-Report-Only: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https://www.googletagmanager.com https://imgquarry.com; connect-src 'self' https://api.web3forms.com https://www.googletagmanager.com https://imgquarry.com; frame-src https://www.googletagmanager.com; form-action 'self' https://api.web3forms.com
+
+# The App Router writes an `index.txt` RSC flight payload beside every route (111 of them),
+# served 200 as text/plain, each a near-copy of its page. robots.txt is `Allow: /`, so nothing
+# stopped them being indexed as duplicates. Added 2026-11-04 (the galbath.co.il pattern).
+#
+# SCOPED DELIBERATELY to index.txt. A blanket `/*.txt` would also noindex /llms.txt — the file
+# that exists to be read by answer engines — and /robots.txt. Do not widen it. The 334
+# `__next.*.txt` segment payloads are not covered; add them only if Search Console shows one indexed.
+/index.txt
+  X-Robots-Tag: noindex
+/*/index.txt
+  X-Robots-Tag: noindex

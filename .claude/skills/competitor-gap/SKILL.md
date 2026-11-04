@@ -29,9 +29,9 @@ blocked results — never present what it returns as a ranking.**
 ## Market structure — established, cite freely
 
 - **The map pack sits above organic** for `מנעולן <city>` and `מנעולן קרוב אליי`. It is won with a
-  Google Business Profile and reviews. **We have had a profile since 2026-09-05 and hold no citable
-  review — the profile holds 0, owner-confirmed 2026-09-05 (§B.4), so those queries are still not
-  winnable with content.
+  Google Business Profile and reviews. **We have had a profile since 2026-09-05, holding 13 reviews,
+  average 5, on the owner's 2026-10-13 reading (§B.4)** — a start, and still a profile race, so those
+  queries are still not winnable with content.
   That is a Business Profile task, not an on-page one.
 - **Lead aggregators hold the bare head terms.** `מנעולן` head-on is expensive. Winnable ground is
   specificity: brand-key, model-level, emergency long-tail.
@@ -53,8 +53,10 @@ Verify from our own export before asserting it, then say it plainly:
 
 ## Where we are behind
 
-Business Profile live but 0 reviews · no emergency coverage · no editorial content · **every major AI
-crawler blocked at the Cloudflare edge** (backlog §6.1).
+As of 2026-11-03 (`docs/competitors.md` §3): 30 of 32 brand pages and page 95 never crawled · cost
+answered late rather than first · few "what to check" blocks · same key type priced on different rows
+across pages. The Cloudflare AI-crawler block (backlog §6.1) is gone; verify with
+`node scripts/check-ai-crawlers.mjs`.
 
 ## The winnability framework
 

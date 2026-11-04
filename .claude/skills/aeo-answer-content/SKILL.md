@@ -1,6 +1,6 @@
 ---
 name: aeo-answer-content
-description: Answer-engine and LLM-citability layer for 3locksmiths — the Cloudflare managed robots.txt blocking every major AI crawler at the edge, the two unparseable JSON-LD blocks that break the machine-readable layer, question-form headings with a 40–60 word extractable answer first, the specs tables that are already the site's best citable asset, llms.txt, and freshness/authorship. Use when optimizing a page to be quoted by AI Overviews, ChatGPT or Perplexity. Triggers "AEO", "GEO", "AI Overviews", "llms.txt", "will an LLM cite this", "answer block", "AI crawlers".
+description: Answer-engine and LLM-citability layer for 3locksmiths — reachability (AI crawlers allowed since 2026-11-03; verify the live robots.txt and run the tripwire), indexing as the real gate for AI Overviews, question-form headings with a 40–60 word extractable answer first, the specs tables that are already the site's best citable asset, the generated llms.txt, and freshness/authorship. Use when optimizing a page to be quoted by AI Overviews, ChatGPT or Perplexity. Triggers "AEO", "GEO", "AI Overviews", "llms.txt", "will an LLM cite this", "answer block", "AI crawlers".
 ---
 
 # Answer-engine optimization
@@ -10,26 +10,26 @@ quote it?"** Three gates, in that order.
 
 ## Gate 1 — reachability. Check this first.
 
-`app/robots.ts` is **not what serves.** Cloudflare prepends a managed block at the edge. Verified live
-2026-08-16:
+**State on 2026-11-03: open.** The live `robots.txt` is what `app/robots.ts` emits — `Allow: /` for
+`*` plus an explicit allow group for OAI-SearchBot, ChatGPT-User, Claude-User, Claude-SearchBot,
+PerplexityBot, Perplexity-User, GPTBot, ClaudeBot, Google-Extended, Applebot-Extended and CCBot
+(`docs/geo-observations.md` §1.1).
 
-```
-User-agent: *
-Content-Signal: search=yes, ai-train=no, use=reference
-Allow: /
-
-Disallow: /   for  Amazonbot · Applebot-Extended · Bytespider · CCBot · ClaudeBot ·
-                   CloudflareBrowserRenderingCrawler · Google-Extended · GPTBot · meta-externalagent
-```
-
-**No repo change overrides this.** Every recommendation below is capped until the zone setting
-changes (Cloudflare dashboard → the zone → AI Crawl Control / managed robots.txt). It is the owner's
-call and the owner's action — document it, never assume it was done, and always verify against the
-live file:
+**History, because it can come back:** from 2026-08-16 Cloudflare prepended a managed block at the
+edge (`Content-Signal: … ai-train=no` and `Disallow: /` for ClaudeBot, GPTBot, Google-Extended,
+CCBot and others), and no repo change could override it. That is a zone setting (AI Crawl Control /
+managed robots.txt) — the owner's to change, never assumed. So verify, every time, both what the
+file says and what the edge enforces:
 
 ```bash
 curl -sS https://3locksmiths.co.il/robots.txt
+node scripts/check-ai-crawlers.mjs     # robots.txt + a user-agent probe; networked, never in prebuild
 ```
+
+**The gate that actually binds now is indexing.** Google AI Overviews draw on Google's ordinary
+index (`Google-Extended` does not gate them), so a page Google has not crawled cannot be cited. On
+2026-11-03, 30 of 32 brand pages and page 95 had never been crawled (`docs/geo-observations.md`
+§1.3).
 
 Understand the three permissions separately, because they have different consequences:
 
@@ -38,16 +38,17 @@ Understand the three permissions separately, because they have different consequ
   answer a live question. **This is the one that produces citations.**
 - **`use=reference`** — may the content be referenced with attribution.
 
-Blocking training while allowing retrieval is a coherent position. Blocking everything, which is the
-current state, means the site cannot be cited at all.
+Blocking training while allowing retrieval is a coherent position. Blocking everything — the state
+from 2026-08-16 until some point before 2026-11-03 — means the site cannot be cited at all.
 
-## Gate 2 — parseability. Currently failing.
+## Gate 2 — parseability. Passing since 2026-08.
 
-Two pages ship an `application/ld+json` block that does not parse — the homepage's scraped `FAQPage`
-and one on `/services/שכפול-מפתח-לרכב/`. **The homepage FAQ is the cleanest machine-readable answer
-set on the site, and an assistant cannot read it.**
+Every JSON-LD block on the site parses: `scripts/enrich.mjs` repairs or drops unparseable scraped
+blocks and fails the build on a broken authored one. The homepage `FAQPage` mirrors the accordion,
+and `scripts/claims.mjs` fails the build if the two ever differ. Keep both properties.
 
-This is worth more than any prose tuning below. Fix: `/schema-structured-data`, Fix 1.
+FAQ rich results are no longer shown for most sites, and HowTo rich results ended in 2023 — the
+`FAQPage` and `HowTo` markup stay as understanding signals, not as a SERP feature to chase.
 
 ## Gate 3 — extractability
 
@@ -68,9 +69,11 @@ An answer engine lifts a **contiguous, self-contained span**. Structure for that
 מפתח סטנדרטי מוכן תוך כ-20 דקות; מפתח חכם עם קידוד שבב לוקח עד 45 דקות, בהתאם לדגם.
 ```
 
-**None of the 53 authored pages does this today.** The first paragraph is usually close but scene-sets
-before answering. Tightening it across the modules is the cheapest high-yield AEO pass available
-(backlog §6.2).
+**Measured 2026-11-03 across the 62 car-key family and cost pages:** 40 first paragraphs are within
+60 words, but only 4 sit under a real question heading and only one (9201) opens with a price; the
+first ₪ comes after a median 230 words on brand pages. Tightening the first paragraph is the
+cheapest high-yield pass available. The 2026-11-04 plan (Phase 3) does it batch by batch, with the
+shared rows in `content/enriched/_prices.mjs`.
 
 **Rendering rules:** the answer must be in the HTML at first paint. **Both currently hold and must be
 preserved:**
@@ -102,39 +105,47 @@ One genuinely useful comparison table earns more citations than ten reassuring p
 
 ## Freshness and authorship
 
-Assistants discount undated, unattributed content. The site has **no** `datePublished`, `dateModified`
-or author anywhere. Add all three to guides (see `/new-article`), with a real named person — blocked
-on `docs/business-facts.md` §A. **Never invent an author**; a fabricated byline is a worse trust
-signal than an absent one.
+Assistants discount undated, unattributed content. The 12 guides carry `datePublished` and
+`dateModified`, visible and in `Article` JSON-LD, kept honest by `scripts/check-dates.mjs`. They
+carry **no author**, on purpose: nobody is named on this site and the people in its images are
+AI-generated brand characters (`docs/business-facts.md` §A, §G.1). **Never invent an author**; a
+fabricated byline is a worse trust signal than an absent one.
 
 ## Entity consistency
 
 An assistant resolves "שלושה מנעולנים" by cross-referencing sources. Since 2026-09-05 `sameAs` carries
-the Google Business Profile — one other source, where there were none. Worse, the one machine-readable contact detail is **wrong**: the business node
-publishes `robiuzan@gmail.com` rather than the manifest's address. Fix that before worrying about
-prose (`/schema-structured-data`, Fix 2). See also `/local-seo-il` §3.
+the Google Business Profile — one other source, where there were none. The business node reads its
+contact details from the manifest (info@, the 076 line), and since 2026-11-04 adds `alternateName`
+("3 Locksmiths"), `hasMap`, `knowsLanguage` and `knowsAbout`; the homepage carries a `WebSite` node
+instead of the scraped, disconnected `Organization`. `description` and `logo` stay absent until the
+roster has a confirmed one-line description and a logo slot. See also `/local-seo-il` §3.
 
 ## llms.txt
 
-A plain-language map at `public/llms.txt` — who the business is, what it does, the service and city
-lists, canonical URLs for the key answers, and contact. Keep it short and factual; it is a pointer
-file, not a second website. **Only useful once Gate 1 is open.**
+Generated at build time by `app/llms.txt/route.ts` from the manifest (2026-11-04) — who the business
+is, what it does, every service, brand, city and guide with canonical URLs, and contact. It carries
+no prices, warranty wording, coverage phrase or imagery line, because it bypasses every content gate;
+`node scripts/check-llms.mjs` (after the build) checks its URLs against the sitemap and its text
+against the claim rules. No major engine has confirmed it reads llms.txt: cheap hygiene, not a lever.
 
 ## Checklist
 
-- [ ] Live `robots.txt` fetched and the AI-crawler stance recorded (not assumed).
+- [ ] Live `robots.txt` fetched and `node scripts/check-ai-crawlers.mjs` green (not assumed).
+- [ ] The page is indexed (Search Console URL Inspection, UPPERCASE `%D7`) — AI Overviews need it.
 - [ ] Every `ld+json` block in `out/` parses.
 - [ ] The business node's contact details are correct and manifest-driven.
 - [ ] Every service, location and guide page opens with a 40–60 word answer block.
 - [ ] Answers ship in the HTML at first paint; the accordion still hides with CSS only.
 - [ ] Each answer is comprehensible with zero surrounding context.
 - [ ] Every brand-key page carries a `specsTable`.
-- [ ] Guides carry `datePublished`, `dateModified` and a real named author.
-- [ ] `public/llms.txt` published and accurate.
+- [ ] Guides carry `datePublished` and `dateModified`; no author unless a real person is confirmed.
+- [ ] `node scripts/check-llms.mjs` green after the build.
 
 ## Gotchas
 
 - Never fabricate dates, authors or data to look authoritative.
 - Never mark up an answer in `FAQPage` that isn't rendered on the page.
-- A blocked crawler makes perfect on-page AEO worth nothing. **Gate 1 first, always** — and Gate 2
-  before any prose work.
+- A blocked crawler makes perfect on-page AEO worth nothing, and so does an unindexed page. **Gate 1
+  first, always** (run the tripwire — the block can return with no commit), then indexing, then prose.
+- Never put an answer block, a price table or the family hub inside `data-nosnippet`: it is what
+  removes text from snippets and AI Overviews (Google honours it on `span`, `div` and `section` only).

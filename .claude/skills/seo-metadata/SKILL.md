@@ -107,8 +107,9 @@ Applied to **every page unconditionally**, deliberately overriding the source Wo
   2026-09-29, backlog §1.5). A robots value set inside `buildMetadata` would be overwritten; a new
   per-route exception belongs beside that one.
 
-And separately: `app/robots.ts` is **not what serves**. Cloudflare prepends a managed block at the
-edge blocking every major AI crawler. See `/aeo-answer-content`.
+And separately: always check the **live** `robots.txt`, not `app/robots.ts` alone. From 2026-08-16
+Cloudflare prepended a managed block at the edge blocking every major AI crawler; by 2026-11-03 it was
+gone and the live file matched the repo. See `/aeo-answer-content`.
 
 ## Sitemap
 

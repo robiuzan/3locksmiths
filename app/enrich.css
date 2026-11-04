@@ -405,6 +405,25 @@ body .section-advantages .grid-item-top .icon > svg.ls-icon {
   background: var(--dark-font-color, #011532);
   color: #fff;
 }
+/* The price table's question heading and scope line on the family pages (render.mjs renderPricing). */
+.content-blocks .enrich-price-heading {
+  margin-block: 28px 12px;
+}
+.content-blocks .enrich-price-scope {
+  margin-block: 10px 0;
+  color: #3f4a5a;
+  font-size: 15px;
+  line-height: 1.6;
+}
+/* /אזורי-שירות/ is the only page that still renders the areas band (`enrich-areas`): on phones the
+ * theme hides items 6+ (media.css:764-766) and expects a "show all" toggle this band never had, so
+ * 20 of its 25 cities were unreachable there. This specificity (0,4,1) beats the theme's rule;
+ * check-css-cascade.mjs does not read media.css, so the win was verified on the built page. */
+@media (max-width: 767.98px) {
+  .content-blocks .enrich-areas .location-list li:nth-child(n + 6) {
+    display: block;
+  }
+}
 @media (max-width: 575.98px) {
   .content-blocks .enrich-hub__list {
     grid-template-columns: repeat(3, minmax(0, 1fr));

@@ -1,6 +1,6 @@
 ---
 name: local-seo-il
-description: Israeli local-SEO doctrine for שלושה מנעולנים — the address (confirmed 2026-10-13, footer only by the owner's choice — the Business Profile hides it), the Google עסק שלי profile that arrived 2026-09-05 — claimed, verified, NAP-checked and holding 0 reviews, four spellings of one phone number including a dead placeholder, the region-typed-as-City fix for קריות, duplicate-city slugs, coverage honesty, and the expansion cap. Use when populating locations for local ranking or auditing local visibility. Triggers "local SEO", "NAP", "city pages", "Google עסק שלי", "doorway pages", "areaServed", "add a city".
+description: Israeli local-SEO doctrine for שלושה מנעולנים — the address (confirmed 2026-10-13, footer only by the owner's choice — the Business Profile hides it), the Google עסק שלי profile that arrived 2026-09-05 — claimed, verified, NAP-checked, 13 reviews on the owner's 2026-10-13 reading — one on-site phone spelling enforced by scripts/phone.mjs, region typing for קריות through areaKind, duplicate-city slugs, coverage honesty, and the expansion cap. Use when populating locations for local ranking or auditing local visibility. Triggers "local SEO", "NAP", "city pages", "Google עסק שלי", "doorway pages", "areaServed", "add a city".
 ---
 
 # Local SEO — Israel
@@ -73,9 +73,11 @@ rather than assuming, and rather than parking these on the owner.
 
 **Three things the endpoint cannot answer, all confirmed by the owner 2026-09-05:** the listing is
 claimed and ownership-verified, its service areas have been corrected to drop the 7 cities withdrawn
-2026-09-02 (§E.1), and it holds **0 reviews**.
+2026-09-02 (§E.1), and it held **0 reviews** then. On the owner's dashboard reading of 2026-10-13 it
+holds 13, average 5 (`content/enriched/_reputation.mjs`).
 
-So the profile is complete, correct and empty. **Reviews are now the only local lever left** — and
+So the profile is complete and correct, and its reviews have only just started. **Reviews are still
+the main local lever left** — and
 §B's ban on `Review` and `AggregateRating` without a verifiable public source is untouched, because
 zero reviews is nothing to cite.
 
@@ -143,7 +145,7 @@ roster manifest `schema.geo` once the address question (§2) is settled.
 > Replace the city name with another city name. Is the page now correct and publishable for that other
 > city? If yes, it is a doorway page.
 
-The existing 17 **pass**. Any new one must clear the same bar with **three or more** true, specific
+The 25 location pages **pass**. Any new one must clear the same bar with **three or more** true, specific
 items: named neighbourhoods or landmarks; local building stock and access reality; travel and
 scheduling honesty for that distance; a city-specific FAQ; local pricing if it genuinely differs.
 
@@ -152,13 +154,15 @@ it in `docs/business-facts.md` §E rather than padding. Full spec: `docs/content
 
 ## 9. The expansion cap
 
-30 services × 25 locations = 750 possible cells. **Do not build them.** Order of operations
-(`docs/keyword-map.md` §7):
+55 service and brand pages × 25 cities = 1,375 possible cells. **Do not build them.** Order of
+operations (`docs/keyword-map.md` §7):
 
-1. Author `content/enriched/95.mjs` — a Tier-1 term currently on the site's weakest page.
-2. Fix the broken JSON-LD, the dead `tel:` links and the personal email in the business node.
-3. Bring the remaining un-enriched pages to their type's bar.
-4. Build the Tier-4 guides — topical authority is the real gap.
+1. ✅ Author `content/enriched/95.mjs` — done; it is now the family hub's parent.
+2. ✅ Fix the broken JSON-LD, the dead `tel:` links and the personal email in the business node —
+   done; each is now a CI check.
+3. Get the brand pages indexed: on 2026-11-03, 30 of 32 had never been crawled
+   (`docs/geo-observations.md`). The family hub and Request Indexing are the levers.
+4. Deepen the Tier-4 guides (the `/מדריכים/` hub has 11 since 2026-08-26) rather than adding more.
 5. **Only then** consider service × location cells.
 
 **No 18th location before step 1.** The depth is already there; scaling adds risk, not reach.

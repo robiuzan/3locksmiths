@@ -1,6 +1,6 @@
 # Keyword map
 
-The intent model behind the 64 routes, and the title / H1 / description formulas every page follows.
+The intent model behind the 109 routes, and the title / H1 / description formulas every page follows.
 Cited by `hebrew-copywriter`, `seo-auditor`, `local-seo-strategist`, `aeo-geo-strategist`,
 `/seo-metadata`, `/new-service` and `/new-city`.
 
@@ -11,17 +11,19 @@ Cited by `hebrew-copywriter`, `seo-auditor`, `local-seo-strategist`, `aeo-geo-st
 The live URL scheme is inherited from WordPress and is **load-bearing** — it holds every ranking
 signal this site has. It is not tidy, and it does not get tidied.
 
-| Silo                     | Path shape                                                                                                      | Count | Intent                              |
-| ------------------------ | --------------------------------------------------------------------------------------------------------------- | ----- | ----------------------------------- |
-| Homepage                 | `/`                                                                                                             | 1     | brand + head term                   |
-| Service silo             | `/services/<he-slug>/`                                                                                          | 30    | commercial, per service             |
-| Service hub              | `/services/`                                                                                                    | 1     | navigational                        |
-| Location silo            | `/locations/<he-slug>/`                                                                                         | 17    | commercial, service × city          |
-| Top-level Hebrew landers | `/מנעולן-רכב/`, `/מנעולן-לבית/`, `/מחירון/`, `/אודותינו/`, `/אזורי-שירות/`, `/קודן-לרכב/`, `/שכפול-שלט-לרכב-2/` | 7     | head terms + trust                  |
-| Calculator steps         | `/step/<he-slug>/`                                                                                              | 4     | funnel fragments, not landing pages |
-| Legal / utility          | `/contact/`, `/privacy-policy/`, `/accessibility-statement/`, `/sitemap/`                                       | 4     | trust + utility                     |
+| Silo                     | Path shape                                                                                                      | Count | Intent                                      |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------- | ----- | ------------------------------------------- |
+| Homepage                 | `/`                                                                                                             | 1     | brand + category directory (§2)             |
+| Service silo             | `/services/<he-slug>/`                                                                                          | 55    | commercial — 23 services + 32 brand-key     |
+| Service hub              | `/services/`                                                                                                    | 1     | navigational                                |
+| Location silo            | `/locations/<he-slug>/`                                                                                         | 25    | commercial, service × city                  |
+| Guides                   | `/מדריכים/` + `/מדריכים/<he-slug>/`                                                                             | 12    | informational (Tier 4): the hub + 11 guides |
+| Top-level Hebrew landers | `/מנעולן-רכב/`, `/מנעולן-לבית/`, `/מחירון/`, `/אודותינו/`, `/אזורי-שירות/`, `/קודן-לרכב/`, `/שכפול-שלט-לרכב-2/` | 7     | head terms + trust                          |
+| Calculator steps         | `/step/<he-slug>/`                                                                                              | 4     | funnel fragments, not landing pages         |
+| Legal / utility          | `/contact/`, `/privacy-policy/`, `/accessibility-statement/`, `/sitemap/`                                       | 4     | trust + utility                             |
 
-**108 pages total. 104 in `sitemap.xml`** (the four `/step/` routes are excluded by `app/sitemap.ts`).
+**109 pages total, 105 in `sitemap.xml`** (counted 2026-11-04; the four `/step/` routes are excluded
+by `app/sitemap.ts`). Counts move as content ships — read `content/enriched/_manifest.json`.
 
 Three quirks that are deliberate:
 
@@ -47,16 +49,24 @@ The money pages. High volume, high competition, high intent.
 Mapped to: `/`, `/מנעולן-רכב/`, `/מנעולן-לבית/`, `/services/שכפול-מפתח-לרכב/`, `/מחירון/`,
 `/services/החלפת-מנעולים/`, `/services/תיקון-דלתות/`.
 
-> ⚠️ `/services/שכפול-מפתח-לרכב/` is a Tier-1 term sitting on the site's **thinnest, least-marked-up
-> service page** (763 words, no description, no `BreadcrumbList`, no `Service` node, malformed
-> JSON-LD). It is page id 95, the enrichment `referenceId`, and it has no authored module. Fixing it
-> is the highest-value single task on the site.
+> **Which page ranks for `שכפול מפתח לרכב` — owner decision, 2026-11-04:** page 95,
+> `/services/שכפול-מפתח-לרכב/`. The homepage is the brand + category directory for `מנעולן`,
+> `מנעולן רכב` and `מנעולן לבית`. It leads visually with car-key duplication, answers the question in
+> one or two sentences and links 95 three times with the exact anchor, but its title keeps
+> `מנעולן 24/7 לרכב ולבית` first. Never give the homepage a title or H1 that competes with 95.
+>
+> On 2026-11-03 Google served the homepage for the term (position ~19) because 95 had never been
+> crawled. The cure is the family hub (every family page links 95) plus Request Indexing — not a
+> second page chasing the term. Baseline: `docs/geo-observations.md`.
+>
+> Page 95 is authored (`content/enriched/95.mjs`), is the enrichment `referenceId` and is the hub's
+> parent.
 
 ### Tier 2 — brand-key terms (the site's real moat)
 
-24 of the 30 service pages target `שכפול מפתח ל<brand>`: מאזדה, טויוטה, יונדאי, קיה, פורד, סקודה,
-שברולט, סוזוקי, רנו, סיטרואן, פיגו, מיצובישי, סובארו, מרצדס, הונדה, אופל, במוו, פולקסווגן, plus
-`שכפול שלט לרכב`, `שחזור מפתח לרכב`, `קודן לרכב`.
+32 brand pages target `שכפול מפתח <brand>` — the list is the build manifest's `family.brands`, and
+since 2026-11-04 every family page links all of them. Plus `שכפול שלט לרכב`, `שחזור מפתח לרכב` and
+`קודן לרכב`.
 
 Lower volume each, but **high intent, low competition, and highly answerable** — a driver searching
 "שכפול מפתח מאזדה" wants a specific answer about their car. This is where the `specsTable` block
@@ -81,9 +91,10 @@ Also Tier 2 on the door side: `דלת פלדלת`, `דלת ממד`, `מנעול 
 > **קריות is a region, not a city.** Any template that interpolates a bare `ב${city}` produces wrong
 > Hebrew for it. See §6.
 
-### Tier 4 — informational / question terms (unbuilt)
+### Tier 4 — informational / question terms
 
-The topical-authority gap. Nothing on this site targets these today:
+The topical-authority layer. Since the `/מדריכים/` hub shipped, three of these have a dedicated
+guide — cost (9201), chip vs smart key (9203) and the only key lost (9202). The other three do not:
 
 - כמה עולה שכפול מפתח לרכב?
 - מה ההבדל בין מפתח עם שבב למפתח חכם?
@@ -92,8 +103,8 @@ The topical-authority gap. Nothing on this site targets these today:
 - האם אפשר לשכפל מפתח רכב בלי המקור?
 - מתי צריך להחליף צילינדר ומתי מספיק תיקון?
 
-These are the natural spine of a `/מדריכים/` hub. Each should answer the question **better than the
-service page does**, then link to the service page for the commercial action. See `/new-article`.
+They are the spine of the `/מדריכים/` hub. Each should answer the question **better than the
+service page does**, then link to the service page for the commercial action. See `/guides-hub`.
 
 ---
 

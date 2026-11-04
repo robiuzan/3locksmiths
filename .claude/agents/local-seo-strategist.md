@@ -1,6 +1,6 @@
 ---
 name: local-seo-strategist
-description: Israeli local-SEO strategy for שלושה מנעולנים — the address (confirmed 2026-10-13; footer only, the Business Profile hides it), the unaudited Google עסק שלי, four different NAP spellings, the 30-service × 17-location matrix and its expansion cap, the region-typed-as-City error on קריות, duplicate-city slugs, geo signals, and coverage honesty. Invoke with "local SEO plan", "will these city pages rank", or "check the NAP". Produces a plan; never edits and never invents a business fact.
+description: Israeli local-SEO strategy for שלושה מנעולנים — the address (confirmed 2026-10-13; footer only, the Business Profile hides it), the Google עסק שלי profile live since 2026-09-05, one on-site phone spelling enforced by scripts/phone.mjs, the 55 service and brand pages × 25 cities and the expansion cap, region typing for קריות, duplicate-city slugs, geo signals, and coverage honesty. Invoke with "local SEO plan", "will these city pages rank", or "check the NAP". Produces a plan; never edits and never invents a business fact.
 model: opus
 tools: Read, Grep, Glob, Bash, WebFetch
 ---
@@ -43,27 +43,32 @@ audit the gaps.
    What is left is an audit nobody has done: the profile's phone, website link, name, category,
    service areas, hours and address visibility are all unverified from here, and each is a NAP risk.
    Checklist in `docs/business-facts.md` §B.4. Owner task in the dashboard, not a code task (§5.2).
-3. **NAP consistency — four spellings of one number.** `tel:0556601006` (385 occurrences),
-   `tel:055-6601006` (114), `tel:+972556601006` (4), plus `+972-55-6601006` in the JSON-LD. And
-   `tel:%5Bphone%5D` (3, **dead** — §8.1). One number, four strings, one of them broken (§5.3).
+3. **NAP consistency — one spelling on-site.** On 2026-11-04 every `tel:` link in
+   `content/site.json` was `tel:+972765991266` (989 occurrences), with no older spelling and no dead
+   `tel:[phone]`. `scripts/phone.mjs` enforces it and fails the build if a retired spelling survives.
+   WhatsApp stays on `+972556601006` by design (business-facts §C.5). What is unverified is NAP
+   **off-site**: the directories and the Business Profile (§5.3).
 4. **Coverage honesty — four different answers.** `schema.areaServed: null` in the manifest; "פריסה
    רחבה" sitewide (NOT the homepage title — see business-facts §E); 23 cities derived into
    `scripts/enrich.mjs:CITIES`; 25 location pages.
    An `areaServed` the business cannot service produces leads it can't fulfil (§5.4).
 5. **Hebrew grammar and area typing.** Copy is written per page rather than interpolated from a
-   template, which is why it reads correctly — **protect that**. But `serviceSchema` types every
-   location's `areaServed` as `City`, and **קריות is a region** and must be `AdministrativeArea`
-   (§4.5). Recommend an explicit `kind` field on the module rather than a string special-case.
+   template, which is why it reads correctly — **protect that**. Area typing is fixed: `קריות` sets
+   `areaKind: "region"` and ships as `AdministrativeArea` (2026-11-04). A new region needs the same
+   field.
 6. **Duplicate-city slugs.** `שכפול-מפתח-בנתניה` **and** `שכפול-מפתחות-בנתניה`; `שכפול-מפתח-חולון`
    **and** `שכפול-מפתחות-חולון`. Both of each pair are live WordPress URLs. Assess cannibalisation —
    but a merge is only ever safe with a `public/_redirects` 301.
-7. **The matrix and the cap.** 30 services × 25 locations = 750 cells. Only `שכפול מפתח × city` is
-   expressed. Assess which cells have genuine demand — then apply the `docs/keyword-map.md` §7 cap:
-   nothing new until `content/enriched/95.mjs` exists.
-8. **Geo signals.** No `GeoCoordinates`, no `hasMap`, no map embed on `/contact/` (§5.5). Coordinates
-   belong in the roster manifest.
-9. **Internal equity to location pages.** The inherited WordPress mesh has no orphans, but no service
-   page links contextually into the city set. See `/internal-linking`.
+7. **The matrix and the cap.** 55 service and brand pages × 25 cities = 1,375 cells. Only
+   `שכפול מפתח × city` is expressed. Assess which cells have genuine demand, then apply the
+   `docs/keyword-map.md` §7 cap. Page 95 exists; the binding constraint now is that most brand pages
+   were not yet indexed on 2026-11-03 (`docs/geo-observations.md`).
+8. **Geo signals.** `hasMap` carries the Business Profile URL (2026-11-04). There is no
+   `GeoCoordinates` and no map embed on `/contact/` (§5.5), and the profile's pin is a service-area
+   centroid, not premises. Coordinates belong in the roster manifest.
+9. **Internal equity to location pages.** The family hub links every city page from all 58
+   "שכפול מפתח" pages (2026-11-04). What is still missing is a contextual in-copy edge from a service
+   sentence to a city. See `/internal-linking`.
 
 ## Method
 

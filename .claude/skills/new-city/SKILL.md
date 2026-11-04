@@ -1,6 +1,6 @@
 ---
 name: new-city
-description: Add or deepen a location page the data-driven way — author content/enriched/<id>.mjs with genuinely local substance so the route, the link mesh, the Service + areaServed schema and the sitemap follow automatically. The existing 17 pass the doorway test; this skill is about holding that bar and fixing the region-typed-as-City error. Use when expanding coverage or retrofitting a city page. Triggers "add a city", "new location page", "cover <city>", "this city page is thin", "doorway".
+description: Add or deepen a location page the data-driven way — author content/enriched/<id>.mjs with genuinely local substance so the route, the link mesh, the Service + areaServed schema and the sitemap follow automatically. The 25 location pages pass the doorway test; this skill is about holding that bar, typing a region (קריות) through areaKind, and letting a new city join the family hub through the build manifest rather than by hand. Use when expanding coverage or retrofitting a city page. Triggers "add a city", "new location page", "cover <city>", "this city page is thin", "doorway".
 ---
 
 # Add or deepen a location page
@@ -42,11 +42,12 @@ export default {
 > ⚠️ **The contract is documented, not enforced.** The modules are plain `.mjs`; a typo'd field name
 > renders nothing, silently. Diff against `lib/enrich/types.ts` by hand.
 
-### `areaKind` — the fix you should make while you're here
+### `areaKind` — set it on any region
 
-`scripts/enrich.mjs:serviceSchema()` currently types every location's `areaServed` as `City`. **קריות
-is a region**, and typing a region as a `City` is a factual error in the graph. Add an explicit
-`areaKind` field rather than special-casing the string:
+**קריות is a region**, and typing a region as a `City` is a factual error in the graph. Since
+2026-11-04 its module sets `areaKind: "region"`, and `placeType()` in `scripts/enrich.mjs` types it
+`AdministrativeArea` — in the page's `Service.areaServed` and in the business node's list. A new
+region gets the same field; never special-case the string:
 
 ```js
 { "@type": data.areaKind === "region" ? "AdministrativeArea" : "City", name: data.city }

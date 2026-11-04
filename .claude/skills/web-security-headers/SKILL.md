@@ -52,7 +52,9 @@ Options, in order of preference:
 
 ## `public/_headers` — the baseline
 
-This file does not exist yet. A safe starting point:
+It exists since 2026-08-26 (`ebb913e`): HSTS, `X-Frame-Options`, `Permissions-Policy`, a
+report-only CSP, and (2026-11-04) `X-Robots-Tag: noindex` on the `index.txt` payloads. **Read the
+live file before changing anything.** The block below is the reasoning it started from:
 
 ```
 /*

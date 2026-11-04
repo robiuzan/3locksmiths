@@ -110,6 +110,11 @@ export interface EnrichedPage {
   keyword: string; // primary keyword == page title (decoded)
   brand?: string; // brand-key pages
   city?: string; // location pages → schema areaServed
+  areaKind?: "region"; // the place is a region, not a city (קריות) → AdministrativeArea in schema
+  // Optional heading overrides for the price table and the process band (render.mjs).
+  pricingHeading?: string;
+  processHeading?: string;
+  processIntro?: string;
 
   seo: { title: string; description: string };
   hero: { h1: string; tagline: string };

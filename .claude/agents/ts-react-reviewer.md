@@ -71,7 +71,7 @@ reported as defects:
 text-right` are banned; use `ps/pe`, `ms/me`, `start/end`, `text-start/text-end`. In
    `app/enrich.css`, prefer logical properties. The vendored theme is out of scope.
 10. **Dead code and dependencies.** Check `package.json` against actual imports. `html-react-parser`
-    and `lucide-react` are dependencies — verify whether anything still imports them.
+    and `lucide-react` were removed (checked 2026-11-04) — flag either if it returns.
     `transpilePackages: ["@ishub/site-kit"]` is present and `next.config.ts` documents it as
     intentionally forward-looking.
 

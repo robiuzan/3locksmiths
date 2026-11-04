@@ -356,6 +356,9 @@ Full rules: `/hebrew-rtl`.
 Live evidence (2026-08-16): the apex returns `Server: cloudflare`, `cf-cache-status: DYNAMIC`, a
 Cloudflare-managed `robots.txt`, and the Cloudflare Pages default header set — with **no
 `Last-Modified`, `ETag` or `x-github-request-id`**, all of which GitHub Pages always sends.
+(The managed `robots.txt` block, which disallowed every major AI crawler, was gone by 2026-11-03:
+the live file matches `app/robots.ts`. `node scripts/check-ai-crawlers.mjs` is the tripwire if a
+zone toggle brings it back.)
 
 But the roster's free-text notes still describe a GitHub Pages deploy, and `logs/deploys.csv` has no
 row for this domain. **So verify, don't assume** — the dry run's drift check asks the Cloudflare API
@@ -397,6 +400,9 @@ node scripts/check-orphans.mjs     # decode-aware; the shell version lies here
 node scripts/check-css-cascade.mjs     # no enrich.css override may tie with the vendored theme
 node scripts/check-catalog-images.mjs  # the cdn-cgi URL builder still matches site-kit
 node scripts/check-placeholders.mjs    # which image slots are still falling back to stock
+node scripts/check-llms.mjs            # AFTER the build: /llms.txt links only real sitemap URLs, no gated claim
+# network, manual, never in a chain:
+node scripts/check-ai-crawlers.mjs     # the live robots.txt and edge still let the AI crawlers in
 ```
 
 All four must pass before any deploy. `/qa-build-gate` adds the assertions on `out/` — route count,
