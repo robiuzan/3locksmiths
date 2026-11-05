@@ -1093,6 +1093,12 @@ phrase in their `<title>` or meta description carry one at all?
 | GA4 property                | resolved inside the container by hostname     | 🔶 existence not verified for this domain |
 | Search Console verification | `ifGKeC-eWQKeDqM1qDUOgGmDODCTE1vSalAmg7bGmEI` | ⛔ see §F.1                               |
 | Web3Forms access key        | `cea18712-6fba-46ca-abb1-2f140806a35a`        | ✅ public by design                       |
+| Lead form delivery          | reaches the owner's Gmail, but in **Spam**    | ✅ owner test 2026-11-05 — see below      |
+
+> **2026-11-05 — the lead email lands in Gmail's Spam folder.** The owner's test reached the
+> thank-you page and the email arrived, in Spam. The form markup was checked and is correct; the
+> fix is in the mailbox, not the site: mark it "Not spam" and add a Gmail filter for
+> `notify@web3forms.com` with "Never send it to Spam". If leads seem to stop, check Spam first.
 
 ### F.1 The verification token is hardcoded and drifts from the manifest — FIXED 2026-08-17
 
