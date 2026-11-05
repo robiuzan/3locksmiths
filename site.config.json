@@ -183,12 +183,12 @@
         },
         {
           "key": "3locksmiths/gallery/home-tile-1.jpg",
-          "sha256": "379a780078042126c60411aad641f2cbb49f3ed304302db3c5addc47953ebd23",
-          "alt": "Hands holding a fan of freshly cut brass keys at a workbench with a key-cutting machine, lock cylinder and scattered keys",
-          "altHe": "ידיים אוחזות מפתחות פליז שזה עתה שוכפלו על שולחן עבודה עם מכונת שיכפול מפתחות, צילינדר מנעול ומפתחות מפוזרים",
+          "sha256": "095558af170fca119c47a28913ae464ce1bc4869bafd32c9ae4eee2434fbb1fb",
+          "alt": "Hands holding an original car key beside a freshly cut copy, next to a key-cutting machine in a van",
+          "altHe": "ידיים מחזיקות מפתח רכב מקורי לצד עותק שזה עתה נחתך, ליד מכונת שכפול מפתחות בניידת",
           "width": 2528,
           "height": 1696,
-          "bytes": 2619403,
+          "bytes": 2789227,
           "kind": "raster",
           "focal": {
             "x": 0.4,
@@ -231,12 +231,12 @@
         },
         {
           "key": "3locksmiths/gallery/home-tile-4.jpg",
-          "sha256": "c671b979532f8eb14b69553910352f8d062e2a5e9e26b6e2d95bed9abb8fd97b",
-          "alt": "Smiling man in a navy polo shirt with a three-figure logo holds up a set of keys in an open doorway",
-          "altHe": "גבר מחייך בחולצת פולו כחולה עם לוגו של שלוש דמויות מחזיק צרור מפתחות בפתח דלת פתוחה",
+          "sha256": "860a2b70f27ff736e79397282675b1f423f1611e55ddf03f7a37bb69dfafcc4e",
+          "alt": "A locksmith beside the open driver door of a parked car, holding an original key and its new coded copy",
+          "altHe": "מנעולן ליד דלת נהג פתוחה של רכב חונה, מחזיק מפתח מקורי ואת העותק המקודד החדש",
           "width": 2528,
           "height": 1696,
-          "bytes": 2376922,
+          "bytes": 2725827,
           "kind": "raster",
           "focal": {
             "x": 0.56,
