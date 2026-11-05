@@ -46,3 +46,7 @@ next-env.d.ts
 
 # Stray editor/sync backups (e.g. site.config.json.bak from a roster sync).
 *.bak
+
+# Local-only evidence (e.g. the AI-answer probe screenshots). They can show an account name or a
+# location, and this repository is public — keep the files here, never commit them.
+/docs/evidence/
