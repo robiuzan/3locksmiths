@@ -288,10 +288,19 @@ const HOME_CLAIM_REWRITES = [
     mirror: true,
   },
   {
-    // Work time at the car, from page 95's key-type table — never an arrival time (§D.11).
+    // Work time at the car — never an arrival time (§D.11). Since 2026-11-05 the owner's times:
+    // the shorter of the hub and brand-page values (docs/business-facts.md, "Job durations").
     id: "home-faq-duration-a",
     from: "לרוב, שכפול מפתח רגיל לוקח עד 30 דקות. למפתח חכם – עד שעה",
-    to: "מפתח מכני כ-20–30 דקות, מפתח עם שבב כ-30–45 דקות, מפתח מתקפל עם שלט כ-40–60 דקות ומפתח חכם כ-45–90 דקות, לפי הדגם.",
+    to: "מפתח מכני כ-10–20 דקות, מפתח עם שבב כ-30–45 דקות, מפתח מתקפל עם שלט כ-30–45 דקות ומפתח חכם כ-45–60 דקות, לפי הדגם.",
+    mirror: true,
+  },
+  {
+    // `from` is what `home-faq-duration-a` wrote until 2026-11-05; that rule now writes `to`
+    // itself, so the stored page and a re-scrape converge on the same text.
+    id: "home-faq-duration-shorter",
+    from: "מפתח מכני כ-20–30 דקות, מפתח עם שבב כ-30–45 דקות, מפתח מתקפל עם שלט כ-40–60 דקות ומפתח חכם כ-45–90 דקות, לפי הדגם.",
+    to: "מפתח מכני כ-10–20 דקות, מפתח עם שבב כ-30–45 דקות, מפתח מתקפל עם שלט כ-30–45 דקות ומפתח חכם כ-45–60 דקות, לפי הדגם.",
     mirror: true,
   },
   {

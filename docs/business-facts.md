@@ -962,6 +962,26 @@ to verify them — the business passes its own test.
 **Vans — owner, 2026-11-04:** each of the three locksmiths works from an equipped van, so the
 plural `הניידות שלנו` (33 pages) is true. It stays; new copy may use it.
 
+### D.14 Job durations — ✅ OWNER, 2026-11-05
+
+The live audit of 2026-11-04 found the hub pages (homepage, 95, 9201, 96, 9202, 9203) stating
+longer work times than the brand pages the owner confirmed on the B1 claims sheet. Asked which is
+right, the owner answered in session on 2026-11-05: **"choose the shorter time between the 2
+options"**. These are the work times at the car, sitewide — never an arrival time (§D.11):
+
+| Job                                               | Time                                                       | Was on the hub pages   |
+| ------------------------------------------------- | ---------------------------------------------------------- | ---------------------- |
+| Mechanical key, no chip                           | 10–20 דקות                                                 | 20–30                  |
+| Cutting the blade (a step)                        | 5–10 דקות                                                  | 20–30                  |
+| Chip key                                          | 30–45 דקות (older models 20–30)                            | 30–45                  |
+| Flip key with remote / key with a built-in remote | 30–45 דקות                                                 | 40–60                  |
+| Smart key (Push-Start, keyless)                   | 45–60 דקות, "עד כשעה"                                      | 45–90, "עד כשעה וחצי"  |
+| Separate remote only                              | 20–30 דקות (some brands 20–40)                             | —                      |
+| Restoration, no working key at all                | 60–90 דקות; a new-model smart key may take a little longer | 60–180, "עד שלוש שעות" |
+
+Source of the values: the B1 claims sheet rows 23, 27–33, 106, 307 and 308. A page may still give
+a brand- or model-specific time inside these ranges; a longer general range is a contradiction.
+
 ## E. Coverage
 
 | Fact                 | Value                                                            | Status            |
