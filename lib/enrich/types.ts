@@ -73,8 +73,14 @@ export interface KeyModelCard {
   keyType: string; // "מפתח מתקפל עם שלט"
   buttons?: string; // "3 לחצנים"
   note: string; // ONE short sentence: what the owner sees, not a parts-catalogue spec
-  image?: string; // catalog slot name, e.g. "ford-key-focus"; unpublished → key-glyph placeholder
-  alt?: string; // overrides the catalog's own alt once the slot is published
+  // A catalog gallery name: a per-model photograph "key-<brand>-<model>" (business-facts §D.15),
+  // or one of the nine key-type plates (TYPE_PLATES in catalog-image.mjs, קיה and פורד only).
+  // A per-model name is written by scripts/attach-key-images.mjs, never by hand.
+  // Unpublished → key-glyph placeholder.
+  image?: string;
+  // The Hebrew alt the card renders, written next to `image` by scripts/attach-key-images.mjs.
+  // Absent → `${keyType} ל${model}`. The catalog's own altHe/alt is never used on a card.
+  alt?: string;
 }
 
 /**

@@ -79,14 +79,47 @@ original (`claims.mjs:66-69` documents living with this).
 
 ## Naming and guard traps
 
-| Trap                                                               | Rule                                                                                                                                                                                         |
-| ------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `check-freshness.mjs:43` skips `check-*` when listing sources      | A **mutating** script must never be named `check-…` or it drops out of the staleness check. `hero-gallery.mjs` is mutating; `check-placeholders.mjs` and `check-catalog-images.mjs` are not. |
-| `check-claims.mjs` tests raw HTML **including `alt`**              | Alt text mentioning ratings, years of experience or response times fails the build.                                                                                                          |
-| `check-typography.mjs` walks every string in every authored module | Hebrew with an ASCII `'` fails. Prompts live in Media Studio, outside its reach — keep them there.                                                                                           |
-| `.prettierignore` does not list `public/assets/img/`               | It passes today only because Prettier has no `.webp` parser. A **JSON sidecar** there would be format-checked and create a regenerate loop.                                                  |
-| `fix-links.mjs:36` excludes image extensions                       | A broken `<img src>` fails nothing. `check-catalog-images.mjs` covers the catalog side.                                                                                                      |
-| `assets.mjs` rewrites every `<img>`                                | It adds `width`/`height`/`loading` only to `/wp-content/uploads/**`. Catalog images must carry their own.                                                                                    |
+| Trap                                                               | Rule                                                                                                                                                                                                                               |
+| ------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `check-freshness.mjs:43` skips `check-*` when listing sources      | A **mutating** script must never be named `check-…` or it drops out of the staleness check. `hero-gallery.mjs` is mutating; `check-placeholders.mjs` and `check-catalog-images.mjs` are not.                                       |
+| `check-claims.mjs` tests **visible** copy, which strips `alt`      | Only the raw-HTML rules see an alt: `claims.mjs` FORBIDDEN (years of experience, warranty term, customer counts) and check-claims BLOCKING_RAW (rating badge, US phone, review widget). A response time or price in an alt passes. |
+| `check-typography.mjs` walks every string in every authored module | Hebrew with an ASCII `'` fails. Prompts live in Media Studio, outside its reach — keep them there.                                                                                                                                 |
+| `.prettierignore` does not list `public/assets/img/`               | It passes today only because Prettier has no `.webp` parser. A **JSON sidecar** there would be format-checked and create a regenerate loop.                                                                                        |
+| `fix-links.mjs:36` excludes image extensions                       | A broken `<img src>` fails nothing. `check-catalog-images.mjs` covers the catalog side.                                                                                                                                            |
+| `assets.mjs` rewrites every `<img>`                                | It adds `width`/`height`/`loading` only to `/wp-content/uploads/**`. Catalog images must carry their own.                                                                                                                          |
+
+## Key-card images (per model)
+
+The brand pages' key grids take one picture per card, made from the owner's own key photographs
+(business-facts §D.15). They do not use a prompt file under `prompts/3locksmiths/` and they do not
+use a slot: they ride the fleet page-images toolkit and arrive as ordinary gallery items.
+
+```
+Media Studio  page-images toolkit, site `threelocksmiths`   brief → digest → OWNER YES → generate/qa → board
+        │     (prompts under prompts/threelocksmiths/ are the approval and disclosure record)
+        ▼
+sites/threelocksmiths/catalog-bridge.mjs   approved frames only → /api/upload + /api/publish
+        ▼                                  (gallery item `key-<brand>-<model>`, altHe + English alt)
+Israeli services sites/ops/sync-media.ps1 -Domain 3locksmiths.co.il   → site.config.json
+        ▼
+node scripts/attach-key-images.mjs --map <abs path to Media Studio/sites/threelocksmiths/cards.json> --dry-run
+node scripts/attach-key-images.mjs --map <…>   → `image:` + Hebrew `alt:` on each confirmed card
+        ▼
+npx prettier --write <the files it names>  →  npm run enrich  →  the gate  →  deploy (owner's word)
+```
+
+- **The attach script decides which pages may take a picture**, not the map: the B1 pages are
+  built in, any other page needs `--allow <id> --ref "§D.n"`, and קיה (98) is never touched.
+  `--replace-plate 99` is the only way an existing `image` changes, and only from a type plate.
+- **The card's alt is authored in the module**, so `check-typography` sees it; the catalog's
+  `altHe` and English `alt` are never rendered on a card.
+- **It refuses rather than guesses**: a stale map line, an ambiguous (model, years) pair, an
+  uncommitted module, a plate or reserved name as the slug, an alt that is not Hebrew, misses the
+  model, or carries a digit or an ASCII quote. Any refusal writes nothing.
+- It is a **freshness source** (scripts/, not `check-*`): editing it means a no-op
+  `npm run enrich` before `check-freshness` passes again.
+- `node scripts/check-placeholders.mjs` counts a card as attached only when its image resolves,
+  and reports attached cards whose alt is not Hebrew or repeats within a grid.
 
 ## Adding a new image slot
 

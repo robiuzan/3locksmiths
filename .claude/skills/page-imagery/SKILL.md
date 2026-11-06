@@ -6,19 +6,21 @@ description: Which image belongs in which slot on שלושה מנעולנים �
 # Page imagery
 
 Getting an image to _fit_ is mostly a CSS question, and the answers are measured, not guessable.
-Every image position on this site is `object-fit: cover`, so **composition must survive a crop**.
+Every photo position on this site but one is `object-fit: cover`, so **composition must survive a
+crop**. The exception is the key-grid card: `contain` on a light mat, so the whole frame shows.
 
 ## The slot inventory
 
-| Slot                                 | Intrinsic              | Governing CSS                                                                                            | What it does to your picture                                                                                                                                 |
-| ------------------------------------ | ---------------------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Page hero**                        | 587×426 · **4:3**      | `.header-banner-right > img` — `min-height:426px`, `cover`, `radius:15px` (main.css:3931)                | Collapses to 380 / 300 / **224px** tall on smaller screens (media.css:118, 288, 390). Severe vertical crop. **LCP element** — eager, `fetchpriority="high"`. |
-| **Homepage tile ×4**                 | 632×426 · **3:2**      | `.home-hero-right-galley .gallery-item img` — `max-height:213px`, `cover`, `radius:20px` (main.css:1768) | 2×2 flex grid; tiles 1 and 4 offset ±39px. Read as a **set**: vary the framing, hold the lighting constant. Not a carousel — no `owlCarousel` binds here.    |
-| **Contact avatar**                   | 96×96 · **1:1**        | `.form-wrap-bar img` (main.css:2746)                                                                     | Rendered **twice per page on 112 pages**. Fixed box → 1x/2x ladder only.                                                                                     |
-| **Service card thumb**               | fills a 298px box      | `.service-card-template .thumbnail img` — `cover` (main.css:5102)                                        | Bottom ~40% sits under a black gradient. **Keep the subject in the upper two-thirds.**                                                                       |
-| **Article figure**                   | 100% of a 785px column | `.photo-wrap img` (main.css:5457)                                                                        | The only genuinely full-width photo slot.                                                                                                                    |
-| **OG card**                          | **1200×630**           | —                                                                                                        | Nothing enforces it; every social platform expects it.                                                                                                       |
-| Advantage icon · form icon · marquee | 36px · 44px · logos    | main.css:3485, 2095, 3536                                                                                | **Icon slots, not photo slots.** Never send a photograph.                                                                                                    |
+| Slot                                 | Intrinsic              | Governing CSS                                                                                              | What it does to your picture                                                                                                                                     |
+| ------------------------------------ | ---------------------- | ---------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Page hero**                        | 587×426 · **4:3**      | `.header-banner-right > img` — `min-height:426px`, `cover`, `radius:15px` (main.css:3931)                  | Collapses to 380 / 300 / **224px** tall on smaller screens (media.css:118, 288, 390). Severe vertical crop. **LCP element** — eager, `fetchpriority="high"`.     |
+| **Homepage tile ×4**                 | 632×426 · **3:2**      | `.home-hero-right-galley .gallery-item img` — `max-height:213px`, `cover`, `radius:20px` (main.css:1768)   | 2×2 flex grid; tiles 1 and 4 offset ±39px. Read as a **set**: vary the framing, hold the lighting constant. Not a carousel — no `owlCarousel` binds here.        |
+| **Contact avatar**                   | 96×96 · **1:1**        | `.form-wrap-bar img` (main.css:2746)                                                                       | Rendered **twice per page on 112 pages**. Fixed box → 1x/2x ladder only.                                                                                         |
+| **Service card thumb**               | fills a 298px box      | `.service-card-template .thumbnail img` — `cover` (main.css:5102)                                          | Bottom ~40% sits under a black gradient. **Keep the subject in the upper two-thirds.**                                                                           |
+| **Article figure**                   | 100% of a 785px column | `.photo-wrap img` (main.css:5457)                                                                          | The only genuinely full-width photo slot.                                                                                                                        |
+| **OG card**                          | **1200×630**           | —                                                                                                          | Nothing enforces it; every social platform expects it.                                                                                                           |
+| **Key-grid card**                    | 1200×1200 · **1:1**    | `.enrich-keycard__media` — 1:1 box, `#f6f7f9` mat, 16px padding; `__img` is `contain` (app/enrich.css:231) | **No crop**: `fit=contain` on the URL and in CSS. 131–431 px wide by grid and viewport. Key and keychain fill the centre; bottom-right stays plain for the logo. |
+| Advantage icon · form icon · marquee | 36px · 44px · logos    | main.css:3485, 2095, 3536                                                                                  | **Icon slots, not photo slots.** Never send a photograph.                                                                                                        |
 
 Two consequences that are easy to get wrong:
 
@@ -68,11 +70,18 @@ without a `srcset`**: it looks right in review and does nothing.
 
 Hebrew first (`altHe`), because the page is `lang="he" dir="rtl"` and it is read aloud in Hebrew.
 `catalogImg` prefers `altHe`, falls back to `alt`. An empty string is a legitimate value for
-decoration — an empty alt is not a missing alt.
+decoration — an empty alt is not a missing alt. **Key-grid cards never use the catalog's alt**:
+`renderKeyModels` passes the card's own `alt`, else `${keyType} ל${model}` — the per-model alt is
+written into the module by `scripts/attach-key-images.mjs`.
 
-**`scripts/check-claims.mjs` tests raw HTML, which includes `alt`.** Alt text mentioning years of
-experience, response times, ratings or customer counts **fails the build**. That is correct: an
-unsourced claim is no more acceptable in an alt attribute than in a heading.
+**Most claim guards do NOT read `alt`.** `scripts/check-claims.mjs` tests _visible_ copy: its
+`visible()` strips every tag, attributes included, before the BLOCKING and arrival rules run. Only
+the raw-HTML rules see an alt — `scripts/claims.mjs` FORBIDDEN (years of experience, a warranty
+term, customer counts: `npm run enrich` fails) and check-claims' BLOCKING_RAW (a rating badge, a US
+phone number, review-widget markup). A response time, an arrival promise or a price in an alt
+passes every gate. So write alt text as if no guard will catch it — an unsourced claim is no more
+acceptable in an alt attribute than in a heading. An alt authored in a module (the key-grid cards'
+`alt`) is at least inside `check-typography`'s reach; a catalog `altHe` is not.
 
 Describe what is visible. Never "תמונה של". Never invent a detail the camera cannot see.
 
@@ -85,12 +94,19 @@ and a generated scene is not evidence of a particular job.
 - Never generate a certificate, licence, rating, badge or review. **This site has already shipped
   three fabricated Google 5.0 badges**, two of them hidden inside images where no text guard could
   see them.
-- Never invent branding, van livery or signage. The business has confirmed: nothing branded.
+- Never invent branding, van livery or signage. The business has confirmed: nothing branded. The
+  one branded object is the owner's own keychain in the per-model key photographs (business-facts
+  §D.15): no readable lettering and never digits on it until the owner rules on its mark.
 - The figures are **AI-generated brand characters, not real staff** (business-facts §G.1). Never
   name them, and never imply a headcount from a picture.
-- **Reject any image with legible text.** The supplied set already contains a dead domain
+- **Reject any image with generated text.** The supplied set already contains a dead domain
   (`3locksmith.co.il`), a gibberish phone number and a scrambled Hebrew logo — all baked into
-  rasters where no text guard can see them.
+  rasters where no text guard can see them. Since 2026-11-05 (§G.1 amendment, owner) exactly two
+  marks are allowed: the official שלושה מנעולנים logo **composited** as a watermark (pixel-exact,
+  bottom-right, never drawn by a model), and the car maker's **genuine** emblem on the car and,
+  where the real key carries it, on the key. A misdrawn emblem is a rejection. Every third-party
+  watermark, stamp, supplier or blank-maker mark is removed from references and rejected in a
+  render.
 
 ## Related
 

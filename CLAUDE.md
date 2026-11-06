@@ -226,7 +226,7 @@ central catalog  ──(ops/sync-media.ps1)──►  site.config.json  images{}
         │
         ▼
 lib/enrich/catalog-image.mjs   ← the ONE place a catalog key becomes an <img>
-        ├──► render.mjs        hero (car/home/both) + contact avatar
+        ├──► render.mjs        hero (car/home/both) + contact avatar + key-grid cards
         ├──► hero-gallery.mjs  the 4 homepage tiles (scraped HTML, so a pipeline pass)
         └──► enrich.mjs        LocalBusiness.image, Article.image, og:image
 ```
@@ -243,6 +243,14 @@ image mandatory.
 ⚠️ `ops/deploy-site.ps1` refuses to deploy when `images.hero` exists but `index.html` has no
 `/cdn-cgi/image/` URL — and the homepage does not use `renderHero`. Publish the hero and ship the
 homepage tiles **in the same change**, or the deploy is blocked. See `/image-pipeline-3locksmiths`.
+
+**A second approval path, for the key-grid cards** (`docs/business-facts.md` §D.15): the
+per-model key photographs are approved as a page-images toolkit **batch digest** — the prompts live
+under `Media Studio/prompts/threelocksmiths/`, not `prompts/3locksmiths/` — and reach the catalog
+through that site's catalog bridge and `ops/sync-media.ps1` like any gallery item. The cards are a
+catalog consumer through `scripts/attach-key-images.mjs` (human-run, offline, never in the enrich
+chain), which writes `image` + a Hebrew `alt` into the modules for confirmed pages only; then
+`npx prettier --write` those files, `npm run enrich`, the gate.
 
 ---
 

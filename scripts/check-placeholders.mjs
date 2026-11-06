@@ -20,7 +20,7 @@
 import { readFileSync, existsSync, readdirSync } from "node:fs";
 import { join, dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { imageRef, _internals } from "../lib/enrich/catalog-image.mjs";
+import { imageRef, TYPE_PLATES, _internals } from "../lib/enrich/catalog-image.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const strict = process.argv.includes("--strict");
@@ -113,11 +113,13 @@ const SLOTS = [
     fallback: "stock: drilling a garden fence (not locksmithing)",
   },
 
-  // --- key-type plates (content/enriched/99.mjs keyModels) ---
-  // Three plates serve all eight Ford cards, and will serve the other 31 brand pages unchanged:
-  // they are named for the KEY TYPE they show, never for a model. Cards whose copy declares the
+  // --- key-type plates (TYPE_PLATES in lib/enrich/catalog-image.mjs) ---
+  // Nine plates, named for the KEY TYPE they show, never for a model. Three serve all eight Ford
+  // cards (99.mjs) and six serve Kia's six cards, one each (98.mjs). Cards whose copy declares the
   // same key deliberately share a file — see the note above `keyModels` in 99.mjs. Product shots,
-  // square, fit=contain, falling back to a glyph rather than to a stock photo.
+  // square, fit=contain, falling back to a glyph rather than to a stock photo. The other brand
+  // pages get per-model photographs instead (docs/business-facts.md §D.15), which are gallery
+  // items and are counted in the card report below, not here.
   {
     name: "key-flip-3btn",
     label: "key type — flip, 3 buttons",
@@ -145,6 +147,20 @@ const SLOTS = [
     ratio: "1:1",
     pages: 1,
     fallback: "key glyph placeholder (Jimny, ASX, Space Star, early Picanto)",
+  },
+  {
+    name: "key-flip-4btn",
+    label: "key type — flip, 4 buttons",
+    ratio: "1:1",
+    pages: 1,
+    fallback: "key glyph placeholder (serves קיה: Ceed, Sportage from 2019)",
+  },
+  {
+    name: "key-smart-4btn",
+    label: "key type — smart, 4 buttons",
+    ratio: "1:1",
+    pages: 1,
+    fallback: "key glyph placeholder (serves קיה: Sorento, Carnival)",
   },
   {
     name: "key-remote-only",
@@ -258,15 +274,21 @@ if (awaiting.length) {
 /**
  * The key grids are the one gap counted in CARDS rather than in slots.
  *
- * A `keyModels` card with no `image` renders a glyph, and 30 of the 32 brand pages are in that
- * state deliberately until the owner supplies photographs (docs/business-facts.md §D.9). SLOTS
- * above cannot see any of it — those cards name no slot — so without this the queue would report
- * every slot published and say nothing about hundreds of empty tiles.
+ * A card counts as attached only when its `image` RESOLVES — imageRef() finds a published catalog
+ * item under that name. A name that is not published renders the key glyph exactly like no name
+ * at all (render.mjs falls back on a null ref), so counting the field instead of the lookup would
+ * report a card done while the page still shows the glyph. 30 of the 32 brand pages show the
+ * glyph deliberately until the owner's per-model photographs are rendered, published and attached
+ * by scripts/attach-key-images.mjs (docs/business-facts.md §D.9, §D.15). SLOTS above cannot see
+ * any of it — per-model images are gallery items no slot names — so without this the queue would
+ * report every slot published and say nothing about hundreds of empty tiles.
  *
- * Reported, never failing, even under --strict: an unattached card is a correct fallback, and the
- * plate it should point at is an owner decision (a wrong plate is what he complained about).
+ * Reported, never failing, even under --strict: an unattached card is a correct fallback, and
+ * which picture a card may show is an owner decision (a wrong plate is what he complained about).
  */
 const ENRICHED = resolve(ROOT, "content", "enriched");
+const HEBREW_LETTER = /[א-ת]/g;
+const LATIN_LETTER = /[A-Za-z]/g;
 const grids = [];
 for (const f of readdirSync(ENRICHED)) {
   if (!f.endsWith(".mjs")) continue;
@@ -278,18 +300,20 @@ for (const f of readdirSync(ENRICHED)) {
   }
   const items = page?.keyModels?.items;
   if (!items?.length) continue;
-  const unattached = items.filter((m) => !m.image).length;
+  const attached = items.filter((m) => m.image && imageRef(m.image));
   grids.push({
+    id: f.replace(/\.mjs$/, ""),
     brand: page.brand ?? f.replace(/\.mjs$/, ""),
     total: items.length,
-    unattached,
+    unattached: items.length - attached.length,
+    attached,
   });
 }
 
 if (grids.length) {
   const cards = grids.reduce((n, g) => n + g.total, 0);
   const open = grids.reduce((n, g) => n + g.unattached, 0);
-  console.log(`key-grid cards: ${cards - open}/${cards} pointing at a published plate\n`);
+  console.log(`key-grid cards: ${cards - open}/${cards} showing a published image\n`);
   for (const g of grids.sort(
     (a, b) => b.unattached - a.unattached || a.brand.localeCompare(b.brand),
   )) {
@@ -301,8 +325,53 @@ if (grids.length) {
   }
   if (open) {
     console.log(
-      `\n${open} card(s) await a plate. Pick from the key-type plates above — the card's own ` +
-        `keyType line says which, and the owner confirms it (docs/business-facts.md §D.9).`,
+      `\n${open} card(s) show the key glyph. A card gets its picture only through ` +
+        `scripts/attach-key-images.mjs, once its per-model image is published and the owner has ` +
+        `confirmed that page's cards (docs/business-facts.md §D.9, §D.15).`,
+    );
+  }
+
+  /**
+   * Report only: the alt each ATTACHED card actually renders — its own `alt`, else the
+   * renderer's `${keyType} ל${model}` (render.mjs) — must read as Hebrew and be unique within
+   * its grid, or a screen reader hears one description under several model headings. And two
+   * cards sharing one image is legitimate only for a key-type plate (TYPE_PLATES).
+   */
+  const altIssues = [];
+  for (const g of grids) {
+    const seen = new Map();
+    const byImage = new Map();
+    for (const m of g.attached) {
+      const alt = m.alt ?? `${m.keyType} ל${m.model}`;
+      const he = (alt.match(HEBREW_LETTER) ?? []).length;
+      const latin = (alt.match(LATIN_LETTER) ?? []).length;
+      if (!he || latin > he)
+        altIssues.push(`${g.id} ${m.model}: alt is not Hebrew — "${alt}"`);
+      seen.set(alt, [...(seen.get(alt) ?? []), m.model]);
+      byImage.set(m.image, [...(byImage.get(m.image) ?? []), m.model]);
+    }
+    for (const [alt, models] of seen) {
+      if (models.length > 1) {
+        altIssues.push(`${g.id} ${models.join(", ")}: the same alt "${alt}"`);
+      }
+    }
+    for (const [image, models] of byImage) {
+      if (models.length > 1 && !TYPE_PLATES.has(image)) {
+        altIssues.push(
+          `${g.id} ${models.join(", ")}: share "${image}", which is not a type plate`,
+        );
+      }
+    }
+  }
+  const shown = grids.reduce((n, g) => n + g.attached.length, 0);
+  if (altIssues.length) {
+    console.log(
+      `\nkey-card alt text: ${altIssues.length} issue(s) among ${shown} attached card(s)`,
+    );
+    for (const line of altIssues) console.log(`  ! ${line}`);
+  } else {
+    console.log(
+      `\nkey-card alt text: all ${shown} attached card(s) read as Hebrew and are unique in their grid`,
     );
   }
   console.log("");
