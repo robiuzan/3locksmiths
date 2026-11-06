@@ -76,7 +76,7 @@
     "gallery": {
       "mode": "fetched",
       "catalogUrl": "https://imgquarry.com/catalog/3locksmiths.co.il/gallery.json",
-      "categories": ["שכפול מפתחות", "team", "hero", "homepage"],
+      "categories": ["שכפול מפתחות", "team", "hero", "homepage", "key-models"],
       "items": [
         {
           "key": "3locksmiths/gallery/157336036-m.jpg",
@@ -324,6 +324,32 @@
           "category": null
         },
         {
+          "key": "3locksmiths/gallery/key-mazda-5.webp",
+          "sha256": "69396de375bcb71a6af6fcb2528343428d220d3d3f33f0dc3ad655d323c760a4",
+          "alt": "A hand holds a Mazda smart key with buttons and a keychain in front of a wet car wheel, beside a red and white painted kerb.",
+          "altHe": "יד אוחזת מפתח חכם של מאזדה עם לחצנים ומחזיק מפתחות, לפני גלגל הרכב הרטוב ושפת מדרכה צבועה באדום ולבן.",
+          "width": 1200,
+          "height": 1200,
+          "bytes": 98846,
+          "kind": "raster",
+          "focal": null,
+          "legacySrc": null,
+          "category": "key-models"
+        },
+        {
+          "key": "3locksmiths/gallery/key-mazda-cx-60.webp",
+          "sha256": "ce4ca73d1785a7d38cb380f1a615d1ebaa0a19f61a60abb35659ffbf980db8bd",
+          "alt": "Hand holding a Mazda smart key with three buttons and a colorful keychain in front of the rain-beaded car front and grille in a garage bay.",
+          "altHe": "יד אוחזת מפתח חכם של מאזדה עם שלושה לחצנים ומחזיק מפתחות צבעוני, מול גריל חזית הרכב רטובה בגשם בתוך מוסך.",
+          "width": 1200,
+          "height": 1200,
+          "bytes": 76026,
+          "kind": "raster",
+          "focal": null,
+          "legacySrc": null,
+          "category": "key-models"
+        },
+        {
           "key": "3locksmiths/gallery/key-remote-only.jpg",
           "sha256": "aeceb80b424e84b32180a7098cd594aa284c0f2374527c562f6ac608d92c462d",
           "alt": "A small separate car remote fob with two buttons on a steel keyring, no blade, on a pale grey surface",
@@ -335,6 +361,45 @@
           "focal": null,
           "legacySrc": null,
           "category": null
+        },
+        {
+          "key": "3locksmiths/gallery/key-skoda-fabia.webp",
+          "sha256": "213adf0aaf92d16b14942646f4f95286196b9cd327920240f78ee0c2cdcf61cb",
+          "alt": "Hand holding a black flip key with three buttons and a colorful keychain, a blurred grey-blue Skoda parked behind in a bright garage bay.",
+          "altHe": "יד אוחזת מפתח מתקפל שחור עם שלושה לחצנים ומחזיק מפתחות צבעוני, ומאחוריה סקודה אפורה-כחולה מטושטשת בתוך מוסך מואר.",
+          "width": 1200,
+          "height": 1200,
+          "bytes": 51844,
+          "kind": "raster",
+          "focal": null,
+          "legacySrc": null,
+          "category": "key-models"
+        },
+        {
+          "key": "3locksmiths/gallery/key-skoda-kodiaq.webp",
+          "sha256": "d4ecd96b817bcf232b258734a9d6d5c0c2fad335d2f601416647b12ded232e8d",
+          "alt": "Hand holding a smart key with three buttons and a keychain in front of a wet blue Skoda, with its grille and headlamp, in a garage bay.",
+          "altHe": "יד מחזיקה מפתח חכם עם שלושה לחצנים ומחזיק מפתחות, ומאחוריו חזית רכב סקודה כחולה עם גריל ופנס רטובים מגשם במוסך.",
+          "width": 1200,
+          "height": 1200,
+          "bytes": 101446,
+          "kind": "raster",
+          "focal": null,
+          "legacySrc": null,
+          "category": "key-models"
+        },
+        {
+          "key": "3locksmiths/gallery/key-skoda-rapid.webp",
+          "sha256": "389e2504552c1d25bf77a017ac160f73548764a607022c816b0c0774f8f6d18d",
+          "alt": "Hand holding a black Skoda flip key with three buttons and a keychain in front of a white car wheel and a wet painted kerb.",
+          "altHe": "יד מחזיקה מפתח מתקפל של סקודה עם שלושה לחצנים ומחזיק מפתחות, מול גלגל הרכב הלבן ושפת מדרכה רטובה.",
+          "width": 1200,
+          "height": 1200,
+          "bytes": 110382,
+          "kind": "raster",
+          "focal": null,
+          "legacySrc": null,
+          "category": "key-models"
         },
         {
           "key": "3locksmiths/gallery/key-smart-3btn.jpg",

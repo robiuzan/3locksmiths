@@ -887,9 +887,12 @@ the shape plainly. It was left out of this change deliberately: correcting a `sp
 claim edit, and this change was scoped to a new section.
 
 **What the owner still has to sign off**, unchanged from §D.5 and §D.8: the model → key-type
-mapping itself, the year spans, and — before any photograph is attached to a card — which of the
-seven published key-type plates each card should point at. A wrong plate is what he complained
-about, and a glyph makes no claim at all.
+mapping itself and the year spans — done for the B1 pages on 2026-11-04 (§D.5), still open for
+every other brand. **Before any photograph is attached to a card**, that page's cards must be
+confirmed. Since 2026-11-05 a card gets its own per-model photograph rather than one of the nine
+published key-type plates (§D.15); on a page outside B1 that waits for the owner's yes on the
+brand's claims sheet. A wrong picture is what he complained about, and a glyph makes no claim at
+all.
 
 ---
 
@@ -981,6 +984,83 @@ options"**. These are the work times at the car, sitewide — never an arrival t
 
 Source of the values: the B1 claims sheet rows 23, 27–33, 106, 307 and 308. A page may still give
 a brand- or model-specific time inside these ranges; a longer general range is a contradiction.
+
+### D.15 Per-model key photographs — pipeline approved 2026-11-05
+
+The key grids (§D.5, §D.9) get one picture per card, made from the owner's own photographs. The
+owner decided the following in chat on 2026-11-05 (relayed by the user); nothing is attached yet.
+
+| Decision                                     | What it means for a card                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| The key photos are other businesses' images  | Found 2026-11-06: the photos in the owner's Drive folder are product images from sellers' websites (seller badges, a competitor's watermark, many US-market keys), not his own photographs. The user decided that day: use them only as generation references, never published; a photo with another business's mark on or beside the key, a US-market key (a red panic button) or a photo too small to copy is dropped, never painted out; the owner confirms every remaining photo, card by card, as the key he cuts for that Israeli model (`Media Studio/sites/threelocksmiths/owner-sheet.mjs`), and nothing is generated for a card he has not confirmed |
+| One picture per model                        | Each card gets its own catalog image, `key-<brand>-<model>`. The nine type plates stay only on קיה (98, unchanged) and on פורד (99) until its own switch                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| Two-type cards show both keys                | Where the folder holds two photographs for the model, the hand holds both keys. With one photograph it holds that key, and the alt names that key only                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| The page alt is Hebrew, authored here        | `scripts/attach-key-images.mjs` writes `image` and `alt` into the module: the key type shown + ל + the card's model (ל- before a Latin-initial model). English appears only in the file name and in the catalog's own `alt`, which the card never renders                                                                                                                                                                                                                                                                                                                                                                                                      |
+| B1 pages are confirmed                       | 121 פיג׳ו, 118 טויוטה, 122 יונדאי, 119 מאזדה, 100 סקודה, 109 סוזוקי, 117 רנו (§D.5, 2026-11-04) may take a picture as soon as it is published. The attach script holds this list itself                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| Every other brand needs its own claims sheet | `docs/claims-sheets/<date>-<brand>.md`: each card's text, the key the owner's photograph shows, any proposed correction. Confirmed in chat before any card on that page is attached, then recorded here; the attach script refuses the page without `--allow <id> --ref "§D.n"`                                                                                                                                                                                                                                                                                                                                                                                |
+| Corrections ship with the image              | A keyType, years or buttons correction the photograph reveals is a claim edit, and ships in the same commit as the picture                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| Marks in the frame                           | Only what §G.1 (amended 2026-11-05) allows: the composited official logo and the car maker's genuine emblem. Every third-party watermark or stamp is removed from the references and rejected by QA                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+
+**What these images are, and are not.** They are AI renditions conditioned on the owner's
+photographs, made with Google's image model (which embeds SynthID). They are **not job photos**
+and not a photograph of any customer's key: never caption one as a real job, a real customer or a
+real result (§G). Disclosure is repo-only, as in §G.1: the prompt files under
+`Media Studio/prompts/threelocksmiths/`, approved as a toolkit batch digest, are the
+synthetic-image record. These images never go to the Business Profile.
+
+**The keychain** on every key is the one in the owner's keychain folder (seen 2026-11-06): a
+brushed-steel tag cut in the shape of the company's three figures, in navy, orange and blue enamel,
+with no lettering and no digits. Its reference images are themselves AI-generated (the owner's files).
+It is the company's own mark, so it falls within the rule of 2026-11-05 that the only logo in the
+pictures is שלושה מנעולנים. The reference used is the keychain alone on a plain background.
+🔶 The owner may still object to the keychain appearing in every picture; nothing else about it is open.
+
+**The English model names** in the slugs and the catalog alt are a translation made for the
+pipeline, not the owner's wording. The Hebrew card text remains the claim.
+
+**This repo is public.** The table below never carries a Google Drive id, URL or Drive file name:
+the reference is named by its local file name and sha256 only.
+
+**Sheet b1 — the owner's answers (2026-11-06, relayed by the user in chat).** The sheet
+(`Media Studio/sites/threelocksmiths/sheets/confirm-b1.html`) covered the 56 cards of the seven B1
+pages. **Confirmed as the key for its card (12):** סקודה פאביה, ראפיד, סקאלה, קודיאק · סוזוקי S-Cross ·
+רנו קדג׳אר · טויוטה RAV4 · מאזדה 2, CX-60 · פיג׳ו 208, 5008 · יונדאי i30. **Skipped (35):** no usable
+photo; those cards keep the glyph. **Photo right, card text wrong (9):** the photo showed another key
+type than the card named; the owner said the photo is the Israeli key and left the wording to us
+("שנה את הטקסט לפי מה שאתה חושב שנכון"). Each card now names its old key type(s) plus the
+photographed one. The added key type is the owner's; the qualifiers (לפי הגימור, בגימורי Keyless,
+בדגמי i-Cockpit, בדורות הוותיקים, יש גם גרסאות, למארז מתקפל) are our wording 🔶. These corrections
+went live on 2026-11-06 in the deploy that shipped the first four pictures (the user's "put the 4 on the site then deploy"); the five cards without a picture yet show the corrected text with the glyph. Not committed at that deploy.
+
+| Page | Model          | keyType before                         | keyType after                                             |
+| ---- | -------------- | -------------------------------------- | --------------------------------------------------------- |
+| 100  | סקודה סופרב    | מפתח חכם KESSY                         | מפתח מתקפל או מפתח חכם KESSY                              |
+| 109  | סוזוקי אלטו    | מפתח עם שבב                            | מפתח עם שבב, או מפתח מתקפל                                |
+| 109  | סוזוקי סוויפט  | מפתח עם ראש שלט ולהב קבוע              | מפתח עם ראש שלט ולהב קבוע, ובגימורי Keyless מפתח חכם      |
+| 109  | סוזוקי באלנו   | מפתח עם ראש שלט ולהב קבוע              | מפתח עם ראש שלט ולהב קבוע, ובגימורי Keyless מפתח חכם      |
+| 117  | רנו קליאו      | מפתח מתקפל, ובגימורים גבוהים כרטיס חכם | מפתח עם ראש שלט או מפתח מתקפל, ובגימורים גבוהים כרטיס חכם |
+| 117  | רנו טראפיק     | מפתח עם שבב, בלי שלט מובנה             | מפתח עם שבב או כרטיס חכם                                  |
+| 119  | מאזדה 5        | מפתח עם שבב או מפתח מתקפל              | מפתח עם שבב, מפתח מתקפל או מפתח חכם                       |
+| 121  | פיג׳ו 308      | מפתח מתקפל עם שלט                      | מפתח מתקפל עם שלט, או מפתח חכם Keyless                    |
+| 122  | יונדאי סנטה פה | מפתח מתקפל או מפתח חכם                 | מפתח מתקפל, מפתח חכם או שלט נפרד                          |
+
+The notes under סופרב, אלטו, סוויפט, באלנו, קליאו, טראפיק, 308 and סנטה פה were adjusted to match
+(the סופרב note said "המפתח נשאר בכיס", true only of the smart key).
+
+**Per-card record** — one row per attached card, filled in the commit that attaches it.
+
+| Page id | Model        | Years      | Slug             | Catalog key                               | sha256           | Local reference file + sha256 | Key shown                                    | Confirmation source                | Owner yes                                  |
+| ------- | ------------ | ---------- | ---------------- | ----------------------------------------- | ---------------- | ----------------------------- | -------------------------------------------- | ---------------------------------- | ------------------------------------------ |
+| 100     | סקודה פאביה  | 2007 ואילך | key-skoda-fabia  | 3locksmiths/gallery/key-skoda-fabia.webp  | 213adf0aaf92d16b | skoda-fabia.jpg bf6ffc2c05e4  | flip key                                     | sheet b1 #1                        | 2026-11-06, batch b658358f, board 197f7cb7 |
+| 100     | סקודה ראפיד  | 2013–2019  | key-skoda-rapid  | 3locksmiths/gallery/key-skoda-rapid.webp  | 389e2504552c1d25 | skoda-rapid.jpg 5c1af2e9354c  | flip key                                     | sheet b1 #2                        | 2026-11-06, batch b658358f, board 197f7cb7 |
+| 100     | סקודה קודיאק | 2017 ואילך | key-skoda-kodiaq | 3locksmiths/gallery/key-skoda-kodiaq.webp | d4ecd96b817bcf23 | skoda-kodiaq.jpg af9c63f67f28 | smart key                                    | sheet b1 #4                        | 2026-11-06, batch b658358f, board 197f7cb7 |
+| 119     | מאזדה 5      | 2005–2015  | key-mazda-5      | 3locksmiths/gallery/key-mazda-5.webp      | 69396de375bcb71a | mazda-5.jpg cf04dd9e35f9      | smart key ("HOLD" label as on the reference) | sheet b1 #19 (card text corrected) | 2026-11-06, batch b658358f, board 197f7cb7 |
+
+**Held back: מאזדה CX-60 (119).** Approved on the board and published to the catalog on 2026-11-06,
+then found faulty in calibration: the keychain's ring hangs from the bottom of the key, where it has
+no hole. Eight further renders failed the same way or worse. The card keeps its glyph (`attach:
+false` in the Media Studio card map); the faulty file stays in the catalog, unused. A real phone
+photo of the key from the owner is the way forward.
 
 ## E. Coverage
 
@@ -1116,13 +1196,13 @@ Fix direction: put the real token in the **roster manifest**, sync, and read it 
 
 ## G. Imagery
 
-| Fact                | Value                                                                 | Status                                                    |
-| ------------------- | --------------------------------------------------------------------- | --------------------------------------------------------- |
-| Content images      | vendored from the WordPress source under `public/wp-content/uploads/` | ✅ provenance: the original site                          |
-| OG card             | `3locksmiths/og.jpg` on `imgquarry.com`, sha256 pinned                | ✅ manifest `images.og`                                   |
-| Photos of real jobs | —                                                                     | 🔶 no evidence any image shows this business's own work   |
-| People in images    | **AI-generated brand characters**, not real staff                     | ✅ owner, 2026-08-30 — see §G.1                           |
-| Generated imagery   | **8 published** — 3 heroes, avatar, 4 homepage tiles                  | ✅ live 2026-08-31; `node scripts/check-placeholders.mjs` |
+| Fact                | Value                                                                                                                                                         | Status                                                                 |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| Content images      | vendored from the WordPress source under `public/wp-content/uploads/`                                                                                         | ✅ provenance: the original site                                       |
+| OG card             | `3locksmiths/og.jpg` on `imgquarry.com`, sha256 pinned                                                                                                        | ✅ manifest `images.og`                                                |
+| Photos of real jobs | —                                                                                                                                                             | 🔶 no evidence any image shows this business's own work                |
+| People in images    | **AI-generated brand characters**, not real staff                                                                                                             | ✅ owner, 2026-08-30 — see §G.1                                        |
+| Generated imagery   | **20 slots published** — 3 heroes, avatar, 4 homepage tiles, 3 homepage CTA photos, 9 key-type plates; per-model key photographs as they are attached (§D.15) | ✅ live 2026-08-31 – 2026-09-01; `node scripts/check-placeholders.mjs` |
 
 The uploads are whatever the original WordPress site shipped. **Nobody has confirmed they are photos
 of this business's own work** rather than stock. Do not caption an image as a real job, a real
@@ -1163,20 +1243,38 @@ wrong phone number or a dead domain baked into a raster is the same class of def
 number in §C.4 and the rating badges in §B.3 — invisible to every text-level guard, and directly
 costly.
 
+> **Amended 2026-11-05 — owner decision in chat, relayed by the user.** Generated text still never
+> ships: any letter, digit or glyph an image model drew is a defect, whatever it says. Exactly two
+> marks are now allowed in an image:
+>
+> 1. the official שלושה מנעולנים logo, **composited** onto the finished file as a watermark —
+>    pixel-exact from the owner's own logo file, bottom-right, never drawn by a model;
+> 2. the car maker's **genuine emblem** on the car and, where the real key carries it, on the key
+>    (the per-model key photographs, §D.15). A misdrawn, mirrored or misspelt emblem is a
+>    rejection, not a pass.
+>
+> Every third-party watermark, stamp, supplier mark or blank-maker mark (Silca, JMA, KeyDIY,
+> Xhorse, Autel and the like) is removed from the reference photographs before they are used, and
+> rejected by QA wherever it reappears in a render. Nothing else changes: no invented branding, van
+> livery, signage, badge or rating (§B.3).
+
 **Disclosure is repo-only**, by the owner's decision: the prompt files in
 `Media Studio/prompts/3locksmiths/` record which images are synthetic and the exact wording behind
-each one. No visible label on the site. Google embeds an invisible **SynthID** watermark in its own
-output; EXIF stripping does not remove it, and should not.
+each one; for the per-model key photographs (§D.15) the record is the toolkit's prompt files under
+`Media Studio/prompts/threelocksmiths/`. No visible label on the site. Google embeds an invisible
+**SynthID** watermark in its own output; EXIF stripping does not remove it, and should not.
 
 **Published 2026-08-31.** All 8 slots are live: `3locksmiths/hero.jpg` plus `gallery/hero-car`,
 `hero-home`, `avatar` and `home-tile-1..4`. Every badge was audited at full resolution before
 upload — four separate generations were rejected for growing a Hebrew wordmark the prompt forbade.
 
-Still inherited stock, and NOT yet replaced: the three CTA-band photographs on the homepage
-(`Rectangle-4133738-1-1`, `-2`, `Rectangle-4133739-1` — welding, a video intercom, a fence
-installer). They are wrong-trade stock like everything else was, but no slot was specified for them.
+The three CTA-band photographs on the homepage (`Rectangle-4133738-1-1`, `-2`,
+`Rectangle-4133739-1` — welding, a video intercom, a fence installer) were wrong-trade stock too.
+They were replaced on 2026-08-31 by the catalog images `home-cta-1..3`. The nine key-type plates
+followed on 2026-08-31 and 2026-09-01 (§D.5).
 
-Run `node scripts/check-placeholders.mjs` for the current state of all 8 slots.
+Run `node scripts/check-placeholders.mjs` for the current state of all 20 slots and of every
+key-grid card.
 
 ---
 
